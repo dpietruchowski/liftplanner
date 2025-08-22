@@ -43,5 +43,6 @@ architecture
 files.json
 output_files.json
 prompt
+diff
 
 .vscode/

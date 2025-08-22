@@ -126,6 +126,8 @@ Rectangle {
                                     anchors.fill: parent
                                     onClicked: {
                                         console.log("Starting workout:", modelData.name)
+                                        ActiveWorkoutService.startWorkout(modelData)
+                                        stackView.push(activeWorkoutScreen)
                                     }
                                 }
                             }

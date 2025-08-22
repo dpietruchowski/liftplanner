@@ -1,8 +1,9 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include "storage/appdbstorage.h"
+#include "services/activeworkoutservice.h"
 #include "services/workoutservice.h"
+#include "storage/appdbstorage.h"
 
 int main(int argc, char *argv[])
 {
@@ -10,11 +11,21 @@ int main(int argc, char *argv[])
 
     AppDbStorage storage("liftplanner.db");
     WorkoutService workoutService(&storage);
+    ActiveWorkoutService activeWorkoutService;
 
     QQmlApplicationEngine engine;
-    
-    qmlRegisterSingletonInstance<WorkoutService>("LiftPlanner", 1, 0, "WorkoutService", &workoutService);
-    
+
+    qmlRegisterSingletonInstance<WorkoutService>("LiftPlanner",
+                                                 1,
+                                                 0,
+                                                 "WorkoutService",
+                                                 &workoutService);
+    qmlRegisterSingletonInstance<ActiveWorkoutService>("LiftPlanner",
+                                                       1,
+                                                       0,
+                                                       "ActiveWorkoutService",
+                                                       &activeWorkoutService);
+
     const QUrl url(QStringLiteral("qrc:/LiftPlanner/ui/Main.qml"));
 
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreationFailed, &app,

@@ -10,12 +10,12 @@ Rectangle {
 
     Row {
         anchors.centerIn: parent
-        spacing: 40
+        spacing: 25
 
         Repeater {
-            model: ["Home", "Workout", "History"]
+            model: ["Workout", "Home", "Workouts", "History"]
             delegate: Rectangle {
-                width: 80
+                width: 50
                 height: 50
                 color: "transparent"
                 Text {

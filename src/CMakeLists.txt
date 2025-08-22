@@ -20,12 +20,7 @@ qt_add_qml_module(liftplanner
     URI LiftPlanner
     VERSION 1.0
     QML_FILES 
-        ui/BottomNavigation.qml
-        ui/Main.qml
-        ui/MainView.qml
-        ui/ScreenHistory.qml
-        ui/ScreenHome.qml
-        ui/ScreenWorkout.qml
+        ${PROJECT_QML_SOURCES}
 )
 
 target_link_libraries(liftplanner
