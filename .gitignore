@@ -38,3 +38,10 @@ Makefile
 
 # QML cache
 .qmlcache/
+
+architecture
+files.json
+output_files.json
+prompt
+
+.vscode/
