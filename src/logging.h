@@ -1,0 +1,7 @@
+#pragma once
+
+#include <QLoggingCategory>
+
+Q_DECLARE_LOGGING_CATEGORY(WorkoutDbRepositoryLogic)
+Q_DECLARE_LOGGING_CATEGORY(ExerciseDbRepositoryLogic)
+Q_DECLARE_LOGGING_CATEGORY(SetDbRepositoryLogic)

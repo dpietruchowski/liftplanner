@@ -1,0 +1,31 @@
+#pragma once
+#include <QObject>
+#include <QVariantMap>
+#include <QJsonObject>
+#include <QList>
+#include "exercisemodel.h"
+#include "../utils/serializationutils.h"
+
+class WorkoutModel : public QObject
+{
+    Q_OBJECT
+
+    DECLARE_MODEL_PROPERTY(int, id, setId, id)
+    DECLARE_MODEL_PROPERTY(QString, name, setName, name)
+    DECLARE_MODEL_PROPERTY(QList<QObject*>, exercises, setExercises, exercises)
+
+public:
+    explicit WorkoutModel(QObject *parent = nullptr);
+
+    void addExercise(ExerciseModel *exercise);
+    void removeExercise(ExerciseModel *exercise);
+
+    QVariantMap toVariantMap(bool dbModel = false) const;
+    static WorkoutModel* fromVariantMap(const QVariantMap &variantMap, QObject *parent = nullptr);
+
+    QJsonObject toJson() const;
+    static WorkoutModel* fromJson(const QJsonObject &jsonObj, QObject *parent = nullptr);
+
+private:
+    void onIdUpdated();
+};

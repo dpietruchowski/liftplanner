@@ -1,0 +1,34 @@
+#pragma once
+#include <QObject>
+#include <QList>
+#include "../models/workoutmodel.h"
+#include "../storage/appdbstorage.h"
+
+class WorkoutService : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QList<QObject*> workouts READ workouts NOTIFY workoutsChanged)
+
+public:
+    explicit WorkoutService(AppDbStorage *dbStorage, QObject *parent = nullptr);
+    ~WorkoutService();
+
+    QList<QObject*> workouts() const;
+
+    Q_INVOKABLE void loadAllWorkouts();
+
+    Q_INVOKABLE void importWorkoutsFromJson(const QString &jsonData);
+    Q_INVOKABLE void generateGptPrompt();
+    Q_INVOKABLE void importWorkoutsFromClipboard();
+
+signals:
+    void workoutsChanged();
+    void errorOccurred(const QString &errorMessage);
+
+private:
+    void loadExercisesForWorkout(WorkoutModel *workout);
+    void loadSetsForExercise(ExerciseModel *exercise);
+
+    AppDbStorage *m_dbStorage;
+    QList<QObject*> m_workouts;
+};

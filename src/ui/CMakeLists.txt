@@ -1,0 +1,5 @@
+file(GLOB QML_FILES_RELATIVE RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/src/ui" "*.qml")
+set(PROJECT_QML_SOURCES "")
+foreach(qml_file ${QML_FILES_RELATIVE})
+    list(APPEND PROJECT_QML_SOURCES "src/ui/${qml_file}")
+endforeach()
