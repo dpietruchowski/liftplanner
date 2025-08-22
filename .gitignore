@@ -1,0 +1,40 @@
+# Compiled objects
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.exe
+
+# Qt generated files
+moc_*
+qrc_*
+ui_*
+*.moc
+*.qmlc
+*.jsc
+
+# Build directories
+build/
+Build/
+cmake-build-*/
+Debug/
+Release/
+
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.ninja
+
+# IDE files
+*.pro.user
+*.sln
+*.vcxproj*
+*.user
+
+# QML cache
+.qmlcache/
