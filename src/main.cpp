@@ -15,6 +15,8 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
+    qmlRegisterSingletonType(QUrl("qrc:/LiftPlanner/ui/Theme.qml"), "LiftPlanner", 1, 0, "Theme");
+
     qmlRegisterSingletonInstance<WorkoutService>("LiftPlanner",
                                                  1,
                                                  0,

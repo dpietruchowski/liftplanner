@@ -15,8 +15,7 @@ qt_add_executable(liftplanner
     logging.cpp
     ${PROJECT_SOURCES}
 )
-set_source_files_properties(ui/Theme.qml
-    PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
+
 qt_add_qml_module(liftplanner
     URI LiftPlanner
     VERSION 1.0
