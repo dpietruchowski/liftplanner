@@ -2,7 +2,7 @@ import glob
 import json
 import os
 
-pattern = "*src/ui/*.qml"
+pattern = "*src/models/work*"
 output_file = "output_files.json"
 
 files_data = []

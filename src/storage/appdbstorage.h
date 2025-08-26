@@ -16,6 +16,8 @@ public:
     ExerciseDbRepository *exerciseRepository();
     SetDbRepository *setRepository();
 
+    int saveWorkout(WorkoutModel *workout);
+
 private:
     void initializeDatabase();
 

@@ -52,21 +52,7 @@ void WorkoutService::importWorkoutsFromJson(const QString &jsonData)
             for (const QJsonValue &workoutValue : workoutsArray) {
                 WorkoutModel *workout = WorkoutModel::fromJson(workoutValue.toObject());
                 if (workout) {
-                    int workoutId = m_dbStorage->workoutRepository()->save(workout);
-                    workout->setId(workoutId);
-                    for (QObject *exerciseObj : workout->exercises()) {
-                        ExerciseModel *exercise = qobject_cast<ExerciseModel *>(exerciseObj);
-                        if (exercise) {
-                            int exerciseId = m_dbStorage->exerciseRepository()->save(exercise);
-                            exercise->setId(exerciseId);
-                            for (QObject *setObj : exercise->sets()) {
-                                SetModel *set = qobject_cast<SetModel *>(setObj);
-                                if (set) {
-                                    m_dbStorage->setRepository()->save(set);
-                                }
-                            }
-                        }
-                    }
+                    m_dbStorage->saveWorkout(workout);
                     delete workout;
                 }
             }

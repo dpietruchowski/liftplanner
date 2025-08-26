@@ -30,3 +30,32 @@ SetDbRepository *AppDbStorage::setRepository()
 {
     return m_setRepo;
 }
+
+int AppDbStorage::saveWorkout(WorkoutModel *workout)
+{
+    if (!workout)
+        return -1;
+
+    workout->setCreatedTime(QDateTime::currentDateTime());
+    int workoutId = m_workoutRepo->save(workout);
+    workout->setId(workoutId);
+
+    for (QObject *exerciseObj : workout->exercises()) {
+        ExerciseModel *exercise = qobject_cast<ExerciseModel *>(exerciseObj);
+        if (exercise) {
+            exercise->setWorkoutId(workoutId);
+            int exerciseId = m_exerciseRepo->save(exercise);
+            exercise->setId(exerciseId);
+
+            for (QObject *setObj : exercise->sets()) {
+                SetModel *set = qobject_cast<SetModel *>(setObj);
+                if (set) {
+                    set->setExerciseId(exerciseId);
+                    m_setRepo->save(set);
+                }
+            }
+        }
+    }
+
+    return workoutId;
+}

@@ -1,132 +1,149 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import LiftPlanner
 
 Rectangle {
     id: root
-    color: "#f0f0f0"
+    color: Theme.background
 
-    Column {
+    ColumnLayout {
         anchors.fill: parent
-        spacing: 10
-        padding: 15
+        anchors.margins: Theme.padding
+        spacing: Theme.spacing
 
         Text {
             text: ActiveWorkoutService.currentWorkout ? ActiveWorkoutService.currentWorkout.name : "Workout"
-            font.pixelSize: 24
+            color: Theme.textPrimary
+            font.pixelSize: Theme.fontLarge
             font.bold: true
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
         }
 
         Rectangle {
-            width: parent.width - 30
-            height: 60
-            color: "#3498db"
-            radius: 8
+            Layout.fillWidth: true
+            height: 70
+            color: Theme.primary
+            radius: Theme.borderRadius
             visible: ActiveWorkoutService.currentExercise
+            border.color: Theme.primaryVariant
+            border.width: 1
 
             Text {
-                text: ActiveWorkoutService.currentExercise ?
-                      ActiveWorkoutService.currentExercise.name : "No exercise"
-                color: "white"
-                font.pixelSize: 18
+                text: ActiveWorkoutService.currentExercise ? ActiveWorkoutService.currentExercise.name : "No exercise"
+                color: Theme.buttonText
+                font.pixelSize: Theme.fontMedium
+                font.bold: true
                 anchors.centerIn: parent
             }
         }
 
-        // Każda seria w osobnym rzędzie
-        Column {
-            width: parent.width - 30
-            spacing: 5
+        ScrollView {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
             visible: ActiveWorkoutService.currentExercise
 
-            Repeater {
-                model: ActiveWorkoutService.currentExercise ? ActiveWorkoutService.currentExercise.sets : []
+            ColumnLayout {
+                width: parent.width
+                spacing: Theme.spacing / 2
 
-                Rectangle {
-                    width: parent.width
-                    height: 50
-                    radius: 5
-                    border.color: "#3498db"
-                    border.width: 2
+                Repeater {
+                    model: ActiveWorkoutService.currentExercise ? ActiveWorkoutService.currentExercise.sets : []
 
-                    // Aktualna seria - podświetlona na niebiesko
-                    color: ActiveWorkoutService.currentSet === modelData ? "#3498db" : "white"
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 60
+                        radius: Theme.borderRadius
+                        border.width: 1
+                        border.color: Theme.border
 
-                    Row {
-                        anchors.fill: parent
-                        anchors.margins: 5
-                        spacing: 10
-
-                        Text {
-                            text: "Set " + (index + 1)
-                            font.pixelSize: 14
-                            font.bold: true
-                            color: ActiveWorkoutService.currentSet === modelData ? "white" : "#333"
-                            width: 50
-                            verticalAlignment: Text.AlignVCenter
+                        color: {
+                            if (ActiveWorkoutService.currentSet === modelData) {
+                                Theme.primary
+                            } else if (modelData.completed) {
+                                Theme.success
+                            } else {
+                                Theme.surface
+                            }
                         }
 
-                        Text {
-                            text: modelData.repetitions + " reps"
-                            font.pixelSize: 14
-                            color: ActiveWorkoutService.currentSet === modelData ? "white" : "#666"
-                            width: 70
-                            verticalAlignment: Text.AlignVCenter
-                        }
+                        Behavior on color { ColorAnimation { duration: 200 } }
 
-                        Text {
-                            text: modelData.weight + " kg"
-                            font.pixelSize: 14
-                            color: ActiveWorkoutService.currentSet === modelData ? "white" : "#666"
-                            width: 60
-                            verticalAlignment: Text.AlignVCenter
-                        }
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.margins: Theme.padding
+                            spacing: Theme.spacing
 
-                        Rectangle {
-                            width: 20
-                            height: 20
-                            radius: 10
-                            color: ActiveWorkoutService.currentSet === modelData ? "white" : "transparent"
-                            border.color: "#3498db"
-                            border.width: 2
-                            anchors.verticalCenter: parent.verticalCenter
+                            Text {
+                                text: "Set " + (index + 1)
+                                font.pixelSize: Theme.fontSmall
+                                font.bold: true
+                                color: ActiveWorkoutService.currentSet === modelData || modelData.completed ? Theme.buttonText : Theme.textPrimary
+                                Layout.preferredWidth: 60
+                            }
+
+                            Text {
+                                text: modelData.repetitions + " reps"
+                                font.pixelSize: Theme.fontSmall
+                                color: ActiveWorkoutService.currentSet === modelData || modelData.completed ? Theme.buttonText : Theme.textSecondary
+                                Layout.preferredWidth: 80
+                            }
+
+                            Text {
+                                text: modelData.weight + " kg"
+                                font.pixelSize: Theme.fontSmall
+                                color: ActiveWorkoutService.currentSet === modelData || modelData.completed ? Theme.buttonText : Theme.textSecondary
+                                Layout.preferredWidth: 80
+                            }
+
+                            Item { Layout.fillWidth: true }
+
+                            Rectangle {
+                                width: 20
+                                height: 20
+                                radius: 10
+                                color: (ActiveWorkoutService.currentSet === modelData || modelData.completed) ? Theme.buttonText : "transparent"
+                                border.color: (modelData.completed) ? Theme.success : (ActiveWorkoutService.currentSet === modelData) ? Theme.primaryVariant : Theme.border
+                                border.width: 2
+                                Layout.alignment: Qt.AlignVCenter
+                            }
                         }
                     }
                 }
             }
         }
 
-        Row {
-            spacing: 10
-            anchors.horizontalCenter: parent.horizontalCenter
+        RowLayout {
+            Layout.alignment: Qt.AlignHCenter
+            spacing: Theme.spacing
 
             Button {
                 text: "◀ Prev"
-                onClicked: ActiveWorkoutService.navigateToPrevious()
                 enabled: ActiveWorkoutService.isActive
+                onClicked: ActiveWorkoutService.navigateToPrevious()
             }
 
             Button {
                 text: "Done"
-                onClicked: ActiveWorkoutService.completeCurrentSet()
                 enabled: ActiveWorkoutService.isActive && ActiveWorkoutService.currentSet
                 background: Rectangle {
-                    color: "#27ae60"
-                    radius: 5
+                    color: enabled ? Theme.success : Theme.border
+                    radius: Theme.borderRadius
                 }
                 contentItem: Text {
-                    text: parent.text
-                    color: "white"
+                    text: qsTr("Done")
+                    color: Theme.buttonText
+                    font.pixelSize: Theme.fontMedium
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                 }
+                onClicked: ActiveWorkoutService.completeCurrentSet()
             }
 
             Button {
                 text: "Next ▶"
-                onClicked: ActiveWorkoutService.navigateToNext()
                 enabled: ActiveWorkoutService.isActive
+                onClicked: ActiveWorkoutService.navigateToNext()
             }
         }
     }

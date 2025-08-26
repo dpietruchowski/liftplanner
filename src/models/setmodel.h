@@ -12,13 +12,16 @@ class SetModel : public QObject
     DECLARE_MODEL_PROPERTY(int, exerciseId, setExerciseId, exercise_id)
     DECLARE_MODEL_PROPERTY(int, repetitions, setRepetitions, repetitions)
     DECLARE_MODEL_PROPERTY(int, weight, setWeight, weight)
+    DECLARE_MODEL_PROPERTY(bool, completed, setCompleted, completed)
 
 public:
-    explicit SetModel(QObject *parent = nullptr);
+    explicit SetModel(QObject *parent = nullptr) : QObject(parent) {}
 
     QVariantMap toVariantMap(bool dbModel = false) const;
     static SetModel *fromVariantMap(const QVariantMap &variantMap, QObject *parent = nullptr);
 
     QJsonObject toJson() const;
     static SetModel *fromJson(const QJsonObject &jsonObj, QObject *parent = nullptr);
+
+    SetModel *clone(QObject *parent = nullptr) const;
 };

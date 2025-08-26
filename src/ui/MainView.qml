@@ -12,27 +12,29 @@ Item {
     property var workoutScreen: ScreenWorkout {}
     property var historyScreen: ScreenHistory {}
 
+
     StackView {
         id: stackView
-        anchors.fill: parent
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: bottomNav.top
     }
 
     Component.onCompleted: {
         stackView.push(homeScreen)
     }
 
+
     BottomNavigation {
         id: bottomNav
         anchors.bottom: parent.bottom
         width: parent.width
-        onItemSelected: index => {
-            currentIndex = index
-            switch(index) {
-                case 0: stackView.replace(activeWorkoutScreen); break;
-                case 1: stackView.replace(homeScreen); break;
-                case 2: stackView.replace(workoutScreen); break;
-                case 3: stackView.replace(historyScreen); break;
-            }
-        }
+        model: [
+            { label: "Workout", screen: activeWorkoutScreen },
+            { label: "Home", screen: homeScreen },
+            { label: "Routines", screen: workoutScreen },
+            { label: "History", screen: historyScreen }
+        ]
     }
 }

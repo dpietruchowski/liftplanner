@@ -14,13 +14,16 @@ void ActiveWorkoutService::startWorkout(WorkoutModel *workout)
         return;
     }
 
-    setCurrentWorkout(workout);
+    auto *clonedWorkout = workout->clone(this);
+    clonedWorkout->setStartedTime(QDateTime::currentDateTime());
+
+    setCurrentWorkout(clonedWorkout);
     setIsActive(true);
 
     updateCurrentExercise();
     updateCurrentSet();
 
-    qDebug() << "Workout started:" << workout->name();
+    qDebug() << "Workout started:" << clonedWorkout->name();
 }
 
 void ActiveWorkoutService::completeCurrentSet()
@@ -96,6 +99,10 @@ void ActiveWorkoutService::navigateToPrevious()
 
 void ActiveWorkoutService::endWorkout()
 {
+    if (m_currentWorkout) {
+        m_currentWorkout->setEndedTime(QDateTime::currentDateTime());
+    }
+
     setIsActive(false);
     setCurrentWorkout(nullptr);
     setCurrentExercise(nullptr);
@@ -108,6 +115,8 @@ void ActiveWorkoutService::saveCompletedSet()
 {
     if (!m_currentSet)
         return;
+
+    m_currentSet->setCompleted(true);
 
     qDebug() << "Completed set:"
              << (m_currentExercise ? m_currentExercise->name() : "Unknown")

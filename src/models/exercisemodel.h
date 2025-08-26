@@ -13,7 +13,7 @@ class ExerciseModel : public QObject
     DECLARE_MODEL_PROPERTY(int, id, setId, id)
     DECLARE_MODEL_PROPERTY(int, workoutId, setWorkoutId, workout_id)
     DECLARE_MODEL_PROPERTY(QString, name, setName, name)
-    DECLARE_MODEL_PROPERTY(QList<QObject*>, sets, setSets, sets)
+    DECLARE_MODEL_PROPERTY(QList<QObject *>, sets, setSets, sets)
 
 public:
     explicit ExerciseModel(QObject *parent = nullptr);
@@ -22,11 +22,10 @@ public:
     void removeSet(SetModel *set);
 
     QVariantMap toVariantMap(bool dbModel = false) const;
-    static ExerciseModel* fromVariantMap(const QVariantMap &variantMap, QObject *parent = nullptr);
+    static ExerciseModel *fromVariantMap(const QVariantMap &variantMap, QObject *parent = nullptr);
 
     QJsonObject toJson() const;
-    static ExerciseModel* fromJson(const QJsonObject &jsonObj, QObject *parent = nullptr);
+    static ExerciseModel *fromJson(const QJsonObject &jsonObj, QObject *parent = nullptr);
 
-private:
-    void onIdUpdated();
+    ExerciseModel *clone(QObject *parent = nullptr) const;
 };

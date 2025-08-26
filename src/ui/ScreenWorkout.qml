@@ -1,52 +1,45 @@
 import QtQuick
 import QtQuick.Controls
-
+import QtQuick.Layouts
 import LiftPlanner
 
 Rectangle {
     id: root
-    color: "#f0f0f0"
+    color: Theme.background
 
-    Component.onCompleted: {
-        WorkoutService.loadAllWorkouts()
-    }
+    Component.onCompleted: WorkoutService.loadAllWorkouts()
 
     ScrollView {
         anchors.fill: parent
-        contentWidth: parent.width
 
-        Column {
+        ColumnLayout {
             width: parent.width
-            spacing: 15
-            padding: 10
-            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: Theme.spacing
+            Layout.alignment: Qt.AlignHCenter
+            anchors.margins: Theme.padding
 
-            Row {
-                spacing: 10
+            RowLayout {
+                spacing: Theme.spacing
+
                 Button {
                     text: "Generate GPT Prompt"
                     onClicked: WorkoutService.generateGptPrompt()
-                    background: Rectangle {
-                        color: "#3498db"
-                        radius: 5
-                    }
+                    background: Rectangle { color: Theme.primary; radius: Theme.borderRadius }
                     contentItem: Text {
                         text: parent.text
-                        color: "white"
+                        color: Theme.buttonText
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
                 }
+
                 Button {
                     text: "Import from JSON"
                     onClicked: WorkoutService.importWorkoutsFromClipboard()
-                    background: Rectangle {
-                        color: "#3498db"
-                        radius: 5
-                    }
+                    background: Rectangle { color: Theme.primary; radius: Theme.borderRadius }
                     contentItem: Text {
                         text: parent.text
-                        color: "white"
+                        color: Theme.buttonText
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
@@ -56,78 +49,73 @@ Rectangle {
             Repeater {
                 model: WorkoutService.workouts
 
-                Column {
-                    width: parent.width - parent.padding * 2
-                    spacing: 8
-
-                    property bool expanded: true
+                ColumnLayout {
+                    width: parent.width
+                    spacing: Theme.spacing
+                    property bool expanded: false
 
                     Rectangle {
-                        width: parent.width
-                        height: 35
-                        color: "#3498db"
-                        radius: 5
+                        Layout.fillWidth: true
+                        radius: Theme.borderRadius
+                        color: Theme.surface
+                        border.color: Theme.primary
+                        border.width: 1
+                        height: 50
 
-                        Row {
+                        RowLayout {
                             anchors.fill: parent
-                            anchors.margins: 8
-                            spacing: 10
+                            anchors.margins: Theme.padding
+                            spacing: Theme.spacing
 
                             Rectangle {
-                                width: 25
-                                height: 25
-                                radius: 12
-                                color: "transparent"
-                                border.color: "white"
+                                width: 28
+                                height: 28
+                                radius: 14
+                                color: Theme.primary
+                                border.color: Theme.buttonText
                                 border.width: 2
-                                anchors.verticalCenter: parent.verticalCenter
 
                                 Text {
                                     text: expanded ? "▼" : "▶"
-                                    font.pixelSize: 12
-                                    color: "white"
                                     anchors.centerIn: parent
+                                    font.pixelSize: 14
+                                    color: Theme.buttonText
                                 }
 
                                 MouseArea {
                                     anchors.fill: parent
-                                    onClicked: {
-                                        expanded = !expanded
-                                        console.log("Workout expanded:", expanded)
-                                    }
+                                    onClicked: expanded = !expanded
                                 }
                             }
 
                             Text {
                                 text: modelData.name
-                                font.pixelSize: 16
+                                font.pixelSize: Theme.fontMedium
                                 font.bold: true
-                                color: "white"
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: parent.width - 80
+                                color: Theme.textPrimary
+                                Layout.fillWidth: true
                                 elide: Text.ElideRight
+                                verticalAlignment: Text.AlignVCenter
                             }
 
                             Rectangle {
-                                width: 25
-                                height: 25
-                                radius: 12
-                                color: "white"
-                                anchors.verticalCenter: parent.verticalCenter
+                                width: 28
+                                height: 28
+                                radius: 14
+                                color: Theme.primary
 
                                 Text {
                                     text: "▶"
-                                    font.pixelSize: 12
-                                    color: "#3498db"
                                     anchors.centerIn: parent
+                                    font.pixelSize: 14
+                                    color: Theme.buttonText
                                 }
 
                                 MouseArea {
                                     anchors.fill: parent
                                     onClicked: {
-                                        console.log("Starting workout:", modelData.name)
                                         ActiveWorkoutService.startWorkout(modelData)
-                                        stackView.push(activeWorkoutScreen)
+                                        stackView.replace(activeWorkoutScreen)
                                     }
                                 }
                             }
@@ -136,50 +124,39 @@ Rectangle {
 
                     Repeater {
                         model: expanded ? modelData.exercises : []
+
                         Rectangle {
-                            width: parent.width
-                            height: 30
-                            color: "#ffffff"
-                            radius: 3
+                            Layout.fillWidth: true
+                            radius: Theme.borderRadius / 2
+                            color: Theme.background
+                            height: 40
 
-                            function getRepetitionsList() {
-                                return modelData.sets.map(function(set) {
-                                    return set.repetitions;
-                                });
-                            }
-
-                            Row {
+                            RowLayout {
                                 anchors.fill: parent
-                                anchors.margins: 8
-                                spacing: 15
+                                anchors.margins: Theme.padding
+                                spacing: Theme.spacing
 
                                 Text {
                                     text: modelData.name
-                                    font.pixelSize: 14
+                                    font.pixelSize: Theme.fontSmall
                                     font.bold: true
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: parent.width * 0.45
+                                    color: Theme.textPrimary
+                                    Layout.preferredWidth: parent.width * 0.45
                                     elide: Text.ElideRight
+                                    verticalAlignment: Text.AlignVCenter
                                 }
 
                                 Text {
-                                    text: "Sets: " + getRepetitionsList().join(", ")
-                                    font.pixelSize: 12
-                                    color: "#666666"
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: parent.width * 0.45
+                                    text: "Sets: " + modelData.sets.map(function(set) { return set.repetitions }).join(", ")
+                                    font.pixelSize: Theme.fontSmall
+                                    color: Theme.textSecondary
+                                    Layout.preferredWidth: parent.width * 0.45
                                     horizontalAlignment: Text.AlignRight
                                     elide: Text.ElideRight
+                                    verticalAlignment: Text.AlignVCenter
                                 }
                             }
                         }
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: "#dddddd"
-                        visible: true
                     }
                 }
             }

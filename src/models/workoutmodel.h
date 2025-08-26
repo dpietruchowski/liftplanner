@@ -3,6 +3,7 @@
 #include <QVariantMap>
 #include <QJsonObject>
 #include <QList>
+#include <QDateTime>
 #include "exercisemodel.h"
 #include "../utils/serializationutils.h"
 
@@ -12,7 +13,10 @@ class WorkoutModel : public QObject
 
     DECLARE_MODEL_PROPERTY(int, id, setId, id)
     DECLARE_MODEL_PROPERTY(QString, name, setName, name)
-    DECLARE_MODEL_PROPERTY(QList<QObject*>, exercises, setExercises, exercises)
+    DECLARE_MODEL_PROPERTY(QList<QObject *>, exercises, setExercises, exercises)
+    DECLARE_MODEL_PROPERTY(QDateTime, createdTime, setCreatedTime, created_time)
+    DECLARE_MODEL_PROPERTY(QDateTime, startedTime, setStartedTime, started_time)
+    DECLARE_MODEL_PROPERTY(QDateTime, endedTime, setEndedTime, ended_time)
 
 public:
     explicit WorkoutModel(QObject *parent = nullptr);
@@ -21,10 +25,12 @@ public:
     void removeExercise(ExerciseModel *exercise);
 
     QVariantMap toVariantMap(bool dbModel = false) const;
-    static WorkoutModel* fromVariantMap(const QVariantMap &variantMap, QObject *parent = nullptr);
+    static WorkoutModel *fromVariantMap(const QVariantMap &variantMap, QObject *parent = nullptr);
 
     QJsonObject toJson() const;
-    static WorkoutModel* fromJson(const QJsonObject &jsonObj, QObject *parent = nullptr);
+    static WorkoutModel *fromJson(const QJsonObject &jsonObj, QObject *parent = nullptr);
+
+    WorkoutModel *clone(QObject *parent = nullptr) const;
 
 private:
     void onIdUpdated();
