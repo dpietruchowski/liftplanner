@@ -6,8 +6,8 @@ QtObject {
 
     property color background: "#121212"     
     property color surface: "#1E1E1E"      
-    property color primary: "#3498db"        
-    property color primaryVariant: "#2980b9"  
+    property color primary: "#1F618D"        
+    property color primaryVariant: "#2471A3"  
     property color secondary: "#03DAC6"      
     property color success: "#27ae60"       
     property color error: "#e74c3c"          

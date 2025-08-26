@@ -15,7 +15,7 @@ class SetModel : public QObject
     DECLARE_MODEL_PROPERTY(bool, completed, setCompleted, completed)
 
 public:
-    explicit SetModel(QObject *parent = nullptr) : QObject(parent) {}
+    explicit SetModel(QObject *parent = nullptr);
 
     QVariantMap toVariantMap(bool dbModel = false) const;
     static SetModel *fromVariantMap(const QVariantMap &variantMap, QObject *parent = nullptr);

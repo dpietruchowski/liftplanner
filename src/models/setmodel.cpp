@@ -1,6 +1,13 @@
 #include "setmodel.h"
 #include "../utils/serializationutils.h"
 
+SetModel::SetModel(QObject *parent)
+    : QObject(parent)
+{
+    m_id = -1;
+    m_exerciseId = -1;
+}
+
 QVariantMap SetModel::toVariantMap(bool dbModel) const
 {
     QVariantMap variant;
