@@ -10,16 +10,21 @@ Rectangle {
     Component.onCompleted: WorkoutService.loadAllWorkouts()
 
     ScrollView {
+        id: scrollView
         anchors.fill: parent
+        anchors.margins: Theme.padding
 
         ColumnLayout {
-            width: parent.width
+            id: columnLayout
+            width: scrollView.contentItem.width
+            Layout.fillWidth: true
+            Layout.fillHeight: true
             spacing: Theme.spacing
-            Layout.alignment: Qt.AlignHCenter
-            anchors.margins: Theme.padding
 
             RowLayout {
+                Layout.fillWidth: true
                 spacing: Theme.spacing
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
                 Button {
                     text: "Generate GPT Prompt"
@@ -50,34 +55,33 @@ Rectangle {
                 model: WorkoutService.workouts
 
                 ColumnLayout {
-                    width: parent.width
+                    Layout.fillWidth: true
                     spacing: Theme.spacing
                     property bool expanded: false
 
                     Rectangle {
                         Layout.fillWidth: true
+                        Layout.preferredHeight: 50
                         radius: Theme.borderRadius
                         color: Theme.surface
                         border.color: Theme.primary
                         border.width: 1
-                        height: 50
 
                         RowLayout {
                             anchors.fill: parent
-                            anchors.margins: Theme.padding
                             spacing: Theme.spacing
 
                             Rectangle {
-                                width: 28
-                                height: 28
+                                Layout.preferredWidth: 28
+                                Layout.preferredHeight: 28
                                 radius: 14
                                 color: Theme.primary
                                 border.color: Theme.buttonText
                                 border.width: 2
 
                                 Text {
-                                    text: expanded ? "▼" : "▶"
                                     anchors.centerIn: parent
+                                    text: expanded ? "▼" : "▶"
                                     font.pixelSize: 14
                                     color: Theme.buttonText
                                 }
@@ -99,14 +103,14 @@ Rectangle {
                             }
 
                             Rectangle {
-                                width: 28
-                                height: 28
+                                Layout.preferredWidth: 28
+                                Layout.preferredHeight: 28
                                 radius: 14
                                 color: Theme.primary
 
                                 Text {
-                                    text: "▶"
                                     anchors.centerIn: parent
+                                    text: "▶"
                                     font.pixelSize: 14
                                     color: Theme.buttonText
                                 }
@@ -115,7 +119,9 @@ Rectangle {
                                     anchors.fill: parent
                                     onClicked: {
                                         ActiveWorkoutService.startWorkout(modelData)
-                                        stackView.replace(activeWorkoutScreen)
+                                        if (stackView.currentItem !== activeWorkoutScreen) {
+                                            stackView.replace(activeWorkoutScreen)
+                                        }
                                     }
                                 }
                             }
@@ -127,21 +133,22 @@ Rectangle {
 
                         Rectangle {
                             Layout.fillWidth: true
+                            Layout.preferredHeight: 40
                             radius: Theme.borderRadius / 2
                             color: Theme.background
-                            height: 40
 
                             RowLayout {
-                                anchors.fill: parent
-                                anchors.margins: Theme.padding
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
                                 spacing: Theme.spacing
+                                Layout.margins: Theme.padding
 
                                 Text {
                                     text: modelData.name
                                     font.pixelSize: Theme.fontSmall
                                     font.bold: true
                                     color: Theme.textPrimary
-                                    Layout.preferredWidth: parent.width * 0.45
+                                    Layout.fillWidth: true
                                     elide: Text.ElideRight
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -150,13 +157,19 @@ Rectangle {
                                     text: "Sets: " + modelData.sets.map(function(set) { return set.repetitions }).join(", ")
                                     font.pixelSize: Theme.fontSmall
                                     color: Theme.textSecondary
-                                    Layout.preferredWidth: parent.width * 0.45
+                                    Layout.fillWidth: true
                                     horizontalAlignment: Text.AlignRight
                                     elide: Text.ElideRight
                                     verticalAlignment: Text.AlignVCenter
                                 }
                             }
                         }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 1
+                        color: Theme.border
                     }
                 }
             }
