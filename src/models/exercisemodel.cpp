@@ -7,6 +7,7 @@ ExerciseModel::ExerciseModel(QObject *parent)
 {
     m_id = -1;
     m_workoutId = -1;
+    m_restSeconds = 60;
 }
 
 void ExerciseModel::addSet(SetModel *set)
@@ -40,6 +41,7 @@ QVariantMap ExerciseModel::toVariantMap(bool dbModel) const
         variant.insert(ExerciseModel::workout_id_key, m_workoutId);
     }
     variant.insert(ExerciseModel::name_key, m_name);
+    variant.insert(ExerciseModel::rest_seconds_key, m_restSeconds);
 
     if (!dbModel)
     {
@@ -66,6 +68,8 @@ ExerciseModel *ExerciseModel::fromVariantMap(const QVariantMap &variantMap, QObj
         model->setWorkoutId(variantMap.value(ExerciseModel::workout_id_key).toInt());
     if (variantMap.contains(ExerciseModel::name_key))
         model->setName(variantMap.value(ExerciseModel::name_key).toString());
+    if (variantMap.contains(ExerciseModel::rest_seconds_key))
+        model->setRestSeconds(variantMap.value(ExerciseModel::rest_seconds_key).toInt());
 
     if (variantMap.contains(ExerciseModel::sets_key))
     {
@@ -98,6 +102,7 @@ ExerciseModel *ExerciseModel::clone(QObject *parent) const
     ExerciseModel *clone = new ExerciseModel(parent);
     clone->setName(m_name);
     clone->setWorkoutId(m_workoutId);
+    clone->setRestSeconds(m_restSeconds);
 
     for (QObject *setObj : m_sets)
     {

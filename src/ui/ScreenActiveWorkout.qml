@@ -42,7 +42,7 @@ Rectangle {
             spacing: Theme.spacing
 
             Button {
-                text: "◀ Prev"
+                text: "Prev"
                 enabled: ActiveWorkoutService.isActive
                 onClicked: ActiveWorkoutService.navigateToPrevious()
             }
@@ -61,14 +61,28 @@ Rectangle {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                 }
-                onClicked: ActiveWorkoutService.completeCurrentSet()
+                onClicked: {
+                    ActiveWorkoutService.completeCurrentSet()
+                    var rs = ActiveWorkoutService.currentExercise ? ActiveWorkoutService.currentExercise.restSeconds : 0
+                    if (rs > 0) {
+                        restDialog.show(rs, qsTr("Rest between sets"), false)
+                    }
+                }
             }
 
             Button {
-                text: "Next ▶"
+                text: "Next \u25b6"
                 enabled: ActiveWorkoutService.isActive
                 onClicked: ActiveWorkoutService.navigateToNext()
             }
+        }
+    }
+
+    RestDialog {
+        id: restDialog
+        dialogVisible: false
+        onDismissed: {
+            restDialog.reset()
         }
     }
 

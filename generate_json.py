@@ -2,7 +2,7 @@ import glob
 import json
 import os
 
-pattern = "*src/models/work*"
+pattern = "*src/ui/Theme*"
 output_file = "output_files.json"
 
 files_data = []

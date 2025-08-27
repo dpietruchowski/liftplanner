@@ -46,3 +46,6 @@ prompt
 diff
 
 .vscode/
+
+log/
+conversation.json
