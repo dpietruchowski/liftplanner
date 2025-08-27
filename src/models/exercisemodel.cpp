@@ -17,6 +17,7 @@ void ExerciseModel::addSet(SetModel *set)
         set->setParent(this);
         set->setExerciseId(m_id);
         m_sets.append(set);
+        emit setsChanged();
     }
 }
 

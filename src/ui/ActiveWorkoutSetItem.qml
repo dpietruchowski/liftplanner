@@ -8,7 +8,7 @@ Rectangle {
     Layout.fillWidth: true
     height: 60
     radius: Theme.borderRadius
-    border.width: 1
+    border.width: ActiveWorkoutService.currentSet === setData ? 3 : 1
 
     color: setData.completed ? Theme.success : Theme.surface
     border.color: ActiveWorkoutService.currentSet === setData ? Theme.primaryVariant : Theme.border

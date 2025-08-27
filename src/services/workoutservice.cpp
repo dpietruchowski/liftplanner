@@ -80,7 +80,7 @@ Ask the user these questions one by one:
 6. Any **injuries or limitations**? (Shoulder, knee, back, etc.)
 7. How much **time per workout** do you have? (e.g., 45 min, 60 min)
 
-Be friendly and clear, and confirm the user’s answers before generating the plan.
+Be friendly and clear, and confirm the users answers before generating the plan.
 
 ### Step 2: Explain output format with an example
 Show this short example so the user understands what the result will look like:
@@ -114,9 +114,9 @@ Once the user provides all answers, create a plan following these rules:
 - Each exercise should have **3-5 sets**, with realistic progression of weights or fixed weights.
 - Weights in kg, repetitions as integers.
 - Make the program logical, progressive, and aligned with the user's goals and experience.
-- Ensure the workouts are balanced and fit within the user’s time constraints.
+- Ensure the workouts are balanced and fit within the users time constraints.
 
-Wait for the user’s answers and confirmation before generating the JSON.
+Wait for the users answers and confirmation before generating the JSON.
 )";
 
     QClipboard *clipboard = QGuiApplication::clipboard();

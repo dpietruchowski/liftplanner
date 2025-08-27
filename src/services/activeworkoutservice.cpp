@@ -1,5 +1,6 @@
 #include "activeworkoutservice.h"
 #include <QDebug>
+#include <QQmlEngine>
 
 ActiveWorkoutService::ActiveWorkoutService(QObject *parent)
     : QObject(parent), m_currentWorkout(nullptr), m_currentExercise(nullptr), m_currentSet(nullptr), m_isActive(false)
@@ -14,7 +15,7 @@ void ActiveWorkoutService::startWorkout(WorkoutModel *workout)
         return;
     }
 
-    auto *clonedWorkout = workout->clone(this);
+    auto *clonedWorkout = workout->clone(nullptr);
     clonedWorkout->setStartedTime(QDateTime::currentDateTime());
 
     setCurrentWorkout(clonedWorkout);
@@ -57,7 +58,7 @@ void ActiveWorkoutService::navigateToNext()
 
         if (currentExerciseIndex < exercises.size() - 1)
         {
-            setCurrentExercise(qobject_cast<ExerciseModel *>(exercises[currentExerciseIndex + 1]));
+            setCurrentExercise(exercises[currentExerciseIndex + 1]);
 
             auto newSets = m_currentExercise->sets();
             setCurrentSet(newSets.isEmpty() ? nullptr : qobject_cast<SetModel *>(newSets[0]));
@@ -65,7 +66,6 @@ void ActiveWorkoutService::navigateToNext()
         else
         {
             endWorkout();
-            emit workoutCompleted();
         }
     }
 }
@@ -89,7 +89,7 @@ void ActiveWorkoutService::navigateToPrevious()
 
         if (currentExerciseIndex > 0)
         {
-            setCurrentExercise(qobject_cast<ExerciseModel *>(exercises[currentExerciseIndex - 1]));
+            setCurrentExercise(exercises[currentExerciseIndex - 1]);
 
             auto prevSets = m_currentExercise->sets();
             setCurrentSet(prevSets.isEmpty() ? nullptr : qobject_cast<SetModel *>(prevSets.last()));
@@ -99,16 +99,21 @@ void ActiveWorkoutService::navigateToPrevious()
 
 void ActiveWorkoutService::endWorkout()
 {
-    if (m_currentWorkout) {
-        m_currentWorkout->setEndedTime(QDateTime::currentDateTime());
-    }
+    WorkoutModel *oldWorkout = m_currentWorkout;
 
     setIsActive(false);
     setCurrentWorkout(nullptr);
     setCurrentExercise(nullptr);
     setCurrentSet(nullptr);
 
+    if (oldWorkout) {
+        oldWorkout->setEndedTime(QDateTime::currentDateTime());
+        oldWorkout->deleteLater();
+    }
+
     qDebug() << "Workout ended";
+
+    emit workoutCompleted();
 }
 
 void ActiveWorkoutService::saveCompletedSet()
@@ -132,7 +137,7 @@ void ActiveWorkoutService::updateCurrentExercise()
         return;
     }
 
-    setCurrentExercise(qobject_cast<ExerciseModel *>(m_currentWorkout->exercises().first()));
+    setCurrentExercise(m_currentWorkout->exercises().first());
 }
 
 void ActiveWorkoutService::updateCurrentSet()

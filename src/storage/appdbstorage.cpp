@@ -44,8 +44,7 @@ int AppDbStorage::saveWorkout(WorkoutModel *workout)
     int workoutId = m_workoutRepo->save(workout);
     workout->setId(workoutId);
 
-    for (QObject *exerciseObj : workout->exercises()) {
-        ExerciseModel *exercise = qobject_cast<ExerciseModel *>(exerciseObj);
+    for (ExerciseModel *exercise : workout->exercises()) {
         if (exercise) {
             exercise->setWorkoutId(workoutId);
             int exerciseId = m_exerciseRepo->save(exercise);

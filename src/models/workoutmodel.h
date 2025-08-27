@@ -13,7 +13,7 @@ class WorkoutModel : public QObject
 
     DECLARE_MODEL_PROPERTY(int, id, setId, id)
     DECLARE_MODEL_PROPERTY(QString, name, setName, name)
-    DECLARE_MODEL_PROPERTY(QList<QObject *>, exercises, setExercises, exercises)
+    DECLARE_MODEL_LIST_PROPERTY(WorkoutModel, ExerciseModel, exercises, setExercises, exercises)
     DECLARE_MODEL_PROPERTY(QDateTime, createdTime, setCreatedTime, created_time)
     DECLARE_MODEL_PROPERTY(QDateTime, startedTime, setStartedTime, started_time)
     DECLARE_MODEL_PROPERTY(QDateTime, endedTime, setEndedTime, ended_time)

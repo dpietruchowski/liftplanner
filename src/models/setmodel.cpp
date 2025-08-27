@@ -59,5 +59,6 @@ SetModel *SetModel::clone(QObject *parent) const
     clone->setExerciseId(m_exerciseId);
     clone->setRepetitions(m_repetitions);
     clone->setWeight(m_weight);
+    clone->setCompleted(m_completed);
     return clone;
 }

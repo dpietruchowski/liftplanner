@@ -1,10 +1,10 @@
 #pragma once
-#include <QObject>
-#include <QVariantMap>
 #include <QJsonObject>
 #include <QList>
-#include "setmodel.h"
+#include <QObject>
+#include <QVariantMap>
 #include "../utils/serializationutils.h"
+#include "setmodel.h"
 
 class ExerciseModel : public QObject
 {
@@ -14,7 +14,7 @@ class ExerciseModel : public QObject
     DECLARE_MODEL_PROPERTY(int, workoutId, setWorkoutId, workout_id)
     DECLARE_MODEL_PROPERTY(QString, name, setName, name)
     DECLARE_MODEL_PROPERTY(int, restSeconds, setRestSeconds, rest_seconds)
-    DECLARE_MODEL_PROPERTY(QList<QObject *>, sets, setSets, sets)
+    DECLARE_MODEL_LIST_PROPERTY(ExerciseModel, SetModel, sets, setSets, sets)
 
 public:
     explicit ExerciseModel(QObject *parent = nullptr);

@@ -18,6 +18,7 @@ void WorkoutModel::addExercise(ExerciseModel *exercise)
         exercise->setParent(this);
         exercise->setWorkoutId(m_id);
         m_exercises.append(exercise);
+        emit exercisesChanged();
     }
 }
 
@@ -55,12 +56,9 @@ QVariantMap WorkoutModel::toVariantMap(bool dbModel) const
     if (!dbModel)
     {
         QVariantList exercisesList;
-        for (QObject *obj : m_exercises)
+        for (ExerciseModel *exercise : m_exercises)
         {
-            if (ExerciseModel *exercise = qobject_cast<ExerciseModel *>(obj))
-            {
-                exercisesList.append(exercise->toVariantMap());
-            }
+            exercisesList.append(exercise->toVariantMap());
         }
         variant.insert(WorkoutModel::exercises_key, exercisesList);
     }
@@ -123,13 +121,10 @@ WorkoutModel *WorkoutModel::clone(QObject *parent) const
     clone->setStartedTime(m_startedTime);
     clone->setEndedTime(m_endedTime);
 
-    for (QObject *exerciseObj : m_exercises)
+    for (ExerciseModel *exercise : m_exercises)
     {
-        if (ExerciseModel *exercise = qobject_cast<ExerciseModel *>(exerciseObj))
-        {
-            ExerciseModel *exerciseClone = exercise->clone(clone);
-            clone->addExercise(exerciseClone);
-        }
+        ExerciseModel *exerciseClone = exercise->clone(clone);
+        clone->addExercise(exerciseClone);
     }
 
     return clone;
@@ -137,9 +132,7 @@ WorkoutModel *WorkoutModel::clone(QObject *parent) const
 
 void WorkoutModel::onIdUpdated()
 {
-    for (QObject *exerciseObj : exercises())
-    {
-        ExerciseModel *exercise = qobject_cast<ExerciseModel *>(exerciseObj);
+    for (ExerciseModel *exercise : m_exercises) {
         exercise->setWorkoutId(id());
     }
 }
