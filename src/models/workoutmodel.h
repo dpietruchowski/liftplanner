@@ -18,8 +18,12 @@ class WorkoutModel : public QObject
     DECLARE_MODEL_PROPERTY(QDateTime, startedTime, setStartedTime, started_time)
     DECLARE_MODEL_PROPERTY(QDateTime, endedTime, setEndedTime, ended_time)
 
+    Q_PROPERTY(bool completed READ isCompleted NOTIFY completedChanged)
+
 public:
     explicit WorkoutModel(QObject *parent = nullptr);
+
+    bool isCompleted() const;
 
     void addExercise(ExerciseModel *exercise);
     void removeExercise(ExerciseModel *exercise);
@@ -31,6 +35,9 @@ public:
     static WorkoutModel *fromJson(const QJsonObject &jsonObj, QObject *parent = nullptr);
 
     WorkoutModel *clone(QObject *parent = nullptr) const;
+
+signals:
+    bool completedChanged();
 
 private:
     void onIdUpdated();

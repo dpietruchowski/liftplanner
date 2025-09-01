@@ -95,21 +95,19 @@ void ActiveWorkoutService::navigateToPrevious()
 
 void ActiveWorkoutService::endWorkout()
 {
-    WorkoutModel *oldWorkout = m_currentWorkout;
+    if (m_currentWorkout) {
+        m_currentWorkout->setEndedTime(QDateTime::currentDateTime());
+        emit workoutCompleted();
+    }
 
     setIsActive(false);
     setCurrentWorkout(nullptr);
     setCurrentExercise(nullptr);
     setCurrentSet(nullptr);
 
-    if (oldWorkout) {
-        oldWorkout->setEndedTime(QDateTime::currentDateTime());
-        oldWorkout->deleteLater();
+    if (m_currentWorkout) {
+        m_currentWorkout->deleteLater();
     }
-
-    qDebug() << "Workout ended";
-
-    emit workoutCompleted();
 }
 
 void ActiveWorkoutService::saveCompletedSet()

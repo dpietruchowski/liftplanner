@@ -54,15 +54,21 @@ Rectangle {
             }
 
             PrimaryButton {
-                text: "Done"
+                text: ActiveWorkoutService.currentWorkout && ActiveWorkoutService.currentWorkout.completed ? "End" : "Done"
                 enabled: ActiveWorkoutService.isActive && ActiveWorkoutService.currentSet
                 buttonTheme: Theme.buttonMedium
-                buttonStyle: Theme.buttonStyleSuccess
+                buttonStyle: ActiveWorkoutService.currentWorkout && ActiveWorkoutService.currentWorkout.completed
+                             ? Theme.buttonStylePrimary
+                             : Theme.buttonStyleSuccess
                 onClicked: {
-                    ActiveWorkoutService.completeCurrentSet()
-                    var rs = ActiveWorkoutService.currentExercise ? ActiveWorkoutService.currentExercise.restSeconds : 0
-                    if (rs > 0) {
-                        restDialog.show(rs, qsTr("Rest between sets"), false)
+                    if (ActiveWorkoutService.currentWorkout.completed) {
+                        ActiveWorkoutService.endWorkout()
+                    } else {
+                        ActiveWorkoutService.completeCurrentSet()
+                        var rs = ActiveWorkoutService.currentExercise ? ActiveWorkoutService.currentExercise.restSeconds : 0
+                        if (rs > 0) {
+                            restDialog.show(rs, qsTr("Rest between sets"), false)
+                        }
                     }
                 }
             }
@@ -89,7 +95,9 @@ Rectangle {
     Connections {
         target: ActiveWorkoutService
         function onWorkoutCompleted() {
+            WorkoutHistoryService.saveWorkout(ActiveWorkoutService.currentWorkout)
             stackView.pop()
         }
     }
+
 }

@@ -11,6 +11,15 @@ WorkoutModel::WorkoutModel(QObject *parent)
     connect(this, &WorkoutModel::idChanged, this, &WorkoutModel::onIdUpdated);
 }
 
+bool WorkoutModel::isCompleted() const
+{
+    for (auto *s : m_exercises) {
+        if (!s->isCompleted())
+            return false;
+    }
+    return true;
+}
+
 void WorkoutModel::addExercise(ExerciseModel *exercise)
 {
     if (exercise && !m_exercises.contains(exercise))
@@ -18,7 +27,11 @@ void WorkoutModel::addExercise(ExerciseModel *exercise)
         exercise->setParent(this);
         exercise->setWorkoutId(m_id);
         m_exercises.append(exercise);
+
+        connect(exercise, &ExerciseModel::completedChanged, this, &WorkoutModel::completedChanged);
+
         emit exercisesChanged();
+        emit completedChanged();
     }
 }
 
