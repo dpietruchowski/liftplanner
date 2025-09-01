@@ -4,14 +4,14 @@
 #include "../models/workoutmodel.h"
 #include "../storage/appdbstorage.h"
 
-class WorkoutService : public QObject
+class RoutineService : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QList<QObject*> workouts READ workouts NOTIFY workoutsChanged)
 
 public:
-    explicit WorkoutService(AppDbStorage *dbStorage, QObject *parent = nullptr);
-    ~WorkoutService();
+    explicit RoutineService(AppDbStorage *dbStorage, QObject *parent = nullptr);
+    ~RoutineService();
 
     QList<QObject*> workouts() const;
 

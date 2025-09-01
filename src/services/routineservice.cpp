@@ -1,69 +1,77 @@
-#include "workoutservice.h"
+#include "routineservice.h"
 #include <QClipboard>
 #include <QDebug>
 #include <QGuiApplication>
 #include <QJsonArray>
 #include <QJsonDocument>
 
-WorkoutService::WorkoutService(AppDbStorage *dbStorage, QObject *parent)
-    : QObject(parent)
-    , m_dbStorage(dbStorage)
+RoutineService::RoutineService(AppDbStorage *dbStorage, QObject *parent)
+    : QObject(parent), m_dbStorage(dbStorage)
 {
 }
 
-WorkoutService::~WorkoutService()
+RoutineService::~RoutineService()
 {
     qDeleteAll(m_workouts);
     m_workouts.clear();
 }
 
-QList<QObject*> WorkoutService::workouts() const
+QList<QObject *> RoutineService::workouts() const
 {
     return m_workouts;
 }
 
-void WorkoutService::loadAllWorkouts()
+void RoutineService::loadAllWorkouts()
 {
-    try {
+    try
+    {
         qDeleteAll(m_workouts);
         m_workouts.clear();
 
-        QVector<WorkoutModel*> workoutModels = m_dbStorage->workoutRepository()->loadAll();
-        
-        for (WorkoutModel *workout : workoutModels) {
+        QVector<WorkoutModel *> workoutModels = m_dbStorage->workoutRepository()->loadAll();
+
+        for (WorkoutModel *workout : workoutModels)
+        {
             loadExercisesForWorkout(workout);
             m_workouts.append(workout);
         }
 
         emit workoutsChanged();
-
-    } catch (const std::exception &e) {
+    }
+    catch (const std::exception &e)
+    {
         emit errorOccurred(QString("Failed to load workouts: %1").arg(e.what()));
     }
 }
 
-void WorkoutService::importWorkoutsFromJson(const QString &jsonData)
+void RoutineService::importWorkoutsFromJson(const QString &jsonData)
 {
-    try {
+    try
+    {
         m_dbStorage->workoutRepository()->remove("");
         QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
-        if (doc.isArray()) {
+        if (doc.isArray())
+        {
             QJsonArray workoutsArray = doc.array();
-            for (const QJsonValue &workoutValue : workoutsArray) {
+            for (const QJsonValue &workoutValue : workoutsArray)
+            {
                 WorkoutModel *workout = WorkoutModel::fromJson(workoutValue.toObject());
-                if (workout) {
+                if (workout)
+                {
                     m_dbStorage->saveWorkout(workout);
                     delete workout;
                 }
             }
             loadAllWorkouts();
         }
-    } catch (const std::exception &e) {
+    }
+    catch (const std::exception &e)
+    {
         emit errorOccurred(QString("Import failed: %1").arg(e.what()));
     }
 }
 
-void WorkoutService::generateGptPrompt()
+void RoutineService::generateGptPrompt()
 {
     QString prompt = R"(
 You are a personal training assistant. Your task is to first gather details from the user, then generate a gym workout plan in JSON format.
@@ -123,45 +131,52 @@ Wait for the users answers and confirmation before generating the JSON.
     clipboard->setText(prompt);
 }
 
-void WorkoutService::importWorkoutsFromClipboard()
+void RoutineService::importWorkoutsFromClipboard()
 {
-    try {
+    try
+    {
         QClipboard *clipboard = QGuiApplication::clipboard();
         QString jsonData = clipboard->text();
 
-        if (jsonData.isEmpty()) {
+        if (jsonData.isEmpty())
+        {
             emit errorOccurred("Clipboard is empty");
             return;
         }
 
         importWorkoutsFromJson(jsonData);
-
-    } catch (const std::exception &e) {
+    }
+    catch (const std::exception &e)
+    {
         emit errorOccurred(QString("Import from clipboard failed: %1").arg(e.what()));
     }
 }
 
-void WorkoutService::loadExercisesForWorkout(WorkoutModel *workout)
+void RoutineService::loadExercisesForWorkout(WorkoutModel *workout)
 {
-    if (!workout) return;
+    if (!workout)
+        return;
 
     QVector<ExerciseModel *> exercises = m_dbStorage->exerciseRepository()->loadAll(
         QString("WHERE workout_id = %1").arg(workout->id()));
 
-    for (ExerciseModel *exercise : exercises) {
+    for (ExerciseModel *exercise : exercises)
+    {
         loadSetsForExercise(exercise);
         workout->addExercise(exercise);
     }
 }
 
-void WorkoutService::loadSetsForExercise(ExerciseModel *exercise)
+void RoutineService::loadSetsForExercise(ExerciseModel *exercise)
 {
-    if (!exercise) return;
+    if (!exercise)
+        return;
 
     QVector<SetModel *> sets = m_dbStorage->setRepository()->loadAll(
         QString("WHERE exercise_id = %1").arg(exercise->id()));
 
-    for (SetModel *set : sets) {
+    for (SetModel *set : sets)
+    {
         exercise->addSet(set);
     }
 }

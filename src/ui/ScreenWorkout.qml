@@ -7,7 +7,7 @@ Rectangle {
     id: root
     color: Theme.background
 
-    Component.onCompleted: WorkoutService.loadAllWorkouts()
+    Component.onCompleted: RoutineService.loadAllWorkouts()
 
     ScrollView {
         id: scrollView
@@ -24,7 +24,7 @@ Rectangle {
             WorkoutButtonsRow {}
 
             Repeater {
-                model: WorkoutService.workouts
+                model: RoutineService.workouts
                 delegate: WorkoutItem {
                     workout: modelData
                 }

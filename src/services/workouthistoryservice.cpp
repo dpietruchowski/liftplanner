@@ -1,0 +1,40 @@
+#include "workouthistoryservice.h"
+
+WorkoutHistoryService::WorkoutHistoryService(AppDbStorage *dbStorage, QObject *parent)
+    : QObject(parent), m_dbStorage(dbStorage)
+{
+    loadAllWorkouts();
+}
+
+void WorkoutHistoryService::loadAllWorkouts()
+{
+    QString condition = "WHERE started_time IS NOT NULL";
+    setWorkouts(m_dbStorage->workoutRepository()->loadAll(condition));
+}
+
+QList<WorkoutModel*> WorkoutHistoryService::workoutsBetween(const QDateTime &from, const QDateTime &to)
+{
+    QList<WorkoutModel*> result;
+    for (WorkoutModel* w : m_workouts) {
+        if (w->startedTime() >= from && w->endedTime() <= to)
+            result.append(w);
+    }
+    return result;
+}
+
+void WorkoutHistoryService::saveWorkout(WorkoutModel *workout)
+{
+    if (!m_dbStorage || !workout) return;
+    if (!workout->startedTime().isValid()) return;
+
+    m_dbStorage->saveWorkout(workout);
+    loadAllWorkouts();
+}
+
+void WorkoutHistoryService::deleteWorkout(WorkoutModel *workout)
+{
+    if (!m_dbStorage || !workout) return;
+
+    m_dbStorage->workoutRepository()->remove(QString::number(workout->id()));
+    loadAllWorkouts();
+}

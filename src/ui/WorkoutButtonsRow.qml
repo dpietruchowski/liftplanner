@@ -11,7 +11,7 @@ RowLayout {
     Button {
         Layout.fillWidth: true
         text: "Generate GPT Prompt"
-        onClicked: WorkoutService.generateGptPrompt()
+        onClicked: RoutineService.generateGptPrompt()
         background: Rectangle { color: Theme.primary; radius: Theme.borderRadius }
         contentItem: Text {
             anchors.centerIn: parent
@@ -25,7 +25,7 @@ RowLayout {
     Button {
         Layout.fillWidth: true
         text: "Import from JSON"
-        onClicked: WorkoutService.importWorkoutsFromClipboard()
+        onClicked: RoutineService.importWorkoutsFromClipboard()
         background: Rectangle { color: Theme.primary; radius: Theme.borderRadius }
         contentItem: Text {
             anchors.centerIn: parent

@@ -1,0 +1,27 @@
+#pragma once
+#include <QObject>
+#include <QList>
+#include <QDateTime>
+#include "models/workoutmodel.h"
+#include "storage/appdbstorage.h"
+
+class WorkoutHistoryService : public QObject
+{
+    Q_OBJECT
+
+    DECLARE_PROPERTY(QList<WorkoutModel*>, workouts, setWorkouts)
+
+public:
+    explicit WorkoutHistoryService(AppDbStorage *dbStorage, QObject *parent = nullptr);
+
+    Q_INVOKABLE void loadAllWorkouts();
+    Q_INVOKABLE QList<WorkoutModel*> workoutsBetween(const QDateTime &from, const QDateTime &to);
+    Q_INVOKABLE void saveWorkout(WorkoutModel *workout);
+    Q_INVOKABLE void deleteWorkout(WorkoutModel *workout);
+
+signals:
+    void errorOccurred(const QString &errorMessage);
+
+private:
+    AppDbStorage *m_dbStorage;
+};
