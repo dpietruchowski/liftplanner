@@ -1,6 +1,6 @@
-import QtQuick
-import QtQuick.Controls
-import QtQuick.Layouts
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
 import LiftPlanner
 
 Rectangle {
@@ -21,15 +21,19 @@ Rectangle {
         }
 
         ScrollView {
+            id: sv
             Layout.fillWidth: true
             Layout.fillHeight: true
+            clip: true
 
-            ColumnLayout {
-                width: parent.width
+            Column {
+                id: contentColumn
+                width: sv.availableWidth
                 spacing: Theme.spacing / 2
 
                 Repeater {
                     model: ActiveWorkoutService.currentWorkout ? ActiveWorkoutService.currentWorkout.exercises : []
+
                     delegate: ActiveWorkoutExerciseItem {
                         exercise: modelData
                     }

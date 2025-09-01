@@ -63,10 +63,6 @@ void ActiveWorkoutService::navigateToNext()
             auto newSets = m_currentExercise->sets();
             setCurrentSet(newSets.isEmpty() ? nullptr : qobject_cast<SetModel *>(newSets[0]));
         }
-        else
-        {
-            endWorkout();
-        }
     }
 }
 
