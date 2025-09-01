@@ -48,7 +48,7 @@ void RoutineService::importWorkoutsFromJson(const QString &jsonData)
 {
     try
     {
-        m_dbStorage->workoutRepository()->remove("");
+        m_dbStorage->workoutRepository()->remove("WHERE started_time IS NULL");
         QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
         if (doc.isArray())
         {

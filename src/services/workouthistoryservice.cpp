@@ -12,10 +12,11 @@ void WorkoutHistoryService::loadAllWorkouts()
     setWorkouts(m_dbStorage->workoutRepository()->loadAll(condition));
 }
 
-QList<WorkoutModel*> WorkoutHistoryService::workoutsBetween(const QDateTime &from, const QDateTime &to)
+QList<WorkoutModel *> WorkoutHistoryService::workoutsBetween(const QDateTime &from, const QDateTime &to)
 {
-    QList<WorkoutModel*> result;
-    for (WorkoutModel* w : m_workouts) {
+    QList<WorkoutModel *> result;
+    for (WorkoutModel *w : m_workouts)
+    {
         if (w->startedTime() >= from && w->endedTime() <= to)
             result.append(w);
     }
@@ -24,8 +25,10 @@ QList<WorkoutModel*> WorkoutHistoryService::workoutsBetween(const QDateTime &fro
 
 void WorkoutHistoryService::saveWorkout(WorkoutModel *workout)
 {
-    if (!m_dbStorage || !workout) return;
-    if (!workout->startedTime().isValid()) return;
+    if (!m_dbStorage || !workout)
+        return;
+    if (!workout->startedTime().isValid())
+        return;
 
     m_dbStorage->saveWorkout(workout);
     loadAllWorkouts();
@@ -33,8 +36,11 @@ void WorkoutHistoryService::saveWorkout(WorkoutModel *workout)
 
 void WorkoutHistoryService::deleteWorkout(WorkoutModel *workout)
 {
-    if (!m_dbStorage || !workout) return;
+    if (!m_dbStorage || !workout)
+        return;
 
-    m_dbStorage->workoutRepository()->remove(QString::number(workout->id()));
+    m_dbStorage->workoutRepository()->remove(
+        QString("WHERE id = %1").arg(workout->id()));
+
     loadAllWorkouts();
 }
