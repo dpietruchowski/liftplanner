@@ -45,26 +45,19 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
             spacing: Theme.spacing
 
-            Button {
+            PrimaryButton {
                 text: "Prev"
                 enabled: ActiveWorkoutService.isActive
+                buttonTheme: Theme.buttonMedium
+                buttonStyle: Theme.buttonStylePrimary
                 onClicked: ActiveWorkoutService.navigateToPrevious()
             }
 
-            Button {
+            PrimaryButton {
                 text: "Done"
                 enabled: ActiveWorkoutService.isActive && ActiveWorkoutService.currentSet
-                background: Rectangle {
-                    color: enabled ? Theme.success : Theme.border
-                    radius: Theme.borderRadius
-                }
-                contentItem: Text {
-                    text: qsTr("Done")
-                    color: Theme.buttonText
-                    font.pixelSize: Theme.fontMedium
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
+                buttonTheme: Theme.buttonMedium
+                buttonStyle: Theme.buttonStyleSuccess
                 onClicked: {
                     ActiveWorkoutService.completeCurrentSet()
                     var rs = ActiveWorkoutService.currentExercise ? ActiveWorkoutService.currentExercise.restSeconds : 0
@@ -74,12 +67,15 @@ Rectangle {
                 }
             }
 
-            Button {
-                text: "Next \u25b6"
+            PrimaryButton {
+                text: "Next"
                 enabled: ActiveWorkoutService.isActive
+                buttonTheme: Theme.buttonMedium
+                buttonStyle: Theme.buttonStylePrimary
                 onClicked: ActiveWorkoutService.navigateToNext()
             }
         }
+
     }
 
     RestDialog {

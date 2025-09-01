@@ -13,9 +13,9 @@ Column {
         width: exerciseDelegate.width
         height: 50
         radius: Theme.borderRadius
-        color: ActiveWorkoutService.currentExercise === exercise ? Theme.primary : Theme.surface
-        border.color: ActiveWorkoutService.currentExercise === exercise ? Theme.primaryVariant : Theme.border
-        border.width: 1
+        color: Theme.primary
+        border.color: exercise.completed ? Theme.success : Theme.border
+        border.width: 2
 
         Text {
             text: exercise.name
@@ -46,4 +46,4 @@ Column {
             }
         }
     }
-    }
+}

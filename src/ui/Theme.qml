@@ -16,7 +16,6 @@ QtObject {
     property color textPrimary: "#FFFFFF"
     property color textSecondary: "#BBBBBB"
     property color textDisabled: "#666666"
-
     property color buttonText: "#FFFFFF"
 
     property int borderRadius: 8
@@ -35,4 +34,37 @@ QtObject {
 
     property int timerCircleMax: 360
     property int timerBorderWidth: 2
+
+    property var buttonSmall: QtObject { property int width: 80; property int height: 32; property int fontSize: fontSmall; property int iconSize: 16 }
+    property var buttonMedium: QtObject { property int width: 100; property int height: 40; property int fontSize: fontMedium; property int iconSize: 20 }
+    property var buttonLarge: QtObject { property int width: 140; property int height: 56; property int fontSize: fontLarge; property int iconSize: 24 }
+
+    property var buttonStylePrimary: QtObject {
+        property color background: "#1F618D"
+        property color hovered: "#2874A6"
+        property color pressed: "#1A4F73"
+        property color border: "#2471A3"
+        property color text: "#FFFFFF"
+    }
+    property var buttonStyleSecondary: QtObject {
+        property color background: "#03DAC6"
+        property color hovered: "#26E2D0"
+        property color pressed: "#00BFA5"
+        property color border: "#03DAC6"
+        property color text: "#212121"
+    }
+    property var buttonStyleSuccess: QtObject {
+        property color background: "#27ae60"
+        property color hovered: "#2ECC71"
+        property color pressed: "#1E8449"
+        property color border: "#27ae60"
+        property color text: "#FFFFFF"
+    }
+    property var buttonStyleDanger: QtObject {
+        property color background: "#e74c3c"
+        property color hovered: "#EC7063"
+        property color pressed: "#C0392B"
+        property color border: "#e74c3c"
+        property color text: "#FFFFFF"
+    }
 }

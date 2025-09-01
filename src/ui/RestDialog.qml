@@ -170,7 +170,7 @@ Item {
                                             var ss = s % 60
                                             return (mm < 10 ? "0" + mm : mm) + ":" + (ss < 10 ? "0" + ss : ss)
                                         }
-                                        font.pixelSize: finished ? 32 : 84
+                                        font.pixelSize: finished ? 26 : 76
                                         font.bold: true
                                         color: Theme.primary
                                         horizontalAlignment: Text.AlignHCenter
@@ -183,8 +183,9 @@ Item {
                                 anchors.bottom: parent.bottom
                                 spacing: 20
 
-                                Button {
+                                PrimaryButton {
                                     text: "-15s"
+                                    buttonTheme: Theme.buttonSmall
                                     onClicked: {
                                         root.remainingSeconds = Math.max(0, root.remainingSeconds - 15)
                                         if (root.remainingSeconds === 0) {
@@ -195,37 +196,38 @@ Item {
                                     }
                                 }
 
-                                Button {
+                                PrimaryButton {
                                     text: "+15s"
+                                    buttonTheme: Theme.buttonSmall
                                     onClicked: {
                                         root.remainingSeconds = root.remainingSeconds + 15
                                     }
                                 }
                             }
+
                         }
 
                         RowLayout {
                             anchors.horizontalCenter: parent.horizontalCenter
                             spacing: 16
 
-                            Button {
+                            PrimaryButton {
                                 text: "Stop"
-                                onClicked: {
-                                    root.stopAndClose()
-                                }
+                                buttonTheme: Theme.buttonSmall
+                                onClicked: root.stopAndClose()
                             }
 
-                            Button {
+                            PrimaryButton {
                                 visible: root.finished
                                 text: "OK"
-                                onClicked: {
-                                    root.hideDialog()
-                                }
+                                buttonTheme: Theme.buttonSmall
+                                onClicked: root.hideDialog()
                             }
 
-                            Button {
+                            PrimaryButton {
                                 visible: !root.finished
                                 text: root.running ? "Pause" : "Start"
+                                buttonTheme: Theme.buttonSmall
                                 onClicked: {
                                     if (!root.running) root.start(); else root.pause()
                                 }

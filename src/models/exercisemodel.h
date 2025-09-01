@@ -16,8 +16,12 @@ class ExerciseModel : public QObject
     DECLARE_MODEL_PROPERTY(int, restSeconds, setRestSeconds, rest_seconds)
     DECLARE_MODEL_LIST_PROPERTY(ExerciseModel, SetModel, sets, setSets, sets)
 
+    Q_PROPERTY(bool completed READ isCompleted NOTIFY completedChanged)
+
 public:
     explicit ExerciseModel(QObject *parent = nullptr);
+
+    bool isCompleted() const;
 
     void addSet(SetModel *set);
     void removeSet(SetModel *set);
@@ -29,4 +33,7 @@ public:
     static ExerciseModel *fromJson(const QJsonObject &jsonObj, QObject *parent = nullptr);
 
     ExerciseModel *clone(QObject *parent = nullptr) const;
+
+signals:
+    bool completedChanged();
 };

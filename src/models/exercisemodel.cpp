@@ -10,6 +10,15 @@ ExerciseModel::ExerciseModel(QObject *parent)
     m_restSeconds = 60;
 }
 
+bool ExerciseModel::isCompleted() const
+{
+    for (auto *s : m_sets) {
+        if (!s->completed())
+            return false;
+    }
+    return true;
+}
+
 void ExerciseModel::addSet(SetModel *set)
 {
     if (set && !m_sets.contains(set))
@@ -17,7 +26,11 @@ void ExerciseModel::addSet(SetModel *set)
         set->setParent(this);
         set->setExerciseId(m_id);
         m_sets.append(set);
+
+        connect(set, &SetModel::completedChanged, this, &ExerciseModel::completedChanged);
+
         emit setsChanged();
+        emit completedChanged();
     }
 }
 
