@@ -12,4 +12,12 @@ ApplicationWindow {
     MainView {
         anchors.fill: parent
     }
+
+    Component.onCompleted: {
+        Theme.applicationWidth = appWindow.width
+        Theme.applicationHeight = appWindow.height
+    }
+
+    onWidthChanged: Theme.applicationWidth = width
+    onHeightChanged: Theme.applicationHeight = height
 }

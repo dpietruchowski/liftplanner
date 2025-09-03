@@ -4,6 +4,9 @@ import QtQuick 2.15
 QtObject {
     id: theme
 
+    property int applicationWidth: 360
+    property int applicationHeight: 640
+
     property color background: "#121212"
     property color surface: "#1E1E1E"
     property color primary: "#1F618D"
@@ -35,9 +38,24 @@ QtObject {
     property int timerCircleMax: 360
     property int timerBorderWidth: 2
 
-    property var buttonSmall: QtObject { property int width: 80; property int height: 32; property int fontSize: fontSmall; property int iconSize: 16 }
-    property var buttonMedium: QtObject { property int width: 100; property int height: 40; property int fontSize: fontMedium; property int iconSize: 20 }
-    property var buttonLarge: QtObject { property int width: 140; property int height: 56; property int fontSize: fontLarge; property int iconSize: 24 }
+    property var buttonSmall: QtObject {
+        property int width: theme.applicationWidth * 0.15
+        property int height: theme.applicationHeight * 0.05
+        property int fontSize: fontSmall
+        property int iconSize: 16
+    }
+    property var buttonMedium: QtObject {
+        property int width: theme.applicationWidth * 0.25
+        property int height: theme.applicationHeight * 0.06
+        property int fontSize: fontMedium
+        property int iconSize: 20
+    }
+    property var buttonLarge: QtObject {
+        property int width: theme.applicationWidth * 0.40
+        property int height: theme.applicationHeight * 0.09
+        property int fontSize: fontLarge
+        property int iconSize: 24
+    }
 
     property var buttonStylePrimary: QtObject {
         property color background: "#1F618D"
