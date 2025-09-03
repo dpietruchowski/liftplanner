@@ -26,9 +26,6 @@ signals:
     void errorOccurred(const QString &errorMessage);
 
 private:
-    void loadExercisesForWorkout(WorkoutModel *workout);
-    void loadSetsForExercise(ExerciseModel *exercise);
-
     AppDbStorage *m_dbStorage;
     QList<QObject*> m_workouts;
 };

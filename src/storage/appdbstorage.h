@@ -17,9 +17,13 @@ public:
     SetDbRepository *setRepository();
 
     int saveWorkout(WorkoutModel *workout);
+    void loadWorkout(WorkoutModel *workout);
 
 private:
     void initializeDatabase();
+
+    void loadExercisesForWorkout(WorkoutModel *workout);
+    void loadSetsForExercise(ExerciseModel *exercise);
 
     QSqlDatabase m_database;
     WorkoutDbRepository *m_workoutRepo;

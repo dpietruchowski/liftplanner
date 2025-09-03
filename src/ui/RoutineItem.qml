@@ -11,7 +11,7 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        Layout.preferredHeight: 56
+        Layout.preferredHeight: 50
         radius: Theme.borderRadius
         color: Theme.surface
         border.color: Theme.primary
@@ -19,8 +19,8 @@ ColumnLayout {
 
         RowLayout {
             anchors.fill: parent
-            anchors.margins: Theme.padding
             spacing: Theme.spacing
+            anchors.margins: Theme.padding
 
             Rectangle {
                 Layout.preferredWidth: 28
@@ -33,7 +33,7 @@ ColumnLayout {
                 Text {
                     anchors.centerIn: parent
                     text: expanded ? "▼" : "▶"
-                    font.pixelSize: Theme.fontSmall
+                    font.pixelSize: 14
                     color: Theme.buttonText
                 }
 
@@ -53,11 +53,28 @@ ColumnLayout {
                 verticalAlignment: Text.AlignVCenter
             }
 
-            Text {
-                text: Qt.formatDateTime(workout.startedTime, "dd.MM.yyyy")
-                font.pixelSize: Theme.fontSmall
-                color: Theme.textSecondary
-                verticalAlignment: Text.AlignVCenter
+            Rectangle {
+                Layout.preferredWidth: 28
+                Layout.preferredHeight: 28
+                radius: 14
+                color: Theme.primary
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "▶"
+                    font.pixelSize: 14
+                    color: Theme.buttonText
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        ActiveWorkoutService.startWorkout(workout)
+                        if (stackView.currentItem !== activeWorkoutScreen) {
+                            stackView.replace(activeWorkoutScreen)
+                        }
+                    }
+                }
             }
         }
     }

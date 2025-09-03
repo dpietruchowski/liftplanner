@@ -9,26 +9,12 @@ Rectangle {
 
     Component.onCompleted: RoutineService.loadAllWorkouts()
 
-    ScrollView {
-        id: scrollView
+    WorkoutListView {
         anchors.fill: parent
-        anchors.margins: Theme.padding
-
-        ColumnLayout {
-            id: columnLayout
-            width: scrollView.contentItem.width
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            spacing: Theme.spacing
-
-            WorkoutButtonsRow {}
-
-            Repeater {
-                model: RoutineService.workouts
-                delegate: WorkoutItem {
-                    workout: modelData
-                }
-            }
+        workouts: RoutineService.workouts
+        workoutDelegate: RoutineItem {
+            workout: modelData
         }
+        buttonsRow: WorkoutButtonsRow {}
     }
 }

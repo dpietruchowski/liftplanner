@@ -9,7 +9,12 @@ WorkoutHistoryService::WorkoutHistoryService(AppDbStorage *dbStorage, QObject *p
 void WorkoutHistoryService::loadAllWorkouts()
 {
     QString condition = "WHERE started_time IS NOT NULL";
-    setWorkouts(m_dbStorage->workoutRepository()->loadAll(condition));
+    QVector<WorkoutModel *> workoutModels = m_dbStorage->workoutRepository()->loadAll(condition);
+    for (WorkoutModel *workout : workoutModels) {
+        m_dbStorage->loadWorkout(workout);
+        m_workouts.append(workout);
+    }
+    setWorkouts(workoutModels);
 }
 
 QList<WorkoutModel *> WorkoutHistoryService::workoutsBetween(const QDateTime &from, const QDateTime &to)

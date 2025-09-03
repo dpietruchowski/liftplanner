@@ -28,11 +28,12 @@ void RoutineService::loadAllWorkouts()
         qDeleteAll(m_workouts);
         m_workouts.clear();
 
-        QVector<WorkoutModel *> workoutModels = m_dbStorage->workoutRepository()->loadAll();
+        QVector<WorkoutModel *> workoutModels = m_dbStorage->workoutRepository()->loadAll(
+            "WHERE started_time IS NULL");
 
         for (WorkoutModel *workout : workoutModels)
         {
-            loadExercisesForWorkout(workout);
+            m_dbStorage->loadWorkout(workout);
             m_workouts.append(workout);
         }
 
@@ -149,34 +150,5 @@ void RoutineService::importWorkoutsFromClipboard()
     catch (const std::exception &e)
     {
         emit errorOccurred(QString("Import from clipboard failed: %1").arg(e.what()));
-    }
-}
-
-void RoutineService::loadExercisesForWorkout(WorkoutModel *workout)
-{
-    if (!workout)
-        return;
-
-    QVector<ExerciseModel *> exercises = m_dbStorage->exerciseRepository()->loadAll(
-        QString("WHERE workout_id = %1").arg(workout->id()));
-
-    for (ExerciseModel *exercise : exercises)
-    {
-        loadSetsForExercise(exercise);
-        workout->addExercise(exercise);
-    }
-}
-
-void RoutineService::loadSetsForExercise(ExerciseModel *exercise)
-{
-    if (!exercise)
-        return;
-
-    QVector<SetModel *> sets = m_dbStorage->setRepository()->loadAll(
-        QString("WHERE exercise_id = %1").arg(exercise->id()));
-
-    for (SetModel *set : sets)
-    {
-        exercise->addSet(set);
     }
 }
