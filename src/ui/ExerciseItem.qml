@@ -14,10 +14,6 @@ Rectangle {
 
     property var exercise
 
-    function repsSummary(sets) {
-        return Array.from(sets).map(s => s.repetitions).join(", ")
-    }
-
     RowLayout {
         id: row
         anchors.fill: parent
@@ -34,7 +30,7 @@ Rectangle {
         }
 
         Text {
-            text: "Sets: " + repsSummary(exercise.sets)
+            text: exercise.setsToString()
             font.pixelSize: Theme.fontSmall
             color: Theme.textSecondary
             Layout.alignment: Qt.AlignRight | Qt.AlignVCenter

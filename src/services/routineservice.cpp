@@ -72,61 +72,71 @@ void RoutineService::importWorkoutsFromJson(const QString &jsonData)
     }
 }
 
-void RoutineService::generateGptPrompt()
+void RoutineService::generateGptPrompt(const QJsonArray &recentTrainings)
 {
-    QString prompt = R"(
-You are a personal training assistant. Your task is to first gather details from the user, then generate a gym workout plan in JSON format.
+    QString prompt;
 
-Follow these steps:
+    if (recentTrainings.isEmpty()) {
+        prompt += R"(
+You are a personal training assistant. Gather details from the user and generate a beginner workout plan.
+Ask for:
+- Gender (male/female)
+- Age
+- Weight
+- Goal
+- Training experience
+- Workouts per week
+- Equipment
+- Injuries or limitations
+- Time per workout
+)";
+    } else {
+        prompt += R"(
+You are a personal training assistant. Analyze the user's recent workouts, evaluate their progress, and provide brief suggestions on what to adjust.
+Include the user's recent workouts as reference:
+)";
 
-### Step 1: Ask questions
-Ask the user these questions one by one:
-1. Choose language
-2. What is your **main goal**? (Build muscle, lose fat, strength, endurance)
-3. What is your **training experience**? (Beginner, Intermediate, Advanced)
-4. How many **workouts per week** can you do? (e.g., 3, 4, 5)
-5. What **equipment** do you have access to? (Full gym, dumbbells only, bodyweight)
-6. Any **injuries or limitations**? (Shoulder, knee, back, etc.)
-7. How much **time per workout** do you have? (e.g., 45 min, 60 min)
+        QString recentTrainingsString = QJsonDocument(recentTrainings)
+                                            .toJson(QJsonDocument::Indented);
+        prompt += recentTrainingsString;
+    }
 
-Be friendly and clear, and confirm the users answers before generating the plan.
+    prompt += R"(
 
-### Step 2: Explain output format with an example
-Show this short example so the user understands what the result will look like:
-```
+Step 1: Show the user the proposed exercises with sets in the format repsxweightkg and wait for confirmation.
+
+Step 2: After confirmation, generate the full workout plan as valid JSON wrapped in a code block.
+
+Format of the JSON:
+- The top-level object is a list of workouts.
+- Each workout has:
+  - "name": string
+  - "exercises": list of exercises
+- Each exercise has:
+  - "name": string
+  - "description": string
+  - "sets": string with each set in format repsxweightkg, separated by commas (e.g., "10x50kg, 8x55kg, 6x60kg")
+- Example structure (without actual example values):
 [
   {
-    "name": "Trening A",
+    "name": "Workout Name",
     "exercises": [
       {
-        "name": "Bench Press",
-        "description: "How to bench press"
-        "sets": [
-          {"repetitions": 10, "weight": 50},
-          {"repetitions": 8, "weight": 55},
-          {"repetitions": 6, "weight": 60}
-        ]
+        "name": "Exercise Name",
+        "description": "Instructions",
+        "sets": "10x50kg, 8x55kg"
       }
     ]
   }
 ]
-```
 
-### Step 3: Generate the workout plan
-Once the user provides all answers, create a plan following these rules:
-- Return ONLY valid JSON, no extra text.
-- Use the exact structure from the example.
-- Simple very short names for exercises
-- Each workout should have **3-5 exercises** arranged in the correct order:
-  - Start with compound lifts (e.g., squats, bench press, deadlift)
-  - Then assistance and isolation exercises (e.g., biceps curls, lateral raises)
-- Each exercise should have **3-5 sets**, with realistic progression of weights or fixed weights.
+Rules:
+- Each set must always be in the format repsxweightkg (e.g., 10x50kg, 8x0kg for bodyweight exercises).
 - Weights in kg, repetitions as integers.
-- Make the program logical, progressive, and aligned with the user's goals and experience.
-- Ensure the workouts are balanced and fit within the users time constraints.
-
-Wait for the users answers and confirmation before generating the JSON.
+- Ensure the workouts are balanced and appropriate for the user.
 )";
+
+    prompt += "\n";
 
     QClipboard *clipboard = QGuiApplication::clipboard();
     clipboard->setText(prompt);

@@ -18,7 +18,7 @@ public:
     Q_INVOKABLE void loadAllWorkouts();
 
     Q_INVOKABLE void importWorkoutsFromJson(const QString &jsonData);
-    Q_INVOKABLE void generateGptPrompt();
+    Q_INVOKABLE void generateGptPrompt(const QJsonArray &recentTrainings);
     Q_INVOKABLE void importWorkoutsFromClipboard();
 
 signals:

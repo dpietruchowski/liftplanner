@@ -23,5 +23,8 @@ public:
     QJsonObject toJson() const;
     static SetModel *fromJson(const QJsonObject &jsonObj, QObject *parent = nullptr);
 
+    QString toString() const;
+    static SetModel *fromString(const QString &str, QObject *parent = nullptr);
+
     SetModel *clone(QObject *parent = nullptr) const;
 };

@@ -53,6 +53,32 @@ SetModel *SetModel::fromJson(const QJsonObject &jsonObj, QObject *parent)
     return fromVariantMap(Serialization::fromJson(jsonObj), parent);
 }
 
+QString SetModel::toString() const
+{
+    return QString("%1x%2kg").arg(m_repetitions).arg(m_weight);
+}
+
+SetModel *SetModel::fromString(const QString &str, QObject *parent)
+{
+    QStringList parts = str.toLower().replace("kg", "").split("x");
+    if (parts.size() != 2)
+        return nullptr;
+
+    bool ok1 = false;
+    bool ok2 = false;
+
+    int reps = parts[0].trimmed().toInt(&ok1);
+    double w = parts[1].trimmed().toDouble(&ok2);
+
+    if (!ok1 || !ok2)
+        return nullptr;
+
+    SetModel *model = new SetModel(parent);
+    model->setRepetitions(reps);
+    model->setWeight(w);
+    return model;
+}
+
 SetModel *SetModel::clone(QObject *parent) const
 {
     SetModel *clone = new SetModel(parent);

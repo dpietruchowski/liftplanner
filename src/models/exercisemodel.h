@@ -32,6 +32,9 @@ public:
     QJsonObject toJson() const;
     static ExerciseModel *fromJson(const QJsonObject &jsonObj, QObject *parent = nullptr);
 
+    Q_INVOKABLE QString setsToString() const;
+    void setsFromString(const QString &str);
+
     ExerciseModel *clone(QObject *parent = nullptr) const;
 
 signals:

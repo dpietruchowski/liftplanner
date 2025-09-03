@@ -1,5 +1,7 @@
 #include "workouthistoryservice.h"
 
+#include <QJsonArray>
+
 WorkoutHistoryService::WorkoutHistoryService(AppDbStorage *dbStorage, QObject *parent)
     : QObject(parent), m_dbStorage(dbStorage)
 {
@@ -8,13 +10,15 @@ WorkoutHistoryService::WorkoutHistoryService(AppDbStorage *dbStorage, QObject *p
 
 void WorkoutHistoryService::loadAllWorkouts()
 {
-    QString condition = "WHERE started_time IS NOT NULL";
+    QString condition = "WHERE started_time IS NOT NULL ORDER BY started_time DESC";
     QVector<WorkoutModel *> workoutModels = m_dbStorage->workoutRepository()->loadAll(condition);
+
     for (WorkoutModel *workout : workoutModels) {
         m_dbStorage->loadWorkout(workout);
-        m_workouts.append(workout);
     }
-    setWorkouts(workoutModels);
+
+    m_workouts = workoutModels.toList();
+    setWorkouts(m_workouts);
 }
 
 QList<WorkoutModel *> WorkoutHistoryService::workoutsBetween(const QDateTime &from, const QDateTime &to)
@@ -48,4 +52,19 @@ void WorkoutHistoryService::deleteWorkout(WorkoutModel *workout)
         QString("WHERE id = %1").arg(workout->id()));
 
     loadAllWorkouts();
+}
+
+QJsonArray WorkoutHistoryService::recentWorkoutsToJson(int count)
+{
+    QJsonArray jsonArray;
+
+    int actualCount = qMin(count, m_workouts.size());
+    for (int i = 0; i < actualCount; ++i) {
+        WorkoutModel *workout = m_workouts.at(i);
+        if (workout) {
+            jsonArray.append(workout->toJson());
+        }
+    }
+
+    return jsonArray;
 }

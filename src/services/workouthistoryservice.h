@@ -1,7 +1,8 @@
 #pragma once
-#include <QObject>
-#include <QList>
 #include <QDateTime>
+#include <QJsonArray>
+#include <QList>
+#include <QObject>
 #include "models/workoutmodel.h"
 #include "storage/appdbstorage.h"
 
@@ -18,6 +19,8 @@ public:
     Q_INVOKABLE QList<WorkoutModel*> workoutsBetween(const QDateTime &from, const QDateTime &to);
     Q_INVOKABLE void saveWorkout(WorkoutModel *workout);
     Q_INVOKABLE void deleteWorkout(WorkoutModel *workout);
+
+    Q_INVOKABLE QJsonArray recentWorkoutsToJson(int count = 10);
 
 signals:
     void errorOccurred(const QString &errorMessage);

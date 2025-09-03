@@ -11,7 +11,7 @@ RowLayout {
     Button {
         Layout.fillWidth: true
         text: "Generate GPT Prompt"
-        onClicked: RoutineService.generateGptPrompt()
+        onClicked: RoutineService.generateGptPrompt(WorkoutHistoryService.recentWorkoutsToJson())
         background: Rectangle { color: Theme.primary; radius: Theme.borderRadius }
         contentItem: Text {
             anchors.centerIn: parent
