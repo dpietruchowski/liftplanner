@@ -1,3 +1,4 @@
+// ActiveWorkoutSetItem.qml
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -6,6 +7,8 @@ import LiftPlanner
 Rectangle {
     id: setRect
     property var setData
+    signal editRepetitions(var setData)
+    signal editWeight(var setData)
     width: setsColumn.width
     height: 60
     radius: Theme.borderRadius
@@ -15,6 +18,13 @@ Rectangle {
 
     Behavior on color { ColorAnimation { duration: 200 } }
 
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: function(mouse) {
+            ActiveWorkoutService.currentSet = setData
+        }
+    }
     Row {
         anchors.fill: parent
         anchors.margins: Theme.padding
@@ -28,18 +38,45 @@ Rectangle {
             width: 60
         }
 
-        Text {
-            text: setData.repetitions + " reps"
-            font.pixelSize: Theme.fontSmall
-            color: setData.completed ? Theme.buttonText : Theme.textSecondary
+        Item {
             width: 80
+            height: parent.height
+
+            Text {
+                text: setData.repetitions + " reps"
+                font.pixelSize: Theme.fontSmall
+                color: setData.completed ? Theme.buttonText : Theme.textSecondary
+                anchors.centerIn: parent
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    ActiveWorkoutService.currentSet = setData
+                    editRepetitions(setData)
+                }
+            }
         }
 
-        Text {
-            text: setData.weight + " kg"
-            font.pixelSize: Theme.fontSmall
-            color: setData.completed ? Theme.buttonText : Theme.textSecondary
+        Item {
             width: 80
+            height: parent.height
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    ActiveWorkoutService.currentSet = setData
+                    editWeight(setData)
+                }
+            }
+
+            Text {
+                id: setText
+                text: setData.weight + " kg"
+                font.pixelSize: Theme.fontSmall
+                color: setData.completed ? Theme.buttonText : Theme.textSecondary
+                anchors.centerIn: parent
+            }
         }
 
         Item {
@@ -56,10 +93,5 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
         }
 
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        onClicked: ActiveWorkoutService.currentSet = setData
     }
 }

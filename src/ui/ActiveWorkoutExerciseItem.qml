@@ -1,3 +1,4 @@
+// ActiveWorkoutExerciseItem.qml
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -6,6 +7,8 @@ import LiftPlanner
 Column {
     id: exerciseDelegate
     property var exercise: modelData
+    signal editSetRepetitions(var setData)
+    signal editSetWeight(var setData)
     width: contentColumn.width
     spacing: Theme.spacing / 2
 
@@ -43,6 +46,8 @@ Column {
 
             delegate: ActiveWorkoutSetItem {
                 setData: modelData
+                onEditRepetitions: function(setDat) { exerciseDelegate.editSetRepetitions(setData) }
+                onEditWeight: function(setDat) { exerciseDelegate.editSetWeight(setData) }
             }
         }
     }

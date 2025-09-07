@@ -7,6 +7,8 @@ Rectangle {
     id: root
     color: Theme.background
 
+    property var currentSetter
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: Theme.padding
@@ -36,6 +38,8 @@ Rectangle {
 
                     delegate: ActiveWorkoutExerciseItem {
                         exercise: modelData
+                        onEditSetRepetitions: function(setData) { handleEditRepetitions(setData) }
+                        onEditSetWeight: function(setData) { handleEditWeight(setData) }
                     }
                 }
             }
@@ -67,7 +71,7 @@ Rectangle {
                         ActiveWorkoutService.completeCurrentSet()
                         var rs = ActiveWorkoutService.currentExercise ? ActiveWorkoutService.currentExercise.restSeconds : 0
                         if (rs > 0) {
-                            restDialog.show(rs, qsTr("Rest between sets"), false)
+                            restDialog.show(rs)
                         }
                     }
                 }
@@ -84,12 +88,41 @@ Rectangle {
 
     }
 
+    Item {
+        id: overlayRoot
+        anchors.fill: parent
+        visible: valueEditorDialog.dialogVisible
+
+        Rectangle {
+            anchors.fill: parent
+            color: "#00000080"
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: valueEditorDialog.dialogVisible = false
+            }
+        }
+
+        ValueEditorDialog {
+            id: valueEditorDialog
+            dialogVisible: false
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            step: 1
+
+            onConfirmed: {
+                if (currentSetter) {
+                    currentSetter(value)
+                }
+                currentSetter = null
+                dialogVisible = false
+            }
+        }
+    }
+
     RestDialog {
         id: restDialog
         dialogVisible: false
-        onDismissed: {
-            restDialog.reset()
-        }
     }
 
     Connections {
@@ -98,6 +131,24 @@ Rectangle {
             WorkoutHistoryService.saveWorkout(ActiveWorkoutService.currentWorkout)
             stackView.pop()
         }
+    }
+
+    function handleEditRepetitions(setData) {
+        currentSetter = function(newValue) { setData.repetitions = newValue }
+        valueEditorDialog.value = setData.repetitions
+        valueEditorDialog.minValue = 0
+        valueEditorDialog.maxValue = 100
+        valueEditorDialog.step = 1
+        valueEditorDialog.dialogVisible = true
+    }
+
+    function handleEditWeight(setData) {
+        currentSetter = function(newValue) { setData.weight = newValue }
+        valueEditorDialog.value = setData.weight
+        valueEditorDialog.minValue = 0
+        valueEditorDialog.maxValue = 500
+        valueEditorDialog.step = 5
+        valueEditorDialog.dialogVisible = true
     }
 
 }
