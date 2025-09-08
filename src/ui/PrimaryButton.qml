@@ -11,12 +11,15 @@ Button {
     property var buttonTheme: Theme.buttonMedium
     property var buttonStyle: Theme.buttonStylePrimary
 
-    implicitWidth: Math.max(buttonTheme.width, label.implicitWidth + (svgIcon ? buttonTheme.iconSize + 24 : 24))
-    implicitHeight: Math.max(buttonTheme.height, buttonTheme.iconSize + 12)
+    // implicitWidth: Math.max(buttonTheme.width, label.implicitWidth + (svgIcon ? buttonTheme.iconSize + 24 : 24))
+    // implicitHeight: Math.max(buttonTheme.height, buttonTheme.iconSize + 12)
+    implicitWidth: buttonTheme.width
+    implicitHeight: buttonTheme.height
 
     background: Rectangle {
         id: bg
         radius: circular ? Math.min(control.implicitHeight, control.implicitWidth) / 2 : Theme.borderRadius
+
         border.width: 1
         border.color: control.down ? buttonStyle.border : buttonStyle.border
         color: control.enabled ?

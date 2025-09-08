@@ -22,25 +22,12 @@ ColumnLayout {
             anchors.margins: Theme.padding
             spacing: Theme.spacing
 
-            Rectangle {
-                Layout.preferredWidth: 28
-                Layout.preferredHeight: 28
-                radius: 14
-                color: Theme.primary
-                border.color: Theme.buttonText
-                border.width: 2
-
-                Text {
-                    anchors.centerIn: parent
-                    text: expanded ? "▼" : "▶"
-                    font.pixelSize: Theme.fontSmall
-                    color: Theme.buttonText
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: expanded = !expanded
-                }
+            PrimaryButton {
+                svgIcon: expanded ? Theme.icons.collapse : Theme.icons.expand
+                circular: true
+                buttonTheme: Theme.buttonSquare
+                buttonStyle: Theme.buttonStylePrimary
+                onClicked: expanded = !expanded
             }
 
             Text {

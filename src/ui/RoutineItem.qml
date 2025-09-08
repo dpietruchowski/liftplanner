@@ -22,25 +22,12 @@ ColumnLayout {
             spacing: Theme.spacing
             anchors.margins: Theme.padding
 
-            Rectangle {
-                Layout.preferredWidth: 28
-                Layout.preferredHeight: 28
-                radius: 14
-                color: Theme.primary
-                border.color: Theme.buttonText
-                border.width: 2
-
-                Text {
-                    anchors.centerIn: parent
-                    text: expanded ? "▼" : "▶"
-                    font.pixelSize: 14
-                    color: Theme.buttonText
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: expanded = !expanded
-                }
+            PrimaryButton {
+                svgIcon: expanded ? Theme.icons.collapse : Theme.icons.expand
+                circular: true
+                buttonTheme: Theme.buttonSquare
+                buttonStyle: Theme.buttonStylePrimary
+                onClicked: expanded = !expanded
             }
 
             Text {
@@ -53,26 +40,15 @@ ColumnLayout {
                 verticalAlignment: Text.AlignVCenter
             }
 
-            Rectangle {
-                Layout.preferredWidth: 28
-                Layout.preferredHeight: 28
-                radius: 14
-                color: Theme.primary
-
-                Text {
-                    anchors.centerIn: parent
-                    text: "▶"
-                    font.pixelSize: 14
-                    color: Theme.buttonText
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        ActiveWorkoutService.startWorkout(workout)
-                        if (stackView.currentItem !== activeWorkoutScreen) {
-                            stackView.replace(activeWorkoutScreen)
-                        }
+            PrimaryButton {
+                svgIcon: Theme.icons.startWorkout
+                circular: true
+                buttonTheme: Theme.buttonSquare
+                buttonStyle: Theme.buttonStylePrimary
+                onClicked: {
+                    ActiveWorkoutService.startWorkout(workout)
+                    if (stackView.currentItem !== activeWorkoutScreen) {
+                        stackView.replace(activeWorkoutScreen)
                     }
                 }
             }

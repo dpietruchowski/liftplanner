@@ -57,6 +57,14 @@ QtObject {
         property string startWorkout: "qrc:/LiftPlanner/ui/icons/start-workout.svg"
     }
 
+    property var buttonSquare: QtObject {
+        property int size: 28
+        property int width: size
+        property int height: size
+        property int fontSize: fontSmall
+        property int iconSize: size
+    }
+
     property var buttonSmall: QtObject {
         property int width: theme.applicationWidth * 0.15
         property int height: theme.applicationHeight * 0.05

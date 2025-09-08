@@ -92,6 +92,5 @@ Rectangle {
             border.width: 2
             anchors.verticalCenter: parent.verticalCenter
         }
-
     }
 }
