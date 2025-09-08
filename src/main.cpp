@@ -5,6 +5,20 @@
 #include "services/routineservice.h"
 #include "services/workouthistoryservice.h"
 #include "storage/appdbstorage.h"
+#include "utils/coloredsvgprovider.h"
+
+#include <QDebug>
+#include <QDirIterator>
+#include <QResource>
+
+void listResources(const QString &prefix)
+{
+    QDirIterator it(prefix, QDir::Files | QDir::NoSymLinks, QDirIterator::Subdirectories);
+    while (it.hasNext())
+    {
+        qDebug() << it.next();
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -18,6 +32,8 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     qmlRegisterSingletonType(QUrl("qrc:/LiftPlanner/ui/Theme.qml"), "LiftPlanner", 1, 0, "Theme");
+
+    qmlRegisterType<ColoredSvgProvider>("LiftPlanner", 1, 0, "ColoredSvgProvider");
 
     qmlRegisterSingletonInstance<RoutineService>("LiftPlanner",
                                                  1,

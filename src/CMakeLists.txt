@@ -7,6 +7,7 @@ add_subdirectory(repositories)
 add_subdirectory(services)
 add_subdirectory(storage)
 add_subdirectory(ui)
+add_subdirectory(ui/icons)
 add_subdirectory(utils)
 
 qt_add_executable(liftplanner
@@ -22,6 +23,13 @@ qt_add_qml_module(liftplanner
     QML_FILES 
         ${PROJECT_QML_SOURCES}
 )
+
+qt_add_resources(liftplanner "app_icons"
+    PREFIX "/LiftPlanner"
+    FILES
+        ${PROJECT_ICON_SOURCES}
+)
+
 
 target_link_libraries(liftplanner
     PRIVATE

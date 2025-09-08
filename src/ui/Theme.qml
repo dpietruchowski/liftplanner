@@ -38,6 +38,25 @@ QtObject {
     property int timerCircleMax: 360
     property int timerBorderWidth: 2
 
+    property var icons: QtObject {
+        property string search: "qrc:/LiftPlanner/ui/icons/search.svg"
+        property string close: "qrc:/LiftPlanner/ui/icons/close.svg"
+        property string menu: "qrc:/LiftPlanner/ui/icons/menu.svg"
+        property string user: "qrc:/LiftPlanner/ui/icons/user.svg"
+        property string settings: "qrc:/LiftPlanner/ui/icons/settings.svg"
+        property string home: "qrc:/LiftPlanner/ui/icons/home.svg"
+        property string info: "qrc:/LiftPlanner/ui/icons/info.svg"
+        property string check: "qrc:/LiftPlanner/ui/icons/check.svg"
+
+        property string addSet: "qrc:/LiftPlanner/ui/icons/add-set.svg"
+        property string removeSet: "qrc:/LiftPlanner/ui/icons/remove-set.svg"
+        property string next: "qrc:/LiftPlanner/ui/icons/next.svg"
+        property string previous: "qrc:/LiftPlanner/ui/icons/previous.svg"
+        property string expand: "qrc:/LiftPlanner/ui/icons/expand.svg"
+        property string collapse: "qrc:/LiftPlanner/ui/icons/collapse.svg"
+        property string startWorkout: "qrc:/LiftPlanner/ui/icons/start-workout.svg"
+    }
+
     property var buttonSmall: QtObject {
         property int width: theme.applicationWidth * 0.15
         property int height: theme.applicationHeight * 0.05

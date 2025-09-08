@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import LiftPlanner
 
 Button {
     id: control
@@ -37,9 +38,15 @@ Button {
             spacing: 8
             anchors.centerIn: parent
 
+            ColoredSvgProvider {
+                id: svgProvider
+                svgOriginSource: control.svgIcon
+                color: control.iconTint
+            }
+
             Image {
                 id: svg
-                source: control.svgIcon
+                source: svgProvider.svgSource
                 visible: control.svgIcon && control.svgIcon !== ""
                 width: visible ? buttonTheme.iconSize : 0
                 height: visible ? buttonTheme.iconSize : 0

@@ -50,7 +50,7 @@ Rectangle {
             spacing: Theme.spacing
 
             PrimaryButton {
-                text: "Prev"
+                svgIcon: Theme.icons.previous
                 enabled: ActiveWorkoutService.isActive
                 buttonTheme: Theme.buttonMedium
                 buttonStyle: Theme.buttonStylePrimary
@@ -78,7 +78,7 @@ Rectangle {
             }
 
             PrimaryButton {
-                text: "Next"
+                svgIcon: Theme.icons.next
                 enabled: ActiveWorkoutService.isActive
                 buttonTheme: Theme.buttonMedium
                 buttonStyle: Theme.buttonStylePrimary
