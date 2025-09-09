@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import LiftPlanner
+import LiftPlanner 1.0
 
 ColumnLayout {
     Layout.fillWidth: true

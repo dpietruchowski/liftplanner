@@ -9,8 +9,12 @@ ApplicationWindow {
     visible: true
     title: "Lift Planner"
 
-    MainView {
+    Loader {
+        id: mainLoader
+        asynchronous: true
+        objectName: "mainLoader"
         anchors.fill: parent
+        source: "MainView.qml"
     }
 
     Component.onCompleted: {

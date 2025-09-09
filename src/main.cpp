@@ -1,11 +1,18 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QQmlEngine>
 #include "services/activeworkoutservice.h"
 #include "services/routineservice.h"
 #include "services/workouthistoryservice.h"
 #include "storage/appdbstorage.h"
 #include "utils/coloredsvgprovider.h"
+
+#define QML_LIVE_ENABLED
+
+#ifdef QML_LIVE_ENABLED
+#include "lib/filewatcher.h"
+#endif
 
 #include <QDebug>
 #include <QDirIterator>
@@ -31,9 +38,53 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
-    qmlRegisterSingletonType(QUrl("qrc:/LiftPlanner/ui/Theme.qml"), "LiftPlanner", 1, 0, "Theme");
+    QObject::connect(
+        &engine,
+        &QQmlApplicationEngine::objectCreationFailed,
+        &app,
+        []() { QCoreApplication::exit(-1); },
+        Qt::QueuedConnection);
 
     qmlRegisterType<ColoredSvgProvider>("LiftPlanner", 1, 0, "ColoredSvgProvider");
+
+#ifdef QML_LIVE_ENABLED
+    const QDir watchDir("/home/damian/dev/lift-planner/src/ui");
+    const QUrl mainQmlUrl = QUrl::fromLocalFile(watchDir.filePath("Main.qml"));
+
+    qmlRegisterSingletonType(QUrl::fromLocalFile(watchDir.filePath("Theme.qml")),
+                             "LiftPlanner",
+                             1,
+                             0,
+                             "Theme");
+
+    engine.addImportPath(watchDir.absolutePath());
+
+    QQmlContext *ctx = engine.rootContext();
+    ctx->setContextProperty("RoutineService", &routineService);
+    ctx->setContextProperty("ActiveWorkoutService", &activeWorkoutService);
+    ctx->setContextProperty("WorkoutHistoryService", &workoutHistoryService);
+
+    engine.load(mainQmlUrl);
+
+    FileWatcher watcher([&, watchDir]() {
+        QObject *root = engine.rootObjects().isEmpty() ? nullptr : engine.rootObjects().first();
+        if (!root)
+            return;
+
+        QObject *loader = root->findChild<QObject *>("mainLoader");
+        if (!loader)
+            return;
+
+        QUrl viewUrl = QUrl::fromLocalFile(watchDir.filePath("MainView.qml"));
+
+        engine.clearComponentCache();
+        loader->setProperty("source", QUrl());
+        loader->setProperty("source", viewUrl);
+    });
+
+    watcher.setDirectory(watchDir.absolutePath());
+
+#else
 
     qmlRegisterSingletonInstance<RoutineService>("LiftPlanner",
                                                  1,
@@ -51,12 +102,10 @@ int main(int argc, char *argv[])
                                                         "WorkoutHistoryService",
                                                         &workoutHistoryService);
 
+    qmlRegisterSingletonType(QUrl("qrc:/LiftPlanner/ui/Theme.qml"), "LiftPlanner", 1, 0, "Theme");
     const QUrl url(QStringLiteral("qrc:/LiftPlanner/ui/Main.qml"));
-
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreationFailed, &app, []()
-                     { QCoreApplication::exit(-1); }, Qt::QueuedConnection);
-
     engine.load(url);
+#endif
 
     return app.exec();
 }

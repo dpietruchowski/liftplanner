@@ -5,8 +5,6 @@ Item {
     id: root
     anchors.fill: parent
 
-    property int currentIndex: 0
-
     property var activeWorkoutScreen: ScreenActiveWorkout {}
     property var homeScreen: ScreenHome {}
     property var workoutScreen: ScreenWorkout {}
