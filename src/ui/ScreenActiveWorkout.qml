@@ -95,7 +95,7 @@ Rectangle {
 
         Rectangle {
             anchors.fill: parent
-            color: "#00000080"
+            color: "#000000C0"
 
             MouseArea {
                 anchors.fill: parent

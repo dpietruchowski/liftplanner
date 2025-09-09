@@ -22,6 +22,9 @@ public:
     Q_INVOKABLE void navigateToPrevious();
     Q_INVOKABLE void endWorkout();
 
+    Q_INVOKABLE void duplicateSet(SetModel *set);
+    Q_INVOKABLE void removeSet(SetModel *set);
+
 signals:
     void workoutCompleted();
     void errorOccurred(const QString &errorMessage);

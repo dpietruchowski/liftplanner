@@ -123,7 +123,7 @@ Rectangle {
                  circular: true
                  buttonTheme: Theme.buttonSquare
                  buttonStyle: Theme.buttonStylePrimary
-                 onClicked: {}
+                 onClicked: ActiveWorkoutService.duplicateSet(modelData)
             }
 
             PrimaryButton {
@@ -131,7 +131,7 @@ Rectangle {
                  circular: true
                  buttonTheme: Theme.buttonSquare
                  buttonStyle: Theme.buttonStylePrimary
-                 onClicked: {}
+                 onClicked: ActiveWorkoutService.removeSet(modelData)
             }
         }
     }

@@ -95,7 +95,8 @@ void ActiveWorkoutService::navigateToPrevious()
 
 void ActiveWorkoutService::endWorkout()
 {
-    if (m_currentWorkout) {
+    if (m_currentWorkout)
+    {
         m_currentWorkout->setEndedTime(QDateTime::currentDateTime());
         emit workoutCompleted();
     }
@@ -105,8 +106,54 @@ void ActiveWorkoutService::endWorkout()
     setCurrentExercise(nullptr);
     setCurrentSet(nullptr);
 
-    if (m_currentWorkout) {
+    if (m_currentWorkout)
+    {
         m_currentWorkout->deleteLater();
+    }
+}
+
+void ActiveWorkoutService::duplicateSet(SetModel *set)
+{
+    if (!set)
+        return;
+
+    auto *exercise = qobject_cast<ExerciseModel *>(set->parent());
+    if (!exercise)
+        return;
+
+    SetModel *clone = set->clone(exercise);
+    if (!clone)
+        return;
+
+    exercise->addSet(clone);
+    setCurrentSet(clone);
+}
+
+void ActiveWorkoutService::removeSet(SetModel *set)
+{
+    if (!set)
+        return;
+
+    auto *exercise = qobject_cast<ExerciseModel *>(set->parent());
+    if (!exercise)
+        return;
+
+    auto sets = exercise->sets();
+    int index = sets.indexOf(set);
+
+    if (index < 0)
+        return;
+
+    exercise->removeSet(set);
+    set->deleteLater();
+
+    if (m_currentSet == set) {
+        if (!exercise->sets().isEmpty()) {
+            int newIndex = qMax(0, index - 1);
+            setCurrentSet(qobject_cast<SetModel *>(exercise->sets().at(newIndex)));
+        } else {
+            setCurrentSet(nullptr);
+        }
     }
 }
 

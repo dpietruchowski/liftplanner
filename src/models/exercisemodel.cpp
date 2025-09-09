@@ -40,6 +40,9 @@ void ExerciseModel::removeSet(SetModel *set)
     {
         m_sets.removeAll(set);
         set->setParent(nullptr);
+
+        emit setsChanged();
+        emit completedChanged();
     }
 }
 
