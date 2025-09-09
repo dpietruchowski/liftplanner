@@ -7,7 +7,11 @@ add_subdirectory(models)
 add_subdirectory(repositories)
 add_subdirectory(services)
 add_subdirectory(storage)
-# add_subdirectory(ui)
+
+if(NOT QML_LIVE_ENABLED)
+    add_subdirectory(ui)
+endif()
+
 add_subdirectory(ui/icons)
 add_subdirectory(utils)
 
@@ -24,13 +28,6 @@ qt_add_qml_module(liftplanner
     QML_FILES
         ${PROJECT_QML_SOURCES}
 )
-
-# qt_add_qml_module(liftplanner
-#     URI LiftPlannerDummy
-#     VERSION 1.0
-#     QML_FILES
-#         ${PROJECT_QML_SOURCES}
-# )
 
 qt_add_resources(liftplanner "app_icons"
     PREFIX "/LiftPlanner"

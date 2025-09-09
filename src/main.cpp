@@ -8,8 +8,6 @@
 #include "storage/appdbstorage.h"
 #include "utils/coloredsvgprovider.h"
 
-#define QML_LIVE_ENABLED
-
 #ifdef QML_LIVE_ENABLED
 #include "lib/filewatcher.h"
 #endif
@@ -42,12 +40,14 @@ int main(int argc, char *argv[])
         &engine,
         &QQmlApplicationEngine::objectCreationFailed,
         &app,
-        []() { QCoreApplication::exit(-1); },
+        []()
+        { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
 
     qmlRegisterType<ColoredSvgProvider>("LiftPlanner", 1, 0, "ColoredSvgProvider");
 
 #ifdef QML_LIVE_ENABLED
+    qDebug() << "Using qml live";
     const QDir watchDir("/home/damian/dev/lift-planner/src/ui");
     const QUrl mainQmlUrl = QUrl::fromLocalFile(watchDir.filePath("Main.qml"));
 
@@ -66,7 +66,8 @@ int main(int argc, char *argv[])
 
     engine.load(mainQmlUrl);
 
-    FileWatcher watcher([&, watchDir]() {
+    FileWatcher watcher([&, watchDir]()
+                        {
         QObject *root = engine.rootObjects().isEmpty() ? nullptr : engine.rootObjects().first();
         if (!root)
             return;
@@ -79,13 +80,11 @@ int main(int argc, char *argv[])
 
         engine.clearComponentCache();
         loader->setProperty("source", QUrl());
-        loader->setProperty("source", viewUrl);
-    });
+        loader->setProperty("source", viewUrl); });
 
     watcher.setDirectory(watchDir.absolutePath());
 
 #else
-
     qmlRegisterSingletonInstance<RoutineService>("LiftPlanner",
                                                  1,
                                                  0,
