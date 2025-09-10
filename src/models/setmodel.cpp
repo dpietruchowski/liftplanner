@@ -8,7 +8,7 @@ SetModel::SetModel(QObject *parent)
     m_exerciseId = -1;
 }
 
-QVariantMap SetModel::toVariantMap(bool dbModel) const
+QVariantMap SetModel::toVariantMap(SerializationMode) const
 {
     QVariantMap variant;
     if (m_id != -1)
@@ -43,9 +43,9 @@ SetModel *SetModel::fromVariantMap(const QVariantMap &variantMap, QObject *paren
     return model;
 }
 
-QJsonObject SetModel::toJson() const
+QJsonObject SetModel::toJson(SerializationMode mode) const
 {
-    return Serialization::toJson(toVariantMap());
+    return Serialization::toJson(toVariantMap(mode));
 }
 
 SetModel *SetModel::fromJson(const QJsonObject &jsonObj, QObject *parent)

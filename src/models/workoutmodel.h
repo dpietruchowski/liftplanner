@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include "exercisemodel.h"
 #include "../utils/serializationutils.h"
+#include "types.h"
 
 class WorkoutModel : public QObject
 {
@@ -28,10 +29,10 @@ public:
     void addExercise(ExerciseModel *exercise);
     void removeExercise(ExerciseModel *exercise);
 
-    QVariantMap toVariantMap(bool dbModel = false) const;
+    QVariantMap toVariantMap(SerializationMode mode) const;
     static WorkoutModel *fromVariantMap(const QVariantMap &variantMap, QObject *parent = nullptr);
 
-    QJsonObject toJson() const;
+    QJsonObject toJson(SerializationMode mode) const;
     static WorkoutModel *fromJson(const QJsonObject &jsonObj, QObject *parent = nullptr);
 
     WorkoutModel *clone(QObject *parent = nullptr) const;

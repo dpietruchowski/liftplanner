@@ -3,6 +3,7 @@
 #include <QVariantMap>
 #include <QJsonObject>
 #include "../utils/serializationutils.h"
+#include "types.h"
 
 class SetModel : public QObject
 {
@@ -17,10 +18,10 @@ class SetModel : public QObject
 public:
     explicit SetModel(QObject *parent = nullptr);
 
-    QVariantMap toVariantMap(bool dbModel = false) const;
+    QVariantMap toVariantMap(SerializationMode mode) const;
     static SetModel *fromVariantMap(const QVariantMap &variantMap, QObject *parent = nullptr);
 
-    QJsonObject toJson() const;
+    QJsonObject toJson(SerializationMode mode) const;
     static SetModel *fromJson(const QJsonObject &jsonObj, QObject *parent = nullptr);
 
     QString toString() const;

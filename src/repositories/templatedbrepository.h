@@ -1,6 +1,7 @@
 #pragma once
-#include "genericdbrepository.h"
 #include <QVector>
+#include "genericdbrepository.h"
+#include "models/types.h"
 
 template <typename ModelType>
 class TemplateDbRepository : public GenericDbRepository
@@ -14,8 +15,14 @@ public:
         return ModelType::fromVariantMap(map);
     }
 
-    int add(const ModelType *item) { return GenericDbRepository::add(item->toVariantMap(true)); }
-    int save(const ModelType *item) { return GenericDbRepository::save(item->toVariantMap(true)); }
+    int add(const ModelType *item)
+    {
+        return GenericDbRepository::add(item->toVariantMap(SerializationMode::DbModel));
+    }
+    int save(const ModelType *item)
+    {
+        return GenericDbRepository::save(item->toVariantMap(SerializationMode::DbModel));
+    }
     void saveAll(const QVector<ModelType *> &items)
     {
         QVector<QVariantMap> maps;

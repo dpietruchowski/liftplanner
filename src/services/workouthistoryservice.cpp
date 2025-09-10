@@ -62,7 +62,7 @@ QJsonArray WorkoutHistoryService::recentWorkoutsToJson(int count)
     for (int i = 0; i < actualCount; ++i) {
         WorkoutModel *workout = m_workouts.at(i);
         if (workout) {
-            jsonArray.append(workout->toJson());
+            jsonArray.append(workout->toJson(SerializationMode::FullFile));
         }
     }
 

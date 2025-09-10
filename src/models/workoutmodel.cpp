@@ -13,7 +13,8 @@ WorkoutModel::WorkoutModel(QObject *parent)
 
 bool WorkoutModel::isCompleted() const
 {
-    for (auto *s : m_exercises) {
+    for (auto *s : m_exercises)
+    {
         if (!s->isCompleted())
             return false;
     }
@@ -44,7 +45,7 @@ void WorkoutModel::removeExercise(ExerciseModel *exercise)
     }
 }
 
-QVariantMap WorkoutModel::toVariantMap(bool dbModel) const
+QVariantMap WorkoutModel::toVariantMap(SerializationMode mode) const
 {
     QVariantMap variant;
     if (m_id != -1)
@@ -66,12 +67,12 @@ QVariantMap WorkoutModel::toVariantMap(bool dbModel) const
         variant.insert(WorkoutModel::ended_time_key, m_endedTime.toString(Qt::ISODate));
     }
 
-    if (!dbModel)
+    if (mode != SerializationMode::DbModel)
     {
         QVariantList exercisesList;
         for (ExerciseModel *exercise : m_exercises)
         {
-            exercisesList.append(exercise->toVariantMap());
+            exercisesList.append(exercise->toVariantMap(mode));
         }
         variant.insert(WorkoutModel::exercises_key, exercisesList);
     }
@@ -116,9 +117,9 @@ WorkoutModel *WorkoutModel::fromVariantMap(const QVariantMap &variantMap, QObjec
     return model;
 }
 
-QJsonObject WorkoutModel::toJson() const
+QJsonObject WorkoutModel::toJson(SerializationMode mode) const
 {
-    return Serialization::toJson(toVariantMap());
+    return Serialization::toJson(toVariantMap(mode));
 }
 
 WorkoutModel *WorkoutModel::fromJson(const QJsonObject &jsonObj, QObject *parent)
@@ -145,7 +146,8 @@ WorkoutModel *WorkoutModel::clone(QObject *parent) const
 
 void WorkoutModel::onIdUpdated()
 {
-    for (ExerciseModel *exercise : m_exercises) {
+    for (ExerciseModel *exercise : m_exercises)
+    {
         exercise->setWorkoutId(id());
     }
 }

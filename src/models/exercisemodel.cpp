@@ -12,7 +12,8 @@ ExerciseModel::ExerciseModel(QObject *parent)
 
 bool ExerciseModel::isCompleted() const
 {
-    for (auto *s : m_sets) {
+    for (auto *s : m_sets)
+    {
         if (!s->completed())
             return false;
     }
@@ -46,7 +47,7 @@ void ExerciseModel::removeSet(SetModel *set)
     }
 }
 
-QVariantMap ExerciseModel::toVariantMap(bool dbModel) const
+QVariantMap ExerciseModel::toVariantMap(SerializationMode mode) const
 {
     QVariantMap variant;
     if (m_id != -1)
@@ -60,8 +61,18 @@ QVariantMap ExerciseModel::toVariantMap(bool dbModel) const
     variant.insert(ExerciseModel::name_key, m_name);
     variant.insert(ExerciseModel::rest_seconds_key, m_restSeconds);
 
-    if (!dbModel) {
+    if (mode == SerializationMode::ChatGpt)
+    {
         variant.insert(ExerciseModel::sets_key, setsToString());
+    }
+    else if (mode == SerializationMode::FullFile)
+    {
+        QVariantList setsList;
+        for (SetModel *set : m_sets)
+        {
+            setsList.append(set->toVariantMap(mode));
+        }
+        variant.insert(ExerciseModel::sets_key, setsList);
     }
 
     return variant;
@@ -80,15 +91,21 @@ ExerciseModel *ExerciseModel::fromVariantMap(const QVariantMap &variantMap, QObj
     if (variantMap.contains(ExerciseModel::rest_seconds_key))
         model->setRestSeconds(variantMap.value(ExerciseModel::rest_seconds_key).toInt());
 
-    if (variantMap.contains(ExerciseModel::sets_key)) {
+    if (variantMap.contains(ExerciseModel::sets_key))
+    {
         QVariant setsVar = variantMap.value(ExerciseModel::sets_key);
 
-        if (setsVar.typeId() == QMetaType::QString) {
+        if (setsVar.typeId() == QMetaType::QString)
+        {
             model->setsFromString(setsVar.toString());
-        } else if (setsVar.typeId() == QMetaType::QVariantList) {
+        }
+        else if (setsVar.typeId() == QMetaType::QVariantList)
+        {
             QVariantList setsList = setsVar.toList();
-            for (const QVariant &var : setsList) {
-                if (var.canConvert<QVariantMap>()) {
+            for (const QVariant &var : setsList)
+            {
+                if (var.canConvert<QVariantMap>())
+                {
                     SetModel *set = SetModel::fromVariantMap(var.toMap(), model);
                     model->addSet(set);
                 }
@@ -99,9 +116,9 @@ ExerciseModel *ExerciseModel::fromVariantMap(const QVariantMap &variantMap, QObj
     return model;
 }
 
-QJsonObject ExerciseModel::toJson() const
+QJsonObject ExerciseModel::toJson(SerializationMode mode) const
 {
-    return Serialization::toJson(toVariantMap());
+    return Serialization::toJson(toVariantMap(mode));
 }
 
 ExerciseModel *ExerciseModel::fromJson(const QJsonObject &jsonObj, QObject *parent)
@@ -112,8 +129,10 @@ ExerciseModel *ExerciseModel::fromJson(const QJsonObject &jsonObj, QObject *pare
 QString ExerciseModel::setsToString() const
 {
     QStringList setStrings;
-    for (QObject *obj : m_sets) {
-        if (SetModel *set = qobject_cast<SetModel *>(obj)) {
+    for (QObject *obj : m_sets)
+    {
+        if (SetModel *set = qobject_cast<SetModel *>(obj))
+        {
             setStrings.append(set->toString());
         }
     }
@@ -126,8 +145,10 @@ void ExerciseModel::setsFromString(const QString &str)
     m_sets.clear();
 
     QStringList setStrings = str.split(",", Qt::SkipEmptyParts);
-    for (QString s : setStrings) {
-        if (SetModel *set = SetModel::fromString(s.trimmed(), this)) {
+    for (QString s : setStrings)
+    {
+        if (SetModel *set = SetModel::fromString(s.trimmed(), this))
+        {
             m_sets.append(set);
         }
     }

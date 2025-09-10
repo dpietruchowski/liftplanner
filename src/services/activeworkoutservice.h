@@ -15,6 +15,10 @@ class ActiveWorkoutService : public QObject
 
 public:
     explicit ActiveWorkoutService(QObject *parent = nullptr);
+    ~ActiveWorkoutService();
+
+    void saveCurrentWorkout();
+    void loadCurrentWorkout();
 
     Q_INVOKABLE void startWorkout(WorkoutModel *workout);
     Q_INVOKABLE void completeCurrentSet();

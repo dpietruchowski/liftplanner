@@ -5,6 +5,7 @@
 #include <QVariantMap>
 #include "../utils/serializationutils.h"
 #include "setmodel.h"
+#include "types.h"
 
 class ExerciseModel : public QObject
 {
@@ -26,10 +27,10 @@ public:
     void addSet(SetModel *set);
     void removeSet(SetModel *set);
 
-    QVariantMap toVariantMap(bool dbModel = false) const;
+    QVariantMap toVariantMap(SerializationMode mode) const;
     static ExerciseModel *fromVariantMap(const QVariantMap &variantMap, QObject *parent = nullptr);
 
-    QJsonObject toJson() const;
+    QJsonObject toJson(SerializationMode mode) const;
     static ExerciseModel *fromJson(const QJsonObject &jsonObj, QObject *parent = nullptr);
 
     Q_INVOKABLE QString setsToString() const;

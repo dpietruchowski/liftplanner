@@ -1,10 +1,81 @@
 #include "activeworkoutservice.h"
 #include <QDebug>
-#include <QQmlEngine>
+#include <QDir>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QStandardPaths>
 
 ActiveWorkoutService::ActiveWorkoutService(QObject *parent)
     : QObject(parent), m_currentWorkout(nullptr), m_currentExercise(nullptr), m_currentSet(nullptr), m_isActive(false)
 {
+    connect(this,
+            &ActiveWorkoutService::currentWorkoutChanged,
+            this,
+            &ActiveWorkoutService::saveCurrentWorkout);
+    connect(this,
+            &ActiveWorkoutService::currentExerciseChanged,
+            this,
+            &ActiveWorkoutService::saveCurrentWorkout);
+    connect(this,
+            &ActiveWorkoutService::currentSetChanged,
+            this,
+            &ActiveWorkoutService::saveCurrentWorkout);
+    loadCurrentWorkout();
+}
+
+ActiveWorkoutService::~ActiveWorkoutService()
+{
+    saveCurrentWorkout();
+}
+
+void ActiveWorkoutService::saveCurrentWorkout()
+{
+    QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir dir(dirPath);
+    if (!dir.exists())
+        dir.mkpath(".");
+
+    QString filePath = dir.filePath("current_workout.json");
+
+    if (!m_currentWorkout) {
+        QFile::remove(filePath);
+        return;
+    }
+
+    QJsonObject json = m_currentWorkout->toJson(SerializationMode::FullFile);
+    QJsonDocument doc(json);
+
+    QFile file(filePath);
+    if (file.open(QIODevice::WriteOnly)) {
+        file.write(doc.toJson());
+        file.close();
+    }
+}
+
+void ActiveWorkoutService::loadCurrentWorkout()
+{
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+                   + "/current_workout.json";
+
+    QFile file(path);
+    if (!file.exists() || !file.open(QIODevice::ReadOnly))
+        return;
+
+    QByteArray data = file.readAll();
+    file.close();
+
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    if (!doc.isObject())
+        return;
+
+    WorkoutModel *loadedWorkout = WorkoutModel::fromJson(doc.object(), this);
+    if (loadedWorkout) {
+        setCurrentWorkout(loadedWorkout);
+        updateCurrentExercise();
+        updateCurrentSet();
+        setIsActive(true);
+    }
 }
 
 void ActiveWorkoutService::startWorkout(WorkoutModel *workout)
@@ -37,6 +108,7 @@ void ActiveWorkoutService::completeCurrentSet()
 
     saveCompletedSet();
     navigateToNext();
+    saveCurrentWorkout();
 }
 
 void ActiveWorkoutService::navigateToNext()
@@ -127,6 +199,7 @@ void ActiveWorkoutService::duplicateSet(SetModel *set)
 
     exercise->addSet(clone);
     setCurrentSet(clone);
+    saveCurrentWorkout();
 }
 
 void ActiveWorkoutService::removeSet(SetModel *set)
@@ -155,6 +228,7 @@ void ActiveWorkoutService::removeSet(SetModel *set)
             setCurrentSet(nullptr);
         }
     }
+    saveCurrentWorkout();
 }
 
 void ActiveWorkoutService::saveCompletedSet()
