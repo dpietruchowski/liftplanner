@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(liftplanner VERSION 0.1 LANGUAGES CXX)
+project(liftplanner VERSION 0.2 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(ANDROID_PACKAGE_NAME "com.liftplanner.app")
+set(QT_ANDROID_VERSION_CODE 2)
+set(QT_ANDROID_VERSION_NAME "0.3")
 
 set(QML_LIVE_ENABLED OFF)
 if(QML_LIVE_ENABLED)
@@ -13,3 +15,9 @@ if(QML_LIVE_ENABLED)
 endif()
 
 add_subdirectory(src)
+
+set_target_properties(liftplanner PROPERTIES
+    QT_ANDROID_PACKAGE_NAME   "${ANDROID_PACKAGE_NAME}"
+    QT_ANDROID_VERSION_CODE   "${QT_ANDROID_VERSION_CODE}"
+    QT_ANDROID_VERSION_NAME   "${QT_ANDROID_VERSION_NAME}"
+)

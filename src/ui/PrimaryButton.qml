@@ -3,23 +3,23 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import LiftPlanner 1.0
 
-Button {
+Control {
     id: control
     property url svgIcon: ""
+    property string text: ""
     property color iconTint: Theme.buttonText
     property bool circular: false
     property var buttonTheme: Theme.buttonMedium
     property var buttonStyle: Theme.buttonStylePrimary
+    signal clicked()
+    property bool down: mouseArea.pressed
 
-    // implicitWidth: Math.max(buttonTheme.width, label.implicitWidth + (svgIcon ? buttonTheme.iconSize + 24 : 24))
-    // implicitHeight: Math.max(buttonTheme.height, buttonTheme.iconSize + 12)
     implicitWidth: buttonTheme.width
     implicitHeight: buttonTheme.height
 
     background: Rectangle {
         id: bg
         radius: circular ? Math.min(control.implicitHeight, control.implicitWidth) / 2 : Theme.borderRadius
-
         border.width: 1
         border.color: control.down ? buttonStyle.border : buttonStyle.border
         color: control.enabled ?
@@ -30,7 +30,6 @@ Button {
         Behavior on color { ColorAnimation { duration: 120 } }
         Behavior on border.color { ColorAnimation { duration: 120 } }
     }
-
 
     contentItem: Item {
         anchors.centerIn: parent
@@ -67,6 +66,14 @@ Button {
                 elide: Text.ElideRight
             }
         }
+    }
+
+    MouseArea {
+        id: mouseArea
+        anchors.fill: parent
+        onClicked: control.clicked()
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
     }
 
     focusPolicy: Qt.StrongFocus
