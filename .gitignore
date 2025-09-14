@@ -18,6 +18,7 @@ ui_*
 
 # Build directories
 build/
+build-*/
 Build/
 cmake-build-*/
 Debug/
