@@ -13,7 +13,9 @@ QtObject {
     property color primary: "#1F618D"
     property color primaryVariant: "#2471A3"
     property color secondary: "#03DAC6"
+    property color info: "#3498db"
     property color success: "#27ae60"
+    property color warning: "#f1c40f"
     property color error: "#e74c3c"
     property color border: "#333333"
 
@@ -47,6 +49,10 @@ QtObject {
         property string settings: "qrc:/LiftPlanner/ui/icons/settings.svg"
         property string home: "qrc:/LiftPlanner/ui/icons/home.svg"
         property string info: "qrc:/LiftPlanner/ui/icons/info.svg"
+        property string success: "qrc:/LiftPlanner/ui/icons/success.svg"
+        property string warning: "qrc:/LiftPlanner/ui/icons/warning.svg"
+        property string error: "qrc:/LiftPlanner/ui/icons/error.svg"
+
         property string check: "qrc:/LiftPlanner/ui/icons/check.svg"
 
         property string addSet: "qrc:/LiftPlanner/ui/icons/add-set.svg"

@@ -62,9 +62,9 @@ Popup {
                     color: {
                         switch (root.type) {
                             case Notification.Type.Error: return Theme.error
-                            case Notification.Type.Warning: return Theme.primary
+                            case Notification.Type.Warning: return Theme.warning
                             case Notification.Type.Success: return Theme.success
-                            case Notification.Type.Info: return Theme.primaryVariant
+                            case Notification.Type.Info: return Theme.info
                             default: return Theme.primaryVariant
                         }
                     }

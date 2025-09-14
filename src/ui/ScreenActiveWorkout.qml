@@ -66,7 +66,7 @@ Rectangle {
                              : Theme.buttonStyleSuccess
                 onClicked: {
                     if (ActiveWorkoutService.currentWorkout.completed) {
-                        ActiveWorkoutService.endWorkout()
+                        endWorkoutPopup.open()
                     } else {
                         ActiveWorkoutService.completeCurrentSet()
                         var rs = ActiveWorkoutService.currentExercise ? ActiveWorkoutService.currentExercise.restSeconds : 0
@@ -85,7 +85,16 @@ Rectangle {
                 onClicked: ActiveWorkoutService.navigateToNext()
             }
         }
+    }
 
+    NotificationPopup {
+        id: endWorkoutPopup
+        text: "Do you want to end workout?"
+        type: Notification.Type.Info
+        buttons: Notification.Button.Ok | Notification.Button.Cancel
+        onAccepted: {
+            ActiveWorkoutService.endWorkout()
+        }
     }
 
     Item {

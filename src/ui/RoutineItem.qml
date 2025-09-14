@@ -9,6 +9,8 @@ ColumnLayout {
     property var workout
     property bool expanded: false
 
+    signal startWorkoutRequest(var workout)
+
     Rectangle {
         Layout.fillWidth: true
         Layout.preferredHeight: 50
@@ -46,10 +48,7 @@ ColumnLayout {
                 buttonTheme: Theme.buttonSquare
                 buttonStyle: Theme.buttonStylePrimary
                 onClicked: {
-                    ActiveWorkoutService.startWorkout(workout)
-                    if (stackView.currentItem !== activeWorkoutScreen) {
-                        stackView.replace(activeWorkoutScreen)
-                    }
+                    startWorkoutRequest(workout)
                 }
             }
         }
