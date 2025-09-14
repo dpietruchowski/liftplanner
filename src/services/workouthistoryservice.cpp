@@ -17,8 +17,8 @@ void WorkoutHistoryService::loadAllWorkouts()
         m_dbStorage->loadWorkout(workout);
     }
 
-    m_workouts = workoutModels.toList();
-    setWorkouts(m_workouts);
+    auto workouts = workoutModels.toList();
+    setWorkouts(workouts);
 }
 
 QList<WorkoutModel *> WorkoutHistoryService::workoutsBetween(const QDateTime &from, const QDateTime &to)
