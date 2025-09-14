@@ -7,7 +7,7 @@ Rectangle {
     id: dialog
     width: parent ? parent.width : 360
     height: 120
-    color: Theme.surface
+    color: Theme.dialogSurface
     radius: Theme.borderRadius
     border.color: Theme.border
     y: dialogVisible ? (parent ? parent.height - height : 0) : (parent ? parent.height : 0)

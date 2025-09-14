@@ -9,7 +9,7 @@ set(ANDROID_PACKAGE_NAME "com.liftplanner.app")
 set(QT_ANDROID_VERSION_CODE 2)
 set(QT_ANDROID_VERSION_NAME "0.4")
 
-set(QML_LIVE_ENABLED OFF)
+set(QML_LIVE_ENABLED ON)
 if(QML_LIVE_ENABLED)
     add_definitions(-DQML_LIVE_ENABLED)
 endif()

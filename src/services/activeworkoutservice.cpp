@@ -197,6 +197,8 @@ void ActiveWorkoutService::duplicateSet(SetModel *set)
     if (!clone)
         return;
 
+    clone->setCompleted(false);
+
     exercise->addSet(clone);
     setCurrentSet(clone);
     saveCurrentWorkout();

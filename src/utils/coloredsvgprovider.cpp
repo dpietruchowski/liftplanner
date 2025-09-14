@@ -1,7 +1,8 @@
 #include "coloredsvgprovider.h"
-#include <QFile>
-#include <QTextStream>
 #include <QDebug>
+#include <QFile>
+#include <QRegularExpression>
+#include <QTextStream>
 #include <QUrl>
 
 QMap<QString, QString> ColoredSvgProvider::s_svgCache;
@@ -19,6 +20,24 @@ void ColoredSvgProvider::setIcon(const QString &s) {
     if (m_icon == s) return;
     m_icon = s;
     emit iconChanged();
+    updateSvgSource();
+}
+
+void ColoredSvgProvider::setWidth(int w)
+{
+    if (m_width == w)
+        return;
+    m_width = w;
+    emit widthChanged();
+    updateSvgSource();
+}
+
+void ColoredSvgProvider::setHeight(int h)
+{
+    if (m_height == h)
+        return;
+    m_height = h;
+    emit heightChanged();
     updateSvgSource();
 }
 
@@ -69,6 +88,15 @@ void ColoredSvgProvider::updateSvgSource() {
     if (m_color.isValid()) {
         QString colorStr = m_color.name(QColor::HexRgb);
         svg.replace("currentColor", colorStr, Qt::CaseInsensitive);
+    }
+
+    QRegularExpression rx("<svg([^>]*)>");
+    QRegularExpressionMatch match = rx.match(svg);
+    if (match.hasMatch()) {
+        QString attrs = match.captured(1);
+        QString replacement
+            = QString("<svg width=\"%1\" height=\"%2\"%3>").arg(m_width).arg(m_height).arg(attrs);
+        svg.replace(rx, replacement);
     }
 
     m_svgSource = "data:image/svg+xml;utf8," + svg.toUtf8().toPercentEncoding();

@@ -7,6 +7,7 @@
 #include "services/workouthistoryservice.h"
 #include "storage/appdbstorage.h"
 #include "utils/coloredsvgprovider.h"
+#include "utils/notificationtypes.h"
 
 #ifdef QML_LIVE_ENABLED
 #include "lib/filewatcher.h"
@@ -43,6 +44,12 @@ int main(int argc, char *argv[])
         []()
         { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
+
+    qmlRegisterUncreatableMetaObject(
+        Notification::staticMetaObject,
+        "LiftPlanner", 1, 0,
+        "Notification",
+        "Error: only enums");
 
     qmlRegisterType<ColoredSvgProvider>("LiftPlanner", 1, 0, "ColoredSvgProvider");
 

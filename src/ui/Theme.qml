@@ -9,6 +9,7 @@ QtObject {
 
     property color background: "#121212"
     property color surface: "#1E1E1E"
+    property color dialogSurface: "#2A2A2A"
     property color primary: "#1F618D"
     property color primaryVariant: "#2471A3"
     property color secondary: "#03DAC6"

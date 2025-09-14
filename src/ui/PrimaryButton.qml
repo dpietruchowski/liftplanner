@@ -40,20 +40,13 @@ Control {
             spacing: 8
             anchors.centerIn: parent
 
-            ColoredSvgProvider {
-                id: svgProvider
-                svgOriginSource: control.svgIcon
-                color: control.iconTint
-            }
-
-            Image {
-                id: svg
-                source: svgProvider.svgSource
+            ColoredSvgImage {
+                id: svgImage
                 visible: control.svgIcon && control.svgIcon !== ""
                 width: visible ? buttonTheme.iconSize : 0
                 height: visible ? buttonTheme.iconSize : 0
-                fillMode: Image.PreserveAspectFit
-                smooth: true
+                svgSource: control.svgIcon
+                color: control.iconTint
             }
 
             Text {

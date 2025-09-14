@@ -6,7 +6,7 @@ import LiftPlanner 1.0
 Rectangle {
     id: dialog
     width: parent ? parent.width : 360
-    color: Theme.surface
+    color: Theme.dialogSurface
     radius: Theme.borderRadius
     border.color: Theme.border
     y: dialogVisible ? 0 : -implicitHeight

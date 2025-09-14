@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import LiftPlanner
 
 Item {
     id: root
@@ -22,7 +23,6 @@ Item {
     Component.onCompleted: {
         stackView.push(homeScreen)
     }
-
 
     BottomNavigation {
         id: bottomNav
