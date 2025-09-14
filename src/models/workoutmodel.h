@@ -31,6 +31,7 @@ public:
 
     QVariantMap toVariantMap(SerializationMode mode) const;
     static WorkoutModel *fromVariantMap(const QVariantMap &variantMap, QObject *parent = nullptr);
+    static bool validateVariantMap(const QVariantMap &variantMap, QString &stringError);
 
     QJsonObject toJson(SerializationMode mode) const;
     static WorkoutModel *fromJson(const QJsonObject &jsonObj, QObject *parent = nullptr);

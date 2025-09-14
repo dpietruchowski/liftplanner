@@ -26,6 +26,9 @@ signals:
     void errorOccurred(const QString &errorMessage);
 
 private:
+    bool validateWorkoutsJson(const QString &jsonData, QString &errorMessage);
+
+private:
     AppDbStorage *m_dbStorage;
     QList<QObject*> m_workouts;
 };

@@ -47,8 +47,13 @@ void RoutineService::loadAllWorkouts()
 
 void RoutineService::importWorkoutsFromJson(const QString &jsonData)
 {
-    try
-    {
+    QString validationError;
+    if (!validateWorkoutsJson(jsonData, validationError)) {
+        emit errorOccurred(QString("Import failed: %1").arg(validationError));
+        return;
+    }
+
+    try {
         m_dbStorage->workoutRepository()->remove("WHERE started_time IS NULL");
         QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
         if (doc.isArray())
@@ -65,10 +70,9 @@ void RoutineService::importWorkoutsFromJson(const QString &jsonData)
             }
             loadAllWorkouts();
         }
-    }
-    catch (const std::exception &e)
-    {
-        emit errorOccurred(QString("Import failed: %1").arg(e.what()));
+    } catch (const std::exception &e) {
+        auto errorStr = QString("Import failed: %1").arg(e.what());
+        emit errorOccurred(errorStr);
     }
 }
 
@@ -161,4 +165,40 @@ void RoutineService::importWorkoutsFromClipboard()
     {
         emit errorOccurred(QString("Import from clipboard failed: %1").arg(e.what()));
     }
+}
+
+bool RoutineService::validateWorkoutsJson(const QString &jsonData, QString &errorMessage)
+{
+    QJsonParseError parseError;
+    QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8(), &parseError);
+    if (parseError.error != QJsonParseError::NoError) {
+        errorMessage = QString("Invalid JSON: %1").arg(parseError.errorString());
+        return false;
+    }
+
+    if (!doc.isArray()) {
+        errorMessage = "JSON is not an array of workouts";
+        return false;
+    }
+
+    QJsonArray workoutsArray = doc.array();
+    int index = 0;
+    for (const QJsonValue &workoutValue : workoutsArray) {
+        if (!workoutValue.isObject()) {
+            errorMessage = QString("Workout at index %1 is not a JSON object").arg(index);
+            return false;
+        }
+
+        QVariantMap workoutMap = Serialization::fromJson(workoutValue.toObject());
+        QString workoutError;
+        if (!WorkoutModel::validateVariantMap(workoutMap, workoutError)) {
+            errorMessage = QString("Workout at index %1 invalid: %2").arg(index).arg(workoutError);
+            return false;
+        }
+
+        index++;
+    }
+
+    errorMessage.clear();
+    return true;
 }

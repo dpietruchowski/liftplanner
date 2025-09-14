@@ -6,6 +6,7 @@
 #include "services/routineservice.h"
 #include "services/workouthistoryservice.h"
 #include "storage/appdbstorage.h"
+#include "utils/clipboardhelper.h"
 #include "utils/coloredsvgprovider.h"
 #include "utils/notificationtypes.h"
 
@@ -34,6 +35,7 @@ int main(int argc, char *argv[])
     RoutineService routineService(&storage);
     ActiveWorkoutService activeWorkoutService;
     WorkoutHistoryService workoutHistoryService(&storage);
+    ClipboardHelper clipboardHelper;
 
     QQmlApplicationEngine engine;
 
@@ -70,6 +72,7 @@ int main(int argc, char *argv[])
     ctx->setContextProperty("RoutineService", &routineService);
     ctx->setContextProperty("ActiveWorkoutService", &activeWorkoutService);
     ctx->setContextProperty("WorkoutHistoryService", &workoutHistoryService);
+    ctx->setContextProperty("ClipboardHelper", &clipboardHelper);
 
     engine.load(mainQmlUrl);
 
@@ -107,6 +110,21 @@ int main(int argc, char *argv[])
                                                         0,
                                                         "WorkoutHistoryService",
                                                         &workoutHistoryService);
+
+    qmlRegisterSingletonInstance<ClipboardHelper>("LiftPlanner",
+                                                  1,
+                                                  0,
+                                                  "ClipboardHelper",
+                                                  &clipboardHelper);
+
+    qmlRegisterSingletonType<ClipboardHelper>("LiftPlanner",
+                                              1,
+                                              0,
+                                              "ClipboardHelper",
+                                              [](QQmlEngine *engine, QJSEngine *) -> QObject * {
+                                                  Q_UNUSED(engine)
+                                                  return new ClipboardHelper();
+                                              });
 
     qmlRegisterSingletonType(QUrl("qrc:/LiftPlanner/ui/Theme.qml"), "LiftPlanner", 1, 0, "Theme");
     const QUrl url(QStringLiteral("qrc:/LiftPlanner/ui/Main.qml"));

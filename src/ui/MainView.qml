@@ -24,6 +24,21 @@ Item {
         stackView.push(homeScreen)
     }
 
+    NotificationPopup {
+        id: notificationPopup
+        copyEnabled: true
+        type: Notification.Type.Error
+        buttons: Notification.Button.Ok
+    }
+
+    Connections {
+        target: RoutineService
+        function onErrorOccurred(error) {
+            notificationPopup.text = error
+            notificationPopup.open()
+        }
+    }
+
     BottomNavigation {
         id: bottomNav
         anchors.bottom: parent.bottom

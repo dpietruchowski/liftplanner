@@ -117,6 +117,48 @@ WorkoutModel *WorkoutModel::fromVariantMap(const QVariantMap &variantMap, QObjec
     return model;
 }
 
+bool WorkoutModel::validateVariantMap(const QVariantMap &variantMap, QString &stringError)
+{
+    if (!variantMap.contains(WorkoutModel::name_key)
+        || !variantMap.value(WorkoutModel::name_key).canConvert<QString>()) {
+        stringError = QString("Missing or invalid '%1' field").arg(WorkoutModel::name_key);
+        return false;
+    }
+
+    QString nameValue = variantMap.value(WorkoutModel::name_key).toString().trimmed();
+    if (nameValue.isEmpty()) {
+        stringError = QString("'%1' cannot be empty").arg(WorkoutModel::name_key);
+        return false;
+    }
+
+    if (variantMap.contains(WorkoutModel::exercises_key)) {
+        QVariant exercisesVar = variantMap.value(WorkoutModel::exercises_key);
+        if (exercisesVar.typeId() != QMetaType::QVariantList) {
+            stringError = QString("Invalid type for '%1', expected list")
+                              .arg(WorkoutModel::exercises_key);
+            return false;
+        }
+
+        QVariantList exercisesList = exercisesVar.toList();
+        for (int i = 0; i < exercisesList.size(); ++i) {
+            const QVariant &var = exercisesList[i];
+            if (!var.canConvert<QVariantMap>()) {
+                stringError = QString("Exercise at index %1 is not a valid object").arg(i);
+                return false;
+            }
+
+            QString exerciseError;
+            if (!ExerciseModel::validateVariantMap(var.toMap(), exerciseError)) {
+                stringError = QString("Exercise at index %1 invalid: %2").arg(i).arg(exerciseError);
+                return false;
+            }
+        }
+    }
+
+    stringError.clear();
+    return true;
+}
+
 QJsonObject WorkoutModel::toJson(SerializationMode mode) const
 {
     return Serialization::toJson(toVariantMap(mode));

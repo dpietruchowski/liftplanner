@@ -43,6 +43,42 @@ SetModel *SetModel::fromVariantMap(const QVariantMap &variantMap, QObject *paren
     return model;
 }
 
+bool SetModel::validateVariantMap(const QVariantMap &variantMap, QString &stringError)
+{
+    if (!variantMap.contains(SetModel::repetitions_key)
+        || !variantMap.value(SetModel::repetitions_key).canConvert<int>()) {
+        stringError = QString("Missing or invalid '%1'").arg(SetModel::repetitions_key);
+        return false;
+    }
+
+    int repetitions = variantMap.value(SetModel::repetitions_key).toInt();
+    if (repetitions <= 0) {
+        stringError = QString("'%1' must be greater than 0").arg(SetModel::repetitions_key);
+        return false;
+    }
+
+    if (!variantMap.contains(SetModel::weight_key)
+        || !variantMap.value(SetModel::weight_key).canConvert<double>()) {
+        stringError = QString("Missing or invalid '%1'").arg(SetModel::weight_key);
+        return false;
+    }
+
+    double weight = variantMap.value(SetModel::weight_key).toDouble();
+    if (weight <= 0) {
+        stringError = QString("'%1' must be greater than 0").arg(SetModel::weight_key);
+        return false;
+    }
+
+    if (!variantMap.contains(SetModel::completed_key)
+        || !variantMap.value(SetModel::completed_key).canConvert<bool>()) {
+        stringError = QString("Missing or invalid '%1'").arg(SetModel::completed_key);
+        return false;
+    }
+
+    stringError.clear();
+    return true;
+}
+
 QJsonObject SetModel::toJson(SerializationMode mode) const
 {
     return Serialization::toJson(toVariantMap(mode));
@@ -77,6 +113,35 @@ SetModel *SetModel::fromString(const QString &str, QObject *parent)
     model->setRepetitions(reps);
     model->setWeight(w);
     return model;
+}
+
+bool SetModel::validateString(const QString &str, QString &stringError)
+{
+    QStringList parts = str.toLower().replace("kg", "").split("x");
+    if (parts.size() != 2) {
+        stringError = QString("Invalid format: '%1'. Expected format is '<reps>x<weight>kg'")
+                          .arg(str);
+        return false;
+    }
+
+    bool ok1 = false;
+    bool ok2 = false;
+
+    int reps = parts[0].trimmed().toInt(&ok1);
+    double weight = parts[1].trimmed().toDouble(&ok2);
+
+    if (!ok1) {
+        stringError = QString("Invalid repetitions: '%1'").arg(parts[0].trimmed());
+        return false;
+    }
+
+    if (!ok2) {
+        stringError = QString("Invalid weight: '%1'").arg(parts[1].trimmed());
+        return false;
+    }
+
+    stringError.clear();
+    return true;
 }
 
 SetModel *SetModel::clone(QObject *parent) const

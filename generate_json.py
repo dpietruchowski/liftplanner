@@ -2,7 +2,7 @@ import glob
 import json
 import os
 
-pattern = "*src/ui/Theme*"
+pattern = "*src/models/*"
 output_file = "output_files.json"
 
 files_data = []
@@ -12,7 +12,7 @@ for file_path in glob.glob(pattern):
         content = f.read()
     files_data.append({
         "file_path": file_path,
-        "content": content
+        "file_content": content
     })
 
 with open(output_file, "w", encoding="utf-8") as f:

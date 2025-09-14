@@ -54,6 +54,7 @@ QtObject {
         property string error: "qrc:/LiftPlanner/ui/icons/error.svg"
 
         property string check: "qrc:/LiftPlanner/ui/icons/check.svg"
+        property string copy: "qrc:/LiftPlanner/ui/icons/copy.svg"
 
         property string addSet: "qrc:/LiftPlanner/ui/icons/add-set.svg"
         property string removeSet: "qrc:/LiftPlanner/ui/icons/remove-set.svg"
@@ -69,7 +70,7 @@ QtObject {
         property int width: size
         property int height: size
         property int fontSize: fontSmall
-        property int iconSize: size
+        property int iconSize: size - 4
     }
 
     property var buttonSmall: QtObject {

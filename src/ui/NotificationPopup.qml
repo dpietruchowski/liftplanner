@@ -16,6 +16,7 @@ Popup {
     property int buttons
     property string title: ""
     property string text: ""
+    property bool copyEnabled: false
 
     signal accepted()
     signal rejected()
@@ -35,6 +36,19 @@ Popup {
             anchors.margins: Theme.padding
             spacing: Theme.spacing
 
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignRight
+
+                PrimaryButton {
+                    visible: root.copyEnabled
+                    svgIcon: Theme.icons.copy
+                    circular: true
+                    buttonTheme: Theme.buttonSquare
+                    buttonStyle: Theme.buttonStylePrimary
+                    onClicked: ClipboardHelper.setText(root.text)
+                }
+            }
 
             Item {
                 Layout.fillHeight: true
@@ -129,5 +143,4 @@ Popup {
             }
         }
     }
-
 }

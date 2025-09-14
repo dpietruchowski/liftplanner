@@ -116,6 +116,72 @@ ExerciseModel *ExerciseModel::fromVariantMap(const QVariantMap &variantMap, QObj
     return model;
 }
 
+bool ExerciseModel::validateVariantMap(const QVariantMap &variantMap, QString &stringError)
+{
+    const QString nameField = ExerciseModel::name_key;
+    const QString restSecondsField = ExerciseModel::rest_seconds_key;
+
+    if (!variantMap.contains(nameField) || !variantMap.value(nameField).canConvert<QString>()) {
+        stringError = QString("Missing or invalid '%1' field").arg(nameField);
+        return false;
+    }
+
+    QString nameValue = variantMap.value(nameField).toString().trimmed();
+    if (nameValue.isEmpty()) {
+        stringError = QString("'%1' cannot be empty").arg(nameField);
+        return false;
+    }
+
+    if (!variantMap.contains(restSecondsField)
+        || !variantMap.value(restSecondsField).canConvert<int>()) {
+        stringError = QString("Missing or invalid '%1' field").arg(restSecondsField);
+        return false;
+    }
+
+    int restSecondsValue = variantMap.value(restSecondsField).toInt();
+    if (restSecondsValue < 0) {
+        stringError = QString("'%1' must be >= 0").arg(restSecondsField);
+        return false;
+    }
+
+    if (variantMap.contains(ExerciseModel::sets_key)) {
+        QVariant setsVar = variantMap.value(ExerciseModel::sets_key);
+
+        if (setsVar.typeId() == QMetaType::QVariantList) {
+            QVariantList setsList = setsVar.toList();
+            for (int i = 0; i < setsList.size(); ++i) {
+                const QVariant &var = setsList[i];
+                if (!var.canConvert<QVariantMap>()) {
+                    stringError = QString("Set at index %1 is not a valid object").arg(i);
+                    return false;
+                }
+                QString setError;
+                if (!SetModel::validateVariantMap(var.toMap(), setError)) {
+                    stringError = QString("Set at index %1 invalid: %2").arg(i).arg(setError);
+                    return false;
+                }
+            }
+        } else if (setsVar.typeId() == QMetaType::QString) {
+            QString setsStr = setsVar.toString();
+            QStringList setStrings = setsStr.split(",", Qt::SkipEmptyParts);
+            for (int i = 0; i < setStrings.size(); ++i) {
+                const QString &s = setStrings[i].trimmed();
+                QString setError;
+                if (!SetModel::validateString(s, setError)) {
+                    stringError = QString("Set at index %1 invalid: %2").arg(i).arg(setError);
+                    return false;
+                }
+            }
+        } else {
+            stringError = "'sets' field has invalid type";
+            return false;
+        }
+    }
+
+    stringError.clear();
+    return true;
+}
+
 QJsonObject ExerciseModel::toJson(SerializationMode mode) const
 {
     return Serialization::toJson(toVariantMap(mode));
