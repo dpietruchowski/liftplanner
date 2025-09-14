@@ -24,6 +24,7 @@ public:
 signals:
     void workoutsChanged();
     void errorOccurred(const QString &errorMessage);
+    void gptPromptGenerated();
 
 private:
     bool validateWorkoutsJson(const QString &jsonData, QString &errorMessage);

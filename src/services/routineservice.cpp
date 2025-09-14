@@ -144,6 +144,8 @@ Rules:
 
     QClipboard *clipboard = QGuiApplication::clipboard();
     clipboard->setText(prompt);
+
+    emit gptPromptGenerated();
 }
 
 void RoutineService::importWorkoutsFromClipboard()

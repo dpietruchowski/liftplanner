@@ -103,6 +103,7 @@ Popup {
                         color: Theme.textSecondary
                         font.pixelSize: Theme.fontMedium
                         wrapMode: Text.Wrap
+                        horizontalAlignment: Text.AlignJustify
                         Layout.fillWidth: true
                     }
                 }

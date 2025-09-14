@@ -34,9 +34,20 @@ Item {
     Connections {
         target: RoutineService
         function onErrorOccurred(error) {
+            notificationPopup.type = Notification.Type.Error
             notificationPopup.text = error
             notificationPopup.open()
         }
+
+        function onGptPromptGenerated() {
+            notificationPopup.type = Notification.Type.Info
+            notificationPopup.text =
+                "Prompt copied to clipboard.\n\n" +
+                "Use this prompt in an AI (ChatGPT, Gemini, etc.) to generate a workout in JSON. " +
+                "Then copy the generated JSON and click the 'Import' button in routines to add it."
+            notificationPopup.open()
+        }
+
     }
 
     BottomNavigation {
