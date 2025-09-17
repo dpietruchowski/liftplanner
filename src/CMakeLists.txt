@@ -35,6 +35,11 @@ qt_add_resources(liftplanner "app_icons"
         ${PROJECT_ICON_SOURCES}
 )
 
+qt_add_resources(liftplanner "resources"
+    PREFIX "/LiftPlanner"
+    FILES
+        data/gpt_prompt_template.txt
+)
 
 target_link_libraries(liftplanner
     PRIVATE

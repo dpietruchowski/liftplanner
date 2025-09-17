@@ -1,9 +1,61 @@
 #include "routineservice.h"
 #include <QClipboard>
 #include <QDebug>
+#include <QFile>
 #include <QGuiApplication>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QRegularExpression>
+
+namespace {
+
+QString parseTemplate(const QString &templateContent,
+                      bool recentTrainingsEmpty,
+                      const QString &recentTrainingsJson = QString())
+{
+    QString result = templateContent;
+
+    QRegularExpression
+        ifPattern(R"(\{% if recent_trainings_empty %\}(.*?)\{% else %\}(.*?)\{% endif %\})",
+                  QRegularExpression::DotMatchesEverythingOption);
+
+    QRegularExpressionMatch match = ifPattern.match(result);
+    if (match.hasMatch()) {
+        QString trueBlock = match.captured(1).trimmed();
+        QString falseBlock = match.captured(2).trimmed();
+
+        if (recentTrainingsEmpty) {
+            result.replace(match.captured(0), trueBlock);
+        } else {
+            result.replace(match.captured(0), falseBlock);
+        }
+    }
+
+    if (!recentTrainingsEmpty && !recentTrainingsJson.isEmpty()) {
+        result.replace("{{recent_trainings_json}}", recentTrainingsJson);
+    } else {
+        result.replace("{{recent_trainings_json}}", "");
+    }
+
+    return result;
+}
+
+QString readTemplateFile(const QString &filePath)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Cannot open template file:" << filePath;
+        return QString();
+    }
+
+    QTextStream in(&file);
+    QString content = in.readAll();
+    file.close();
+
+    return content;
+}
+
+} // namespace
 
 RoutineService::RoutineService(AppDbStorage *dbStorage, QObject *parent)
     : QObject(parent), m_dbStorage(dbStorage)
@@ -78,72 +130,22 @@ void RoutineService::importWorkoutsFromJson(const QString &jsonData)
 
 void RoutineService::generateGptPrompt(const QJsonArray &recentTrainings)
 {
-    QString prompt;
+    QString templateContent = readTemplateFile(":/LiftPlanner/data/gpt_prompt_template.txt");
 
-    if (recentTrainings.isEmpty()) {
-        prompt += R"(
-You are a personal training assistant. Gather details from the user and generate a beginner workout plan.
-Ask for:
-- Gender (male/female)
-- Age
-- Weight
-- Goal
-- Training experience
-- Workouts per week
-- Equipment
-- Injuries or limitations
-- Time per workout
-)";
-    } else {
-        prompt += R"(
-You are a personal training assistant. Analyze the user's recent workouts, evaluate their progress, and provide brief suggestions on what to adjust.
-Include the user's recent workouts as reference:
-)";
-
-        QString recentTrainingsString = QJsonDocument(recentTrainings)
-                                            .toJson(QJsonDocument::Indented);
-        prompt += recentTrainingsString;
+    if (templateContent.isEmpty()) {
+        qWarning() << "GPT template content is emtpy";
+        return;
     }
 
-    prompt += R"(
+    QString recentTrainingsJson;
+    if (!recentTrainings.isEmpty()) {
+        recentTrainingsJson = QJsonDocument(recentTrainings).toJson(QJsonDocument::Indented);
+    }
 
-Step 1: Show the user the proposed exercises with sets in the format repsxweightkg and wait for confirmation.
-
-Step 2: After confirmation, generate the full workout plan as valid JSON wrapped in a code block.
-
-Format of the JSON:
-- The top-level object is a list of workouts.
-- Each workout has:
-  - "name": string
-  - "exercises": list of exercises
-- Each exercise has:
-  - "name": string
-  - "description": string
-  - "sets": string with each set in format repsxweightkg, separated by commas (e.g., "10x50kg, 8x55kg, 6x60kg")
-- Example structure (without actual example values):
-[
-  {
-    "name": "Workout Name",
-    "exercises": [
-      {
-        "name": "Exercise Name",
-        "description": "Instructions",
-        "sets": "10x50kg, 8x55kg"
-      }
-    ]
-  }
-]
-
-Rules:
-- Each set must always be in the format repsxweightkg (e.g., 10x50kg, 8x0kg for bodyweight exercises).
-- Weights in kg, repetitions as integers.
-- Ensure the workouts are balanced and appropriate for the user.
-)";
-
-    prompt += "\n";
+    templateContent = parseTemplate(templateContent, recentTrainings.isEmpty(), recentTrainingsJson);
 
     QClipboard *clipboard = QGuiApplication::clipboard();
-    clipboard->setText(prompt);
+    clipboard->setText(templateContent);
 
     emit gptPromptGenerated();
 }
