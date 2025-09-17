@@ -14,7 +14,9 @@ class ExerciseModel : public QObject
     DECLARE_MODEL_PROPERTY(int, id, setId, id)
     DECLARE_MODEL_PROPERTY(int, workoutId, setWorkoutId, workout_id)
     DECLARE_MODEL_PROPERTY(QString, name, setName, name)
+    DECLARE_MODEL_PROPERTY(QString, description, setDescription, description)
     DECLARE_MODEL_PROPERTY(int, restSeconds, setRestSeconds, rest_seconds)
+    DECLARE_MODEL_PROPERTY(QString, youtubeLink, setYoutubeLink, youtube_link)
     DECLARE_MODEL_LIST_PROPERTY(ExerciseModel, SetModel, sets, setSets, sets)
 
     Q_PROPERTY(bool completed READ isCompleted NOTIFY completedChanged)

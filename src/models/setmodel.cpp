@@ -1,5 +1,6 @@
 #include "setmodel.h"
-#include "../utils/serializationutils.h"
+#include "utils/serializationutils.h"
+#include "utils/variantmapvalidator.h"
 
 SetModel::SetModel(QObject *parent)
     : QObject(parent)
@@ -45,29 +46,12 @@ SetModel *SetModel::fromVariantMap(const QVariantMap &variantMap, QObject *paren
 
 bool SetModel::validateVariantMap(const QVariantMap &variantMap, QString &stringError)
 {
-    if (!variantMap.contains(SetModel::repetitions_key)
-        || !variantMap.value(SetModel::repetitions_key).canConvert<int>()) {
-        stringError = QString("Missing or invalid '%1'").arg(SetModel::repetitions_key);
-        return false;
-    }
+    VariantMapValidator validator(variantMap, stringError);
 
-    int repetitions = variantMap.value(SetModel::repetitions_key).toInt();
-    if (repetitions <= 0) {
-        stringError = QString("'%1' must be greater than 0").arg(SetModel::repetitions_key);
+    if (!validator.validateInt(SetModel::repetitions_key, true, 1))
         return false;
-    }
-
-    if (!variantMap.contains(SetModel::weight_key)
-        || !variantMap.value(SetModel::weight_key).canConvert<double>()) {
-        stringError = QString("Missing or invalid '%1'").arg(SetModel::weight_key);
+    if (!validator.validateInt(SetModel::weight_key, true, 0))
         return false;
-    }
-
-    double weight = variantMap.value(SetModel::weight_key).toDouble();
-    if (weight <= 0) {
-        stringError = QString("'%1' must be greater than 0").arg(SetModel::weight_key);
-        return false;
-    }
 
     if (!variantMap.contains(SetModel::completed_key)
         || !variantMap.value(SetModel::completed_key).canConvert<bool>()) {

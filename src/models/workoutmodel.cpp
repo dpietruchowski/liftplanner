@@ -1,6 +1,7 @@
 #include "workoutmodel.h"
 #include <QJsonArray>
-#include "../utils/serializationutils.h"
+#include "utils/serializationutils.h"
+#include "utils/variantmapvalidator.h"
 
 WorkoutModel::WorkoutModel(QObject *parent)
     : QObject(parent)
@@ -119,17 +120,10 @@ WorkoutModel *WorkoutModel::fromVariantMap(const QVariantMap &variantMap, QObjec
 
 bool WorkoutModel::validateVariantMap(const QVariantMap &variantMap, QString &stringError)
 {
-    if (!variantMap.contains(WorkoutModel::name_key)
-        || !variantMap.value(WorkoutModel::name_key).canConvert<QString>()) {
-        stringError = QString("Missing or invalid '%1' field").arg(WorkoutModel::name_key);
-        return false;
-    }
+    VariantMapValidator validator(variantMap, stringError);
 
-    QString nameValue = variantMap.value(WorkoutModel::name_key).toString().trimmed();
-    if (nameValue.isEmpty()) {
-        stringError = QString("'%1' cannot be empty").arg(WorkoutModel::name_key);
+    if (!validator.validateString(WorkoutModel::name_key, true))
         return false;
-    }
 
     if (variantMap.contains(WorkoutModel::exercises_key)) {
         QVariant exercisesVar = variantMap.value(WorkoutModel::exercises_key);

@@ -1,6 +1,7 @@
 #include "exercisemodel.h"
 #include <QJsonArray>
-#include "../utils/serializationutils.h"
+#include "utils/serializationutils.h"
+#include "utils/variantmapvalidator.h"
 
 ExerciseModel::ExerciseModel(QObject *parent)
     : QObject(parent)
@@ -50,26 +51,22 @@ void ExerciseModel::removeSet(SetModel *set)
 QVariantMap ExerciseModel::toVariantMap(SerializationMode mode) const
 {
     QVariantMap variant;
-    if (m_id != -1)
-    {
+    if (m_id != -1) {
         variant.insert(ExerciseModel::id_key, m_id);
     }
-    if (m_workoutId != -1)
-    {
+    if (m_workoutId != -1) {
         variant.insert(ExerciseModel::workout_id_key, m_workoutId);
     }
     variant.insert(ExerciseModel::name_key, m_name);
+    variant.insert(ExerciseModel::description_key, m_description);
     variant.insert(ExerciseModel::rest_seconds_key, m_restSeconds);
+    variant.insert(ExerciseModel::youtube_link_key, m_youtubeLink);
 
-    if (mode == SerializationMode::ChatGpt)
-    {
+    if (mode == SerializationMode::ChatGpt) {
         variant.insert(ExerciseModel::sets_key, setsToString());
-    }
-    else if (mode == SerializationMode::FullFile)
-    {
+    } else if (mode == SerializationMode::FullFile) {
         QVariantList setsList;
-        for (SetModel *set : m_sets)
-        {
+        for (SetModel *set : m_sets) {
             setsList.append(set->toVariantMap(mode));
         }
         variant.insert(ExerciseModel::sets_key, setsList);
@@ -88,24 +85,22 @@ ExerciseModel *ExerciseModel::fromVariantMap(const QVariantMap &variantMap, QObj
         model->setWorkoutId(variantMap.value(ExerciseModel::workout_id_key).toInt());
     if (variantMap.contains(ExerciseModel::name_key))
         model->setName(variantMap.value(ExerciseModel::name_key).toString());
+    if (variantMap.contains(ExerciseModel::description_key))
+        model->setDescription(variantMap.value(ExerciseModel::description_key).toString());
     if (variantMap.contains(ExerciseModel::rest_seconds_key))
         model->setRestSeconds(variantMap.value(ExerciseModel::rest_seconds_key).toInt());
+    if (variantMap.contains(ExerciseModel::youtube_link_key))
+        model->setYoutubeLink(variantMap.value(ExerciseModel::youtube_link_key).toString());
 
-    if (variantMap.contains(ExerciseModel::sets_key))
-    {
+    if (variantMap.contains(ExerciseModel::sets_key)) {
         QVariant setsVar = variantMap.value(ExerciseModel::sets_key);
 
-        if (setsVar.typeId() == QMetaType::QString)
-        {
+        if (setsVar.typeId() == QMetaType::QString) {
             model->setsFromString(setsVar.toString());
-        }
-        else if (setsVar.typeId() == QMetaType::QVariantList)
-        {
+        } else if (setsVar.typeId() == QMetaType::QVariantList) {
             QVariantList setsList = setsVar.toList();
-            for (const QVariant &var : setsList)
-            {
-                if (var.canConvert<QVariantMap>())
-                {
+            for (const QVariant &var : setsList) {
+                if (var.canConvert<QVariantMap>()) {
                     SetModel *set = SetModel::fromVariantMap(var.toMap(), model);
                     model->addSet(set);
                 }
@@ -118,31 +113,16 @@ ExerciseModel *ExerciseModel::fromVariantMap(const QVariantMap &variantMap, QObj
 
 bool ExerciseModel::validateVariantMap(const QVariantMap &variantMap, QString &stringError)
 {
-    const QString nameField = ExerciseModel::name_key;
-    const QString restSecondsField = ExerciseModel::rest_seconds_key;
+    VariantMapValidator validator(variantMap, stringError);
 
-    if (!variantMap.contains(nameField) || !variantMap.value(nameField).canConvert<QString>()) {
-        stringError = QString("Missing or invalid '%1' field").arg(nameField);
+    if (!validator.validateString(ExerciseModel::name_key, true))
         return false;
-    }
-
-    QString nameValue = variantMap.value(nameField).toString().trimmed();
-    if (nameValue.isEmpty()) {
-        stringError = QString("'%1' cannot be empty").arg(nameField);
+    if (!validator.validateInt(ExerciseModel::rest_seconds_key, true))
         return false;
-    }
-
-    if (!variantMap.contains(restSecondsField)
-        || !variantMap.value(restSecondsField).canConvert<int>()) {
-        stringError = QString("Missing or invalid '%1' field").arg(restSecondsField);
+    if (!validator.validateString(ExerciseModel::description_key, false))
         return false;
-    }
-
-    int restSecondsValue = variantMap.value(restSecondsField).toInt();
-    if (restSecondsValue < 0) {
-        stringError = QString("'%1' must be >= 0").arg(restSecondsField);
+    if (!validator.validateUrl(ExerciseModel::youtube_link_key, false))
         return false;
-    }
 
     if (variantMap.contains(ExerciseModel::sets_key)) {
         QVariant setsVar = variantMap.value(ExerciseModel::sets_key);
