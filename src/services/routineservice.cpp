@@ -139,7 +139,7 @@ void RoutineService::generateGptPrompt(const QJsonArray &recentTrainings)
 
     QString recentTrainingsJson;
     if (!recentTrainings.isEmpty()) {
-        recentTrainingsJson = QJsonDocument(recentTrainings).toJson(QJsonDocument::Indented);
+        recentTrainingsJson = QJsonDocument(recentTrainings).toJson(QJsonDocument::Compact);
     }
 
     templateContent = parseTemplate(templateContent, recentTrainings.isEmpty(), recentTrainingsJson);

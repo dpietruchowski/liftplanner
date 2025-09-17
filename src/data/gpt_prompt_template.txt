@@ -22,29 +22,39 @@ Step 1: Show the user the proposed exercises with sets in the format repsxweight
 Step 2: After confirmation, generate the full workout plan as valid JSON wrapped in a code block.
 
 Format of the JSON:
-- The top-level object is a list of workouts.
-- Each workout has:
-  - "name": string
-  - "exercises": list of exercises
-- Each exercise has:
-  - "name": string
-  - "description": string
-  - "sets": string with each set in format repsxweightkg, separated by commas (e.g., "10x50kg, 8x55kg, 6x60kg")
-- Example structure (without actual example values):
-[
-  {
-    "name": "Workout Name",
-    "exercises": [
-      {
-        "name": "Exercise Name",
-        "description": "Instructions",
-        "sets": "10x50kg, 8x55kg"
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorkoutList",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "exercises": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "description": { "type": "string" },
+            "sets": {
+              "type": "string",
+              "pattern": "^([0-9]+x[0-9]+kg)(,\\s*[0-9]+x[0-9]+kg)*$"
+            },
+            "youtube_link": { "type": "string" },
+            "rest_seconds": { "type": "number" }
+          },
+          "required": ["name", "description", "sets"],
+          "additionalProperties": false
+        }
       }
-    ]
+    },
+    "required": ["name", "exercises"],
+    "additionalProperties": false
   }
-]
+}
 
 Rules:
 - Each set must always be in the format repsxweightkg (e.g., 10x50kg, 8x0kg for bodyweight exercises).
-- Weights in kg, repetitions as integers.
+- Weights (integers) in kg, repetitions as integers.
 - Ensure the workouts are balanced and appropriate for the user.
