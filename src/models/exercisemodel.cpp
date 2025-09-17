@@ -51,16 +51,20 @@ void ExerciseModel::removeSet(SetModel *set)
 QVariantMap ExerciseModel::toVariantMap(SerializationMode mode) const
 {
     QVariantMap variant;
-    if (m_id != -1) {
-        variant.insert(ExerciseModel::id_key, m_id);
-    }
-    if (m_workoutId != -1) {
-        variant.insert(ExerciseModel::workout_id_key, m_workoutId);
-    }
+
     variant.insert(ExerciseModel::name_key, m_name);
-    variant.insert(ExerciseModel::description_key, m_description);
     variant.insert(ExerciseModel::rest_seconds_key, m_restSeconds);
     variant.insert(ExerciseModel::youtube_link_key, m_youtubeLink);
+
+    if (mode != SerializationMode::ChatGpt) {
+        if (m_id != -1) {
+            variant.insert(ExerciseModel::id_key, m_id);
+        }
+        if (m_workoutId != -1) {
+            variant.insert(ExerciseModel::workout_id_key, m_workoutId);
+        }
+        variant.insert(ExerciseModel::description_key, m_description);
+    }
 
     if (mode == SerializationMode::ChatGpt) {
         variant.insert(ExerciseModel::sets_key, setsToString());

@@ -7,7 +7,10 @@ ExerciseDbRepository::ExerciseDbRepository(QSqlDatabase &database, QObject *pare
     : TemplateDbRepository(ExerciseDbRepository::exercises_table,
                            {ExerciseModel::id_key,
                             ExerciseModel::workout_id_key,
-                            ExerciseModel::name_key},
+                            ExerciseModel::name_key,
+                            ExerciseModel::description_key,
+                            ExerciseModel::youtube_link_key,
+                            ExerciseModel::rest_seconds_key},
                            database,
                            parent)
 {
@@ -15,11 +18,17 @@ ExerciseDbRepository::ExerciseDbRepository(QSqlDatabase &database, QObject *pare
                                       "%2 INTEGER PRIMARY KEY AUTOINCREMENT, "
                                       "%3 INTEGER NOT NULL, "
                                       "%4 TEXT, "
-                                      "FOREIGN KEY(%3) REFERENCES %5(%6) ON DELETE CASCADE)")
+                                      "%5 TEXT, "
+                                      "%6 TEXT, "
+                                      "%7 INTEGER, "
+                                      "FOREIGN KEY(%3) REFERENCES %8(%9) ON DELETE CASCADE)")
                            .arg(ExerciseDbRepository::exercises_table,
                                 ExerciseModel::id_key,
                                 ExerciseModel::workout_id_key,
                                 ExerciseModel::name_key,
+                                ExerciseModel::description_key,
+                                ExerciseModel::youtube_link_key,
+                                ExerciseModel::rest_seconds_key,
                                 WorkoutDbRepository::workouts_table,
                                 WorkoutModel::id_key);
 
