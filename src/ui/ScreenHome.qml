@@ -5,14 +5,16 @@ import LiftPlanner 1.0
 
 Rectangle {
     id: root
-    width: 360
-    height: 640
     color: Theme.background
+
+    anchors.margins: Theme.padding
 
     property var lastWorkoutName: WorkoutHistoryService.lastWorkout ?
                                       WorkoutHistoryService.lastWorkout.name : "---"
     property var nextWorkoutName: RoutineService.nextWorkout ?
                                       RoutineService.nextWorkout.name : "---"
+
+    onWidthChanged: console.log(width)
 
     Connections {
         target: RoutineService
@@ -27,79 +29,87 @@ Rectangle {
         active: RoutineService.workouts.length === 0
         sourceComponent: noRoutinesInstruction
     }
-
-    ColumnLayout {
-        visible: RoutineService.workouts.length > 0
-        width: parent.width - 2 * Theme.padding   // cała szerokość z marginesami
-        anchors.horizontalCenter: parent.horizontalCenter
+    Item {
+        id: wrapper
+        width: parent.width
+        height: columnLayout.implicitHeight
         anchors.verticalCenter: parent.verticalCenter
-        spacing: Theme.spacing
+        anchors.leftMargin: Theme.padding
+        anchors.rightMargin: Theme.padding
 
-        Rectangle {
-            width: parent.width
-            height: 100
-            radius: Theme.borderRadius
-            color: Theme.surface
+        ColumnLayout {
+            width: parent.width - 2 * Theme.padding
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: Theme.spacing
+            visible: RoutineService.workouts.length > 0
 
-            Column {
-                anchors.fill: parent
-                anchors.margins: Theme.padding
-                spacing: 4
+            Rectangle {
+                width: parent.width
+                height: 100
+                radius: Theme.borderRadius
+                color: Theme.surface
 
-                Text {
-                    text: "Your last workout"
-                    color: Theme.textSecondary
-                    font.pixelSize: Theme.fontMedium
-                }
+                Column {
+                    anchors.fill: parent
+                    anchors.margins: Theme.padding
+                    spacing: 4
 
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: root.lastWorkoutName
-                    color: Theme.textPrimary
-                    font.pixelSize: Theme.fontLarge
-                    font.bold: true
-                }
-            }
-        }
+                    Text {
+                        text: "Your last workout"
+                        color: Theme.textSecondary
+                        font.pixelSize: Theme.fontMedium
+                    }
 
-        Rectangle {
-            width: parent.width
-            height: 100
-            radius: Theme.borderRadius
-            color: Theme.surface
-
-            Column {
-                anchors.fill: parent
-                anchors.margins: Theme.padding
-                spacing: 4
-
-                Text {
-                    text: "Next"
-                    color: Theme.textSecondary
-                    font.pixelSize: Theme.fontMedium
-                }
-
-                Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: root.nextWorkoutName
-                    color: Theme.textPrimary
-                    font.pixelSize: Theme.fontLarge
-                    font.bold: true
+                    Text {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: root.lastWorkoutName
+                        color: Theme.textPrimary
+                        font.pixelSize: Theme.fontLarge
+                        font.bold: true
+                    }
                 }
             }
-        }
 
-        PrimaryButton {
-            Layout.alignment: Qt.AlignHCenter
-            text: "Start workout"
-            buttonTheme: Theme.buttonLarge
-            buttonStyle: Theme.buttonStylePrimary
-            onClicked: {
-                if (ActiveWorkoutService.currentWorkout) {
-                     startWorkoutPopup.open()
-                 } else {
-                     startWorkout()
-                 }
+            Rectangle {
+                width: parent.width
+                height: 100
+                radius: Theme.borderRadius
+                color: Theme.surface
+
+                Column {
+                    anchors.fill: parent
+                    anchors.margins: Theme.padding
+                    spacing: 4
+
+                    Text {
+                        text: "Next"
+                        color: Theme.textSecondary
+                        font.pixelSize: Theme.fontMedium
+                    }
+
+                    Text {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: root.nextWorkoutName
+                        color: Theme.textPrimary
+                        font.pixelSize: Theme.fontLarge
+                        font.bold: true
+                    }
+                }
+            }
+
+            PrimaryButton {
+                Layout.alignment: Qt.AlignHCenter
+                text: "Start workout"
+                buttonTheme: Theme.buttonLarge
+                buttonStyle: Theme.buttonStylePrimary
+                onClicked: {
+                    if (ActiveWorkoutService.currentWorkout) {
+                         startWorkoutPopup.open()
+                     } else {
+                         startWorkout()
+                     }
+                }
             }
         }
     }
