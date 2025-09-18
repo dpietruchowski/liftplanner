@@ -179,17 +179,13 @@ WorkoutModel *RoutineService::next(const QString &name) const
     for (int i = 0; i < m_workouts.size(); ++i) {
         WorkoutModel *workout = m_workouts[i];
         if (workout && workout->name() == name) {
-            int nextIndex = i + 1;
-            if (nextIndex < m_workouts.size())
-                return m_workouts[nextIndex];
-            else
-                return m_workouts.first();
+            int nextIndex = (i + 1) % m_workouts.size();
+            return m_workouts[nextIndex];
         }
     }
 
     return m_workouts.first();
 }
-
 bool RoutineService::validateWorkoutsJson(const QString &jsonData, QString &errorMessage)
 {
     QJsonParseError parseError;
