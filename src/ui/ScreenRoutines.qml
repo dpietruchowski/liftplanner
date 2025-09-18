@@ -24,7 +24,9 @@ Rectangle {
                  }
             }
         }
-        buttonsRow: WorkoutButtonsRow {}
+        buttonsRow: WorkoutButtonsRow {
+            onImportRoutines: importRoutinesPopup.open()
+        }
     }
 
     function startWorkout() {
@@ -43,6 +45,16 @@ Rectangle {
         buttons: Notification.Button.Ok | Notification.Button.Cancel
         onAccepted: {
             startWorkout()
+        }
+    }
+
+    NotificationPopup {
+        id: importRoutinesPopup
+        text: "Do you want to import new routines?"
+        type: Notification.Type.Warning
+        buttons: Notification.Button.Ok | Notification.Button.Cancel
+        onAccepted: {
+            RoutineService.importWorkoutsFromClipboard()
         }
     }
 }

@@ -8,7 +8,7 @@ Item {
 
     property var activeWorkoutScreen: ScreenActiveWorkout {}
     property var homeScreen: ScreenHome {}
-    property var workoutScreen: ScreenWorkout {}
+    property var routinesScreen: ScreenRoutines {}
     property var historyScreen: ScreenHistory {}
 
 
@@ -57,7 +57,7 @@ Item {
         model: [
             { label: "Workout", screen: activeWorkoutScreen },
             { label: "Home", screen: homeScreen },
-            { label: "Routines", screen: workoutScreen },
+            { label: "Routines", screen: routinesScreen },
             { label: "History", screen: historyScreen }
         ]
     }

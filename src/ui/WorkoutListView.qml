@@ -24,6 +24,7 @@ Item {
 
             Loader {
                 sourceComponent: root.buttonsRow
+                Layout.fillWidth: true
             }
 
             Repeater {

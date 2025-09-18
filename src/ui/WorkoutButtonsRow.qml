@@ -8,31 +8,23 @@ RowLayout {
     spacing: Theme.spacing
     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-    Button {
+    signal importRoutines()
+
+    Item {
         Layout.fillWidth: true
-        text: "Generate GPT Prompt"
-        onClicked: RoutineService.generateGptPrompt(WorkoutHistoryService.recentWorkoutsToJson())
-        background: Rectangle { color: Theme.primary; radius: Theme.borderRadius }
-        contentItem: Text {
-            anchors.centerIn: parent
-            text: parent.text
-            color: Theme.buttonText
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
     }
 
-    Button {
-        Layout.fillWidth: true
-        text: "Import from JSON"
-        onClicked: RoutineService.importWorkoutsFromClipboard()
-        background: Rectangle { color: Theme.primary; radius: Theme.borderRadius }
-        contentItem: Text {
-            anchors.centerIn: parent
-            text: parent.text
-            color: Theme.buttonText
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
+    PrimaryButton {
+        text: "Prompt"
+        buttonTheme: Theme.buttonMedium
+        buttonStyle: Theme.buttonStylePrimary
+        onClicked: RoutineService.generateGptPrompt(WorkoutHistoryService.recentWorkoutsToJson())
+    }
+
+    PrimaryButton {
+        text: "Import"
+        buttonTheme: Theme.buttonMedium
+        buttonStyle: Theme.buttonStylePrimary
+        onClicked: importRoutines()
     }
 }

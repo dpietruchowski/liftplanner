@@ -14,6 +14,8 @@ Control {
     signal clicked()
     property bool down: mouseArea.pressed
 
+    property bool hasIcon: svgIcon && svgIcon.toString() !== ""
+
     implicitWidth: buttonTheme.width
     implicitHeight: buttonTheme.height
 
@@ -32,6 +34,7 @@ Control {
     }
 
     contentItem: Item {
+        id: item
         anchors.centerIn: parent
         width: parent.width
         height: parent.height
@@ -42,11 +45,12 @@ Control {
 
             ColoredSvgImage {
                 id: svgImage
-                visible: control.svgIcon && control.svgIcon !== ""
-                width: visible ? buttonTheme.iconSize : 0
-                height: visible ? buttonTheme.iconSize : 0
+                opacity: control.hasIcon ? 1 : 0
+                width: control.hasIcon ? buttonTheme.iconSize : 100
+                height: control.hasIcon ? buttonTheme.iconSize : 0
                 svgSource: control.svgIcon
                 color: control.iconTint
+                enabled: control.hasIcon
             }
 
             Text {
