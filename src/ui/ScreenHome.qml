@@ -21,7 +21,15 @@ Rectangle {
         }
     }
 
+    Loader {
+        anchors.fill: parent
+        anchors.verticalCenter: parent.verticalCenter
+        active: RoutineService.workouts.length === 0
+        sourceComponent: noRoutinesInstruction
+    }
+
     ColumnLayout {
+        visible: RoutineService.workouts.length > 0
         width: parent.width - 2 * Theme.padding   // cała szerokość z marginesami
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
@@ -112,6 +120,28 @@ Rectangle {
         ActiveWorkoutService.startWorkout(RoutineService.nextWorkout)
         if (stackView.currentItem !== activeWorkoutScreen) {
             stackView.replace(activeWorkoutScreen)
+        }
+    }
+
+    Component {
+        id: noRoutinesInstruction
+
+        Rectangle {
+            radius: Theme.borderRadius
+            color: Theme.surface
+
+            Text {
+                anchors.fill: parent
+                text: "You don’t have any routines yet.\n\n" +
+                      "Go to the 'Routines' tab and click the 'Prompt' button. " +
+                      "The prompt for the language model will be copied to your clipboard. " +
+                      "Paste it into any AI (ChatGPT, Gemini, etc.) and discuss your training goals. " +
+                      "Once the AI generates a workout in JSON format, copy it to your clipboard and return to this app. " +
+                      "In the 'Routines' tab, click the 'Import' button. Your routines should now be imported."
+                color: Theme.textPrimary
+                font.pixelSize: Theme.fontMedium
+                wrapMode: Text.WordWrap
+            }
         }
     }
 }

@@ -31,7 +31,8 @@ Rectangle {
                 height: 50
                 color: "transparent"
 
-                property color textColor: bottomNav.currentIndex === index ? Theme.primary : Theme.textSecondary
+                property bool active: stackView.currentItem === modelData.screen
+                property color textColor: active ? Theme.primary : Theme.textSecondary
 
                 Column {
                     anchors.fill: parent
@@ -46,7 +47,7 @@ Rectangle {
                     Text {
                         text: modelData.label
                         color: textColor
-                        font.bold: bottomNav.currentIndex === index
+                        font.bold: active === index
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
                 }
