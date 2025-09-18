@@ -38,6 +38,7 @@ Rectangle {
         anchors.rightMargin: Theme.padding
 
         ColumnLayout {
+            id: columnLayout
             width: parent.width - 2 * Theme.padding
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
