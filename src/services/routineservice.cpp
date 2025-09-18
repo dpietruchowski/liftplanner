@@ -58,8 +58,14 @@ QString readTemplateFile(const QString &filePath)
 } // namespace
 
 RoutineService::RoutineService(AppDbStorage *dbStorage, QObject *parent)
-    : QObject(parent), m_dbStorage(dbStorage)
+    : QObject(parent)
+    , m_dbStorage(dbStorage)
 {
+    connect(this, &RoutineService::workoutsChanged, this, &RoutineService::nextWorkoutChanged);
+    connect(this,
+            &RoutineService::lastWorkoutNameChanged,
+            this,
+            &RoutineService::nextWorkoutChanged);
 }
 
 RoutineService::~RoutineService()
@@ -68,31 +74,27 @@ RoutineService::~RoutineService()
     m_workouts.clear();
 }
 
-QList<QObject *> RoutineService::workouts() const
+QList<WorkoutModel *> RoutineService::workouts() const
 {
     return m_workouts;
 }
 
 void RoutineService::loadAllWorkouts()
 {
-    try
-    {
+    try {
         qDeleteAll(m_workouts);
         m_workouts.clear();
 
         QVector<WorkoutModel *> workoutModels = m_dbStorage->workoutRepository()->loadAll(
             "WHERE started_time IS NULL");
 
-        for (WorkoutModel *workout : workoutModels)
-        {
+        for (WorkoutModel *workout : workoutModels) {
             m_dbStorage->loadWorkout(workout);
             m_workouts.append(workout);
         }
 
         emit workoutsChanged();
-    }
-    catch (const std::exception &e)
-    {
+    } catch (const std::exception &e) {
         emit errorOccurred(QString("Failed to load workouts: %1").arg(e.what()));
     }
 }
@@ -108,14 +110,11 @@ void RoutineService::importWorkoutsFromJson(const QString &jsonData)
     try {
         m_dbStorage->workoutRepository()->remove("WHERE started_time IS NULL");
         QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
-        if (doc.isArray())
-        {
+        if (doc.isArray()) {
             QJsonArray workoutsArray = doc.array();
-            for (const QJsonValue &workoutValue : workoutsArray)
-            {
+            for (const QJsonValue &workoutValue : workoutsArray) {
                 WorkoutModel *workout = WorkoutModel::fromJson(workoutValue.toObject());
-                if (workout)
-                {
+                if (workout) {
                     m_dbStorage->saveWorkout(workout);
                     delete workout;
                 }
@@ -133,7 +132,7 @@ void RoutineService::generateGptPrompt(const QJsonArray &recentTrainings)
     QString templateContent = readTemplateFile(":/LiftPlanner/data/gpt_prompt_template.txt");
 
     if (templateContent.isEmpty()) {
-        qWarning() << "GPT template content is emtpy";
+        qWarning() << "GPT template content is empty";
         return;
     }
 
@@ -152,23 +151,43 @@ void RoutineService::generateGptPrompt(const QJsonArray &recentTrainings)
 
 void RoutineService::importWorkoutsFromClipboard()
 {
-    try
-    {
+    try {
         QClipboard *clipboard = QGuiApplication::clipboard();
         QString jsonData = clipboard->text();
 
-        if (jsonData.isEmpty())
-        {
+        if (jsonData.isEmpty()) {
             emit errorOccurred("Clipboard is empty");
             return;
         }
 
         importWorkoutsFromJson(jsonData);
-    }
-    catch (const std::exception &e)
-    {
+    } catch (const std::exception &e) {
         emit errorOccurred(QString("Import from clipboard failed: %1").arg(e.what()));
     }
+}
+
+WorkoutModel *RoutineService::nextWorkout() const
+{
+    return next(lastWorkoutName());
+}
+
+WorkoutModel *RoutineService::next(const QString &name) const
+{
+    if (m_workouts.isEmpty())
+        return nullptr;
+
+    for (int i = 0; i < m_workouts.size(); ++i) {
+        WorkoutModel *workout = m_workouts[i];
+        if (workout && workout->name() == name) {
+            int nextIndex = i + 1;
+            if (nextIndex < m_workouts.size())
+                return m_workouts[nextIndex];
+            else
+                return m_workouts.first();
+        }
+    }
+
+    return m_workouts.first();
 }
 
 bool RoutineService::validateWorkoutsJson(const QString &jsonData, QString &errorMessage)

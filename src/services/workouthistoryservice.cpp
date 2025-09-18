@@ -5,6 +5,11 @@
 WorkoutHistoryService::WorkoutHistoryService(AppDbStorage *dbStorage, QObject *parent)
     : QObject(parent), m_dbStorage(dbStorage)
 {
+    connect(this,
+            &WorkoutHistoryService::workoutsChanged,
+            this,
+            &WorkoutHistoryService::lastWorkoutChanged);
+
     loadAllWorkouts();
 }
 
@@ -67,4 +72,12 @@ QJsonArray WorkoutHistoryService::recentWorkoutsToJson(int count)
     }
 
     return jsonArray;
+}
+
+WorkoutModel *WorkoutHistoryService::lastWorkout() const
+{
+    if (m_workouts.isEmpty())
+        return nullptr;
+
+    return m_workouts.first();
 }
