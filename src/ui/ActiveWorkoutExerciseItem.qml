@@ -9,6 +9,7 @@ Column {
     property var exercise: modelData
     signal editSetRepetitions(var setData)
     signal editSetWeight(var setData)
+    signal showExerciseInfo(var exercise)
     width: contentColumn.width
     spacing: Theme.spacing / 2
 
@@ -27,6 +28,18 @@ Column {
             font.bold: true
             anchors.centerIn: parent
             elide: Text.ElideRight
+        }
+
+        PrimaryButton {
+            anchors.right: parent.right
+            anchors.rightMargin: Theme.spacing
+            anchors.verticalCenter: parent.verticalCenter
+            svgIcon: Theme.icons.info
+            circular: true
+            buttonTheme: Theme.buttonSquare
+            buttonStyle: Theme.buttonStylePrimary
+            z: 1
+            onClicked: exerciseDelegate.showExerciseInfo(exercise)
         }
 
         MouseArea {

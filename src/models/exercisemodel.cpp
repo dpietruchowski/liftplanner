@@ -89,8 +89,10 @@ ExerciseModel *ExerciseModel::fromVariantMap(const QVariantMap &variantMap, QObj
         model->setWorkoutId(variantMap.value(ExerciseModel::workout_id_key).toInt());
     if (variantMap.contains(ExerciseModel::name_key))
         model->setName(variantMap.value(ExerciseModel::name_key).toString());
+
     if (variantMap.contains(ExerciseModel::description_key))
         model->setDescription(variantMap.value(ExerciseModel::description_key).toString());
+
     if (variantMap.contains(ExerciseModel::rest_seconds_key))
         model->setRestSeconds(variantMap.value(ExerciseModel::rest_seconds_key).toInt());
     if (variantMap.contains(ExerciseModel::youtube_link_key))
@@ -210,9 +212,10 @@ ExerciseModel *ExerciseModel::clone(QObject *parent) const
     clone->setName(m_name);
     clone->setWorkoutId(m_workoutId);
     clone->setRestSeconds(m_restSeconds);
+    clone->setDescription(m_description);
+    clone->setYoutubeLink(m_youtubeLink);
 
-    for (QObject *setObj : m_sets)
-    {
+    for (QObject *setObj : m_sets) {
         if (SetModel *set = qobject_cast<SetModel *>(setObj))
         {
             SetModel *setClone = set->clone(clone);

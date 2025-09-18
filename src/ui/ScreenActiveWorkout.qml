@@ -40,6 +40,16 @@ Rectangle {
                         exercise: modelData
                         onEditSetRepetitions: function(setData) { handleEditRepetitions(setData) }
                         onEditSetWeight: function(setData) { handleEditWeight(setData) }
+                        onShowExerciseInfo: function(exercise) {
+                            exerciseInfoPopup.title = exercise.name
+                            exerciseInfoPopup.text = exercise.description
+                                    + "<br><br><a href=\""
+                                    + exercise.youtubeLink
+                                    + "\">"
+                                    + exercise.youtubeLink
+                                    + "</a>"
+                            exerciseInfoPopup.open()
+                        }
                     }
                 }
             }
@@ -85,6 +95,13 @@ Rectangle {
                 onClicked: ActiveWorkoutService.navigateToNext()
             }
         }
+    }
+
+    NotificationPopup {
+        id: exerciseInfoPopup
+        iconVisible: false
+        buttons: Notification.Button.Ok
+        textFormat: Text.RichText
     }
 
     NotificationPopup {

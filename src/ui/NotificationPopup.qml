@@ -12,11 +12,13 @@ Popup {
     width: Math.min(parent.width * 0.9, 360)
     height: 0.5 * parent.height
 
+    property bool iconVisible: true
     property int type
     property int buttons
     property string title: ""
     property string text: ""
     property bool copyEnabled: false
+    property int textFormat: Text.PlainText
 
     signal accepted()
     signal rejected()
@@ -64,6 +66,7 @@ Popup {
                     id: icon
                     width: 48
                     height: 48
+                    visible: root.iconVisible
                     svgSource: {
                         switch (root.type) {
                             case Notification.Type.Error: return Theme.icons.error
@@ -105,6 +108,10 @@ Popup {
                         wrapMode: Text.Wrap
                         horizontalAlignment: Text.AlignJustify
                         Layout.fillWidth: true
+                        textFormat: root.textFormat
+                        onLinkActivated: function(link) {
+                            Qt.openUrlExternally(link)
+                        }
                     }
                 }
             }
