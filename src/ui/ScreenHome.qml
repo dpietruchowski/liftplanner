@@ -14,13 +14,8 @@ Rectangle {
     property var nextWorkoutName: RoutineService.nextWorkout ?
                                       RoutineService.nextWorkout.name : "---"
 
-    onWidthChanged: console.log(width)
-
-    Connections {
-        target: RoutineService
-        function onNextWorkoutChanged() {
-            console.log("next workout", RoutineService.nextWorkout)
-        }
+    onLastWorkoutNameChanged: {
+        RoutineService.lastWorkoutName = lastWorkoutName
     }
 
     Loader {
