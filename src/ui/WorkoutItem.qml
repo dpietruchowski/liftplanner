@@ -4,10 +4,14 @@ import QtQuick.Layouts
 import LiftPlanner 1.0
 
 ColumnLayout {
+    id: root
     Layout.fillWidth: true
     spacing: Theme.spacing
     property var workout
     property bool expanded: false
+
+
+    signal deleteWorkout(var workout)
 
     Rectangle {
         Layout.fillWidth: true
@@ -45,6 +49,14 @@ ColumnLayout {
                 font.pixelSize: Theme.fontSmall
                 color: Theme.textSecondary
                 verticalAlignment: Text.AlignVCenter
+            }
+
+            PrimaryButton {
+                svgIcon: Theme.icons.close
+                circular: true
+                buttonTheme: Theme.buttonSquare
+                buttonStyle: Theme.buttonStyleDanger
+                onClicked: root.deleteWorkout(workout)
             }
         }
     }
