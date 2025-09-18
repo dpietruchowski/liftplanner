@@ -53,6 +53,10 @@ QtObject {
         property string warning: "qrc:/LiftPlanner/ui/icons/warning.svg"
         property string error: "qrc:/LiftPlanner/ui/icons/error.svg"
 
+        property string barbell: "qrc:/LiftPlanner/ui/icons/barbell.svg"
+        property string calendar: "qrc:/LiftPlanner/ui/icons/calendar.svg"
+        property string routines: "qrc:/LiftPlanner/ui/icons/routines.svg"
+
         property string check: "qrc:/LiftPlanner/ui/icons/check.svg"
         property string copy: "qrc:/LiftPlanner/ui/icons/copy.svg"
 

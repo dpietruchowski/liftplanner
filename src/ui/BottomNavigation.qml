@@ -1,12 +1,14 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import LiftPlanner 1.0
 
 Rectangle {
     id: bottomNav
     height: 60
-    color: "#333"
+    color: Theme.surface
 
     property var model: []
+    property int currentIndex: 0
     signal itemSelected(int index)
 
     function printStack() {
@@ -29,15 +31,30 @@ Rectangle {
                 height: 50
                 color: "transparent"
 
-                Text {
-                    anchors.centerIn: parent
-                    text: modelData.label
-                    color: "white"
+                property color textColor: bottomNav.currentIndex === index ? Theme.primary : Theme.textSecondary
+
+                Column {
+                    anchors.fill: parent
+
+                    ColoredSvgImage {
+                        id: svgImage
+                        svgSource: modelData.icon
+                        color: textColor
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    Text {
+                        text: modelData.label
+                        color: textColor
+                        font.bold: bottomNav.currentIndex === index
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
                 }
 
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
+                        bottomNav.currentIndex = index
                         bottomNav.itemSelected(index)
                         if (modelData.screen && stackView && stackView.currentItem !== modelData.screen) {
                             if (stackView.depth > 0)

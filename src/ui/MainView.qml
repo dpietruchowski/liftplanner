@@ -22,6 +22,7 @@ Item {
 
     Component.onCompleted: {
         stackView.push(homeScreen)
+        bottomNav.currentIndex = 1
     }
 
     NotificationPopup {
@@ -55,10 +56,10 @@ Item {
         anchors.bottom: parent.bottom
         width: parent.width
         model: [
-            { label: "Workout", screen: activeWorkoutScreen },
-            { label: "Home", screen: homeScreen },
-            { label: "Routines", screen: routinesScreen },
-            { label: "History", screen: historyScreen }
+            { label: "Workout", screen: activeWorkoutScreen, icon: Theme.icons.barbell },
+            { label: "Home", screen: homeScreen, icon: Theme.icons.home  },
+            { label: "Routines", screen: routinesScreen, icon: Theme.icons.routines  },
+            { label: "History", screen: historyScreen, icon: Theme.icons.calendar  }
         ]
     }
 }
