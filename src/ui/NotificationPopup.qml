@@ -10,7 +10,7 @@ Popup {
     closePolicy: Popup.CloseOnEscape
     anchors.centerIn: parent
     width: Math.min(parent.width * 0.9, 360)
-    height: 0.5 * parent.height
+    implicitHeight: mainLayout.implicitHeight + Theme.padding * 2
 
     property bool iconVisible: true
     property int type
