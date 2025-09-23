@@ -51,3 +51,5 @@ diff
 log/
 conversation.json
 script/
+
+*.keystore

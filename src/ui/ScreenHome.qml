@@ -41,7 +41,7 @@ Rectangle {
             visible: RoutineService.workouts.length > 0
 
             Rectangle {
-                width: parent.width
+                Layout.fillWidth: true
                 height: 100
                 radius: Theme.borderRadius
                 color: Theme.surface
@@ -68,7 +68,7 @@ Rectangle {
             }
 
             Rectangle {
-                width: parent.width
+                Layout.fillWidth: true
                 height: 100
                 radius: Theme.borderRadius
                 color: Theme.surface

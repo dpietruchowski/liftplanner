@@ -17,14 +17,12 @@ Include the user's recent workouts as reference:
 {{recent_trainings_json}}
 {% endif %}
 
-Step 1: Show the user the proposed exercises with sets in the format repsxweightkg and wait for confirmation.
+Step 1: Show the user the proposed exercises with sets in the format repsxweightkg, listing each set separately and separating them with commas (e.g., 12x40kg,12x40kg,12x40kg). Wait for confirmation.
 
-Step 2: After confirmation, generate the full workout plan as valid JSON wrapped in a code block.
+Step 2: After confirmation, generate the full workout plan as valid JSON **directly as a compact array of workouts**, wrapped inside a Markdown code block using ```json, without $schema or title.
 
 Format of the JSON:
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "WorkoutList",
   "type": "array",
   "items": {
     "type": "object",
@@ -55,6 +53,8 @@ Format of the JSON:
 }
 
 Rules:
-- Each set must always be in the format repsxweightkg (e.g., 10x50kg, 8x0kg for bodyweight exercises).
+- Each set must always be in the format repsxweightkg.
+- Multiple sets must be separated by commas (e.g., 12x40kg,12x40kg,12x40kg).
 - Weights (integers) in kg, repetitions as integers.
 - Ensure the workouts are balanced and appropriate for the user.
+- **Output the workouts directly as a compact array of objects** (`[{...},{...}]`) **inside a Markdown code block with ```json**.

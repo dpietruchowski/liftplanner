@@ -78,19 +78,19 @@ QtObject {
     }
 
     property var buttonSmall: QtObject {
-        property int width: theme.applicationWidth * 0.15
+        property int width: theme.applicationWidth * 0.18
         property int height: theme.applicationHeight * 0.05
         property int fontSize: fontSmall
         property int iconSize: 16
     }
     property var buttonMedium: QtObject {
-        property int width: theme.applicationWidth * 0.25
+        property int width: theme.applicationWidth * 0.28
         property int height: theme.applicationHeight * 0.06
         property int fontSize: fontMedium
         property int iconSize: 20
     }
     property var buttonLarge: QtObject {
-        property int width: theme.applicationWidth * 0.40
+        property int width: theme.applicationWidth * 0.45
         property int height: theme.applicationHeight * 0.09
         property int fontSize: fontLarge
         property int iconSize: 24
