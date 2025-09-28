@@ -1,37 +1,41 @@
 #!/usr/bin/env bash
 set -e
 
-echo "📦 Podpisywanie APK przy użyciu jarsigner..."
+echo "📦 Signing APK using apksigner..."
 
 BUILD_DIR="build"
 KEYSTORE="/home/user/project/android/lift-planner.keystore"
 KEY_ALIAS="lift_planner_key"
-UNSIGNED_APK="/home/user/build/outputs/apk/release/android-build-release-unsigned.apk"
+UNSIGNED_APK="/home/user/build/src/android-build/build/outputs/apk/release/android-build-release-unsigned.apk"
 SIGNED_APK="/home/user/build/liftplanner-release-signed.apk"
 
+APKSIGNER_PATH="/opt/android-sdk/build-tools/34.0.0/apksigner"
+
+# Sign the APK
 docker run -it --rm \
     -v "${PWD}:/home/user/project:ro" \
     -v "${PWD}/${BUILD_DIR}:/home/user/build" \
     stateoftheartio/qt6:6.8-android-aqt \
     sh -c "cd /home/user/build && \
-           jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
-           -keystore '$KEYSTORE' \
-           'src/android-build/build/outputs/apk/release/android-build-release-unsigned.apk' \
-           '$KEY_ALIAS' && \
-           cp 'src/android-build/build/outputs/apk/release/android-build-release-unsigned.apk' 'liftplanner-release-signed.apk'"
+           echo '🔑 Signing APK...' && \
+           $APKSIGNER_PATH sign \
+               --ks '$KEYSTORE' \
+               --ks-key-alias '$KEY_ALIAS' \
+               --out '$SIGNED_APK' \
+               '$UNSIGNED_APK'"
 
-echo "✅ APK podpisane: ${BUILD_DIR}/liftplanner-release-signed.apk"
+echo "✅ APK signed: ${SIGNED_APK}"
 
-# Sprawdzenie podpisu
+# Verify the signature
 docker run -it --rm \
     -v "${PWD}:/home/user/project:ro" \
     -v "${PWD}/${BUILD_DIR}:/home/user/build" \
     stateoftheartio/qt6:6.8-android-aqt \
-    sh -c "jarsigner -verify -verbose -certs '/home/user/build/liftplanner-release-signed.apk'"
+    sh -c "$APKSIGNER_PATH verify --verbose '$SIGNED_APK'"
 
 if [ $? -eq 0 ]; then
-  echo '✅ Weryfikacja podpisu powiodła się!'
+    echo '✅ Signature verification succeeded!'
 else
-  echo '❌ Weryfikacja podpisu NIE powiodła się!'
-  exit 1
+    echo '❌ Signature verification FAILED!'
+    exit 1
 fi
