@@ -6,6 +6,7 @@
 class QmlRegistrator;
 
 class AppDbStorage;
+class WorkoutService;
 class RoutineViewModel;
 class ActiveWorkoutViewModel;
 class WorkoutHistoryViewModel;
@@ -22,6 +23,7 @@ public:
 
 private:
     std::unique_ptr<AppDbStorage> m_storage;
+    std::unique_ptr<WorkoutService> m_workoutService;
 
     std::unique_ptr<RoutineViewModel> m_routineViewModel;
     std::unique_ptr<ActiveWorkoutViewModel> m_activeWorkoutViewModel;

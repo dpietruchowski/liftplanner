@@ -1,6 +1,8 @@
 #include "liftplannerapplication.h"
 
 #include "core/storage/appdbstorage.h"
+#include "modules/workout/application/workoutservice.h"
+#include "modules/workout/infrastructure/database/workoutrepositorydb.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
 #include "ui/viewmodels/routineviewmodel.h"
 #include "ui/viewmodels/workouthistoryviewmodel.h"
@@ -18,9 +20,11 @@ LiftPlannerApplication::~LiftPlannerApplication() = default;
 
 void LiftPlannerApplication::initialize()
 {
-    m_routineViewModel = std::make_unique<RoutineViewModel>(m_storage.get());
+    m_workoutService = std::make_unique<WorkoutService>(m_storage->workoutRepo());
+
+    m_routineViewModel = std::make_unique<RoutineViewModel>(m_workoutService.get());
     m_activeWorkoutViewModel = std::make_unique<ActiveWorkoutViewModel>();
-    m_workoutHistoryViewModel = std::make_unique<WorkoutHistoryViewModel>(m_storage.get());
+    m_workoutHistoryViewModel = std::make_unique<WorkoutHistoryViewModel>(m_workoutService.get());
     m_clipboardHelper = std::make_unique<ClipboardHelper>();
 }
 

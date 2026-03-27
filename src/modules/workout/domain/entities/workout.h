@@ -14,12 +14,14 @@ public:
     int id() const;
     const QString &name() const;
     const QDateTime &createdTime() const;
+    const QDateTime &plannedTime() const;
     const QDateTime &startedTime() const;
     const QDateTime &endedTime() const;
 
     void setId(int id);
     void setName(const QString &name);
     void setCreatedTime(const QDateTime &createdTime);
+    void setPlannedTime(const QDateTime &plannedTime);
     void setStartedTime(const QDateTime &startedTime);
     void setEndedTime(const QDateTime &endedTime);
 
@@ -37,6 +39,7 @@ private:
     int m_id{-1};
     QString m_name;
     QDateTime m_createdTime;
+    QDateTime m_plannedTime;
     QDateTime m_startedTime;
     QDateTime m_endedTime;
     std::vector<Exercise> m_exercises;

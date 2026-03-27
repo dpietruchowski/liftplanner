@@ -5,8 +5,9 @@
 #include <QList>
 #include <QObject>
 #include "ui/models/workoutmodel.h"
-#include "core/storage/appdbstorage.h"
 #include "utils/serializationutils.h"
+
+class WorkoutService;
 
 class WorkoutHistoryViewModel : public QObject
 {
@@ -16,7 +17,7 @@ class WorkoutHistoryViewModel : public QObject
     Q_PROPERTY(WorkoutModel *lastWorkout READ lastWorkout NOTIFY lastWorkoutChanged)
 
 public:
-    explicit WorkoutHistoryViewModel(AppDbStorage *dbStorage, QObject *parent = nullptr);
+    explicit WorkoutHistoryViewModel(WorkoutService *service, QObject *parent = nullptr);
 
     Q_INVOKABLE void loadAllWorkouts();
     Q_INVOKABLE void saveWorkout(WorkoutModel *workout);
@@ -31,5 +32,5 @@ signals:
     void lastWorkoutChanged();
 
 private:
-    AppDbStorage *m_dbStorage;
+    WorkoutService *m_service;
 };

@@ -3,8 +3,9 @@
 #include <QList>
 #include <QObject>
 #include "ui/models/workoutmodel.h"
-#include "core/storage/appdbstorage.h"
 #include "utils/serializationutils.h"
+
+class WorkoutService;
 
 class RoutineViewModel : public QObject
 {
@@ -15,7 +16,7 @@ class RoutineViewModel : public QObject
     Q_PROPERTY(WorkoutModel *nextWorkout READ nextWorkout NOTIFY nextWorkoutChanged)
 
 public:
-    explicit RoutineViewModel(AppDbStorage *dbStorage, QObject *parent = nullptr);
+    explicit RoutineViewModel(WorkoutService *service, QObject *parent = nullptr);
     ~RoutineViewModel();
 
     QList<WorkoutModel *> workouts() const;
@@ -40,6 +41,6 @@ private:
     bool validateWorkoutsJson(const QString &jsonData, QString &errorMessage);
 
 private:
-    AppDbStorage *m_dbStorage;
+    WorkoutService *m_service;
     QList<WorkoutModel *> m_workouts;
 };

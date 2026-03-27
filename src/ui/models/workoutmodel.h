@@ -14,6 +14,7 @@ class WorkoutModel : public QObject
     Q_PROPERTY(QString name READ name NOTIFY dataChanged)
     Q_PROPERTY(QQmlListProperty<ExerciseModel> exercises READ exercisesProperty NOTIFY exercisesChanged)
     Q_PROPERTY(QDateTime createdTime READ createdTime NOTIFY dataChanged)
+    Q_PROPERTY(QDateTime plannedTime READ plannedTime NOTIFY dataChanged)
     Q_PROPERTY(QDateTime startedTime READ startedTime NOTIFY dataChanged)
     Q_PROPERTY(QDateTime endedTime READ endedTime NOTIFY dataChanged)
     Q_PROPERTY(bool completed READ isCompleted NOTIFY completedChanged)
@@ -25,6 +26,7 @@ public:
     int id() const;
     QString name() const;
     QDateTime createdTime() const;
+    QDateTime plannedTime() const;
     QDateTime startedTime() const;
     QDateTime endedTime() const;
     bool isCompleted() const;

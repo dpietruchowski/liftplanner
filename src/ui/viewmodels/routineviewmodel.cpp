@@ -6,8 +6,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QRegularExpression>
+#include "modules/workout/application/workoutservice.h"
 #include "utils/workoutjson.h"
-#include "modules/workout/domain/repositories/workoutquery.h"
 
 namespace
 {
@@ -68,8 +68,8 @@ namespace
 
 } // namespace
 
-RoutineViewModel::RoutineViewModel(AppDbStorage *dbStorage, QObject *parent)
-    : QObject(parent), m_dbStorage(dbStorage)
+RoutineViewModel::RoutineViewModel(WorkoutService *service, QObject *parent)
+    : QObject(parent), m_service(service)
 {
     connect(this, &RoutineViewModel::workoutsChanged, this, &RoutineViewModel::nextWorkoutChanged);
     connect(this,
@@ -96,10 +96,7 @@ void RoutineViewModel::loadAllWorkouts()
         qDeleteAll(m_workouts);
         m_workouts.clear();
 
-        WorkoutQuery query;
-        query.whereStartedTimeIsNull();
-
-        auto entities = m_dbStorage->loadWorkouts(query);
+        auto entities = m_service->loadRoutines();
         for (const auto &entity : entities)
             m_workouts.append(new WorkoutModel(entity, this));
 
@@ -122,14 +119,9 @@ void RoutineViewModel::importWorkoutsFromJson(const QString &jsonData)
 
     try
     {
-        WorkoutQuery removeQuery;
-        removeQuery.whereStartedTimeIsNull();
-        m_dbStorage->removeWorkoutsByQuery(removeQuery);
-
         QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
         auto workouts = WorkoutJson::workoutsFromJsonArray(doc.array());
-        for (const auto &workout : workouts)
-            m_dbStorage->saveWorkout(workout);
+        m_service->importRoutines(workouts);
 
         loadAllWorkouts();
     }

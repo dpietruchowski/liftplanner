@@ -1,9 +1,9 @@
 #include "workouthistoryviewmodel.h"
+#include "modules/workout/application/workoutservice.h"
 #include "utils/workoutjson.h"
-#include "modules/workout/domain/repositories/workoutquery.h"
 
-WorkoutHistoryViewModel::WorkoutHistoryViewModel(AppDbStorage *dbStorage, QObject *parent)
-    : QObject(parent), m_dbStorage(dbStorage)
+WorkoutHistoryViewModel::WorkoutHistoryViewModel(WorkoutService *service, QObject *parent)
+    : QObject(parent), m_service(service)
 {
     connect(this,
             &WorkoutHistoryViewModel::workoutsChanged,
@@ -18,11 +18,7 @@ void WorkoutHistoryViewModel::loadAllWorkouts()
     qDeleteAll(m_workouts);
     m_workouts.clear();
 
-    WorkoutQuery query;
-    query.whereStartedTimeIsNotNull();
-    query.orderByStartedTime(SortDirection::Descending);
-
-    auto entities = m_dbStorage->loadWorkouts(query);
+    auto entities = m_service->loadHistory();
     for (const auto &entity : entities)
         m_workouts.append(new WorkoutModel(entity, this));
 
@@ -31,22 +27,22 @@ void WorkoutHistoryViewModel::loadAllWorkouts()
 
 void WorkoutHistoryViewModel::saveWorkout(WorkoutModel *workout)
 {
-    if (!m_dbStorage || !workout)
+    if (!m_service || !workout)
         return;
     if (!workout->startedTime().isValid())
         return;
 
     Workout entity = workout->toEntity();
-    m_dbStorage->saveWorkout(entity);
+    m_service->saveWorkout(entity);
     loadAllWorkouts();
 }
 
 void WorkoutHistoryViewModel::deleteWorkout(WorkoutModel *workout)
 {
-    if (!m_dbStorage || !workout)
+    if (!m_service || !workout)
         return;
 
-    m_dbStorage->removeWorkout(workout->id());
+    m_service->deleteWorkout(workout->id());
     loadAllWorkouts();
 }
 

@@ -19,6 +19,7 @@ WorkoutModel::WorkoutModel(const Workout &workout, QObject *parent)
 int WorkoutModel::id() const { return m_workout.id(); }
 QString WorkoutModel::name() const { return m_workout.name(); }
 QDateTime WorkoutModel::createdTime() const { return m_workout.createdTime(); }
+QDateTime WorkoutModel::plannedTime() const { return m_workout.plannedTime(); }
 QDateTime WorkoutModel::startedTime() const { return m_workout.startedTime(); }
 QDateTime WorkoutModel::endedTime() const { return m_workout.endedTime(); }
 
@@ -74,6 +75,7 @@ Workout WorkoutModel::toEntity() const
     w.setId(m_workout.id());
     w.setName(m_workout.name());
     w.setCreatedTime(m_workout.createdTime());
+    w.setPlannedTime(m_workout.plannedTime());
     w.setStartedTime(m_workout.startedTime());
     w.setEndedTime(m_workout.endedTime());
     for (auto *e : m_exercises)

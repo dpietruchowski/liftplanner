@@ -40,35 +40,3 @@ void AppDbStorage::initializeDatabase()
     m_workoutRepo = std::make_unique<WorkoutRepositoryDb>(*m_dbStorage);
     m_workoutRepo->createTables();
 }
-
-std::vector<Workout> AppDbStorage::loadWorkouts(const WorkoutQuery &query)
-{
-    return m_workoutRepo->findAll(query);
-}
-
-Workout AppDbStorage::loadFullWorkout(int workoutId)
-{
-    WorkoutQuery query;
-    query.whereId(workoutId);
-    auto workouts = m_workoutRepo->findAll(query);
-    if (workouts.empty())
-        return {};
-    return workouts.front();
-}
-
-int AppDbStorage::saveWorkout(const Workout &workout)
-{
-    return m_workoutRepo->save(workout);
-}
-
-bool AppDbStorage::removeWorkout(int workoutId)
-{
-    WorkoutQuery query;
-    query.whereId(workoutId);
-    return m_workoutRepo->remove(query);
-}
-
-bool AppDbStorage::removeWorkoutsByQuery(const WorkoutQuery &query)
-{
-    return m_workoutRepo->remove(query);
-}

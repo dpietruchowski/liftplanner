@@ -20,6 +20,7 @@ WorkoutRepositoryDb::WorkoutRepositoryDb(DbStorage &storage)
               WorkoutSerializer::id_key,
               WorkoutSerializer::name_key,
               WorkoutSerializer::created_time_key,
+              WorkoutSerializer::planned_time_key,
               WorkoutSerializer::started_time_key,
               WorkoutSerializer::ended_time_key},
           storage, nullptr)),
@@ -37,6 +38,7 @@ bool WorkoutRepositoryDb::createTables()
         .column(Column(WorkoutSerializer::id_key).integer().primaryKey().autoIncrement().notNull())
         .column(Column(WorkoutSerializer::name_key).text())
         .column(Column(WorkoutSerializer::created_time_key).text())
+        .column(Column(WorkoutSerializer::planned_time_key).text())
         .column(Column(WorkoutSerializer::started_time_key).text())
         .column(Column(WorkoutSerializer::ended_time_key).text());
 

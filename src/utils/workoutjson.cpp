@@ -46,6 +46,8 @@ namespace WorkoutJson
 
         if (workout.createdTime().isValid())
             obj["created_time"] = workout.createdTime().toString(Qt::ISODate);
+        if (workout.plannedTime().isValid())
+            obj["planned_time"] = workout.plannedTime().toString(Qt::ISODate);
         if (workout.startedTime().isValid())
             obj["started_time"] = workout.startedTime().toString(Qt::ISODate);
         if (workout.endedTime().isValid())
@@ -161,6 +163,8 @@ namespace WorkoutJson
             w.setName(json["name"].toString());
         if (json.contains("created_time"))
             w.setCreatedTime(QDateTime::fromString(json["created_time"].toString(), Qt::ISODate));
+        if (json.contains("planned_time"))
+            w.setPlannedTime(QDateTime::fromString(json["planned_time"].toString(), Qt::ISODate));
         if (json.contains("started_time"))
             w.setStartedTime(QDateTime::fromString(json["started_time"].toString(), Qt::ISODate));
         if (json.contains("ended_time"))
