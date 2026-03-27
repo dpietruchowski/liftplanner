@@ -35,7 +35,7 @@ ColumnLayout {
             }
 
             Text {
-                text: workout.name
+                text: workout ? workout.name : ""
                 font.pixelSize: Theme.fontSize.medium
                 font.bold: true
                 color: Theme.colors.textPrimary
@@ -45,7 +45,7 @@ ColumnLayout {
             }
 
             Text {
-                text: Qt.formatDateTime(workout.startedTime, "dd.MM.yyyy")
+                text: workout ? Qt.formatDateTime(workout.startedTime, "dd.MM.yyyy") : ""
                 font.pixelSize: Theme.fontSize.small
                 color: Theme.colors.textSecondary
                 verticalAlignment: Text.AlignVCenter
