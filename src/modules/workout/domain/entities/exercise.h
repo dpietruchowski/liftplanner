@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QString>
+#include <vector>
+#include "set.h"
 
 class Exercise final
 {
@@ -22,6 +24,13 @@ public:
     void setRestSeconds(int restSeconds);
     void setYoutubeLink(const QString &youtubeLink);
 
+    const std::vector<Set> &sets() const;
+    std::vector<Set> &sets();
+    void addSet(const Set &set);
+    void removeSet(int index);
+    bool isCompleted() const;
+    QString setsToString() const;
+
 private:
     void validate() const;
 
@@ -31,4 +40,5 @@ private:
     QString m_description;
     int m_restSeconds{120};
     QString m_youtubeLink;
+    std::vector<Set> m_sets;
 };

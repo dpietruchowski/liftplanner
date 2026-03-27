@@ -1,6 +1,6 @@
 #include "workouthistoryviewmodel.h"
-
-#include <QJsonArray>
+#include "utils/workoutjson.h"
+#include "modules/workout/domain/repositories/workoutquery.h"
 
 WorkoutHistoryViewModel::WorkoutHistoryViewModel(AppDbStorage *dbStorage, QObject *parent)
     : QObject(parent), m_dbStorage(dbStorage)
@@ -15,28 +15,18 @@ WorkoutHistoryViewModel::WorkoutHistoryViewModel(AppDbStorage *dbStorage, QObjec
 
 void WorkoutHistoryViewModel::loadAllWorkouts()
 {
-    QString condition = "WHERE started_time IS NOT NULL ORDER BY started_time DESC";
-    QVector<WorkoutModel *> workoutModels = m_dbStorage->loadAllWorkouts(condition);
+    qDeleteAll(m_workouts);
+    m_workouts.clear();
 
-    for (WorkoutModel *workout : workoutModels)
-    {
-        m_dbStorage->loadWorkout(workout);
-    }
+    WorkoutQuery query;
+    query.whereStartedTimeIsNotNull();
+    query.orderByStartedTime(SortDirection::Descending);
 
-    auto workouts = workoutModels.toList();
-    setWorkouts(workouts);
-}
+    auto entities = m_dbStorage->loadWorkouts(query);
+    for (const auto &entity : entities)
+        m_workouts.append(new WorkoutModel(entity, this));
 
-QList<WorkoutModel *> WorkoutHistoryViewModel::workoutsBetween(const QDateTime &from,
-                                                               const QDateTime &to)
-{
-    QList<WorkoutModel *> result;
-    for (WorkoutModel *w : m_workouts)
-    {
-        if (w->startedTime() >= from && w->endedTime() <= to)
-            result.append(w);
-    }
-    return result;
+    emit workoutsChanged();
 }
 
 void WorkoutHistoryViewModel::saveWorkout(WorkoutModel *workout)
@@ -46,7 +36,8 @@ void WorkoutHistoryViewModel::saveWorkout(WorkoutModel *workout)
     if (!workout->startedTime().isValid())
         return;
 
-    m_dbStorage->saveWorkout(workout);
+    Workout entity = workout->toEntity();
+    m_dbStorage->saveWorkoutEntity(entity);
     loadAllWorkouts();
 }
 
@@ -55,9 +46,7 @@ void WorkoutHistoryViewModel::deleteWorkout(WorkoutModel *workout)
     if (!m_dbStorage || !workout)
         return;
 
-    m_dbStorage->removeWorkouts(
-        QString("WHERE id = %1").arg(workout->id()));
-
+    m_dbStorage->removeWorkout(workout->id());
     loadAllWorkouts();
 }
 
@@ -70,9 +59,7 @@ QJsonArray WorkoutHistoryViewModel::recentWorkoutsToJson(int count)
     {
         WorkoutModel *workout = m_workouts.at(i);
         if (workout)
-        {
-            jsonArray.append(workout->toJson(SerializationMode::ChatGpt));
-        }
+            jsonArray.append(WorkoutJson::workoutToJsonCompact(workout->toEntity()));
     }
 
     return jsonArray;

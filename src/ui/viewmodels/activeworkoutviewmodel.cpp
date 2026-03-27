@@ -5,9 +5,11 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QStandardPaths>
+#include "utils/workoutjson.h"
 
 ActiveWorkoutViewModel::ActiveWorkoutViewModel(QObject *parent)
-    : QObject(parent), m_currentWorkout(nullptr), m_currentExercise(nullptr), m_currentSet(nullptr), m_isActive(false)
+    : QObject(parent), m_currentWorkout(nullptr), m_currentExercise(nullptr),
+      m_currentSet(nullptr), m_isActive(false)
 {
     connect(this,
             &ActiveWorkoutViewModel::currentWorkoutChanged,
@@ -44,7 +46,7 @@ void ActiveWorkoutViewModel::saveCurrentWorkout()
         return;
     }
 
-    QJsonObject json = m_currentWorkout->toJson(SerializationMode::FullFile);
+    QJsonObject json = WorkoutJson::workoutToJson(m_currentWorkout->toEntity());
     QJsonDocument doc(json);
 
     QFile file(filePath);
@@ -70,14 +72,13 @@ void ActiveWorkoutViewModel::loadCurrentWorkout()
     if (!doc.isObject())
         return;
 
-    WorkoutModel *loadedWorkout = WorkoutModel::fromJson(doc.object(), this);
-    if (loadedWorkout)
-    {
-        setCurrentWorkout(loadedWorkout);
-        updateCurrentExercise();
-        updateCurrentSet();
-        setIsActive(true);
-    }
+    Workout entity = WorkoutJson::workoutFromJson(doc.object());
+    auto *loadedWorkout = new WorkoutModel(entity, this);
+
+    setCurrentWorkout(loadedWorkout);
+    updateCurrentExercise();
+    updateCurrentSet();
+    setIsActive(true);
 }
 
 void ActiveWorkoutViewModel::startWorkout(WorkoutModel *workout)
@@ -123,7 +124,7 @@ void ActiveWorkoutViewModel::navigateToNext()
 
     if (currentSetIndex < sets.size() - 1)
     {
-        setCurrentSet(qobject_cast<SetModel *>(sets[currentSetIndex + 1]));
+        setCurrentSet(sets[currentSetIndex + 1]);
     }
     else
     {
@@ -135,7 +136,7 @@ void ActiveWorkoutViewModel::navigateToNext()
             setCurrentExercise(exercises[currentExerciseIndex + 1]);
 
             auto newSets = m_currentExercise->sets();
-            setCurrentSet(newSets.isEmpty() ? nullptr : qobject_cast<SetModel *>(newSets[0]));
+            setCurrentSet(newSets.isEmpty() ? nullptr : newSets[0]);
         }
     }
 }
@@ -150,7 +151,7 @@ void ActiveWorkoutViewModel::navigateToPrevious()
 
     if (currentSetIndex > 0)
     {
-        setCurrentSet(qobject_cast<SetModel *>(sets[currentSetIndex - 1]));
+        setCurrentSet(sets[currentSetIndex - 1]);
     }
     else
     {
@@ -162,7 +163,7 @@ void ActiveWorkoutViewModel::navigateToPrevious()
             setCurrentExercise(exercises[currentExerciseIndex - 1]);
 
             auto prevSets = m_currentExercise->sets();
-            setCurrentSet(prevSets.isEmpty() ? nullptr : qobject_cast<SetModel *>(prevSets.last()));
+            setCurrentSet(prevSets.isEmpty() ? nullptr : prevSets.last());
         }
     }
 }
@@ -229,7 +230,7 @@ void ActiveWorkoutViewModel::removeSet(SetModel *set)
         if (!exercise->sets().isEmpty())
         {
             int newIndex = qMax(0, index - 1);
-            setCurrentSet(qobject_cast<SetModel *>(exercise->sets().at(newIndex)));
+            setCurrentSet(exercise->sets().at(newIndex));
         }
         else
         {
@@ -271,5 +272,5 @@ void ActiveWorkoutViewModel::updateCurrentSet()
         return;
     }
 
-    setCurrentSet(qobject_cast<SetModel *>(m_currentExercise->sets().first()));
+    setCurrentSet(m_currentExercise->sets().first());
 }

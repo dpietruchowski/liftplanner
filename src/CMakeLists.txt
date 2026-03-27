@@ -2,7 +2,7 @@ find_package(Qt6 6.4 REQUIRED COMPONENTS Quick Sql Qml)
 
 qt_standard_project_setup()
 
-add_subdirectory(models)
+add_subdirectory(ui/models)
 add_subdirectory(core)
 add_subdirectory(modules/workout)
 

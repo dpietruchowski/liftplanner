@@ -2,13 +2,14 @@
 
 #include <QList>
 #include <QObject>
-#include "models/workoutmodel.h"
+#include "ui/models/workoutmodel.h"
 #include "core/storage/appdbstorage.h"
+#include "utils/serializationutils.h"
 
 class RoutineViewModel : public QObject
 {
     Q_OBJECT
-    DECLARE_MODEL_PROPERTY(QString, lastWorkoutName, setLastWorkoutName, lastWorkoutName)
+    DECLARE_PROPERTY(QString, lastWorkoutName, setLastWorkoutName)
 
     Q_PROPERTY(QList<WorkoutModel *> workouts READ workouts NOTIFY workoutsChanged)
     Q_PROPERTY(WorkoutModel *nextWorkout READ nextWorkout NOTIFY nextWorkoutChanged)

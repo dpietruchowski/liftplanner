@@ -6,6 +6,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QRegularExpression>
+#include "utils/workoutjson.h"
+#include "modules/workout/domain/repositories/workoutquery.h"
 
 namespace
 {
@@ -94,14 +96,12 @@ void RoutineViewModel::loadAllWorkouts()
         qDeleteAll(m_workouts);
         m_workouts.clear();
 
-        QVector<WorkoutModel *> workoutModels = m_dbStorage->loadAllWorkouts(
-            "WHERE started_time IS NULL");
+        WorkoutQuery query;
+        query.whereStartedTimeIsNull();
 
-        for (WorkoutModel *workout : workoutModels)
-        {
-            m_dbStorage->loadWorkout(workout);
-            m_workouts.append(workout);
-        }
+        auto entities = m_dbStorage->loadWorkouts(query);
+        for (const auto &entity : entities)
+            m_workouts.append(new WorkoutModel(entity, this));
 
         emit workoutsChanged();
     }
@@ -122,27 +122,20 @@ void RoutineViewModel::importWorkoutsFromJson(const QString &jsonData)
 
     try
     {
-        m_dbStorage->removeWorkouts("WHERE started_time IS NULL");
+        WorkoutQuery removeQuery;
+        removeQuery.whereStartedTimeIsNull();
+        m_dbStorage->removeWorkoutsByQuery(removeQuery);
+
         QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
-        if (doc.isArray())
-        {
-            QJsonArray workoutsArray = doc.array();
-            for (const QJsonValue &workoutValue : workoutsArray)
-            {
-                WorkoutModel *workout = WorkoutModel::fromJson(workoutValue.toObject());
-                if (workout)
-                {
-                    m_dbStorage->saveWorkout(workout);
-                    delete workout;
-                }
-            }
-            loadAllWorkouts();
-        }
+        auto workouts = WorkoutJson::workoutsFromJsonArray(doc.array());
+        for (const auto &workout : workouts)
+            m_dbStorage->saveWorkoutEntity(workout);
+
+        loadAllWorkouts();
     }
     catch (const std::exception &e)
     {
-        auto errorStr = QString("Import failed: %1").arg(e.what());
-        emit errorOccurred(errorStr);
+        emit errorOccurred(QString("Import failed: %1").arg(e.what()));
     }
 }
 

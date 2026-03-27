@@ -4,8 +4,9 @@
 #include <QJsonArray>
 #include <QList>
 #include <QObject>
-#include "models/workoutmodel.h"
+#include "ui/models/workoutmodel.h"
 #include "core/storage/appdbstorage.h"
+#include "utils/serializationutils.h"
 
 class WorkoutHistoryViewModel : public QObject
 {
@@ -18,7 +19,6 @@ public:
     explicit WorkoutHistoryViewModel(AppDbStorage *dbStorage, QObject *parent = nullptr);
 
     Q_INVOKABLE void loadAllWorkouts();
-    Q_INVOKABLE QList<WorkoutModel *> workoutsBetween(const QDateTime &from, const QDateTime &to);
     Q_INVOKABLE void saveWorkout(WorkoutModel *workout);
     Q_INVOKABLE void deleteWorkout(WorkoutModel *workout);
 

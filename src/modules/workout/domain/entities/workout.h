@@ -3,8 +3,7 @@
 #include <QString>
 #include <QDateTime>
 #include <vector>
-
-class Exercise;
+#include "exercise.h"
 
 class Workout final
 {
@@ -24,6 +23,12 @@ public:
     void setStartedTime(const QDateTime &startedTime);
     void setEndedTime(const QDateTime &endedTime);
 
+    const std::vector<Exercise> &exercises() const;
+    std::vector<Exercise> &exercises();
+    void addExercise(const Exercise &exercise);
+    void removeExercise(int index);
+    bool isCompleted() const;
+
     static Workout createDefault(const QString &name);
 
 private:
@@ -34,4 +39,5 @@ private:
     QDateTime m_createdTime;
     QDateTime m_startedTime;
     QDateTime m_endedTime;
+    std::vector<Exercise> m_exercises;
 };

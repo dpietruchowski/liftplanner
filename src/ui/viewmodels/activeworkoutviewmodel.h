@@ -1,9 +1,9 @@
 #pragma once
 
 #include <QObject>
-#include "models/workoutmodel.h"
-#include "models/exercisemodel.h"
-#include "models/setmodel.h"
+#include "ui/models/workoutmodel.h"
+#include "ui/models/exercisemodel.h"
+#include "ui/models/setmodel.h"
 #include "utils/serializationutils.h"
 
 class ActiveWorkoutViewModel : public QObject

@@ -5,14 +5,12 @@
 #include "modules/workout/domain/entities/workout.h"
 #include "modules/workout/domain/entities/exercise.h"
 #include "modules/workout/domain/entities/set.h"
+#include "modules/workout/domain/repositories/workoutquery.h"
 
 class DbStorage;
 class WorkoutRepositoryDb;
 class ExerciseRepositoryDb;
 class SetRepositoryDb;
-class WorkoutModel;
-class ExerciseModel;
-class SetModel;
 
 class AppDbStorage : public QObject
 {
@@ -26,19 +24,11 @@ public:
     ExerciseRepositoryDb &exerciseRepo();
     SetRepositoryDb &setRepo();
 
-    int saveWorkout(WorkoutModel *workout);
-    void loadWorkout(WorkoutModel *workout);
-
-    static Workout workoutFromModel(const WorkoutModel *model);
-    static Exercise exerciseFromModel(const ExerciseModel *model);
-    static Set setFromModel(const SetModel *model);
-
-    static void populateWorkoutModel(WorkoutModel *model, const Workout &entity);
-    static void populateExerciseModel(ExerciseModel *model, const Exercise &entity);
-    static void populateSetModel(SetModel *model, const Set &entity);
-
-    QVector<WorkoutModel *> loadAllWorkouts(const QString &condition);
-    bool removeWorkouts(const QString &condition);
+    std::vector<Workout> loadWorkouts(const WorkoutQuery &query);
+    Workout loadFullWorkout(int workoutId);
+    int saveWorkoutEntity(const Workout &workout);
+    bool removeWorkout(int workoutId);
+    bool removeWorkoutsByQuery(const WorkoutQuery &query);
 
 private:
     void initializeDatabase();
