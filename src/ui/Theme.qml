@@ -132,11 +132,27 @@ QtObject {
             property int iconSize: 16
         }
 
+        property var smallSquare: QtObject {
+            property int size: theme.applicationHeight * 0.05
+            property int width: size
+            property int height: size
+            property int fontSize: theme.fontSize.small
+            property int iconSize: size - 4
+        }
+
         property var medium: QtObject {
             property int width: theme.applicationWidth * 0.28
             property int height: theme.applicationHeight * 0.06
             property int fontSize: theme.fontSize.medium
             property int iconSize: 20
+        }
+
+        property var mediumSquare: QtObject {
+            property int size: theme.applicationHeight * 0.06
+            property int width: size
+            property int height: size
+            property int fontSize: theme.fontSize.medium
+            property int iconSize: size - 4
         }
 
         property var large: QtObject {

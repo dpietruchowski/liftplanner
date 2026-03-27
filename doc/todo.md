@@ -2,6 +2,7 @@
 
 ## P1 (Highest Priority)
 1. Zmienić layout rest dialog -> rozwiniety i nierozwniety
+2. Dodać funkcjonalność, aby usunąć ekran początkowy, jeśli nie ma zaplanowanych ćwiczeń
 
 ## P2
 1. Timer, rest dialog -> złe ikonki
@@ -16,3 +17,8 @@
 1. Dodać możliwość doawania ćwiczeń
 2. Dodać animacje przy rozwijaniu/zwijaniu
 3. Dodać kalendarz
+
+---
+
+## Done
+- ~~Dodać importowanie historii~~

@@ -48,6 +48,42 @@ Item {
         endTime = null
     }
 
+    component PlusButton: ThemedButton {
+        buttonSize: Theme.button.medium
+        buttonStyle: Theme.button.primary
+        text: "+"
+        onClicked: {
+            restDialog.restSeconds += 10
+            restDialog.endTime = new Date(restDialog.endTime.getTime() + 10000)
+        }
+    }
+
+    component MinusButton: ThemedButton {
+        buttonSize: Theme.button.medium
+        buttonStyle: Theme.button.primary
+        text: "-"
+        onClicked: {
+            if (restDialog.restSeconds > 10) {
+                restDialog.restSeconds -= 10
+                restDialog.endTime = new Date(restDialog.endTime.getTime() - 10000)
+            }
+        }
+    }
+
+    component ExpandButton: ThemedButton {
+        iconSource: Theme.icons.expand
+        buttonSize: Theme.button.smallSquare
+        buttonStyle: Theme.button.primary
+        onClicked: restDialog.expanded = true
+    }
+
+    component CollapseButton: ThemedButton {
+        iconSource: Theme.icons.collapse
+        buttonSize: Theme.button.mediumSquare
+        buttonStyle: Theme.button.primary
+        onClicked: restDialog.expanded = false
+    }
+
     Timer {
         id: restTimer
         interval: 250
@@ -77,24 +113,28 @@ Item {
             anchors.fill: parent
             visible: !restDialog.expanded
 
-            // Text centered on full bar width
-            Text {
-                anchors.centerIn: parent
-                text: restDialog.timeText()
-                color: Theme.colors.textPrimary
-                font.pixelSize: Theme.fontSize.medium
-                font.bold: true
-            }
+            RowLayout {
+                id: collapsedRow
+                anchors.fill: parent
+                anchors.margins: Theme.padding.medium
+                spacing: Theme.spacing.medium
 
-            // Expand button pinned to right
-            ThemedButton {
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.padding.medium
-                anchors.verticalCenter: parent.verticalCenter
-                iconSource: Theme.icons.expand
-                buttonSize: Theme.button.square
-                buttonStyle: Theme.button.primary
-                onClicked: restDialog.expanded = true
+                Item { Layout.fillWidth: true }
+
+                MinusButton { buttonSize: Theme.button.small }
+
+                Text {
+                    text: restDialog.timeText()
+                    color: Theme.colors.textPrimary
+                    font.pixelSize: Theme.fontSize.medium
+                    font.bold: true
+                }
+
+                PlusButton { buttonSize: Theme.button.small }
+
+                Item { Layout.fillWidth: true }
+
+                ExpandButton {}
             }
         }
 
@@ -121,41 +161,14 @@ Item {
                 Layout.alignment: Qt.AlignHCenter
                 spacing: Theme.spacing.large
 
-                ThemedButton {
-                    text: "-"
-                    buttonSize: Theme.button.medium
-                    buttonStyle: Theme.button.primary
-                    onClicked: {
-                        if (restDialog.restSeconds > 10) {
-                            restDialog.restSeconds -= 10
-                            restDialog.endTime = new Date(restDialog.endTime.getTime() - 10000)
-                        }
-                    }
-                }
-
-                ThemedButton {
-                    text: "+"
-                    buttonSize: Theme.button.medium
-                    buttonStyle: Theme.button.primary
-                    onClicked: {
-                        restDialog.restSeconds += 10
-                        restDialog.endTime = new Date(restDialog.endTime.getTime() + 10000)
-                    }
-                }
-            }
-
-            // Collapse arrow pinned right
-            RowLayout {
-                Layout.fillWidth: true
-
                 Item { Layout.fillWidth: true }
 
-                ThemedButton {
-                    iconSource: Theme.icons.collapse
-                    buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.primary
-                    onClicked: restDialog.expanded = false
-                }
+                MinusButton {}
+                PlusButton {}
+
+                Item { Layout.fillWidth: true }
+                
+                CollapseButton {}
             }
         }
     }
