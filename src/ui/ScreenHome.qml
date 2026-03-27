@@ -59,22 +59,21 @@ Rectangle {
             label: "last workout"
             workout: WorkoutHistoryService.lastWorkout
         }
-    }
 
-    ThemedButton {
-        buttonSize: Theme.button.large
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: Theme.padding.medium
-        text: "Start workout"
-
-        onClicked: {
-            if (PlannedWorkoutService.workouts.length === 0) {
-                noPlannedPopup.open()
-            } else if (ActiveWorkoutService.currentWorkout) {
-                startWorkoutPopup.open()
-            } else {
-                startWorkout()
+        // Start workout button
+        ThemedButton {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: Theme.spacing.large
+            text: "Start workout"
+            buttonStyle: Theme.button.primary
+            buttonSize: Theme.button.large
+            onClicked: {
+                if (ActiveWorkoutService.currentWorkout)
+                    startWorkoutPopup.open()
+                else if (!PlannedWorkoutService.nextWorkout)
+                    noPlannedPopup.open()
+                else
+                    startWorkout()
             }
         }
     }
