@@ -27,6 +27,7 @@ public:
     Q_INVOKABLE void deleteWorkout(WorkoutModel *workout);
     Q_INVOKABLE void importFromJson(const QString &jsonData);
     Q_INVOKABLE void importFromClipboard();
+    Q_INVOKABLE void exportToClipboard(int limit = 50);
 
     Q_INVOKABLE QJsonArray recentWorkoutsToJson(int count = 10);
 
@@ -35,6 +36,7 @@ public:
 signals:
     void errorOccurred(const QString &errorMessage);
     void lastWorkoutChanged();
+    void exportedToClipboard();
 
 private:
     WorkoutService *m_service;

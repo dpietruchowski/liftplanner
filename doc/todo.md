@@ -2,7 +2,6 @@
 
 ## P1 (Highest Priority)
 1. Zmienić layout rest dialog -> rozwiniety i nierozwniety
-2. Dodać importowanie historii
 
 ## P2
 1. Timer, rest dialog -> złe ikonki

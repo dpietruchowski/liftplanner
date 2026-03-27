@@ -29,6 +29,13 @@ Rectangle {
             Item { Layout.fillWidth: true }
 
             ThemedButton {
+                text: "Export"
+                buttonSize: Theme.button.medium
+                buttonStyle: Theme.button.secondary
+                onClicked: WorkoutHistoryService.exportToClipboard(50)
+            }
+
+            ThemedButton {
                 text: "Import"
                 buttonSize: Theme.button.medium
                 buttonStyle: Theme.button.primary
@@ -58,5 +65,17 @@ Rectangle {
         onAccepted: {
             WorkoutHistoryService.importFromClipboard()
         }
+    }
+
+    NotificationPopup {
+        id: exportedPopup
+        text: "History copied to clipboard!"
+        type: Notification.Type.Info
+        buttons: Notification.Button.Ok
+    }
+
+    Connections {
+        target: WorkoutHistoryService
+        function onExportedToClipboard() { exportedPopup.open() }
     }
 }

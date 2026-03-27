@@ -110,3 +110,26 @@ void WorkoutHistoryViewModel::importFromClipboard()
         emit errorOccurred(QString("Import from clipboard failed: %1").arg(e.what()));
     }
 }
+
+void WorkoutHistoryViewModel::exportToClipboard(int limit)
+{
+    try
+    {
+        QJsonArray jsonArray;
+        int count = limit > 0 ? qMin(limit, m_workouts.size()) : m_workouts.size();
+        for (int i = 0; i < count; ++i)
+            jsonArray.append(WorkoutJson::workoutToJsonCompact(m_workouts.at(i)->toEntity()));
+
+        QJsonDocument doc(jsonArray);
+        QString jsonString = doc.toJson(QJsonDocument::Indented);
+
+        QClipboard *clipboard = QGuiApplication::clipboard();
+        clipboard->setText(jsonString);
+
+        emit exportedToClipboard();
+    }
+    catch (const std::exception &e)
+    {
+        emit errorOccurred(QString("Export failed: %1").arg(e.what()));
+    }
+}
