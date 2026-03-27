@@ -7,8 +7,6 @@ import Themed.Components
 Column {
     id: exerciseDelegate
     property var exercise: modelData
-    signal editSetRepetitions(var setData)
-    signal editSetWeight(var setData)
     signal showExerciseInfo(var exercise)
     width: contentColumn.width
     spacing: Theme.spacing.medium / 2
@@ -59,8 +57,6 @@ Column {
 
             delegate: ActiveWorkoutSetItem {
                 setData: modelData
-                onEditRepetitions: function(setDat) { exerciseDelegate.editSetRepetitions(setData) }
-                onEditWeight: function(setDat) { exerciseDelegate.editSetWeight(setData) }
             }
         }
     }

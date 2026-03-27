@@ -8,8 +8,6 @@ Rectangle {
     id: root
     color: Theme.colors.background
 
-    property var currentSetter
-
     RestDialog {
         id: restDialog
         dialogVisible: false
@@ -49,8 +47,6 @@ Rectangle {
 
                     delegate: ActiveWorkoutExerciseItem {
                         exercise: modelData
-                        onEditSetRepetitions: function(setData) { handleEditRepetitions(setData) }
-                        onEditSetWeight: function(setData) { handleEditWeight(setData) }
                         onShowExerciseInfo: function(exercise) {
                             exerciseInfoPopup.title = exercise.name
                             exerciseInfoPopup.text = exercise.description
@@ -125,61 +121,11 @@ Rectangle {
         }
     }
 
-    Item {
-        id: overlayRoot
-        anchors.fill: parent
-        visible: valueEditorDialog.dialogVisible
-
-        Rectangle {
-            anchors.fill: parent
-            color: Theme.colors.overlay
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: valueEditorDialog.dialogVisible = false
-            }
-        }
-
-        ValueEditorDialog {
-            id: valueEditorDialog
-            dialogVisible: false
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.bottom
-            step: 1
-
-            onConfirmed: function(value) {
-                if (currentSetter) {
-                    currentSetter(value)
-                }
-                currentSetter = null
-                dialogVisible = false
-            }
-        }
-    }
-
     Connections {
         target: ActiveWorkoutService
         function onWorkoutCompleted() {
             WorkoutHistoryService.saveWorkout(ActiveWorkoutService.currentWorkout)
             stackView.pop()
         }
-    }
-
-    function handleEditRepetitions(setData) {
-        currentSetter = function(newValue) { setData.repetitions = newValue }
-        valueEditorDialog.value = setData.repetitions
-        valueEditorDialog.minValue = 0
-        valueEditorDialog.maxValue = 100
-        valueEditorDialog.step = 1
-        valueEditorDialog.dialogVisible = true
-    }
-
-    function handleEditWeight(setData) {
-        currentSetter = function(newValue) { setData.weight = newValue }
-        valueEditorDialog.value = setData.weight
-        valueEditorDialog.minValue = 0
-        valueEditorDialog.maxValue = 500
-        valueEditorDialog.step = 5
-        valueEditorDialog.dialogVisible = true
     }
 }

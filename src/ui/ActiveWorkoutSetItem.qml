@@ -8,17 +8,18 @@ Rectangle {
     id: setRect
     property var setData
     property bool actionsVisible: false
-    signal editRepetitions(var setData)
-    signal editWeight(var setData)
 
     width: setsColumn.width
-    height: actionsVisible ? Theme.layout.cardHeight : Theme.layout.listItemHeight
+    height: actionsVisible ? Theme.layout.listItemHeight + Theme.button.square.size + Theme.padding.small * 2 : Theme.layout.listItemHeight
     radius: Theme.radius.medium
     color: setData.completed ? Theme.colors.success : Theme.colors.surface
     border.width: ActiveWorkoutService.currentSet === setData ? Theme.border.thick : Theme.border.thin
     border.color: ActiveWorkoutService.currentSet === setData ? Theme.colors.primaryVariant : Theme.colors.border
 
     Behavior on color { ColorAnimation { duration: 200 } }
+    Behavior on height { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+
+    clip: true
 
     MouseArea {
         anchors.fill: parent
@@ -27,18 +28,15 @@ Rectangle {
 
     Column {
         anchors.fill: parent
-        anchors.margins: 0
         spacing: 0
 
+        // Row 1: Set N | reps | weight | indicator
         RowLayout {
-            id: mainRow
             width: parent.width
             height: Theme.layout.listItemHeight
-            spacing: Theme.spacing.medium
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.margins: Theme.padding.medium
+            spacing: 0
 
+            // "Set N" column
             Text {
                 text: "Set " + (index + 1)
                 font.pixelSize: Theme.fontSize.small
@@ -46,52 +44,38 @@ Rectangle {
                 color: setData.completed ? Theme.colors.buttonText : Theme.colors.textPrimary
                 Layout.preferredWidth: 60
                 Layout.alignment: Qt.AlignVCenter
+                leftPadding: Theme.padding.medium
             }
 
+            // Reps column
             Item {
                 Layout.preferredWidth: 80
                 Layout.fillHeight: true
 
                 Text {
+                    anchors.centerIn: parent
                     text: setData.repetitions + " reps"
                     font.pixelSize: Theme.fontSize.small
                     color: setData.completed ? Theme.colors.buttonText : Theme.colors.textSecondary
-                    anchors.centerIn: parent
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        ActiveWorkoutService.currentSet = setData
-                        editRepetitions(setData)
-                    }
                 }
             }
 
+            // Weight column
             Item {
                 Layout.preferredWidth: 80
                 Layout.fillHeight: true
 
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        ActiveWorkoutService.currentSet = setData
-                        editWeight(setData)
-                    }
-                }
-
                 Text {
+                    anchors.centerIn: parent
                     text: setData.weight + " kg"
                     font.pixelSize: Theme.fontSize.small
                     color: setData.completed ? Theme.colors.buttonText : Theme.colors.textSecondary
-                    anchors.centerIn: parent
                 }
             }
 
-            Item {
-                Layout.fillWidth: true
-            }
+            Item { Layout.fillWidth: true }
 
+            // Indicator column
             Rectangle {
                 width: Theme.layout.indicatorSize
                 height: Theme.layout.indicatorSize
@@ -100,6 +84,7 @@ Rectangle {
                 border.color: setData.completed ? Theme.colors.success : Theme.colors.border
                 border.width: Theme.border.medium
                 Layout.alignment: Qt.AlignVCenter
+                Layout.rightMargin: Theme.padding.medium
 
                 MouseArea {
                     anchors.fill: parent
@@ -108,30 +93,89 @@ Rectangle {
             }
         }
 
+        // Row 2 (expanded): [-][+] under reps | [-][+] under weight | [-][+] add/remove
         RowLayout {
-            id: actionsRow
-            spacing: Theme.spacing.medium
             visible: actionsVisible
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.margins: Theme.padding.medium
+            width: parent.width
+            height: Theme.button.square.size + Theme.padding.small
+            spacing: 0
+
+            // Empty space under "Set N"
+            Item { Layout.preferredWidth: 60 }
+
+            // Reps -/+ under reps column
+            Item {
+                Layout.preferredWidth: 80
+                Layout.fillHeight: true
+
+                RowLayout {
+                    anchors.centerIn: parent
+                    spacing: Theme.spacing.xsmall
+
+                    ThemedButton {
+                        text: "-"
+                        buttonSize: Theme.button.square
+                        buttonStyle: Theme.button.primary
+                        onClicked: { if (setData.repetitions > 0) setData.repetitions -= 1 }
+                    }
+
+                    ThemedButton {
+                        text: "+"
+                        buttonSize: Theme.button.square
+                        buttonStyle: Theme.button.primary
+                        onClicked: setData.repetitions += 1
+                    }
+                }
+            }
+
+            // Weight -/+ under weight column
+            Item {
+                Layout.preferredWidth: 80
+                Layout.fillHeight: true
+
+                RowLayout {
+                    anchors.centerIn: parent
+                    spacing: Theme.spacing.xsmall
+
+                    ThemedButton {
+                        text: "-"
+                        buttonSize: Theme.button.square
+                        buttonStyle: Theme.button.primary
+                        onClicked: { if (setData.weight >= 2.5) setData.weight -= 2.5 }
+                    }
+
+                    ThemedButton {
+                        text: "+"
+                        buttonSize: Theme.button.square
+                        buttonStyle: Theme.button.primary
+                        onClicked: setData.weight += 2.5
+                    }
+                }
+            }
 
             Item { Layout.fillWidth: true }
 
-            ThemedButton {
-                 iconSource: Theme.icons.addSet
-                 circular: true
-                 buttonSize: Theme.button.square
-                 buttonStyle: Theme.button.primary
-                 onClicked: ActiveWorkoutService.duplicateSet(modelData)
-            }
+            // Add/remove set under indicator
+            RowLayout {
+                spacing: Theme.spacing.xsmall
+                Layout.alignment: Qt.AlignVCenter
+                Layout.rightMargin: Theme.padding.medium
 
-            ThemedButton {
-                 iconSource: Theme.icons.removeSet
-                 circular: true
-                 buttonSize: Theme.button.square
-                 buttonStyle: Theme.button.primary
-                 onClicked: ActiveWorkoutService.removeSet(modelData)
+                ThemedButton {
+                    iconSource: Theme.icons.addSet
+                    circular: true
+                    buttonSize: Theme.button.square
+                    buttonStyle: Theme.button.primary
+                    onClicked: ActiveWorkoutService.duplicateSet(modelData)
+                }
+
+                ThemedButton {
+                    iconSource: Theme.icons.removeSet
+                    circular: true
+                    buttonSize: Theme.button.square
+                    buttonStyle: Theme.button.primary
+                    onClicked: ActiveWorkoutService.removeSet(modelData)
+                }
             }
         }
     }
