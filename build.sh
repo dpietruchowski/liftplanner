@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-BUILD_DIR=build
+BUILD_DIR=build-android
 BUILD_TYPE=Release
 CLEAR_BUILD=false
 
@@ -17,8 +17,8 @@ for arg in "$@"; do
             BUILD_TYPE=Release
             ;;
         *)
-            echo "Nieznany argument: $arg"
-            echo "Użycie: ./build.sh [clear] [debug|release]"
+            echo "Unknown argument: $arg"
+            echo "Usage: ./build.sh [clear] [debug|release]"
             exit 1
             ;;
     esac
@@ -30,8 +30,8 @@ fi
 
 mkdir -p "$BUILD_DIR"
 
-docker run -it --rm \
+docker run --rm \
     -v "${PWD}:/home/user/project:ro" \
     -v "${PWD}/${BUILD_DIR}:/home/user/build" \
     stateoftheartio/qt6:6.8-android-aqt \
-    sh -c "qt-cmake ./project -G Ninja -B ./build -DCMAKE_BUILD_TYPE=${BUILD_TYPE}; cmake --build ./build --config ${BUILD_TYPE}"
+    sh -c "qt-cmake /home/user/project -G Ninja -B /home/user/build -DCMAKE_BUILD_TYPE=${BUILD_TYPE} && cmake --build /home/user/build --config ${BUILD_TYPE}"
