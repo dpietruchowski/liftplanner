@@ -10,10 +10,20 @@ Rectangle {
 
     property var currentSetter
 
+    RestDialog {
+        id: restDialog
+        dialogVisible: false
+    }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: Theme.padding.medium
+        anchors.topMargin: restDialog.isVisible
+                           ? restDialog.barHeight + Theme.padding.medium
+                           : Theme.padding.medium
         spacing: Theme.spacing.medium
+
+        Behavior on anchors.topMargin { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
         Text {
             text: ActiveWorkoutService.currentWorkout ? ActiveWorkoutService.currentWorkout.name : "Workout"
@@ -145,11 +155,6 @@ Rectangle {
                 dialogVisible = false
             }
         }
-    }
-
-    RestDialog {
-        id: restDialog
-        dialogVisible: false
     }
 
     Connections {

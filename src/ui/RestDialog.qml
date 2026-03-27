@@ -4,32 +4,45 @@ import QtQuick.Layouts
 import LiftPlanner 1.0
 import Themed.Components
 
-Rectangle {
+Item {
     id: restDialog
     property int restSeconds: 60
     property int remainingSeconds: 0
     property bool dialogVisible: false
+    property bool expanded: false
     property var endTime: null
 
-    visible: dialogVisible
-    width: parent.width
-    height: Theme.layout.dialogBarHeight
-    anchors.top: parent.top
-    color: Theme.colors.dialogSurface
-    radius: Theme.radius.medium
-    border.width: Theme.border.thin
-    border.color: Theme.colors.border
+    readonly property int collapsedHeight: Theme.layout.listItemHeight
+    readonly property int expandedHeight: Theme.layout.dialogBarHeight
+    readonly property int barHeight: dialogVisible ? (expanded ? expandedHeight : collapsedHeight) : 0
+    readonly property bool isVisible: dialogVisible
+
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: barHeight
+    z: 10
+    clip: true
+
+    Behavior on height { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
+
+    function timeText() {
+        var mins = Math.floor(remainingSeconds / 60)
+        var secs = remainingSeconds % 60
+        return (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs
+    }
 
     function show(seconds) {
         restSeconds = seconds
         remainingSeconds = seconds
         endTime = new Date(Date.now() + seconds * 1000)
+        expanded = true
         dialogVisible = true
         restTimer.start()
     }
 
     function hideDialog() {
         dialogVisible = false
+        expanded = false
         restTimer.stop()
         remainingSeconds = 0
         endTime = null
@@ -52,52 +65,98 @@ Rectangle {
         }
     }
 
-    RowLayout {
+    Rectangle {
         anchors.fill: parent
-        anchors.margins: Theme.padding.medium
-        spacing: Theme.spacing.medium
+        color: Theme.colors.dialogSurface
+        radius: Theme.radius.medium
+        border.width: Theme.border.thin
+        border.color: Theme.colors.border
 
-        ThemedButton {
-            text: "-"
-            buttonSize: Theme.button.medium
-            buttonStyle: Theme.button.primary
-            onClicked: {
-                if (restDialog.restSeconds > 10) {
-                    restDialog.restSeconds -= 10
-                    restDialog.endTime = new Date(restDialog.endTime.getTime() - 10000)
+        // === Collapsed ===
+        Item {
+            anchors.fill: parent
+            visible: !restDialog.expanded
+
+            // Text centered on full bar width
+            Text {
+                anchors.centerIn: parent
+                text: restDialog.timeText()
+                color: Theme.colors.textPrimary
+                font.pixelSize: Theme.fontSize.medium
+                font.bold: true
+            }
+
+            // Expand button pinned to right
+            ThemedButton {
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.padding.medium
+                anchors.verticalCenter: parent.verticalCenter
+                iconSource: Theme.icons.expand
+                buttonSize: Theme.button.square
+                buttonStyle: Theme.button.primary
+                onClicked: restDialog.expanded = true
+            }
+        }
+
+        // === Expanded ===
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: Theme.padding.small
+            spacing: 0
+            visible: restDialog.expanded
+
+            // Row 1: large time centered
+            Text {
+                Layout.fillWidth: true
+                text: restDialog.timeText()
+                color: Theme.colors.textPrimary
+                font.pixelSize: Theme.fontSize.huge
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            // Row 2: [ - ]  [ + ] centered
+            RowLayout {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: Theme.spacing.large
+
+                ThemedButton {
+                    text: "-"
+                    buttonSize: Theme.button.medium
+                    buttonStyle: Theme.button.primary
+                    onClicked: {
+                        if (restDialog.restSeconds > 10) {
+                            restDialog.restSeconds -= 10
+                            restDialog.endTime = new Date(restDialog.endTime.getTime() - 10000)
+                        }
+                    }
+                }
+
+                ThemedButton {
+                    text: "+"
+                    buttonSize: Theme.button.medium
+                    buttonStyle: Theme.button.primary
+                    onClicked: {
+                        restDialog.restSeconds += 10
+                        restDialog.endTime = new Date(restDialog.endTime.getTime() + 10000)
+                    }
                 }
             }
-        }
 
-        Text {
-            Layout.fillWidth: true
-            text: {
-                var mins = Math.floor(restDialog.remainingSeconds / 60)
-                var secs = restDialog.remainingSeconds % 60
-                return (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs
+            // Collapse arrow pinned right
+            RowLayout {
+                Layout.fillWidth: true
+
+                Item { Layout.fillWidth: true }
+
+                ThemedButton {
+                    iconSource: Theme.icons.collapse
+                    buttonSize: Theme.button.square
+                    buttonStyle: Theme.button.primary
+                    onClicked: restDialog.expanded = false
+                }
             }
-            color: Theme.colors.textPrimary
-            font.pixelSize: Theme.fontSize.huge
-            font.bold: true
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
-
-        ThemedButton {
-            text: "+"
-            buttonSize: Theme.button.medium
-            buttonStyle: Theme.button.primary
-            onClicked: {
-                restDialog.restSeconds += 10
-                restDialog.endTime = new Date(restDialog.endTime.getTime() + 10000)
-            }
-        }
-
-        ThemedButton {
-            text: "OK"
-            buttonSize: Theme.button.medium
-            buttonStyle: Theme.button.success
-            onClicked: restDialog.hideDialog()
         }
     }
 }

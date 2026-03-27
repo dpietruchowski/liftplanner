@@ -82,7 +82,7 @@ QtObject {
         property int listItemHeight: 50
         property int listItemHeightLarge: 56
         property int cardHeight: 100
-        property int dialogBarHeight: 120
+        property int dialogBarHeight: 200
         property int indicatorSize: 20
         property int iconSizeLarge: 48
         property int exerciseItemHeight: 25
