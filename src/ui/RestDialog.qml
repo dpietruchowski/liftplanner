@@ -51,7 +51,7 @@ Item {
     component PlusButton: ThemedButton {
         buttonSize: Theme.button.medium
         buttonStyle: Theme.button.primary
-        text: "+"
+        iconSource: Theme.icons.plus
         onClicked: {
             restDialog.restSeconds += 10
             restDialog.endTime = new Date(restDialog.endTime.getTime() + 10000)
@@ -61,7 +61,7 @@ Item {
     component MinusButton: ThemedButton {
         buttonSize: Theme.button.medium
         buttonStyle: Theme.button.primary
-        text: "-"
+        iconSource: Theme.icons.minus
         onClicked: {
             if (restDialog.restSeconds > 10) {
                 restDialog.restSeconds -= 10
@@ -167,7 +167,7 @@ Item {
                 PlusButton {}
 
                 Item { Layout.fillWidth: true }
-                
+
                 CollapseButton {}
             }
         }

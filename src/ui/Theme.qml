@@ -109,6 +109,8 @@ QtObject {
 
         property string addSet: "qrc:/LiftPlanner/ui/icons/add-set.svg"
         property string removeSet: "qrc:/LiftPlanner/ui/icons/remove-set.svg"
+        property string plus: "qrc:/LiftPlanner/ui/icons/plus.svg"
+        property string minus: "qrc:/LiftPlanner/ui/icons/minus.svg"
         property string next: "qrc:/LiftPlanner/ui/icons/next.svg"
         property string previous: "qrc:/LiftPlanner/ui/icons/previous.svg"
         property string expand: "qrc:/LiftPlanner/ui/icons/expand.svg"
@@ -122,7 +124,7 @@ QtObject {
             property int width: size
             property int height: size
             property int fontSize: theme.fontSize.small
-            property int iconSize: size - 4
+            property int iconSize: 14
         }
 
         property var small: QtObject {
@@ -191,6 +193,14 @@ QtObject {
             property color hovered: "#EC7063"
             property color pressed: "#C0392B"
             property color border: "#e74c3c"
+            property color text: "#FFFFFF"
+        }
+
+        property var ghost: QtObject {
+            property color background: "#40FFFFFF"
+            property color hovered: "#60FFFFFF"
+            property color pressed: "#25FFFFFF"
+            property color border: "#70FFFFFF"
             property color text: "#FFFFFF"
         }
     }

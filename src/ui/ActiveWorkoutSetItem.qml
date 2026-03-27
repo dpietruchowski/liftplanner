@@ -113,16 +113,16 @@ Rectangle {
                     spacing: Theme.spacing.xsmall
 
                     ThemedButton {
-                        text: "-"
+                        iconSource: Theme.icons.minus
                         buttonSize: Theme.button.square
-                        buttonStyle: Theme.button.primary
+                        buttonStyle: Theme.button.ghost
                         onClicked: { if (setData.repetitions > 0) setData.repetitions -= 1 }
                     }
 
                     ThemedButton {
-                        text: "+"
+                        iconSource: Theme.icons.plus
                         buttonSize: Theme.button.square
-                        buttonStyle: Theme.button.primary
+                        buttonStyle: Theme.button.ghost
                         onClicked: setData.repetitions += 1
                     }
                 }
@@ -138,16 +138,16 @@ Rectangle {
                     spacing: Theme.spacing.xsmall
 
                     ThemedButton {
-                        text: "-"
+                        iconSource: Theme.icons.minus
                         buttonSize: Theme.button.square
-                        buttonStyle: Theme.button.primary
+                        buttonStyle: Theme.button.ghost
                         onClicked: { if (setData.weight >= 2.5) setData.weight -= 2.5 }
                     }
 
                     ThemedButton {
-                        text: "+"
+                        iconSource: Theme.icons.plus
                         buttonSize: Theme.button.square
-                        buttonStyle: Theme.button.primary
+                        buttonStyle: Theme.button.ghost
                         onClicked: setData.weight += 2.5
                     }
                 }
@@ -163,17 +163,15 @@ Rectangle {
 
                 ThemedButton {
                     iconSource: Theme.icons.addSet
-                    circular: true
                     buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.primary
+                    buttonStyle: Theme.button.ghost
                     onClicked: ActiveWorkoutService.duplicateSet(modelData)
                 }
 
                 ThemedButton {
                     iconSource: Theme.icons.removeSet
-                    circular: true
                     buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.primary
+                    buttonStyle: Theme.button.ghost
                     onClicked: ActiveWorkoutService.removeSet(modelData)
                 }
             }

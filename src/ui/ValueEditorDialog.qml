@@ -33,7 +33,7 @@ Rectangle {
         spacing: Theme.spacing.medium
 
         ThemedButton {
-            text: "-"
+            iconSource: Theme.icons.minus
             buttonSize: Theme.button.medium
             buttonStyle: Theme.button.primary
             onClicked: {
@@ -53,7 +53,7 @@ Rectangle {
         }
 
         ThemedButton {
-            text: "+"
+            iconSource: Theme.icons.plus
             buttonSize: Theme.button.medium
             buttonStyle: Theme.button.primary
             onClicked: {
