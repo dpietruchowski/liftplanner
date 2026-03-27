@@ -40,6 +40,11 @@ WorkoutQuery &WorkoutQuery::wherePlannedTimeIsNotNull()
     m_plannedTimeIsNull = false;
     return *this;
 }
+WorkoutQuery &WorkoutQuery::whereStatus(WorkoutStatus status)
+{
+    m_status = status;
+    return *this;
+}
 WorkoutQuery &WorkoutQuery::orderByCreatedTime(SortDirection direction)
 {
     m_orderByCreatedTimeDirection = direction;
@@ -72,6 +77,7 @@ const std::optional<QDateTime> &WorkoutQuery::createdAfter() const { return m_cr
 const std::optional<QDateTime> &WorkoutQuery::createdBefore() const { return m_createdBefore; }
 const std::optional<bool> &WorkoutQuery::startedTimeIsNull() const { return m_startedTimeIsNull; }
 const std::optional<bool> &WorkoutQuery::plannedTimeIsNull() const { return m_plannedTimeIsNull; }
+const std::optional<WorkoutStatus> &WorkoutQuery::status() const { return m_status; }
 const std::optional<SortDirection> &WorkoutQuery::orderByCreatedTimeDirection() const { return m_orderByCreatedTimeDirection; }
 const std::optional<SortDirection> &WorkoutQuery::orderByStartedTimeDirection() const { return m_orderByStartedTimeDirection; }
 const std::optional<SortDirection> &WorkoutQuery::orderByPlannedTimeDirection() const { return m_orderByPlannedTimeDirection; }

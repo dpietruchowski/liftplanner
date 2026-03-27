@@ -2,6 +2,7 @@
 #include <gmock/gmock.h>
 #include "modules/workout/application/workoutservice.h"
 #include "modules/workout/domain/entities/workout.h"
+#include "modules/workout/domain/entities/workoutstatus.h"
 #include "modules/workout/domain/repositories/workoutrepository.h"
 #include "modules/workout/domain/repositories/workoutquery.h"
 
@@ -52,13 +53,13 @@ protected:
 
 // --- loadPlannedWorkouts ---
 
-TEST_F(WorkoutServiceTest, LoadPlannedWorkouts_QueriesStartedTimeIsNull)
+TEST_F(WorkoutServiceTest, LoadPlannedWorkouts_QueriesStatusPlanned)
 {
     EXPECT_CALL(m_repo, findAll(::testing::_))
         .WillOnce([](const WorkoutQuery &query)
                   {
-            EXPECT_TRUE(query.startedTimeIsNull().has_value());
-            EXPECT_TRUE(query.startedTimeIsNull().value());
+            EXPECT_TRUE(query.status().has_value());
+            EXPECT_EQ(query.status().value(), WorkoutStatus::Planned);
             return std::vector<Workout>{}; });
 
     m_service->loadPlannedWorkouts();
@@ -98,8 +99,8 @@ TEST_F(WorkoutServiceTest, ImportPlannedWorkouts_RemovesExistingFirst)
     EXPECT_CALL(m_repo, remove(::testing::_))
         .WillOnce([](const WorkoutQuery &query)
                   {
-            EXPECT_TRUE(query.startedTimeIsNull().has_value());
-            EXPECT_TRUE(query.startedTimeIsNull().value());
+            EXPECT_TRUE(query.status().has_value());
+            EXPECT_EQ(query.status().value(), WorkoutStatus::Planned);
             return true; });
 
     EXPECT_CALL(m_repo, save(::testing::_))
@@ -134,13 +135,13 @@ TEST_F(WorkoutServiceTest, ImportPlannedWorkouts_SavesEachWorkout)
 
 // --- removeAllPlannedWorkouts ---
 
-TEST_F(WorkoutServiceTest, RemoveAllPlannedWorkouts_QueriesStartedTimeIsNull)
+TEST_F(WorkoutServiceTest, RemoveAllPlannedWorkouts_QueriesStatusPlanned)
 {
     EXPECT_CALL(m_repo, remove(::testing::_))
         .WillOnce([](const WorkoutQuery &query)
                   {
-            EXPECT_TRUE(query.startedTimeIsNull().has_value());
-            EXPECT_TRUE(query.startedTimeIsNull().value());
+            EXPECT_TRUE(query.status().has_value());
+            EXPECT_EQ(query.status().value(), WorkoutStatus::Planned);
             return true; });
 
     m_service->removeAllPlannedWorkouts();
@@ -148,13 +149,13 @@ TEST_F(WorkoutServiceTest, RemoveAllPlannedWorkouts_QueriesStartedTimeIsNull)
 
 // --- loadHistory ---
 
-TEST_F(WorkoutServiceTest, LoadHistory_QueriesStartedTimeIsNotNull)
+TEST_F(WorkoutServiceTest, LoadHistory_QueriesStatusEnded)
 {
     EXPECT_CALL(m_repo, findAll(::testing::_))
         .WillOnce([](const WorkoutQuery &query)
                   {
-            EXPECT_TRUE(query.startedTimeIsNull().has_value());
-            EXPECT_FALSE(query.startedTimeIsNull().value());
+            EXPECT_TRUE(query.status().has_value());
+            EXPECT_EQ(query.status().value(), WorkoutStatus::Ended);
             return std::vector<Workout>{}; });
 
     m_service->loadHistory();

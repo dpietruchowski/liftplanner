@@ -93,7 +93,7 @@ void ActiveWorkoutViewModel::startWorkout(WorkoutModel *workout)
     }
 
     auto *clonedWorkout = workout->clone(nullptr);
-    clonedWorkout->setStartedTime(QDateTime::currentDateTime());
+    clonedWorkout->start();
 
     setCurrentWorkout(clonedWorkout);
     setIsActive(true);
@@ -176,7 +176,7 @@ void ActiveWorkoutViewModel::endWorkout()
     if (!m_currentWorkout)
         return;
 
-    m_currentWorkout->setEndedTime(QDateTime::currentDateTime());
+    m_currentWorkout->end();
     saveToDb();
     emit workoutCompleted();
 

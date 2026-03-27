@@ -3,6 +3,7 @@
 #include <QSqlQuery>
 #include <dbtoolkit/dbstorage.h>
 #include "modules/workout/domain/entities/workout.h"
+#include "modules/workout/domain/entities/workoutstatus.h"
 #include "modules/workout/domain/entities/exercise.h"
 #include "modules/workout/domain/entities/set.h"
 #include "modules/workout/domain/repositories/workoutquery.h"
@@ -333,4 +334,118 @@ TEST_F(WorkoutRepositoryDbTest, Save_PreservesPlannedTime)
     auto found = m_repo->findOne(WorkoutQuery().whereId(id));
     ASSERT_TRUE(found.has_value());
     EXPECT_EQ(found->plannedTime().toString(Qt::ISODate), plannedTime.toString(Qt::ISODate));
+}
+
+// --- WorkoutStatus ---
+
+TEST_F(WorkoutRepositoryDbTest, Save_PreservesStatus_Planned)
+{
+    Workout w = makeWorkout("Planned");
+    w.setPlannedTime(QDateTime::currentDateTime().addDays(1));
+    int id = m_repo->save(w);
+
+    auto found = m_repo->findOne(WorkoutQuery().whereId(id));
+    ASSERT_TRUE(found.has_value());
+    EXPECT_EQ(found->status(), WorkoutStatus::Planned);
+}
+
+TEST_F(WorkoutRepositoryDbTest, Save_PreservesStatus_Started)
+{
+    Workout w = makeWorkout("Active");
+    w.start();
+    int id = m_repo->save(w);
+
+    auto found = m_repo->findOne(WorkoutQuery().whereId(id));
+    ASSERT_TRUE(found.has_value());
+    EXPECT_EQ(found->status(), WorkoutStatus::Started);
+}
+
+TEST_F(WorkoutRepositoryDbTest, Save_PreservesStatus_Ended)
+{
+    Workout w = makeWorkout("Done");
+    w.start();
+    w.end();
+    int id = m_repo->save(w);
+
+    auto found = m_repo->findOne(WorkoutQuery().whereId(id));
+    ASSERT_TRUE(found.has_value());
+    EXPECT_EQ(found->status(), WorkoutStatus::Ended);
+}
+
+TEST_F(WorkoutRepositoryDbTest, WhereStatus_FiltersPlanned)
+{
+    Workout planned = makeWorkout("Planned");
+    m_repo->save(planned);
+
+    Workout started = makeWorkout("Started");
+    started.start();
+    m_repo->save(started);
+
+    Workout ended = makeWorkout("Ended");
+    ended.start();
+    ended.end();
+    m_repo->save(ended);
+
+    auto results = m_repo->findAll(WorkoutQuery().whereStatus(WorkoutStatus::Planned));
+    ASSERT_EQ(results.size(), 1u);
+    EXPECT_EQ(results[0].name(), "Planned");
+}
+
+TEST_F(WorkoutRepositoryDbTest, WhereStatus_FiltersStarted)
+{
+    Workout planned = makeWorkout("Planned");
+    m_repo->save(planned);
+
+    Workout started = makeWorkout("Started");
+    started.start();
+    m_repo->save(started);
+
+    Workout ended = makeWorkout("Ended");
+    ended.start();
+    ended.end();
+    m_repo->save(ended);
+
+    auto results = m_repo->findAll(WorkoutQuery().whereStatus(WorkoutStatus::Started));
+    ASSERT_EQ(results.size(), 1u);
+    EXPECT_EQ(results[0].name(), "Started");
+}
+
+TEST_F(WorkoutRepositoryDbTest, WhereStatus_FiltersEnded)
+{
+    Workout planned = makeWorkout("Planned");
+    m_repo->save(planned);
+
+    Workout started = makeWorkout("Started");
+    started.start();
+    m_repo->save(started);
+
+    Workout ended = makeWorkout("Ended");
+    ended.start();
+    ended.end();
+    m_repo->save(ended);
+
+    auto results = m_repo->findAll(WorkoutQuery().whereStatus(WorkoutStatus::Ended));
+    ASSERT_EQ(results.size(), 1u);
+    EXPECT_EQ(results[0].name(), "Ended");
+}
+
+TEST_F(WorkoutRepositoryDbTest, Save_Update_PreservesStatusChange)
+{
+    Workout w = makeWorkout("Workout");
+    int id = m_repo->save(w);
+
+    w.setId(id);
+    w.start();
+    m_repo->save(w);
+
+    auto found = m_repo->findOne(WorkoutQuery().whereId(id));
+    ASSERT_TRUE(found.has_value());
+    EXPECT_EQ(found->status(), WorkoutStatus::Started);
+
+    w.end();
+    m_repo->save(w);
+
+    found = m_repo->findOne(WorkoutQuery().whereId(id));
+    ASSERT_TRUE(found.has_value());
+    EXPECT_EQ(found->status(), WorkoutStatus::Ended);
 }

@@ -35,6 +35,9 @@ bool WorkoutModel::isCompleted() const
     return true;
 }
 
+WorkoutStatus WorkoutModel::status() const { return m_workout.status(); }
+QString WorkoutModel::statusString() const { return workoutStatusToString(m_workout.status()); }
+
 QQmlListProperty<ExerciseModel> WorkoutModel::exercisesProperty()
 {
     return QQmlListProperty<ExerciseModel>(this, &m_exercises);
@@ -54,6 +57,18 @@ void WorkoutModel::setStartedTime(const QDateTime &time)
 void WorkoutModel::setEndedTime(const QDateTime &time)
 {
     m_workout.setEndedTime(time);
+    emit dataChanged();
+}
+
+void WorkoutModel::start()
+{
+    m_workout.start();
+    emit dataChanged();
+}
+
+void WorkoutModel::end()
+{
+    m_workout.end();
     emit dataChanged();
 }
 
@@ -78,6 +93,7 @@ Workout WorkoutModel::toEntity() const
     w.setPlannedTime(m_workout.plannedTime());
     w.setStartedTime(m_workout.startedTime());
     w.setEndedTime(m_workout.endedTime());
+    w.setStatus(m_workout.status());
     for (auto *e : m_exercises)
         w.addExercise(e->toEntity());
     return w;

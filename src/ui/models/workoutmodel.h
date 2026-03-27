@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QQmlListProperty>
 #include "modules/workout/domain/entities/workout.h"
+#include "modules/workout/domain/entities/workoutstatus.h"
 #include "exercisemodel.h"
 
 class WorkoutModel : public QObject
@@ -18,6 +19,7 @@ class WorkoutModel : public QObject
     Q_PROPERTY(QDateTime startedTime READ startedTime NOTIFY dataChanged)
     Q_PROPERTY(QDateTime endedTime READ endedTime NOTIFY dataChanged)
     Q_PROPERTY(bool completed READ isCompleted NOTIFY completedChanged)
+    Q_PROPERTY(QString status READ statusString NOTIFY dataChanged)
 
 public:
     explicit WorkoutModel(QObject *parent = nullptr);
@@ -30,12 +32,16 @@ public:
     QDateTime startedTime() const;
     QDateTime endedTime() const;
     bool isCompleted() const;
+    WorkoutStatus status() const;
+    QString statusString() const;
 
     QQmlListProperty<ExerciseModel> exercisesProperty();
     QList<ExerciseModel *> exercises() const;
 
     void setStartedTime(const QDateTime &time);
     void setEndedTime(const QDateTime &time);
+    void start();
+    void end();
 
     void addExercise(ExerciseModel *exercise);
 

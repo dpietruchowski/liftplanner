@@ -1,4 +1,5 @@
 #include "workoutservice.h"
+#include "modules/workout/domain/entities/workoutstatus.h"
 #include "modules/workout/domain/repositories/workoutquery.h"
 #include "modules/workout/domain/repositories/workoutrepository.h"
 
@@ -10,7 +11,7 @@ WorkoutService::WorkoutService(WorkoutRepository &repository)
 std::vector<Workout> WorkoutService::loadPlannedWorkouts() const
 {
     WorkoutQuery query;
-    query.whereStartedTimeIsNull();
+    query.whereStatus(WorkoutStatus::Planned);
     query.orderByPlannedTime(SortDirection::Ascending);
     return m_repository.findAll(query);
 }
@@ -25,14 +26,14 @@ void WorkoutService::importPlannedWorkouts(const std::vector<Workout> &workouts)
 void WorkoutService::removeAllPlannedWorkouts()
 {
     WorkoutQuery query;
-    query.whereStartedTimeIsNull();
+    query.whereStatus(WorkoutStatus::Planned);
     m_repository.remove(query);
 }
 
 std::vector<Workout> WorkoutService::loadHistory() const
 {
     WorkoutQuery query;
-    query.whereStartedTimeIsNotNull();
+    query.whereStatus(WorkoutStatus::Ended);
     query.orderByStartedTime(SortDirection::Descending);
     return m_repository.findAll(query);
 }

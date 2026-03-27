@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/types.h"
+#include "modules/workout/domain/entities/workoutstatus.h"
 #include <optional>
 #include <QDateTime>
 
@@ -15,6 +16,7 @@ public:
     WorkoutQuery &whereStartedTimeIsNotNull();
     WorkoutQuery &wherePlannedTimeIsNull();
     WorkoutQuery &wherePlannedTimeIsNotNull();
+    WorkoutQuery &whereStatus(WorkoutStatus status);
     WorkoutQuery &orderByCreatedTime(SortDirection direction);
     WorkoutQuery &orderByStartedTime(SortDirection direction);
     WorkoutQuery &orderByPlannedTime(SortDirection direction);
@@ -27,6 +29,7 @@ public:
     const std::optional<QDateTime> &createdBefore() const;
     const std::optional<bool> &startedTimeIsNull() const;
     const std::optional<bool> &plannedTimeIsNull() const;
+    const std::optional<WorkoutStatus> &status() const;
     const std::optional<SortDirection> &orderByCreatedTimeDirection() const;
     const std::optional<SortDirection> &orderByStartedTimeDirection() const;
     const std::optional<SortDirection> &orderByPlannedTimeDirection() const;
@@ -40,6 +43,7 @@ private:
     std::optional<QDateTime> m_createdBefore;
     std::optional<bool> m_startedTimeIsNull;
     std::optional<bool> m_plannedTimeIsNull;
+    std::optional<WorkoutStatus> m_status;
     std::optional<SortDirection> m_orderByCreatedTimeDirection;
     std::optional<SortDirection> m_orderByStartedTimeDirection;
     std::optional<SortDirection> m_orderByPlannedTimeDirection;

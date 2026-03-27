@@ -1,5 +1,6 @@
 #include "workoutserializer.h"
 #include "modules/workout/domain/entities/workout.h"
+#include "modules/workout/domain/entities/workoutstatus.h"
 
 #include <QDateTime>
 
@@ -19,6 +20,8 @@ Workout WorkoutSerializer::fromVariant(const QVariantMap &data)
         workout.setStartedTime(QDateTime::fromString(data.value(started_time_key).toString(), Qt::ISODate));
     if (data.contains(ended_time_key))
         workout.setEndedTime(QDateTime::fromString(data.value(ended_time_key).toString(), Qt::ISODate));
+    if (data.contains(status_key))
+        workout.setStatus(workoutStatusFromString(data.value(status_key).toString()));
 
     return workout;
 }
@@ -40,6 +43,8 @@ QVariantMap WorkoutSerializer::toVariant(const Workout &workout)
         data.insert(started_time_key, workout.startedTime().toString(Qt::ISODate));
     if (workout.endedTime().isValid())
         data.insert(ended_time_key, workout.endedTime().toString(Qt::ISODate));
+
+    data.insert(status_key, workoutStatusToString(workout.status()));
 
     return data;
 }

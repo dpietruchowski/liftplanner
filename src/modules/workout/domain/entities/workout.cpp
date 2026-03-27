@@ -22,6 +22,21 @@ void Workout::setPlannedTime(const QDateTime &plannedTime) { m_plannedTime = pla
 void Workout::setStartedTime(const QDateTime &startedTime) { m_startedTime = startedTime; }
 void Workout::setEndedTime(const QDateTime &endedTime) { m_endedTime = endedTime; }
 
+WorkoutStatus Workout::status() const { return m_status; }
+void Workout::setStatus(WorkoutStatus status) { m_status = status; }
+
+void Workout::start()
+{
+    m_startedTime = QDateTime::currentDateTime();
+    m_status = WorkoutStatus::Started;
+}
+
+void Workout::end()
+{
+    m_endedTime = QDateTime::currentDateTime();
+    m_status = WorkoutStatus::Ended;
+}
+
 const std::vector<Exercise> &Workout::exercises() const { return m_exercises; }
 std::vector<Exercise> &Workout::exercises() { return m_exercises; }
 

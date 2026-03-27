@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "modules/workout/domain/entities/workout.h"
+#include "modules/workout/domain/entities/workoutstatus.h"
 #include "modules/workout/domain/entities/exercise.h"
 #include "modules/workout/domain/entities/set.h"
 
@@ -16,6 +17,7 @@ TEST_F(WorkoutTest, DefaultConstructor_SetsDefaults)
     EXPECT_FALSE(w.createdTime().isValid());
     EXPECT_FALSE(w.startedTime().isValid());
     EXPECT_FALSE(w.endedTime().isValid());
+    EXPECT_EQ(w.status(), WorkoutStatus::Planned);
 }
 
 TEST_F(WorkoutTest, ParameterizedConstructor_SetsNameAndCreatedTime)
@@ -169,4 +171,68 @@ TEST_F(WorkoutTest, CopySemantics_IncludesExercises)
     EXPECT_EQ(copy.exercises()[0].name(), "Bench");
     EXPECT_EQ(copy.exercises()[0].sets().size(), 1u);
     EXPECT_EQ(copy.exercises()[0].sets()[0].repetitions(), 10);
+}
+
+// --- WorkoutStatus ---
+
+TEST_F(WorkoutTest, SetStatus_ChangesStatus)
+{
+    Workout w;
+    EXPECT_EQ(w.status(), WorkoutStatus::Planned);
+
+    w.setStatus(WorkoutStatus::Started);
+    EXPECT_EQ(w.status(), WorkoutStatus::Started);
+
+    w.setStatus(WorkoutStatus::Ended);
+    EXPECT_EQ(w.status(), WorkoutStatus::Ended);
+}
+
+TEST_F(WorkoutTest, Start_SetsStatusAndStartedTime)
+{
+    Workout w("Push", QDateTime::currentDateTime());
+    EXPECT_EQ(w.status(), WorkoutStatus::Planned);
+    EXPECT_FALSE(w.startedTime().isValid());
+
+    QDateTime before = QDateTime::currentDateTime();
+    w.start();
+    QDateTime after = QDateTime::currentDateTime();
+
+    EXPECT_EQ(w.status(), WorkoutStatus::Started);
+    EXPECT_TRUE(w.startedTime().isValid());
+    EXPECT_GE(w.startedTime(), before);
+    EXPECT_LE(w.startedTime(), after);
+}
+
+TEST_F(WorkoutTest, End_SetsStatusAndEndedTime)
+{
+    Workout w("Push", QDateTime::currentDateTime());
+    w.start();
+
+    QDateTime before = QDateTime::currentDateTime();
+    w.end();
+    QDateTime after = QDateTime::currentDateTime();
+
+    EXPECT_EQ(w.status(), WorkoutStatus::Ended);
+    EXPECT_TRUE(w.endedTime().isValid());
+    EXPECT_GE(w.endedTime(), before);
+    EXPECT_LE(w.endedTime(), after);
+}
+
+TEST_F(WorkoutTest, Start_DoesNotOverwriteEndedTime)
+{
+    Workout w("Push", QDateTime::currentDateTime());
+    w.start();
+
+    EXPECT_FALSE(w.endedTime().isValid());
+}
+
+TEST_F(WorkoutTest, CopySemantics_IncludesStatus)
+{
+    Workout original("Push", QDateTime::currentDateTime());
+    original.start();
+
+    Workout copy = original;
+
+    EXPECT_EQ(copy.status(), WorkoutStatus::Started);
+    EXPECT_EQ(copy.startedTime(), original.startedTime());
 }

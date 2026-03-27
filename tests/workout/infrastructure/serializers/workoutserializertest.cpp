@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "modules/workout/domain/entities/workout.h"
+#include "modules/workout/domain/entities/workoutstatus.h"
 #include "modules/workout/infrastructure/serializers/workoutserializer.h"
 
 class WorkoutSerializerTest : public ::testing::Test
@@ -22,6 +23,8 @@ TEST_F(WorkoutSerializerTest, ToVariant_FullWorkout)
     EXPECT_TRUE(data.contains(WorkoutSerializer::created_time_key));
     EXPECT_TRUE(data.contains(WorkoutSerializer::started_time_key));
     EXPECT_TRUE(data.contains(WorkoutSerializer::ended_time_key));
+    EXPECT_TRUE(data.contains(WorkoutSerializer::status_key));
+    EXPECT_EQ(data.value(WorkoutSerializer::status_key).toString(), "Planned");
 }
 
 TEST_F(WorkoutSerializerTest, ToVariant_NewWorkout_NoId)
@@ -85,4 +88,62 @@ TEST_F(WorkoutSerializerTest, Roundtrip_PreservesData)
 TEST_F(WorkoutSerializerTest, TableName_IsCorrect)
 {
     EXPECT_STREQ(WorkoutSerializer::table, "workouts");
+}
+
+// --- Status ---
+
+TEST_F(WorkoutSerializerTest, ToVariant_SerializesStatus)
+{
+    Workout w("Push", QDateTime::currentDateTime());
+    w.setStatus(WorkoutStatus::Started);
+
+    QVariantMap data = WorkoutSerializer::toVariant(w);
+
+    EXPECT_EQ(data.value(WorkoutSerializer::status_key).toString(), "Started");
+}
+
+TEST_F(WorkoutSerializerTest, FromVariant_DeserializesStatus)
+{
+    QVariantMap data;
+    data.insert(WorkoutSerializer::name_key, "Leg Day");
+    data.insert(WorkoutSerializer::status_key, "Ended");
+
+    Workout w = WorkoutSerializer::fromVariant(data);
+
+    EXPECT_EQ(w.status(), WorkoutStatus::Ended);
+}
+
+TEST_F(WorkoutSerializerTest, FromVariant_MissingStatus_DefaultsToPlanned)
+{
+    QVariantMap data;
+    data.insert(WorkoutSerializer::name_key, "Old Workout");
+
+    Workout w = WorkoutSerializer::fromVariant(data);
+
+    EXPECT_EQ(w.status(), WorkoutStatus::Planned);
+}
+
+TEST_F(WorkoutSerializerTest, Roundtrip_PreservesStatus)
+{
+    Workout original("Full Body", QDateTime::currentDateTime());
+    original.start();
+
+    QVariantMap data = WorkoutSerializer::toVariant(original);
+    Workout restored = WorkoutSerializer::fromVariant(data);
+
+    EXPECT_EQ(restored.status(), WorkoutStatus::Started);
+}
+
+TEST_F(WorkoutSerializerTest, Roundtrip_EndedStatus)
+{
+    Workout original("Cardio", QDateTime::currentDateTime());
+    original.start();
+    original.end();
+
+    QVariantMap data = WorkoutSerializer::toVariant(original);
+    Workout restored = WorkoutSerializer::fromVariant(data);
+
+    EXPECT_EQ(restored.status(), WorkoutStatus::Ended);
+    EXPECT_TRUE(restored.startedTime().isValid());
+    EXPECT_TRUE(restored.endedTime().isValid());
 }
