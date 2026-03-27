@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(liftplanner VERSION 0.2 LANGUAGES CXX)
+project(liftplanner VERSION 1.0 LANGUAGES CXX)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick)
 
@@ -11,8 +11,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(ANDROID_PACKAGE_NAME "com.liftplanner.app")
 set(ANDROID_KEYSTORE_PATH "${CMAKE_SOURCE_DIR}/android/lift-planner.keystore")
 set(ANDROID_KEY_ALIAS "lift_planner_key")
-set(QT_ANDROID_VERSION_CODE 1)
-set(QT_ANDROID_VERSION_NAME "0.1")
+set(QT_ANDROID_VERSION_CODE 2)
+set(QT_ANDROID_VERSION_NAME "1.0-rc1")
 set(QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/android")
 
 set(QML_LIVE_ENABLED OFF)
