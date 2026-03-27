@@ -1,6 +1,4 @@
 #include "exerciserepositorydb.h"
-#include "modules/workout/domain/entities/exercise.h"
-#include "modules/workout/domain/repositories/exercisequery.h"
 #include "modules/workout/infrastructure/serializers/exerciseserializer.h"
 #include "modules/workout/infrastructure/serializers/workoutserializer.h"
 
@@ -45,29 +43,16 @@ bool ExerciseRepositoryDb::createTable()
     return m_repository->createTable(table);
 }
 
-std::vector<Exercise> ExerciseRepositoryDb::findAll(const ExerciseQuery &query) const
+std::vector<Exercise> ExerciseRepositoryDb::findByWorkoutId(int workoutId) const
 {
-    auto where = buildWhereClause(query);
-    int limit = query.limit().value_or(-1);
-
-    auto rows = m_repository->select(where, Order(), limit);
+    auto where = Where(ExerciseSerializer::workout_id_key).equals(workoutId);
+    auto rows = m_repository->select(where);
 
     std::vector<Exercise> results;
     results.reserve(rows.size());
     for (const auto &row : rows)
-    {
         results.push_back(ExerciseSerializer::fromVariant(row));
-    }
     return results;
-}
-
-std::optional<Exercise> ExerciseRepositoryDb::findOne(const ExerciseQuery &query) const
-{
-    auto where = buildWhereClause(query);
-    auto rows = m_repository->select(where, Order(), 1);
-    if (rows.isEmpty())
-        return std::nullopt;
-    return ExerciseSerializer::fromVariant(rows.first());
 }
 
 int ExerciseRepositoryDb::save(const Exercise &exercise)
@@ -84,46 +69,11 @@ int ExerciseRepositoryDb::save(const Exercise &exercise)
         }
     }
 
-    auto result = m_repository->insert(data);
-    return result.toInt();
+    return m_repository->insert(data).toInt();
 }
 
-bool ExerciseRepositoryDb::remove(const ExerciseQuery &query)
+void ExerciseRepositoryDb::removeByWorkoutId(int workoutId)
 {
-    auto where = buildWhereClause(query);
-    return m_repository->remove(where) > 0;
-}
-
-int ExerciseRepositoryDb::count(const ExerciseQuery &query) const
-{
-    auto where = buildWhereClause(query);
-    return m_repository->count(where);
-}
-
-bool ExerciseRepositoryDb::exists(const ExerciseQuery &query) const
-{
-    auto where = buildWhereClause(query);
-    return m_repository->exists(where);
-}
-
-Where ExerciseRepositoryDb::buildWhereClause(const ExerciseQuery &query) const
-{
-    Where where;
-
-    if (query.id().has_value())
-        where = Where(ExerciseSerializer::id_key).equals(query.id().value());
-
-    if (query.workoutId().has_value())
-    {
-        auto wkWhere = Where(ExerciseSerializer::workout_id_key).equals(query.workoutId().value());
-        where = where.isEmpty() ? wkWhere : where.and_(wkWhere);
-    }
-
-    if (query.name().has_value())
-    {
-        auto nameWhere = Where(ExerciseSerializer::name_key).equals(query.name().value());
-        where = where.isEmpty() ? nameWhere : where.and_(nameWhere);
-    }
-
-    return where;
+    auto where = Where(ExerciseSerializer::workout_id_key).equals(workoutId);
+    m_repository->remove(where);
 }

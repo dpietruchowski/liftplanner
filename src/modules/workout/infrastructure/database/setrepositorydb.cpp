@@ -1,6 +1,4 @@
 #include "setrepositorydb.h"
-#include "modules/workout/domain/entities/set.h"
-#include "modules/workout/domain/repositories/setquery.h"
 #include "modules/workout/infrastructure/serializers/setserializer.h"
 #include "modules/workout/infrastructure/serializers/exerciseserializer.h"
 
@@ -41,29 +39,16 @@ bool SetRepositoryDb::createTable()
     return m_repository->createTable(table);
 }
 
-std::vector<Set> SetRepositoryDb::findAll(const SetQuery &query) const
+std::vector<Set> SetRepositoryDb::findByExerciseId(int exerciseId) const
 {
-    auto where = buildWhereClause(query);
-    int limit = query.limit().value_or(-1);
-
-    auto rows = m_repository->select(where, Order(), limit);
+    auto where = Where(SetSerializer::exercise_id_key).equals(exerciseId);
+    auto rows = m_repository->select(where);
 
     std::vector<Set> results;
     results.reserve(rows.size());
     for (const auto &row : rows)
-    {
         results.push_back(SetSerializer::fromVariant(row));
-    }
     return results;
-}
-
-std::optional<Set> SetRepositoryDb::findOne(const SetQuery &query) const
-{
-    auto where = buildWhereClause(query);
-    auto rows = m_repository->select(where, Order(), 1);
-    if (rows.isEmpty())
-        return std::nullopt;
-    return SetSerializer::fromVariant(rows.first());
 }
 
 int SetRepositoryDb::save(const Set &set)
@@ -80,40 +65,11 @@ int SetRepositoryDb::save(const Set &set)
         }
     }
 
-    auto result = m_repository->insert(data);
-    return result.toInt();
+    return m_repository->insert(data).toInt();
 }
 
-bool SetRepositoryDb::remove(const SetQuery &query)
+void SetRepositoryDb::removeByExerciseId(int exerciseId)
 {
-    auto where = buildWhereClause(query);
-    return m_repository->remove(where) > 0;
-}
-
-int SetRepositoryDb::count(const SetQuery &query) const
-{
-    auto where = buildWhereClause(query);
-    return m_repository->count(where);
-}
-
-bool SetRepositoryDb::exists(const SetQuery &query) const
-{
-    auto where = buildWhereClause(query);
-    return m_repository->exists(where);
-}
-
-Where SetRepositoryDb::buildWhereClause(const SetQuery &query) const
-{
-    Where where;
-
-    if (query.id().has_value())
-        where = Where(SetSerializer::id_key).equals(query.id().value());
-
-    if (query.exerciseId().has_value())
-    {
-        auto exWhere = Where(SetSerializer::exercise_id_key).equals(query.exerciseId().value());
-        where = where.isEmpty() ? exWhere : where.and_(exWhere);
-    }
-
-    return where;
+    auto where = Where(SetSerializer::exercise_id_key).equals(exerciseId);
+    m_repository->remove(where);
 }

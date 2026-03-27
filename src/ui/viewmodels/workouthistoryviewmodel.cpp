@@ -37,7 +37,7 @@ void WorkoutHistoryViewModel::saveWorkout(WorkoutModel *workout)
         return;
 
     Workout entity = workout->toEntity();
-    m_dbStorage->saveWorkoutEntity(entity);
+    m_dbStorage->saveWorkout(entity);
     loadAllWorkouts();
 }
 

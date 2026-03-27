@@ -3,6 +3,8 @@
 #include <QSqlQuery>
 #include <dbtoolkit/dbstorage.h>
 #include "modules/workout/domain/entities/workout.h"
+#include "modules/workout/domain/entities/exercise.h"
+#include "modules/workout/domain/entities/set.h"
 #include "modules/workout/domain/repositories/workoutquery.h"
 #include "modules/workout/infrastructure/database/workoutrepositorydb.h"
 
@@ -20,7 +22,7 @@ protected:
 
         m_dbStorage = std::make_unique<DbStorage>(m_database);
         m_repo = std::make_unique<WorkoutRepositoryDb>(*m_dbStorage);
-        ASSERT_TRUE(m_repo->createTable());
+        ASSERT_TRUE(m_repo->createTables());
     }
 
     void TearDown() override
@@ -35,6 +37,22 @@ protected:
     Workout makeWorkout(const QString &name)
     {
         return Workout(name, QDateTime::currentDateTime());
+    }
+
+    Workout makeFullWorkout(const QString &name)
+    {
+        Workout w(name, QDateTime::currentDateTime());
+
+        Exercise e1("Bench Press", 120);
+        e1.addSet(Set(10, 80));
+        e1.addSet(Set(8, 85));
+        w.addExercise(e1);
+
+        Exercise e2("Squat", 180);
+        e2.addSet(Set(5, 100));
+        w.addExercise(e2);
+
+        return w;
     }
 
     QString m_connectionName = "workout_repo_test";
@@ -166,4 +184,61 @@ TEST_F(WorkoutRepositoryDbTest, StartedTimeFilter_Null)
     auto history = m_repo->findAll(WorkoutQuery().whereStartedTimeIsNotNull());
     EXPECT_EQ(history.size(), 1u);
     EXPECT_EQ(history[0].name(), "Started");
+}
+
+TEST_F(WorkoutRepositoryDbTest, Save_FullAggregate_LoadsExercisesAndSets)
+{
+    Workout w = makeFullWorkout("Full Day");
+    int id = m_repo->save(w);
+
+    auto found = m_repo->findOne(WorkoutQuery().whereId(id));
+    ASSERT_TRUE(found.has_value());
+    EXPECT_EQ(found->name(), "Full Day");
+    ASSERT_EQ(found->exercises().size(), 2u);
+
+    const auto &e1 = found->exercises()[0];
+    EXPECT_EQ(e1.name(), "Bench Press");
+    EXPECT_EQ(e1.restSeconds(), 120);
+    ASSERT_EQ(e1.sets().size(), 2u);
+    EXPECT_EQ(e1.sets()[0].repetitions(), 10);
+    EXPECT_EQ(e1.sets()[0].weight(), 80);
+    EXPECT_EQ(e1.sets()[1].repetitions(), 8);
+    EXPECT_EQ(e1.sets()[1].weight(), 85);
+
+    const auto &e2 = found->exercises()[1];
+    EXPECT_EQ(e2.name(), "Squat");
+    ASSERT_EQ(e2.sets().size(), 1u);
+    EXPECT_EQ(e2.sets()[0].repetitions(), 5);
+    EXPECT_EQ(e2.sets()[0].weight(), 100);
+}
+
+TEST_F(WorkoutRepositoryDbTest, FindAll_LoadsChildrenForAll)
+{
+    m_repo->save(makeFullWorkout("W1"));
+    m_repo->save(makeFullWorkout("W2"));
+
+    auto all = m_repo->findAll(WorkoutQuery());
+    EXPECT_EQ(all.size(), 2u);
+
+    for (const auto &w : all)
+    {
+        EXPECT_EQ(w.exercises().size(), 2u);
+        EXPECT_FALSE(w.exercises()[0].sets().empty());
+    }
+}
+
+TEST_F(WorkoutRepositoryDbTest, Remove_CascadesDeleteToChildren)
+{
+    int id = m_repo->save(makeFullWorkout("ToDelete"));
+    EXPECT_EQ(m_repo->count(WorkoutQuery()), 1);
+
+    m_repo->remove(WorkoutQuery().whereId(id));
+
+    EXPECT_EQ(m_repo->count(WorkoutQuery()), 0);
+
+    // Re-save to verify tables are intact
+    int id2 = m_repo->save(makeFullWorkout("After"));
+    auto found = m_repo->findOne(WorkoutQuery().whereId(id2));
+    ASSERT_TRUE(found.has_value());
+    EXPECT_EQ(found->exercises().size(), 2u);
 }

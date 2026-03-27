@@ -129,7 +129,7 @@ void RoutineViewModel::importWorkoutsFromJson(const QString &jsonData)
         QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
         auto workouts = WorkoutJson::workoutsFromJsonArray(doc.array());
         for (const auto &workout : workouts)
-            m_dbStorage->saveWorkoutEntity(workout);
+            m_dbStorage->saveWorkout(workout);
 
         loadAllWorkouts();
     }

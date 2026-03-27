@@ -2,30 +2,23 @@
 
 #include <memory>
 #include <vector>
-#include "modules/workout/domain/repositories/setrepository.h"
-
-#include <dbtoolkit/query/where.h>
+#include "modules/workout/domain/entities/set.h"
 
 class DbStorage;
 class DbRepository;
 
-class SetRepositoryDb : public SetRepository
+class SetRepositoryDb
 {
 public:
     explicit SetRepositoryDb(DbStorage &storage);
-    ~SetRepositoryDb() override;
+    ~SetRepositoryDb();
 
     bool createTable();
 
-    std::vector<Set> findAll(const SetQuery &query) const override;
-    std::optional<Set> findOne(const SetQuery &query) const override;
-    int save(const Set &set) override;
-    bool remove(const SetQuery &query) override;
-    int count(const SetQuery &query) const override;
-    bool exists(const SetQuery &query) const override;
+    std::vector<Set> findByExerciseId(int exerciseId) const;
+    int save(const Set &set);
+    void removeByExerciseId(int exerciseId);
 
 private:
     std::unique_ptr<DbRepository> m_repository;
-
-    Where buildWhereClause(const SetQuery &query) const;
 };
