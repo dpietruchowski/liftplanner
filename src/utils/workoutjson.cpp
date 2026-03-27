@@ -80,6 +80,8 @@ namespace WorkoutJson
             obj["planned_time"] = workout.plannedTime().toString(Qt::ISODate);
         if (workout.startedTime().isValid())
             obj["started_time"] = workout.startedTime().toString(Qt::ISODate);
+        if (workout.endedTime().isValid())
+            obj["ended_time"] = workout.endedTime().toString(Qt::ISODate);
 
         QJsonArray exercisesArray;
         for (const auto &exercise : workout.exercises())

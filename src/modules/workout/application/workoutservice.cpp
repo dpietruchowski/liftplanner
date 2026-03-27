@@ -46,7 +46,7 @@ void WorkoutService::importHistory(const std::vector<Workout> &workouts)
         if (!workout.startedTime().isValid())
             workout.setStartedTime(QDateTime::currentDateTime());
         if (!workout.endedTime().isValid())
-            workout.setEndedTime(QDateTime::currentDateTime());
+            workout.setEndedTime(workout.startedTime().addSecs(3600));
         m_repository.save(workout);
     }
 }

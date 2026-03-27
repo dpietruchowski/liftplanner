@@ -43,6 +43,10 @@ Makefile
 # Database files
 *.db
 
+# JSON data files
+ex.json
+prompt.json
+
 .vscode/
 
 *.keystore
