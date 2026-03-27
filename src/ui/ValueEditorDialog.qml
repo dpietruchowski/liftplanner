@@ -1,63 +1,74 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
-import "."
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import LiftPlanner 1.0
+import Themed.Components
 
 Rectangle {
-    id: dialog
-    width: parent ? parent.width : 360
-    height: 120
-    color: Theme.dialogSurface
-    radius: Theme.borderRadius
-    border.color: Theme.border
-    y: dialogVisible ? (parent ? parent.height - height : 0) : (parent ? parent.height : 0)
-    Behavior on y { NumberAnimation { duration: 200 } }
-
-    property int value: 0
-    property int minValue: 0
-    property int maxValue: 100
-    property int step: 1
+    id: valueEditor
+    property real value: 0
+    property real minValue: 0
+    property real maxValue: 999
+    property real step: 1
     property bool dialogVisible: false
-    signal confirmed()
 
-    ColumnLayout {
+    signal confirmed(real value)
+
+    visible: dialogVisible
+    width: parent.width
+    height: 120
+    anchors.bottom: parent.bottom
+    color: Theme.colors.dialogSurface
+    radius: Theme.radius.medium
+    border.width: Theme.border.thin
+    border.color: Theme.colors.border
+
+    Behavior on y {
+        NumberAnimation { duration: 200; easing.type: Easing.OutQuad }
+    }
+
+    RowLayout {
         anchors.fill: parent
-        anchors.margins: Theme.padding
-        spacing: Theme.spacing
+        anchors.margins: Theme.padding.medium
+        spacing: Theme.spacing.medium
 
-        RowLayout {
-            Layout.alignment: Qt.AlignHCenter
-            spacing: Theme.spacing
-
-            PrimaryButton {
-                text: "-"
-                buttonTheme: Theme.buttonMedium
-                buttonStyle: Theme.buttonStylePrimary
-                onClicked: if (value > minValue) value -= step
+        ThemedButton {
+            text: "-"
+            buttonSize: Theme.button.medium
+            buttonStyle: Theme.button.primary
+            onClicked: {
+                if (valueEditor.value - valueEditor.step >= valueEditor.minValue)
+                    valueEditor.value -= valueEditor.step
             }
+        }
 
-            Text {
-                text: value.toString()
-                font.pixelSize: Theme.fontLarge
-                color: Theme.textPrimary
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                width: 60
-                Layout.alignment: Qt.AlignVCenter
+        Text {
+            Layout.fillWidth: true
+            text: valueEditor.value.toFixed(step < 1 ? 1 : 0)
+            color: Theme.colors.textPrimary
+            font.pixelSize: Theme.fontSize.large
+            font.bold: true
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+
+        ThemedButton {
+            text: "+"
+            buttonSize: Theme.button.medium
+            buttonStyle: Theme.button.primary
+            onClicked: {
+                if (valueEditor.value + valueEditor.step <= valueEditor.maxValue)
+                    valueEditor.value += valueEditor.step
             }
+        }
 
-            PrimaryButton {
-                text: "+"
-                buttonTheme: Theme.buttonMedium
-                buttonStyle: Theme.buttonStylePrimary
-                onClicked: if (value < maxValue) value += step
-            }
-
-            PrimaryButton {
-                text: "OK"
-                buttonTheme: Theme.buttonMedium
-                buttonStyle: Theme.buttonStyleSuccess
-                onClicked: { dialogVisible = false; confirmed() }
+        ThemedButton {
+            text: "OK"
+            buttonSize: Theme.button.medium
+            buttonStyle: Theme.button.success
+            onClicked: {
+                valueEditor.confirmed(valueEditor.value)
+                valueEditor.dialogVisible = false
             }
         }
     }

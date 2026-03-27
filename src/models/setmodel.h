@@ -1,6 +1,5 @@
 #pragma once
 #include <QObject>
-#include <QVariantMap>
 #include <QJsonObject>
 #include "../utils/serializationutils.h"
 #include "types.h"
@@ -18,16 +17,11 @@ class SetModel : public QObject
 public:
     explicit SetModel(QObject *parent = nullptr);
 
-    QVariantMap toVariantMap(SerializationMode mode) const;
-    static SetModel *fromVariantMap(const QVariantMap &variantMap, QObject *parent = nullptr);
-    static bool validateVariantMap(const QVariantMap &variantMap, QString &stringError);
-
     QJsonObject toJson(SerializationMode mode) const;
     static SetModel *fromJson(const QJsonObject &jsonObj, QObject *parent = nullptr);
 
     QString toString() const;
     static SetModel *fromString(const QString &str, QObject *parent = nullptr);
-    static bool validateString(const QString &str, QString &stringError);
 
     SetModel *clone(QObject *parent = nullptr) const;
 };

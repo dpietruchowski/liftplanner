@@ -1,15 +1,10 @@
 #pragma once
 
-#include <QJsonObject>
-#include <QMetaEnum>
+#include <QObject>
 #include <QQmlListProperty>
 #include <QString>
-#include <QVariant>
-#include <string>
-#include <tuple>
 
 #define DEFINE_KEY(field_name) static constexpr const char *field_name##_key = #field_name;
-#define DEFINE_TABLE_NAME(table_name) static constexpr const char *table_name##_table = #table_name;
 
 #define DECLARE_MODEL_PROPERTY(type, name, setterName, keyName)           \
 private:                                                                  \
@@ -120,22 +115,3 @@ private:                                                                        
             emit w->name##Changed();                                                 \
         }                                                                            \
     }
-
-namespace Serialization
-{
-    QJsonObject toJson(const QVariantMap &variantMap);
-    QVariantMap fromJson(const QJsonObject &jsonObj);
-
-    template <typename EnumType>
-    QString convertEnumToString(int enumValue)
-    {
-        QMetaEnum metaEnum = QMetaEnum::fromType<EnumType>();
-        return metaEnum.valueToKey(enumValue);
-    }
-    template <typename EnumType>
-    EnumType convertStringToEnum(const QString &enumName)
-    {
-        QMetaEnum metaEnum = QMetaEnum::fromType<EnumType>();
-        return static_cast<EnumType>(metaEnum.keyToValue(enumName.toUtf8().constData()));
-    }
-} // namespace Serialization

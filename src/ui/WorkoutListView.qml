@@ -1,6 +1,7 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import Themed.Components
 
 Item {
     id: root
@@ -13,14 +14,14 @@ Item {
     ScrollView {
         id: scrollView
         anchors.fill: parent
-        anchors.margins: Theme.padding
+        anchors.margins: Theme.padding.medium
 
         ColumnLayout {
             id: columnLayout
             width: scrollView.contentItem.width
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: Theme.spacing
+            spacing: Theme.spacing.medium
 
             Loader {
                 sourceComponent: root.buttonsRow

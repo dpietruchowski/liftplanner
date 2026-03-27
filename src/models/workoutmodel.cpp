@@ -1,7 +1,5 @@
 #include "workoutmodel.h"
 #include <QJsonArray>
-#include "utils/serializationutils.h"
-#include "utils/variantmapvalidator.h"
 
 WorkoutModel::WorkoutModel(QObject *parent)
     : QObject(parent)
@@ -46,121 +44,57 @@ void WorkoutModel::removeExercise(ExerciseModel *exercise)
     }
 }
 
-QVariantMap WorkoutModel::toVariantMap(SerializationMode mode) const
+QJsonObject WorkoutModel::toJson(SerializationMode mode) const
 {
-    QVariantMap variant;
+    QJsonObject obj;
     if (m_id != -1)
-    {
-        variant.insert(WorkoutModel::id_key, m_id);
-    }
-    variant.insert(WorkoutModel::name_key, m_name);
+        obj["id"] = m_id;
+    obj["name"] = m_name;
 
     if (m_createdTime.isValid())
-    {
-        variant.insert(WorkoutModel::created_time_key, m_createdTime.toString(Qt::ISODate));
-    }
+        obj["created_time"] = m_createdTime.toString(Qt::ISODate);
     if (m_startedTime.isValid())
-    {
-        variant.insert(WorkoutModel::started_time_key, m_startedTime.toString(Qt::ISODate));
-    }
+        obj["started_time"] = m_startedTime.toString(Qt::ISODate);
     if (m_endedTime.isValid())
-    {
-        variant.insert(WorkoutModel::ended_time_key, m_endedTime.toString(Qt::ISODate));
-    }
+        obj["ended_time"] = m_endedTime.toString(Qt::ISODate);
 
     if (mode != SerializationMode::DbModel)
     {
-        QVariantList exercisesList;
+        QJsonArray exercisesArray;
         for (ExerciseModel *exercise : m_exercises)
-        {
-            exercisesList.append(exercise->toVariantMap(mode));
-        }
-        variant.insert(WorkoutModel::exercises_key, exercisesList);
+            exercisesArray.append(exercise->toJson(mode));
+        obj["exercises"] = exercisesArray;
     }
-    return variant;
-}
-
-WorkoutModel *WorkoutModel::fromVariantMap(const QVariantMap &variantMap, QObject *parent)
-{
-    WorkoutModel *model = new WorkoutModel(parent);
-
-    if (variantMap.contains(WorkoutModel::id_key))
-        model->setId(variantMap.value(WorkoutModel::id_key).toInt());
-    if (variantMap.contains(WorkoutModel::name_key))
-        model->setName(variantMap.value(WorkoutModel::name_key).toString());
-
-    if (variantMap.contains(WorkoutModel::created_time_key))
-    {
-        model->setCreatedTime(QDateTime::fromString(variantMap.value(WorkoutModel::created_time_key).toString(), Qt::ISODate));
-    }
-    if (variantMap.contains(WorkoutModel::started_time_key))
-    {
-        model->setStartedTime(QDateTime::fromString(variantMap.value(WorkoutModel::started_time_key).toString(), Qt::ISODate));
-    }
-    if (variantMap.contains(WorkoutModel::ended_time_key))
-    {
-        model->setEndedTime(QDateTime::fromString(variantMap.value(WorkoutModel::ended_time_key).toString(), Qt::ISODate));
-    }
-
-    if (variantMap.contains(WorkoutModel::exercises_key))
-    {
-        QVariantList exercisesList = variantMap.value(WorkoutModel::exercises_key).toList();
-        for (const QVariant &var : exercisesList)
-        {
-            if (var.canConvert<QVariantMap>())
-            {
-                ExerciseModel *exercise = ExerciseModel::fromVariantMap(var.toMap(), model);
-                model->addExercise(exercise);
-            }
-        }
-    }
-
-    return model;
-}
-
-bool WorkoutModel::validateVariantMap(const QVariantMap &variantMap, QString &stringError)
-{
-    VariantMapValidator validator(variantMap, stringError);
-
-    if (!validator.validateString(WorkoutModel::name_key, true))
-        return false;
-
-    if (variantMap.contains(WorkoutModel::exercises_key)) {
-        QVariant exercisesVar = variantMap.value(WorkoutModel::exercises_key);
-        if (exercisesVar.typeId() != QMetaType::QVariantList) {
-            stringError = QString("Invalid type for '%1', expected list")
-                              .arg(WorkoutModel::exercises_key);
-            return false;
-        }
-
-        QVariantList exercisesList = exercisesVar.toList();
-        for (int i = 0; i < exercisesList.size(); ++i) {
-            const QVariant &var = exercisesList[i];
-            if (!var.canConvert<QVariantMap>()) {
-                stringError = QString("Exercise at index %1 is not a valid object").arg(i);
-                return false;
-            }
-
-            QString exerciseError;
-            if (!ExerciseModel::validateVariantMap(var.toMap(), exerciseError)) {
-                stringError = QString("Exercise at index %1 invalid: %2").arg(i).arg(exerciseError);
-                return false;
-            }
-        }
-    }
-
-    stringError.clear();
-    return true;
-}
-
-QJsonObject WorkoutModel::toJson(SerializationMode mode) const
-{
-    return Serialization::toJson(toVariantMap(mode));
+    return obj;
 }
 
 WorkoutModel *WorkoutModel::fromJson(const QJsonObject &jsonObj, QObject *parent)
 {
-    return fromVariantMap(Serialization::fromJson(jsonObj), parent);
+    WorkoutModel *model = new WorkoutModel(parent);
+
+    if (jsonObj.contains("id"))
+        model->setId(jsonObj["id"].toInt());
+    if (jsonObj.contains("name"))
+        model->setName(jsonObj["name"].toString());
+    if (jsonObj.contains("created_time"))
+        model->setCreatedTime(QDateTime::fromString(jsonObj["created_time"].toString(), Qt::ISODate));
+    if (jsonObj.contains("started_time"))
+        model->setStartedTime(QDateTime::fromString(jsonObj["started_time"].toString(), Qt::ISODate));
+    if (jsonObj.contains("ended_time"))
+        model->setEndedTime(QDateTime::fromString(jsonObj["ended_time"].toString(), Qt::ISODate));
+
+    if (jsonObj.contains("exercises"))
+    {
+        QJsonArray exercisesArray = jsonObj["exercises"].toArray();
+        for (const QJsonValue &val : exercisesArray)
+        {
+            ExerciseModel *exercise = ExerciseModel::fromJson(val.toObject(), model);
+            if (exercise)
+                model->addExercise(exercise);
+        }
+    }
+
+    return model;
 }
 
 WorkoutModel *WorkoutModel::clone(QObject *parent) const

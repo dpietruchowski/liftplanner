@@ -2,10 +2,11 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import LiftPlanner 1.0
+import Themed.Components
 
 Rectangle {
     id: root
-    color: Theme.background
+    color: Theme.colors.background
 
     property var workoutToDelete
 

@@ -2,43 +2,43 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import LiftPlanner 1.0
+import Themed.Components
 
 ColumnLayout {
     id: root
     Layout.fillWidth: true
-    spacing: Theme.spacing
+    spacing: Theme.spacing.medium
     property var workout
     property bool expanded: false
-
 
     signal deleteWorkout(var workout)
 
     Rectangle {
         Layout.fillWidth: true
         Layout.preferredHeight: 56
-        radius: Theme.borderRadius
-        color: Theme.surface
-        border.color: Theme.primary
+        radius: Theme.radius.medium
+        color: Theme.colors.surface
+        border.color: Theme.colors.primary
         border.width: 1
 
         RowLayout {
             anchors.fill: parent
-            anchors.margins: Theme.padding
-            spacing: Theme.spacing
+            anchors.margins: Theme.padding.medium
+            spacing: Theme.spacing.medium
 
-            PrimaryButton {
-                svgIcon: expanded ? Theme.icons.collapse : Theme.icons.expand
+            ThemedButton {
+                iconSource: expanded ? Theme.icons.collapse : Theme.icons.expand
                 circular: true
-                buttonTheme: Theme.buttonSquare
-                buttonStyle: Theme.buttonStylePrimary
+                buttonSize: Theme.button.square
+                buttonStyle: Theme.button.primary
                 onClicked: expanded = !expanded
             }
 
             Text {
                 text: workout.name
-                font.pixelSize: Theme.fontMedium
+                font.pixelSize: Theme.fontSize.medium
                 font.bold: true
-                color: Theme.textPrimary
+                color: Theme.colors.textPrimary
                 Layout.fillWidth: true
                 elide: Text.ElideRight
                 verticalAlignment: Text.AlignVCenter
@@ -46,16 +46,16 @@ ColumnLayout {
 
             Text {
                 text: Qt.formatDateTime(workout.startedTime, "dd.MM.yyyy")
-                font.pixelSize: Theme.fontSmall
-                color: Theme.textSecondary
+                font.pixelSize: Theme.fontSize.small
+                color: Theme.colors.textSecondary
                 verticalAlignment: Text.AlignVCenter
             }
 
-            PrimaryButton {
-                svgIcon: Theme.icons.close
+            ThemedButton {
+                iconSource: Theme.icons.close
                 circular: true
-                buttonTheme: Theme.buttonSquare
-                buttonStyle: Theme.buttonStyleDanger
+                buttonSize: Theme.button.square
+                buttonStyle: Theme.button.danger
                 onClicked: root.deleteWorkout(workout)
             }
         }
@@ -72,6 +72,6 @@ ColumnLayout {
     Rectangle {
         Layout.fillWidth: true
         height: 1
-        color: Theme.border
+        color: Theme.colors.border
     }
 }

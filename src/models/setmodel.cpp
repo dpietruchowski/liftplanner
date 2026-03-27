@@ -1,6 +1,4 @@
 #include "setmodel.h"
-#include "utils/serializationutils.h"
-#include "utils/variantmapvalidator.h"
 
 SetModel::SetModel(QObject *parent)
     : QObject(parent)
@@ -9,68 +7,35 @@ SetModel::SetModel(QObject *parent)
     m_exerciseId = -1;
 }
 
-QVariantMap SetModel::toVariantMap(SerializationMode) const
+QJsonObject SetModel::toJson(SerializationMode) const
 {
-    QVariantMap variant;
+    QJsonObject obj;
     if (m_id != -1)
-    {
-        variant.insert(SetModel::id_key, m_id);
-    }
+        obj["id"] = m_id;
     if (m_exerciseId != -1)
-    {
-        variant.insert(SetModel::exercise_id_key, m_exerciseId);
-    }
-    variant.insert(SetModel::repetitions_key, m_repetitions);
-    variant.insert(SetModel::weight_key, m_weight);
-    variant.insert(SetModel::completed_key, m_completed);
-    return variant;
-}
-
-SetModel *SetModel::fromVariantMap(const QVariantMap &variantMap, QObject *parent)
-{
-    SetModel *model = new SetModel(parent);
-
-    if (variantMap.contains(SetModel::id_key))
-        model->setId(variantMap.value(SetModel::id_key).toInt());
-    if (variantMap.contains(SetModel::exercise_id_key))
-        model->setExerciseId(variantMap.value(SetModel::exercise_id_key).toInt());
-    if (variantMap.contains(SetModel::repetitions_key))
-        model->setRepetitions(variantMap.value(SetModel::repetitions_key).toInt());
-    if (variantMap.contains(SetModel::weight_key))
-        model->setWeight(variantMap.value(SetModel::weight_key).toInt());
-    if (variantMap.contains(SetModel::completed_key))
-        model->setCompleted(variantMap.value(SetModel::completed_key).toBool());
-
-    return model;
-}
-
-bool SetModel::validateVariantMap(const QVariantMap &variantMap, QString &stringError)
-{
-    VariantMapValidator validator(variantMap, stringError);
-
-    if (!validator.validateInt(SetModel::repetitions_key, true, 1))
-        return false;
-    if (!validator.validateInt(SetModel::weight_key, true, 0))
-        return false;
-
-    if (!variantMap.contains(SetModel::completed_key)
-        || !variantMap.value(SetModel::completed_key).canConvert<bool>()) {
-        stringError = QString("Missing or invalid '%1'").arg(SetModel::completed_key);
-        return false;
-    }
-
-    stringError.clear();
-    return true;
-}
-
-QJsonObject SetModel::toJson(SerializationMode mode) const
-{
-    return Serialization::toJson(toVariantMap(mode));
+        obj["exercise_id"] = m_exerciseId;
+    obj["repetitions"] = m_repetitions;
+    obj["weight"] = m_weight;
+    obj["completed"] = m_completed;
+    return obj;
 }
 
 SetModel *SetModel::fromJson(const QJsonObject &jsonObj, QObject *parent)
 {
-    return fromVariantMap(Serialization::fromJson(jsonObj), parent);
+    SetModel *model = new SetModel(parent);
+
+    if (jsonObj.contains("id"))
+        model->setId(jsonObj["id"].toInt());
+    if (jsonObj.contains("exercise_id"))
+        model->setExerciseId(jsonObj["exercise_id"].toInt());
+    if (jsonObj.contains("repetitions"))
+        model->setRepetitions(jsonObj["repetitions"].toInt());
+    if (jsonObj.contains("weight"))
+        model->setWeight(jsonObj["weight"].toInt());
+    if (jsonObj.contains("completed"))
+        model->setCompleted(jsonObj["completed"].toBool());
+
+    return model;
 }
 
 QString SetModel::toString() const
@@ -97,35 +62,6 @@ SetModel *SetModel::fromString(const QString &str, QObject *parent)
     model->setRepetitions(reps);
     model->setWeight(w);
     return model;
-}
-
-bool SetModel::validateString(const QString &str, QString &stringError)
-{
-    QStringList parts = str.toLower().replace("kg", "").split("x");
-    if (parts.size() != 2) {
-        stringError = QString("Invalid format: '%1'. Expected format is '<reps>x<weight>kg'")
-                          .arg(str);
-        return false;
-    }
-
-    bool ok1 = false;
-    bool ok2 = false;
-
-    int reps = parts[0].trimmed().toInt(&ok1);
-    double weight = parts[1].trimmed().toDouble(&ok2);
-
-    if (!ok1) {
-        stringError = QString("Invalid repetitions: '%1'").arg(parts[0].trimmed());
-        return false;
-    }
-
-    if (!ok2) {
-        stringError = QString("Invalid weight: '%1'").arg(parts[1].trimmed());
-        return false;
-    }
-
-    stringError.clear();
-    return true;
 }
 
 SetModel *SetModel::clone(QObject *parent) const

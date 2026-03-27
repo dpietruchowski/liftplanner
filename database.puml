@@ -1,0 +1,51 @@
+@startuml
+
+entity "Word" as WordModel {
+  * id : INTEGER
+  * lemma : TEXT
+  * partOfSpeech : TEXT
+  * pronunciation : TEXT
+  * usageFrequency : REAL
+  * language : TEXT
+  * addedDate : DATETIME
+}
+
+entity "Translation" as TranslationModel {
+  * id : INTEGER
+  * sourceWordId : INTEGER
+  * targetWordId : INTEGER
+  * context : TEXT
+}
+
+entity "Sentence" as SentenceModel {
+  * id : INTEGER
+  * text : TEXT
+  * language : TEXT
+  * addedDate : DATETIME
+}
+
+entity "SentenceTranslation" as SentenceTranslationModel {
+  * id : INTEGER
+  * sourceSentenceId : INTEGER
+  * targetSentenceId : INTEGER
+  * context : TEXT
+}
+
+entity "TargetWord" as TargetWordModel {
+  * id : INTEGER
+  * sentenceId : INTEGER
+  * wordId : INTEGER
+  * wordInSentence : TEXT
+  * suggestions : TEXT
+}
+
+WordModel ||--o{ TranslationModel : sourceWordId
+WordModel ||--o{ TranslationModel : targetWordId
+
+SentenceModel ||--o{ SentenceTranslationModel : sourceSentenceId
+SentenceModel ||--o{ SentenceTranslationModel : targetSentenceId
+
+SentenceModel ||--o{ TargetWordModel : sentenceId
+WordModel ||--o{ TargetWordModel : wordId
+
+@enduml

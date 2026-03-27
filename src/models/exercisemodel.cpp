@@ -1,7 +1,5 @@
 #include "exercisemodel.h"
 #include <QJsonArray>
-#include "utils/serializationutils.h"
-#include "utils/variantmapvalidator.h"
 
 ExerciseModel::ExerciseModel(QObject *parent)
     : QObject(parent)
@@ -48,134 +46,77 @@ void ExerciseModel::removeSet(SetModel *set)
     }
 }
 
-QVariantMap ExerciseModel::toVariantMap(SerializationMode mode) const
+QJsonObject ExerciseModel::toJson(SerializationMode mode) const
 {
-    QVariantMap variant;
+    QJsonObject obj;
+    obj["name"] = m_name;
+    obj["rest_seconds"] = m_restSeconds;
+    obj["youtube_link"] = m_youtubeLink;
 
-    variant.insert(ExerciseModel::name_key, m_name);
-    variant.insert(ExerciseModel::rest_seconds_key, m_restSeconds);
-    variant.insert(ExerciseModel::youtube_link_key, m_youtubeLink);
-
-    if (mode != SerializationMode::ChatGpt) {
-        if (m_id != -1) {
-            variant.insert(ExerciseModel::id_key, m_id);
-        }
-        if (m_workoutId != -1) {
-            variant.insert(ExerciseModel::workout_id_key, m_workoutId);
-        }
-        variant.insert(ExerciseModel::description_key, m_description);
+    if (mode != SerializationMode::ChatGpt)
+    {
+        if (m_id != -1)
+            obj["id"] = m_id;
+        if (m_workoutId != -1)
+            obj["workout_id"] = m_workoutId;
+        obj["description"] = m_description;
     }
 
-    if (mode == SerializationMode::ChatGpt) {
-        variant.insert(ExerciseModel::sets_key, setsToString());
-    } else if (mode == SerializationMode::FullFile) {
-        QVariantList setsList;
-        for (SetModel *set : m_sets) {
-            setsList.append(set->toVariantMap(mode));
+    if (mode == SerializationMode::ChatGpt)
+    {
+        obj["sets"] = setsToString();
+    }
+    else if (mode == SerializationMode::FullFile)
+    {
+        QJsonArray setsArray;
+        for (QObject *setObj : m_sets)
+        {
+            if (auto *set = qobject_cast<SetModel *>(setObj))
+                setsArray.append(set->toJson(mode));
         }
-        variant.insert(ExerciseModel::sets_key, setsList);
+        obj["sets"] = setsArray;
     }
 
-    return variant;
+    return obj;
 }
 
-ExerciseModel *ExerciseModel::fromVariantMap(const QVariantMap &variantMap, QObject *parent)
+ExerciseModel *ExerciseModel::fromJson(const QJsonObject &jsonObj, QObject *parent)
 {
     ExerciseModel *model = new ExerciseModel(parent);
 
-    if (variantMap.contains(ExerciseModel::id_key))
-        model->setId(variantMap.value(ExerciseModel::id_key).toInt());
-    if (variantMap.contains(ExerciseModel::workout_id_key))
-        model->setWorkoutId(variantMap.value(ExerciseModel::workout_id_key).toInt());
-    if (variantMap.contains(ExerciseModel::name_key))
-        model->setName(variantMap.value(ExerciseModel::name_key).toString());
+    if (jsonObj.contains("id"))
+        model->setId(jsonObj["id"].toInt());
+    if (jsonObj.contains("workout_id"))
+        model->setWorkoutId(jsonObj["workout_id"].toInt());
+    if (jsonObj.contains("name"))
+        model->setName(jsonObj["name"].toString());
+    if (jsonObj.contains("description"))
+        model->setDescription(jsonObj["description"].toString());
+    if (jsonObj.contains("rest_seconds"))
+        model->setRestSeconds(jsonObj["rest_seconds"].toInt());
+    if (jsonObj.contains("youtube_link"))
+        model->setYoutubeLink(jsonObj["youtube_link"].toString());
 
-    if (variantMap.contains(ExerciseModel::description_key))
-        model->setDescription(variantMap.value(ExerciseModel::description_key).toString());
-
-    if (variantMap.contains(ExerciseModel::rest_seconds_key))
-        model->setRestSeconds(variantMap.value(ExerciseModel::rest_seconds_key).toInt());
-    if (variantMap.contains(ExerciseModel::youtube_link_key))
-        model->setYoutubeLink(variantMap.value(ExerciseModel::youtube_link_key).toString());
-
-    if (variantMap.contains(ExerciseModel::sets_key)) {
-        QVariant setsVar = variantMap.value(ExerciseModel::sets_key);
-
-        if (setsVar.typeId() == QMetaType::QString) {
-            model->setsFromString(setsVar.toString());
-        } else if (setsVar.typeId() == QMetaType::QVariantList) {
-            QVariantList setsList = setsVar.toList();
-            for (const QVariant &var : setsList) {
-                if (var.canConvert<QVariantMap>()) {
-                    SetModel *set = SetModel::fromVariantMap(var.toMap(), model);
+    if (jsonObj.contains("sets"))
+    {
+        QJsonValue setsVal = jsonObj["sets"];
+        if (setsVal.isString())
+        {
+            model->setsFromString(setsVal.toString());
+        }
+        else if (setsVal.isArray())
+        {
+            QJsonArray setsArray = setsVal.toArray();
+            for (const QJsonValue &val : setsArray)
+            {
+                SetModel *set = SetModel::fromJson(val.toObject(), model);
+                if (set)
                     model->addSet(set);
-                }
             }
         }
     }
 
     return model;
-}
-
-bool ExerciseModel::validateVariantMap(const QVariantMap &variantMap, QString &stringError)
-{
-    VariantMapValidator validator(variantMap, stringError);
-
-    if (!validator.validateString(ExerciseModel::name_key, true))
-        return false;
-    if (!validator.validateInt(ExerciseModel::rest_seconds_key, true))
-        return false;
-    if (!validator.validateString(ExerciseModel::description_key, false))
-        return false;
-    if (!validator.validateUrl(ExerciseModel::youtube_link_key, false))
-        return false;
-
-    if (variantMap.contains(ExerciseModel::sets_key)) {
-        QVariant setsVar = variantMap.value(ExerciseModel::sets_key);
-
-        if (setsVar.typeId() == QMetaType::QVariantList) {
-            QVariantList setsList = setsVar.toList();
-            for (int i = 0; i < setsList.size(); ++i) {
-                const QVariant &var = setsList[i];
-                if (!var.canConvert<QVariantMap>()) {
-                    stringError = QString("Set at index %1 is not a valid object").arg(i);
-                    return false;
-                }
-                QString setError;
-                if (!SetModel::validateVariantMap(var.toMap(), setError)) {
-                    stringError = QString("Set at index %1 invalid: %2").arg(i).arg(setError);
-                    return false;
-                }
-            }
-        } else if (setsVar.typeId() == QMetaType::QString) {
-            QString setsStr = setsVar.toString();
-            QStringList setStrings = setsStr.split(",", Qt::SkipEmptyParts);
-            for (int i = 0; i < setStrings.size(); ++i) {
-                const QString &s = setStrings[i].trimmed();
-                QString setError;
-                if (!SetModel::validateString(s, setError)) {
-                    stringError = QString("Set at index %1 invalid: %2").arg(i).arg(setError);
-                    return false;
-                }
-            }
-        } else {
-            stringError = "'sets' field has invalid type";
-            return false;
-        }
-    }
-
-    stringError.clear();
-    return true;
-}
-
-QJsonObject ExerciseModel::toJson(SerializationMode mode) const
-{
-    return Serialization::toJson(toVariantMap(mode));
-}
-
-ExerciseModel *ExerciseModel::fromJson(const QJsonObject &jsonObj, QObject *parent)
-{
-    return fromVariantMap(Serialization::fromJson(jsonObj), parent);
 }
 
 QString ExerciseModel::setsToString() const
@@ -215,7 +156,8 @@ ExerciseModel *ExerciseModel::clone(QObject *parent) const
     clone->setDescription(m_description);
     clone->setYoutubeLink(m_youtubeLink);
 
-    for (QObject *setObj : m_sets) {
+    for (QObject *setObj : m_sets)
+    {
         if (SetModel *set = qobject_cast<SetModel *>(setObj))
         {
             SetModel *setClone = set->clone(clone);

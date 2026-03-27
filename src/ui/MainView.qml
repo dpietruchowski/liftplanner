@@ -1,6 +1,7 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Controls
 import LiftPlanner
+import Themed.Components
 
 Item {
     id: root
@@ -10,7 +11,6 @@ Item {
     property var homeScreen: ScreenHome {}
     property var routinesScreen: ScreenRoutines {}
     property var historyScreen: ScreenHistory {}
-
 
     StackView {
         id: stackView
@@ -48,7 +48,6 @@ Item {
                 "Then copy the generated JSON and click the 'Import' button in routines to add it."
             notificationPopup.open()
         }
-
     }
 
     BottomNavigation {
@@ -57,9 +56,9 @@ Item {
         width: parent.width
         model: [
             { label: "Workout", screen: activeWorkoutScreen, icon: Theme.icons.barbell },
-            { label: "Home", screen: homeScreen, icon: Theme.icons.home  },
-            { label: "Routines", screen: routinesScreen, icon: Theme.icons.routines  },
-            { label: "History", screen: historyScreen, icon: Theme.icons.calendar  }
+            { label: "Home", screen: homeScreen, icon: Theme.icons.home },
+            { label: "Routines", screen: routinesScreen, icon: Theme.icons.routines },
+            { label: "History", screen: historyScreen, icon: Theme.icons.calendar }
         ]
     }
 }

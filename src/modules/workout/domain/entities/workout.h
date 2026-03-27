@@ -1,0 +1,37 @@
+#pragma once
+
+#include <QString>
+#include <QDateTime>
+#include <vector>
+
+class Exercise;
+
+class Workout final
+{
+public:
+    Workout();
+    Workout(const QString &name, const QDateTime &createdTime);
+
+    int id() const;
+    const QString &name() const;
+    const QDateTime &createdTime() const;
+    const QDateTime &startedTime() const;
+    const QDateTime &endedTime() const;
+
+    void setId(int id);
+    void setName(const QString &name);
+    void setCreatedTime(const QDateTime &createdTime);
+    void setStartedTime(const QDateTime &startedTime);
+    void setEndedTime(const QDateTime &endedTime);
+
+    static Workout createDefault(const QString &name);
+
+private:
+    void validate() const;
+
+    int m_id{-1};
+    QString m_name;
+    QDateTime m_createdTime;
+    QDateTime m_startedTime;
+    QDateTime m_endedTime;
+};

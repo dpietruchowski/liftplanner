@@ -1,23 +1,24 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 import LiftPlanner 1.0
+import Themed.Components
 
 Rectangle {
     id: root
-    color: Theme.background
+    color: Theme.colors.background
 
     property var currentSetter
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Theme.padding
-        spacing: Theme.spacing
+        anchors.margins: Theme.padding.medium
+        spacing: Theme.spacing.medium
 
         Text {
             text: ActiveWorkoutService.currentWorkout ? ActiveWorkoutService.currentWorkout.name : "Workout"
-            color: Theme.textPrimary
-            font.pixelSize: Theme.fontLarge
+            color: Theme.colors.textPrimary
+            font.pixelSize: Theme.fontSize.large
             font.bold: true
             Layout.alignment: Qt.AlignHCenter
         }
@@ -31,7 +32,7 @@ Rectangle {
             Column {
                 id: contentColumn
                 width: sv.availableWidth
-                spacing: Theme.spacing / 2
+                spacing: Theme.spacing.medium / 2
 
                 Repeater {
                     model: ActiveWorkoutService.currentWorkout ? ActiveWorkoutService.currentWorkout.exercises : []
@@ -57,23 +58,23 @@ Rectangle {
 
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            spacing: Theme.spacing
+            spacing: Theme.spacing.medium
 
-            PrimaryButton {
-                svgIcon: Theme.icons.previous
+            ThemedButton {
+                iconSource: Theme.icons.previous
                 enabled: ActiveWorkoutService.isActive
-                buttonTheme: Theme.buttonMedium
-                buttonStyle: Theme.buttonStylePrimary
+                buttonSize: Theme.button.medium
+                buttonStyle: Theme.button.primary
                 onClicked: ActiveWorkoutService.navigateToPrevious()
             }
 
-            PrimaryButton {
+            ThemedButton {
                 text: ActiveWorkoutService.currentWorkout && ActiveWorkoutService.currentWorkout.completed ? "End" : "Done"
                 enabled: ActiveWorkoutService.isActive && ActiveWorkoutService.currentSet
-                buttonTheme: Theme.buttonMedium
+                buttonSize: Theme.button.medium
                 buttonStyle: ActiveWorkoutService.currentWorkout && ActiveWorkoutService.currentWorkout.completed
-                             ? Theme.buttonStylePrimary
-                             : Theme.buttonStyleSuccess
+                             ? Theme.button.primary
+                             : Theme.button.success
                 onClicked: {
                     if (ActiveWorkoutService.currentWorkout.completed) {
                         endWorkoutPopup.open()
@@ -87,11 +88,11 @@ Rectangle {
                 }
             }
 
-            PrimaryButton {
-                svgIcon: Theme.icons.next
+            ThemedButton {
+                iconSource: Theme.icons.next
                 enabled: ActiveWorkoutService.isActive
-                buttonTheme: Theme.buttonMedium
-                buttonStyle: Theme.buttonStylePrimary
+                buttonSize: Theme.button.medium
+                buttonStyle: Theme.button.primary
                 onClicked: ActiveWorkoutService.navigateToNext()
             }
         }
@@ -176,5 +177,4 @@ Rectangle {
         valueEditorDialog.step = 5
         valueEditorDialog.dialogVisible = true
     }
-
 }

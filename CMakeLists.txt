@@ -4,8 +4,8 @@ project(liftplanner VERSION 0.2 LANGUAGES CXX)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED OFF)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Android
 set(ANDROID_PACKAGE_NAME "com.liftplanner.app")
@@ -17,7 +17,13 @@ set(QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/android")
 
 set(QML_LIVE_ENABLED OFF)
 
+add_subdirectory(libs)
 add_subdirectory(src)
+
+if(NOT ANDROID)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
 
 if(ANDROID)
     set(CMAKE_BUILD_TYPE Release)

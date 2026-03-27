@@ -1,111 +1,104 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
 import LiftPlanner 1.0
+import Themed.Components
 
 Rectangle {
-    id: dialog
-    width: parent ? parent.width : 360
-    color: Theme.dialogSurface
-    radius: Theme.borderRadius
-    border.color: Theme.border
-    y: dialogVisible ? 0 : -implicitHeight
-    Behavior on y { NumberAnimation { duration: 200 } }
-
-    property int restSeconds: 0
+    id: restDialog
+    property int restSeconds: 60
     property int remainingSeconds: 0
     property bool dialogVisible: false
-    property real endTime: 0
-    signal dismissed()
+    property var endTime: null
 
-    implicitHeight: contentLayout.implicitHeight + Theme.padding * 2
-
-    Timer {
-        id: updateTimer
-        interval: 250
-        repeat: true
-        running: false
-        onTriggered: {
-            if (endTime > 0) {
-                var now = Date.now()
-                remainingSeconds = Math.max(0, Math.ceil((endTime - now) / 1000))
-                if (remainingSeconds === 0) {
-                    running = false
-                    updateTimer.running = false
-                }
-            }
-        }
-    }
-
-    ColumnLayout {
-        id: contentLayout
-        anchors.fill: parent
-        anchors.margins: Theme.padding
-        spacing: Theme.spacing
-
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignHCenter
-
-            Text {
-                text: {
-                    var s = remainingSeconds
-                    var mm = Math.floor(s / 60)
-                    var ss = s % 60
-                    return (mm < 10 ? "0" + mm : mm) + ":" + (ss < 10 ? "0" + ss : ss)
-                }
-                font.pixelSize: Theme.fontHuge
-                color: Theme.textPrimary
-                horizontalAlignment: Text.AlignHCenter
-                Layout.alignment: Qt.AlignHCenter
-            }
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignRight
-            spacing: Theme.spacing
-
-            PrimaryButton {
-                text: "-"
-                buttonTheme: Theme.buttonMedium
-                buttonStyle: Theme.buttonStylePrimary
-                onClicked: {
-                    endTime -= 15000
-                    remainingSeconds = Math.max(0, Math.ceil((endTime - Date.now()) / 1000))
-                }
-            }
-
-            PrimaryButton {
-                text: "+"
-                buttonTheme: Theme.buttonMedium
-                buttonStyle: Theme.buttonStylePrimary
-                onClicked: {
-                    endTime += 15000
-                    remainingSeconds = Math.ceil((endTime - Date.now()) / 1000)
-                }
-            }
-
-            PrimaryButton {
-                text: "OK"
-                buttonTheme: Theme.buttonMedium
-                buttonStyle: Theme.buttonStyleSuccess
-                onClicked: dialog.hideDialog()
-            }
-        }
-    }
+    visible: dialogVisible
+    width: parent.width
+    height: 120
+    anchors.top: parent.top
+    color: Theme.colors.dialogSurface
+    radius: Theme.radius.medium
+    border.width: Theme.border.thin
+    border.color: Theme.colors.border
 
     function show(seconds) {
-        restSeconds = seconds || 0
-        remainingSeconds = restSeconds
-        endTime = Date.now() + remainingSeconds * 1000
+        restSeconds = seconds
+        remainingSeconds = seconds
+        endTime = new Date(Date.now() + seconds * 1000)
         dialogVisible = true
-        updateTimer.running = restSeconds > 0
+        restTimer.start()
     }
 
     function hideDialog() {
         dialogVisible = false
-        updateTimer.running = false
-        dismissed()
+        restTimer.stop()
+        remainingSeconds = 0
+        endTime = null
+    }
+
+    Timer {
+        id: restTimer
+        interval: 250
+        repeat: true
+        running: false
+        onTriggered: {
+            if (restDialog.endTime === null) return
+            var diff = Math.ceil((restDialog.endTime.getTime() - Date.now()) / 1000)
+            if (diff <= 0) {
+                restDialog.remainingSeconds = 0
+                restDialog.hideDialog()
+                ActiveWorkoutService.onRestFinished()
+            } else {
+                restDialog.remainingSeconds = diff
+            }
+        }
+    }
+
+    RowLayout {
+        anchors.fill: parent
+        anchors.margins: Theme.padding.medium
+        spacing: Theme.spacing.medium
+
+        ThemedButton {
+            text: "-"
+            buttonSize: Theme.button.medium
+            buttonStyle: Theme.button.primary
+            onClicked: {
+                if (restDialog.restSeconds > 10) {
+                    restDialog.restSeconds -= 10
+                    restDialog.endTime = new Date(restDialog.endTime.getTime() - 10000)
+                }
+            }
+        }
+
+        Text {
+            Layout.fillWidth: true
+            text: {
+                var mins = Math.floor(restDialog.remainingSeconds / 60)
+                var secs = restDialog.remainingSeconds % 60
+                return (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs
+            }
+            color: Theme.colors.textPrimary
+            font.pixelSize: Theme.fontSize.huge
+            font.bold: true
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+
+        ThemedButton {
+            text: "+"
+            buttonSize: Theme.button.medium
+            buttonStyle: Theme.button.primary
+            onClicked: {
+                restDialog.restSeconds += 10
+                restDialog.endTime = new Date(restDialog.endTime.getTime() + 10000)
+            }
+        }
+
+        ThemedButton {
+            text: "OK"
+            buttonSize: Theme.button.medium
+            buttonStyle: Theme.button.success
+            onClicked: restDialog.hideDialog()
+        }
     }
 }
