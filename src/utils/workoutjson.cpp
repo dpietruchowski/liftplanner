@@ -101,7 +101,7 @@ namespace WorkoutJson
         if (json.contains("repetitions"))
             s.setRepetitions(json["repetitions"].toInt());
         if (json.contains("weight"))
-            s.setWeight(json["weight"].toInt());
+            s.setWeight(json["weight"].toDouble());
         if (json.contains("completed"))
             s.setCompleted(json["completed"].toBool());
         return s;
@@ -119,7 +119,7 @@ namespace WorkoutJson
             {
                 bool ok1 = false, ok2 = false;
                 int reps = tokens[0].trimmed().toInt(&ok1);
-                int weight = tokens[1].trimmed().toInt(&ok2);
+                double weight = tokens[1].trimmed().toDouble(&ok2);
                 if (ok1 && ok2)
                     sets.emplace_back(reps, weight);
             }

@@ -126,7 +126,7 @@ Item {
                 Text {
                     text: restDialog.timeText()
                     color: Theme.colors.textPrimary
-                    font.pixelSize: Theme.fontSize.medium
+                    font.pixelSize: Theme.fontSize.large
                     font.bold: true
                 }
 
@@ -141,7 +141,7 @@ Item {
         // === Expanded ===
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: Theme.padding.small
+            anchors.margins: Theme.padding.medium
             spacing: 0
             visible: restDialog.expanded
 

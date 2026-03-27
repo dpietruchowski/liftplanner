@@ -31,7 +31,7 @@ bool SetRepositoryDb::createTable()
         .column(Column(SetSerializer::id_key).integer().primaryKey().autoIncrement().notNull())
         .column(Column(SetSerializer::exercise_id_key).integer().notNull())
         .column(Column(SetSerializer::repetitions_key).integer())
-        .column(Column(SetSerializer::weight_key).integer())
+        .column(Column(SetSerializer::weight_key).real())
         .foreignKey(SetSerializer::exercise_id_key,
                     ExerciseSerializer::table,
                     ExerciseSerializer::id_key,

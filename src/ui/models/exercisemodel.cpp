@@ -47,7 +47,7 @@ QString ExerciseModel::setsToString() const
 {
     QStringList parts;
     for (auto *s : m_sets)
-        parts.append(QString("%1x%2kg").arg(s->repetitions()).arg(s->weight()));
+        parts.append(QString("%1x%2kg").arg(s->repetitions()).arg(QString::number(s->weight(), 'g', 6)));
     return parts.join(", ");
 }
 

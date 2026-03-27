@@ -12,7 +12,7 @@ Set SetSerializer::fromVariant(const QVariantMap &data)
     if (data.contains(repetitions_key))
         set.setRepetitions(data.value(repetitions_key).toInt());
     if (data.contains(weight_key))
-        set.setWeight(data.value(weight_key).toInt());
+        set.setWeight(data.value(weight_key).toDouble());
 
     return set;
 }

@@ -11,7 +11,7 @@ SetModel::SetModel(const Set &set, QObject *parent)
 }
 
 int SetModel::repetitions() const { return m_set.repetitions(); }
-int SetModel::weight() const { return m_set.weight(); }
+double SetModel::weight() const { return m_set.weight(); }
 bool SetModel::completed() const { return m_set.completed(); }
 
 void SetModel::setRepetitions(int value)
@@ -23,7 +23,7 @@ void SetModel::setRepetitions(int value)
     }
 }
 
-void SetModel::setWeight(int value)
+void SetModel::setWeight(double value)
 {
     if (m_set.weight() != value)
     {
