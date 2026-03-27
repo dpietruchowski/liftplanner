@@ -27,8 +27,6 @@ Rectangle {
         width: parent.width
         height: columnLayout.implicitHeight
         anchors.verticalCenter: parent.verticalCenter
-        anchors.leftMargin: Theme.padding.medium
-        anchors.rightMargin: Theme.padding.medium
 
         ColumnLayout {
             id: columnLayout
@@ -38,71 +36,193 @@ Rectangle {
             spacing: Theme.spacing.medium
             visible: PlannedWorkoutService.workouts.length > 0
 
-            Rectangle {
-                Layout.fillWidth: true
-                height: Theme.layout.cardHeight
-                radius: Theme.radius.medium
-                color: Theme.colors.surface
-
-                Column {
-                    anchors.fill: parent
-                    anchors.margins: Theme.padding.medium
-                    spacing: Theme.spacing.xsmall
-
-                    Text {
-                        text: "Your last workout"
-                        color: Theme.colors.textSecondary
-                        font.pixelSize: Theme.fontSize.medium
-                    }
-
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: root.lastWorkoutName
-                        color: Theme.colors.textPrimary
-                        font.pixelSize: Theme.fontSize.large
-                        font.bold: true
-                    }
-                }
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                height: Theme.layout.cardHeight
-                radius: Theme.radius.medium
-                color: Theme.colors.surface
-
-                Column {
-                    anchors.fill: parent
-                    anchors.margins: Theme.padding.medium
-                    spacing: Theme.spacing.xsmall
-
-                    Text {
-                        text: "Next planned"
-                        color: Theme.colors.textSecondary
-                        font.pixelSize: Theme.fontSize.medium
-                    }
-
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: root.nextWorkoutName
-                        color: Theme.colors.textPrimary
-                        font.pixelSize: Theme.fontSize.large
-                        font.bold: true
-                    }
-                }
-            }
-
-            ThemedButton {
+            // Date
+            Text {
                 Layout.alignment: Qt.AlignHCenter
-                text: "Start workout"
-                buttonSize: Theme.button.large
-                buttonStyle: Theme.button.primary
-                onClicked: {
-                    if (ActiveWorkoutService.currentWorkout) {
-                         startWorkoutPopup.open()
-                     } else {
-                         startWorkout()
-                     }
+                text: Qt.formatDate(new Date(), "dddd, d MMMM yyyy")
+                color: Theme.colors.textSecondary
+                font.pixelSize: Theme.fontSize.small
+            }
+
+            // Stat tiles
+            RowLayout {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: Theme.spacing.medium
+
+                Rectangle {
+                    width: 120
+                    height: 64
+                    radius: Theme.radius.medium
+                    color: Theme.colors.surface
+
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 2
+
+                        Text {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: PlannedWorkoutService.workouts.length
+                            color: Theme.colors.textPrimary
+                            font.pixelSize: Theme.fontSize.xlarge
+                            font.bold: true
+                        }
+
+                        Text {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: "Planned"
+                            color: Theme.colors.textSecondary
+                            font.pixelSize: Theme.fontSize.small
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: 120
+                    height: 64
+                    radius: Theme.radius.medium
+                    color: Theme.colors.surface
+
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 2
+
+                        Text {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: WorkoutHistoryService.workouts.length
+                            color: Theme.colors.textPrimary
+                            font.pixelSize: Theme.fontSize.xlarge
+                            font.bold: true
+                        }
+
+                        Text {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: "Done"
+                            color: Theme.colors.textSecondary
+                            font.pixelSize: Theme.fontSize.small
+                        }
+                    }
+                }
+            }
+
+            // Next planned (smaller)
+            Column {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 2
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "planned workout"
+                    color: Theme.colors.textSecondary
+                    font.pixelSize: Theme.fontSize.small
+                }
+
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: Theme.spacing.small
+
+                    Text {
+                        text: root.nextWorkoutName
+                        color: Theme.colors.textSecondary
+                        font.pixelSize: Theme.fontSize.medium
+                        font.bold: true
+                    }
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: PlannedWorkoutService.nextWorkout
+                              ? Qt.formatDate(PlannedWorkoutService.nextWorkout.plannedTime, "d MMM")
+                              : ""
+                        color: Theme.colors.textSecondary
+                        font.pixelSize: Theme.fontSize.small
+                    }
+                }
+            }
+
+            // Current workout (large, prominent)
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: Theme.layout.cardHeight * 1.4
+                radius: Theme.radius.large
+                color: Theme.colors.surface
+                border.width: Theme.border.medium
+                border.color: Theme.colors.primaryVariant
+
+                Column {
+                    anchors.centerIn: parent
+                    spacing: Theme.spacing.small
+
+                    Text {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: "planned workout"
+                        color: Theme.colors.textSecondary
+                        font.pixelSize: Theme.fontSize.small
+                    }
+
+                    Row {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        spacing: Theme.spacing.small
+
+                        Text {
+                            text: root.nextWorkoutName
+                            color: Theme.colors.textPrimary
+                            font.pixelSize: Theme.fontSize.xlarge
+                            font.bold: true
+                        }
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: PlannedWorkoutService.nextWorkout
+                                  ? Qt.formatDate(PlannedWorkoutService.nextWorkout.plannedTime, "d MMM")
+                                  : ""
+                            color: Theme.colors.textSecondary
+                            font.pixelSize: Theme.fontSize.medium
+                        }
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        if (ActiveWorkoutService.currentWorkout) {
+                            startWorkoutPopup.open()
+                        } else {
+                            startWorkout()
+                        }
+                    }
+                }
+            }
+
+            // Last workout (smaller)
+            Column {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 2
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "last workout"
+                    color: Theme.colors.textSecondary
+                    font.pixelSize: Theme.fontSize.small
+                }
+
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: Theme.spacing.small
+
+                    Text {
+                        text: root.lastWorkoutName
+                        color: Theme.colors.textSecondary
+                        font.pixelSize: Theme.fontSize.medium
+                        font.bold: true
+                    }
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: WorkoutHistoryService.lastWorkout
+                              ? Qt.formatDate(WorkoutHistoryService.lastWorkout.endedTime, "d MMM")
+                              : ""
+                        color: Theme.colors.textSecondary
+                        font.pixelSize: Theme.fontSize.small
+                    }
                 }
             }
         }
