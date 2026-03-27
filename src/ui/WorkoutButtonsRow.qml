@@ -9,7 +9,7 @@ RowLayout {
     spacing: Theme.spacing.medium
     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-    signal importRoutines()
+    signal importWorkouts()
 
     Item {
         Layout.fillWidth: true
@@ -19,13 +19,13 @@ RowLayout {
         text: "Prompt"
         buttonSize: Theme.button.medium
         buttonStyle: Theme.button.primary
-        onClicked: RoutineService.generateGptPrompt(WorkoutHistoryService.recentWorkoutsToJson())
+        onClicked: PlannedWorkoutService.generatePrompt()
     }
 
     ThemedButton {
         text: "Import"
         buttonSize: Theme.button.medium
         buttonStyle: Theme.button.primary
-        onClicked: importRoutines()
+        onClicked: importWorkouts()
     }
 }

@@ -12,19 +12,16 @@ Rectangle {
 
     property var lastWorkoutName: WorkoutHistoryService.lastWorkout ?
                                       WorkoutHistoryService.lastWorkout.name : "---"
-    property var nextWorkoutName: RoutineService.nextWorkout ?
-                                      RoutineService.nextWorkout.name : "---"
-
-    onLastWorkoutNameChanged: {
-        RoutineService.lastWorkoutName = lastWorkoutName
-    }
+    property var nextWorkoutName: PlannedWorkoutService.nextWorkout ?
+                                      PlannedWorkoutService.nextWorkout.name : "---"
 
     Loader {
         anchors.fill: parent
         anchors.verticalCenter: parent.verticalCenter
-        active: RoutineService.workouts.length === 0
-        sourceComponent: noRoutinesInstruction
+        active: PlannedWorkoutService.workouts.length === 0
+        sourceComponent: noPlannedInstruction
     }
+
     Item {
         id: wrapper
         width: parent.width
@@ -39,7 +36,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacing.medium
-            visible: RoutineService.workouts.length > 0
+            visible: PlannedWorkoutService.workouts.length > 0
 
             Rectangle {
                 Layout.fillWidth: true
@@ -80,7 +77,7 @@ Rectangle {
                     spacing: Theme.spacing.xsmall
 
                     Text {
-                        text: "Next"
+                        text: "Next planned"
                         color: Theme.colors.textSecondary
                         font.pixelSize: Theme.fontSize.medium
                     }
@@ -122,16 +119,17 @@ Rectangle {
     }
 
     function startWorkout() {
-        if (!RoutineService.nextWorkout)
+        if (!PlannedWorkoutService.nextWorkout)
             return
-        ActiveWorkoutService.startWorkout(RoutineService.nextWorkout)
+        ActiveWorkoutService.startWorkout(PlannedWorkoutService.nextWorkout)
+        PlannedWorkoutService.loadAll()
         if (stackView.currentItem !== activeWorkoutScreen) {
             stackView.replace(activeWorkoutScreen)
         }
     }
 
     Component {
-        id: noRoutinesInstruction
+        id: noPlannedInstruction
 
         Rectangle {
             radius: Theme.radius.medium
@@ -139,12 +137,12 @@ Rectangle {
 
             Text {
                 anchors.fill: parent
-                text: "You don't have any routines yet.\n\n" +
-                      "Go to the 'Routines' tab and click the 'Prompt' button. " +
-                      "The prompt for the language model will be copied to your clipboard. " +
+                text: "You don't have any planned workouts yet.\n\n" +
+                      "Go to the 'Planned' tab and click 'Prompt'. " +
+                      "The prompt will be copied to your clipboard. " +
                       "Paste it into any AI (ChatGPT, Gemini, etc.) and discuss your training goals. " +
-                      "Once the AI generates a workout in JSON format, copy it to your clipboard and return to this app. " +
-                      "In the 'Routines' tab, click the 'Import' button. Your routines should now be imported."
+                      "Once the AI generates workouts in JSON format, copy the JSON and return to this app. " +
+                      "In the 'Planned' tab, click 'Import' to add your workouts."
                 color: Theme.colors.textPrimary
                 font.pixelSize: Theme.fontSize.medium
                 wrapMode: Text.WordWrap

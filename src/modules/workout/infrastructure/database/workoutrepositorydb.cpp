@@ -191,6 +191,16 @@ Where WorkoutRepositoryDb::buildWhereClause(const WorkoutQuery &query) const
         where = where.isEmpty() ? stWhere : where.and_(stWhere);
     }
 
+    if (query.plannedTimeIsNull().has_value())
+    {
+        Where ptWhere;
+        if (query.plannedTimeIsNull().value())
+            ptWhere = Where(WorkoutSerializer::planned_time_key).isNull();
+        else
+            ptWhere = Where(WorkoutSerializer::planned_time_key).isNotNull();
+        where = where.isEmpty() ? ptWhere : where.and_(ptWhere);
+    }
+
     return where;
 }
 
@@ -216,6 +226,20 @@ Order WorkoutRepositoryDb::buildOrderClause(const WorkoutQuery &query) const
             stOrder.desc();
         order = order.isEmpty() ? stOrder : order.then(WorkoutSerializer::started_time_key);
         if (query.orderByStartedTimeDirection().value() == SortDirection::Ascending)
+            order.asc();
+        else
+            order.desc();
+    }
+
+    if (query.orderByPlannedTimeDirection().has_value())
+    {
+        auto ptOrder = Order(WorkoutSerializer::planned_time_key);
+        if (query.orderByPlannedTimeDirection().value() == SortDirection::Ascending)
+            ptOrder.asc();
+        else
+            ptOrder.desc();
+        order = order.isEmpty() ? ptOrder : order.then(WorkoutSerializer::planned_time_key);
+        if (query.orderByPlannedTimeDirection().value() == SortDirection::Ascending)
             order.asc();
         else
             order.desc();

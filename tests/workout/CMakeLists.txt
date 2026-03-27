@@ -6,6 +6,7 @@ set(TEST_SOURCES
     infrastructure/serializers/exerciseserializertest.cpp
     infrastructure/serializers/setserializertest.cpp
     infrastructure/database/workoutrepositorydbtest.cpp
+    application/workoutservicetest.cpp
 )
 
 add_executable(workout_tests ${TEST_SOURCES})

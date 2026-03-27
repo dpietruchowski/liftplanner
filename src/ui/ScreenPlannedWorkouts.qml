@@ -9,12 +9,12 @@ Rectangle {
     color: Theme.colors.background
     property var currentWorkout
 
-    Component.onCompleted: RoutineService.loadAllWorkouts()
+    Component.onCompleted: PlannedWorkoutService.loadAll()
 
     WorkoutListView {
         anchors.fill: parent
-        workouts: RoutineService.workouts
-        workoutDelegate: RoutineItem {
+        workouts: PlannedWorkoutService.workouts
+        workoutDelegate: PlannedWorkoutItem {
             workout: modelData
             onStartWorkoutRequest: function(workout) {
                 root.currentWorkout = workout
@@ -26,7 +26,7 @@ Rectangle {
             }
         }
         buttonsRow: WorkoutButtonsRow {
-            onImportRoutines: importRoutinesPopup.open()
+            onImportWorkouts: importPopup.open()
         }
     }
 
@@ -34,6 +34,7 @@ Rectangle {
         if (!currentWorkout)
             return
         ActiveWorkoutService.startWorkout(currentWorkout)
+        PlannedWorkoutService.loadAll()
         if (stackView.currentItem !== activeWorkoutScreen) {
             stackView.replace(activeWorkoutScreen)
         }
@@ -50,12 +51,12 @@ Rectangle {
     }
 
     NotificationPopup {
-        id: importRoutinesPopup
-        text: "Do you want to import new routines?"
+        id: importPopup
+        text: "Do you want to import new planned workouts?"
         type: Notification.Type.Warning
         buttons: Notification.Button.Ok | Notification.Button.Cancel
         onAccepted: {
-            RoutineService.importWorkoutsFromClipboard()
+            PlannedWorkoutService.importFromClipboard()
         }
     }
 }

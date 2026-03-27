@@ -242,3 +242,95 @@ TEST_F(WorkoutRepositoryDbTest, Remove_CascadesDeleteToChildren)
     ASSERT_TRUE(found.has_value());
     EXPECT_EQ(found->exercises().size(), 2u);
 }
+
+TEST_F(WorkoutRepositoryDbTest, PlannedTimeFilter_FindsPlannedWorkouts)
+{
+    Workout planned = makeWorkout("Planned");
+    planned.setPlannedTime(QDateTime::currentDateTime().addDays(1));
+    m_repo->save(planned);
+
+    Workout noPlanned = makeWorkout("NoPlanned");
+    m_repo->save(noPlanned);
+
+    auto withPlanned = m_repo->findAll(WorkoutQuery().wherePlannedTimeIsNotNull());
+    EXPECT_EQ(withPlanned.size(), 1u);
+    EXPECT_EQ(withPlanned[0].name(), "Planned");
+
+    auto withoutPlanned = m_repo->findAll(WorkoutQuery().wherePlannedTimeIsNull());
+    EXPECT_EQ(withoutPlanned.size(), 1u);
+    EXPECT_EQ(withoutPlanned[0].name(), "NoPlanned");
+}
+
+TEST_F(WorkoutRepositoryDbTest, OrderByPlannedTime_Ascending)
+{
+    Workout w1 = makeWorkout("Later");
+    w1.setPlannedTime(QDateTime::currentDateTime().addDays(3));
+    m_repo->save(w1);
+
+    Workout w2 = makeWorkout("Sooner");
+    w2.setPlannedTime(QDateTime::currentDateTime().addDays(1));
+    m_repo->save(w2);
+
+    Workout w3 = makeWorkout("Middle");
+    w3.setPlannedTime(QDateTime::currentDateTime().addDays(2));
+    m_repo->save(w3);
+
+    auto results = m_repo->findAll(WorkoutQuery().orderByPlannedTime(SortDirection::Ascending));
+    ASSERT_EQ(results.size(), 3u);
+    EXPECT_EQ(results[0].name(), "Sooner");
+    EXPECT_EQ(results[1].name(), "Middle");
+    EXPECT_EQ(results[2].name(), "Later");
+}
+
+TEST_F(WorkoutRepositoryDbTest, OrderByPlannedTime_Descending)
+{
+    Workout w1 = makeWorkout("Later");
+    w1.setPlannedTime(QDateTime::currentDateTime().addDays(3));
+    m_repo->save(w1);
+
+    Workout w2 = makeWorkout("Sooner");
+    w2.setPlannedTime(QDateTime::currentDateTime().addDays(1));
+    m_repo->save(w2);
+
+    auto results = m_repo->findAll(WorkoutQuery().orderByPlannedTime(SortDirection::Descending));
+    ASSERT_EQ(results.size(), 2u);
+    EXPECT_EQ(results[0].name(), "Later");
+    EXPECT_EQ(results[1].name(), "Sooner");
+}
+
+TEST_F(WorkoutRepositoryDbTest, PlannedVsStarted_SeparatesCorrectly)
+{
+    Workout planned = makeWorkout("Planned Day");
+    planned.setPlannedTime(QDateTime::currentDateTime().addDays(1));
+    m_repo->save(planned);
+
+    Workout started = makeWorkout("Started Day");
+    started.setStartedTime(QDateTime::currentDateTime());
+    m_repo->save(started);
+
+    Workout both = makeWorkout("Was Planned Now Started");
+    both.setPlannedTime(QDateTime::currentDateTime().addDays(-1));
+    both.setStartedTime(QDateTime::currentDateTime());
+    m_repo->save(both);
+
+    // Planned = startedTime IS NULL (not yet started)
+    auto plannedResults = m_repo->findAll(WorkoutQuery().whereStartedTimeIsNull());
+    EXPECT_EQ(plannedResults.size(), 1u);
+    EXPECT_EQ(plannedResults[0].name(), "Planned Day");
+
+    // History = startedTime IS NOT NULL
+    auto historyResults = m_repo->findAll(WorkoutQuery().whereStartedTimeIsNotNull());
+    EXPECT_EQ(historyResults.size(), 2u);
+}
+
+TEST_F(WorkoutRepositoryDbTest, Save_PreservesPlannedTime)
+{
+    QDateTime plannedTime = QDateTime::currentDateTime().addDays(5);
+    Workout w = makeWorkout("Future Workout");
+    w.setPlannedTime(plannedTime);
+    int id = m_repo->save(w);
+
+    auto found = m_repo->findOne(WorkoutQuery().whereId(id));
+    ASSERT_TRUE(found.has_value());
+    EXPECT_EQ(found->plannedTime().toString(Qt::ISODate), plannedTime.toString(Qt::ISODate));
+}

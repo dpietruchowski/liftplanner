@@ -6,6 +6,8 @@
 #include "ui/models/setmodel.h"
 #include "utils/serializationutils.h"
 
+class WorkoutService;
+
 class ActiveWorkoutViewModel : public QObject
 {
     Q_OBJECT
@@ -15,7 +17,7 @@ class ActiveWorkoutViewModel : public QObject
     DECLARE_PROPERTY(bool, isActive, setIsActive)
 
 public:
-    explicit ActiveWorkoutViewModel(QObject *parent = nullptr);
+    explicit ActiveWorkoutViewModel(WorkoutService *service, QObject *parent = nullptr);
     ~ActiveWorkoutViewModel();
 
     void saveCurrentWorkout();
@@ -38,4 +40,7 @@ private:
     void saveCompletedSet();
     void updateCurrentExercise();
     void updateCurrentSet();
+    void saveToDb();
+
+    WorkoutService *m_service;
 };

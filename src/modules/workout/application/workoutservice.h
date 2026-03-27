@@ -12,10 +12,10 @@ class WorkoutService
 public:
     explicit WorkoutService(WorkoutRepository &repository);
 
-    // Routines (workout templates, not yet started)
-    std::vector<Workout> loadRoutines() const;
-    void importRoutines(const std::vector<Workout> &workouts);
-    void removeAllRoutines();
+    // Planned workouts (not yet started, ordered by plannedTime)
+    std::vector<Workout> loadPlannedWorkouts() const;
+    void importPlannedWorkouts(const std::vector<Workout> &workouts);
+    void removeAllPlannedWorkouts();
 
     // History (started/completed workouts)
     std::vector<Workout> loadHistory() const;

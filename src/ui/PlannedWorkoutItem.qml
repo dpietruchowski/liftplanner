@@ -14,7 +14,7 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        Layout.preferredHeight: Theme.layout.listItemHeight
+        Layout.preferredHeight: Theme.layout.listItemHeightLarge
         radius: Theme.radius.medium
         color: Theme.colors.surface
         border.color: Theme.colors.primary
@@ -33,14 +33,24 @@ ColumnLayout {
                 onClicked: expanded = !expanded
             }
 
-            Text {
-                text: workout.name
-                font.pixelSize: Theme.fontSize.medium
-                font.bold: true
-                color: Theme.colors.textPrimary
+            Column {
                 Layout.fillWidth: true
-                elide: Text.ElideRight
-                verticalAlignment: Text.AlignVCenter
+
+                Text {
+                    text: workout.name
+                    font.pixelSize: Theme.fontSize.medium
+                    font.bold: true
+                    color: Theme.colors.textPrimary
+                    elide: Text.ElideRight
+                    width: parent.width
+                }
+
+                Text {
+                    text: Qt.formatDateTime(workout.plannedTime, "ddd, d MMM yyyy")
+                    font.pixelSize: Theme.fontSize.small
+                    color: Theme.colors.textSecondary
+                    visible: text.length > 0
+                }
             }
 
             ThemedButton {

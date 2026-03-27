@@ -7,21 +7,22 @@ WorkoutService::WorkoutService(WorkoutRepository &repository)
 {
 }
 
-std::vector<Workout> WorkoutService::loadRoutines() const
+std::vector<Workout> WorkoutService::loadPlannedWorkouts() const
 {
     WorkoutQuery query;
     query.whereStartedTimeIsNull();
+    query.orderByPlannedTime(SortDirection::Ascending);
     return m_repository.findAll(query);
 }
 
-void WorkoutService::importRoutines(const std::vector<Workout> &workouts)
+void WorkoutService::importPlannedWorkouts(const std::vector<Workout> &workouts)
 {
-    removeAllRoutines();
+    removeAllPlannedWorkouts();
     for (const auto &workout : workouts)
         m_repository.save(workout);
 }
 
-void WorkoutService::removeAllRoutines()
+void WorkoutService::removeAllPlannedWorkouts()
 {
     WorkoutQuery query;
     query.whereStartedTimeIsNull();

@@ -9,7 +9,7 @@ Item {
 
     property var activeWorkoutScreen: ScreenActiveWorkout {}
     property var homeScreen: ScreenHome {}
-    property var routinesScreen: ScreenRoutines {}
+    property var plannedScreen: ScreenPlannedWorkouts {}
     property var historyScreen: ScreenHistory {}
 
     StackView {
@@ -33,19 +33,19 @@ Item {
     }
 
     Connections {
-        target: RoutineService
+        target: PlannedWorkoutService
         function onErrorOccurred(error) {
             notificationPopup.type = Notification.Type.Error
             notificationPopup.text = error
             notificationPopup.open()
         }
 
-        function onGptPromptGenerated() {
+        function onPromptGenerated() {
             notificationPopup.type = Notification.Type.Info
             notificationPopup.text =
                 "Prompt copied to clipboard.\n\n" +
-                "Use this prompt in an AI (ChatGPT, Gemini, etc.) to generate a workout in JSON. " +
-                "Then copy the generated JSON and click the 'Import' button in routines to add it."
+                "Paste it into any AI (ChatGPT, Gemini, etc.) and discuss your training plan. " +
+                "Then copy the generated JSON and click the 'Import' button to add planned workouts."
             notificationPopup.open()
         }
     }
@@ -57,7 +57,7 @@ Item {
         model: [
             { label: "Workout", screen: activeWorkoutScreen, icon: Theme.icons.barbell },
             { label: "Home", screen: homeScreen, icon: Theme.icons.home },
-            { label: "Routines", screen: routinesScreen, icon: Theme.icons.routines },
+            { label: "Planned", screen: plannedScreen, icon: Theme.icons.planned },
             { label: "History", screen: historyScreen, icon: Theme.icons.calendar }
         ]
     }

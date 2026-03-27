@@ -6,9 +6,10 @@
 #include <QJsonObject>
 #include <QStandardPaths>
 #include "utils/workoutjson.h"
+#include "modules/workout/application/workoutservice.h"
 
-ActiveWorkoutViewModel::ActiveWorkoutViewModel(QObject *parent)
-    : QObject(parent), m_currentWorkout(nullptr), m_currentExercise(nullptr),
+ActiveWorkoutViewModel::ActiveWorkoutViewModel(WorkoutService *service, QObject *parent)
+    : QObject(parent), m_service(service), m_currentWorkout(nullptr), m_currentExercise(nullptr),
       m_currentSet(nullptr), m_isActive(false)
 {
     connect(this,
@@ -55,6 +56,8 @@ void ActiveWorkoutViewModel::saveCurrentWorkout()
         file.write(doc.toJson());
         file.close();
     }
+
+    saveToDb();
 }
 
 void ActiveWorkoutViewModel::loadCurrentWorkout()
@@ -170,21 +173,21 @@ void ActiveWorkoutViewModel::navigateToPrevious()
 
 void ActiveWorkoutViewModel::endWorkout()
 {
-    if (m_currentWorkout)
-    {
-        m_currentWorkout->setEndedTime(QDateTime::currentDateTime());
-        emit workoutCompleted();
-    }
+    if (!m_currentWorkout)
+        return;
+
+    m_currentWorkout->setEndedTime(QDateTime::currentDateTime());
+    saveToDb();
+    emit workoutCompleted();
+
+    auto *oldWorkout = m_currentWorkout;
 
     setIsActive(false);
     setCurrentWorkout(nullptr);
     setCurrentExercise(nullptr);
     setCurrentSet(nullptr);
 
-    if (m_currentWorkout)
-    {
-        m_currentWorkout->deleteLater();
-    }
+    oldWorkout->deleteLater();
 }
 
 void ActiveWorkoutViewModel::duplicateSet(SetModel *set)
@@ -273,4 +276,12 @@ void ActiveWorkoutViewModel::updateCurrentSet()
     }
 
     setCurrentSet(m_currentExercise->sets().first());
+}
+
+void ActiveWorkoutViewModel::saveToDb()
+{
+    if (!m_service || !m_currentWorkout)
+        return;
+
+    m_service->saveWorkout(m_currentWorkout->toEntity());
 }
