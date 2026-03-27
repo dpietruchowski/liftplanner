@@ -19,6 +19,7 @@ public:
 
     // History (started/completed workouts)
     std::vector<Workout> loadHistory() const;
+    void importHistory(const std::vector<Workout> &workouts);
 
     // General CRUD
     std::optional<Workout> findWorkout(int id) const;

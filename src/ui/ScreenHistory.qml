@@ -18,13 +18,27 @@ Rectangle {
 
             onDeleteWorkout: function(workout) {
                 root.workoutToDelete = workout
-                endWorkoutPopup.open()
+                deletePopup.open()
+            }
+        }
+        buttonsRow: RowLayout {
+            Layout.fillWidth: true
+            spacing: Theme.spacing.medium
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+            Item { Layout.fillWidth: true }
+
+            ThemedButton {
+                text: "Import"
+                buttonSize: Theme.button.medium
+                buttonStyle: Theme.button.primary
+                onClicked: importPopup.open()
             }
         }
     }
 
     NotificationPopup {
-        id: endWorkoutPopup
+        id: deletePopup
         text: "Do you want to delete workout?"
         type: Notification.Type.Info
         buttons: Notification.Button.Ok | Notification.Button.Cancel
@@ -33,6 +47,16 @@ Rectangle {
                 WorkoutHistoryService.deleteWorkout(root.workoutToDelete)
                 root.workoutToDelete = null
             }
+        }
+    }
+
+    NotificationPopup {
+        id: importPopup
+        text: "Import workout history from clipboard?"
+        type: Notification.Type.Info
+        buttons: Notification.Button.Ok | Notification.Button.Cancel
+        onAccepted: {
+            WorkoutHistoryService.importFromClipboard()
         }
     }
 }

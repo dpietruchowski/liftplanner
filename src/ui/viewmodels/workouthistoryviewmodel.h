@@ -6,6 +6,9 @@
 #include <QObject>
 #include "ui/models/workoutmodel.h"
 #include "utils/serializationutils.h"
+#include <QClipboard>
+#include <QGuiApplication>
+#include <QJsonDocument>
 
 class WorkoutService;
 
@@ -22,6 +25,8 @@ public:
     Q_INVOKABLE void loadAllWorkouts();
     Q_INVOKABLE void saveWorkout(WorkoutModel *workout);
     Q_INVOKABLE void deleteWorkout(WorkoutModel *workout);
+    Q_INVOKABLE void importFromJson(const QString &jsonData);
+    Q_INVOKABLE void importFromClipboard();
 
     Q_INVOKABLE QJsonArray recentWorkoutsToJson(int count = 10);
 

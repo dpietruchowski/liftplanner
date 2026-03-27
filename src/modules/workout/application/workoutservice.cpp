@@ -38,6 +38,19 @@ std::vector<Workout> WorkoutService::loadHistory() const
     return m_repository.findAll(query);
 }
 
+void WorkoutService::importHistory(const std::vector<Workout> &workouts)
+{
+    for (auto workout : workouts)
+    {
+        workout.setStatus(WorkoutStatus::Ended);
+        if (!workout.startedTime().isValid())
+            workout.setStartedTime(QDateTime::currentDateTime());
+        if (!workout.endedTime().isValid())
+            workout.setEndedTime(QDateTime::currentDateTime());
+        m_repository.save(workout);
+    }
+}
+
 std::optional<Workout> WorkoutService::findWorkout(int id) const
 {
     WorkoutQuery query;

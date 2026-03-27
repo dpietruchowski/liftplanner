@@ -16,3 +16,4 @@
 ## P4 (Lowest Priority)
 1. Dodać możliwość doawania ćwiczeń
 2. Dodać animacje przy rozwijaniu/zwijaniu
+3. Dodać kalendarz

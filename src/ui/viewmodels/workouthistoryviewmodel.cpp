@@ -68,3 +68,45 @@ WorkoutModel *WorkoutHistoryViewModel::lastWorkout() const
 
     return m_workouts.first();
 }
+
+void WorkoutHistoryViewModel::importFromJson(const QString &jsonData)
+{
+    try
+    {
+        QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
+        if (doc.isNull() || !doc.isArray())
+        {
+            emit errorOccurred("Import failed: invalid JSON");
+            return;
+        }
+
+        auto workouts = WorkoutJson::workoutsFromJsonArray(doc.array());
+        m_service->importHistory(workouts);
+        loadAllWorkouts();
+    }
+    catch (const std::exception &e)
+    {
+        emit errorOccurred(QString("Import failed: %1").arg(e.what()));
+    }
+}
+
+void WorkoutHistoryViewModel::importFromClipboard()
+{
+    try
+    {
+        QClipboard *clipboard = QGuiApplication::clipboard();
+        QString jsonData = clipboard->text();
+
+        if (jsonData.isEmpty())
+        {
+            emit errorOccurred("Clipboard is empty");
+            return;
+        }
+
+        importFromJson(jsonData);
+    }
+    catch (const std::exception &e)
+    {
+        emit errorOccurred(QString("Import from clipboard failed: %1").arg(e.what()));
+    }
+}
