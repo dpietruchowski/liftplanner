@@ -16,7 +16,7 @@ Rectangle {
 
     visible: dialogVisible
     width: parent.width
-    height: 120
+    height: Theme.layout.dialogBarHeight
     anchors.bottom: parent.bottom
     color: Theme.colors.dialogSurface
     radius: Theme.radius.medium

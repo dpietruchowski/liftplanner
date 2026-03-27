@@ -122,7 +122,7 @@ Rectangle {
 
         Rectangle {
             anchors.fill: parent
-            color: "#000000C0"
+            color: Theme.colors.overlay
 
             MouseArea {
                 anchors.fill: parent
@@ -137,7 +137,7 @@ Rectangle {
             anchors.bottom: parent.bottom
             step: 1
 
-            onConfirmed: {
+            onConfirmed: function(value) {
                 if (currentSetter) {
                     currentSetter(value)
                 }

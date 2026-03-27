@@ -43,14 +43,14 @@ Rectangle {
 
             Rectangle {
                 Layout.fillWidth: true
-                height: 100
+                height: Theme.layout.cardHeight
                 radius: Theme.radius.medium
                 color: Theme.colors.surface
 
                 Column {
                     anchors.fill: parent
                     anchors.margins: Theme.padding.medium
-                    spacing: 4
+                    spacing: Theme.spacing.xsmall
 
                     Text {
                         text: "Your last workout"
@@ -70,14 +70,14 @@ Rectangle {
 
             Rectangle {
                 Layout.fillWidth: true
-                height: 100
+                height: Theme.layout.cardHeight
                 radius: Theme.radius.medium
                 color: Theme.colors.surface
 
                 Column {
                     anchors.fill: parent
                     anchors.margins: Theme.padding.medium
-                    spacing: 4
+                    spacing: Theme.spacing.xsmall
 
                     Text {
                         text: "Next"

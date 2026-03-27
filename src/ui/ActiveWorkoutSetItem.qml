@@ -12,10 +12,10 @@ Rectangle {
     signal editWeight(var setData)
 
     width: setsColumn.width
-    height: actionsVisible ? 100 : 60
+    height: actionsVisible ? Theme.layout.cardHeight : Theme.layout.listItemHeight
     radius: Theme.radius.medium
     color: setData.completed ? Theme.colors.success : Theme.colors.surface
-    border.width: ActiveWorkoutService.currentSet === setData ? 3 : 1
+    border.width: ActiveWorkoutService.currentSet === setData ? Theme.border.thick : Theme.border.thin
     border.color: ActiveWorkoutService.currentSet === setData ? Theme.colors.primaryVariant : Theme.colors.border
 
     Behavior on color { ColorAnimation { duration: 200 } }
@@ -33,7 +33,7 @@ Rectangle {
         RowLayout {
             id: mainRow
             width: parent.width
-            height: 60
+            height: Theme.layout.listItemHeight
             spacing: Theme.spacing.medium
             anchors.left: parent.left
             anchors.right: parent.right
@@ -93,12 +93,12 @@ Rectangle {
             }
 
             Rectangle {
-                width: 20
-                height: 20
-                radius: 10
+                width: Theme.layout.indicatorSize
+                height: Theme.layout.indicatorSize
+                radius: Theme.layout.indicatorSize / 2
                 color: setData.completed ? Theme.colors.buttonText : "transparent"
                 border.color: setData.completed ? Theme.colors.success : Theme.colors.border
-                border.width: 2
+                border.width: Theme.border.medium
                 Layout.alignment: Qt.AlignVCenter
 
                 MouseArea {

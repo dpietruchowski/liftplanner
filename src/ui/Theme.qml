@@ -31,6 +31,7 @@ QtObject {
         property color textPlaceholder: "#666666"
         property color buttonText: "#FFFFFF"
         property color overlay: "#000000A0"
+        property color overlayLight: "#80000000"
     }
 
     property var fontSize: QtObject {
@@ -48,12 +49,14 @@ QtObject {
     }
 
     property var padding: QtObject {
+        property int xsmall: 4
         property int small: 6
         property int medium: 12
         property int large: 18
     }
 
     property var spacing: QtObject {
+        property int xsmall: 4
         property int small: 6
         property int medium: 12
         property int large: 18
@@ -62,6 +65,7 @@ QtObject {
     property var border: QtObject {
         property int thin: 1
         property int medium: 2
+        property int thick: 3
     }
 
     property var card: QtObject {
@@ -69,6 +73,20 @@ QtObject {
     }
 
     property real dialogOpacity: 0.98
+
+    property var layout: QtObject {
+        property int navBarHeight: 60
+        property int navItemWidth: 70
+        property int navItemHeight: 50
+        property int navBarSpacing: 24
+        property int listItemHeight: 50
+        property int listItemHeightLarge: 56
+        property int cardHeight: 100
+        property int dialogBarHeight: 120
+        property int indicatorSize: 20
+        property int iconSizeLarge: 48
+        property int exerciseItemHeight: 25
+    }
 
     property var icons: QtObject {
         property string search: "qrc:/LiftPlanner/ui/icons/search.svg"

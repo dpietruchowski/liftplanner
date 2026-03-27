@@ -15,11 +15,11 @@ Column {
 
     Rectangle {
         width: exerciseDelegate.width
-        height: 50
+        height: Theme.layout.listItemHeight
         radius: Theme.radius.medium
         color: Theme.colors.primary
         border.color: exercise.completed ? Theme.colors.success : Theme.colors.border
-        border.width: 2
+        border.width: Theme.border.medium
 
         Text {
             text: exercise.name

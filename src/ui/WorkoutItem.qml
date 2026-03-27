@@ -15,11 +15,11 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        Layout.preferredHeight: 56
+        Layout.preferredHeight: Theme.layout.listItemHeightLarge
         radius: Theme.radius.medium
         color: Theme.colors.surface
         border.color: Theme.colors.primary
-        border.width: 1
+        border.width: Theme.border.thin
 
         RowLayout {
             anchors.fill: parent
@@ -71,7 +71,7 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        height: 1
+        height: Theme.border.thin
         color: Theme.colors.border
     }
 }

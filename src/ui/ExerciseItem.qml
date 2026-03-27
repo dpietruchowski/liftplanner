@@ -7,7 +7,7 @@ import Themed.Components
 Rectangle {
     id: root
     Layout.fillWidth: true
-    Layout.preferredHeight: 25
+    Layout.preferredHeight: Theme.layout.exerciseItemHeight
     radius: Theme.radius.medium / 2
     color: Theme.colors.background
     anchors.leftMargin: Theme.padding.medium

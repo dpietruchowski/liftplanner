@@ -37,7 +37,7 @@ Popup {
     }
 
     Overlay.modal: Rectangle {
-        color: "#80000000"
+        color: Theme.colors.overlayLight
     }
 
     ColumnLayout {
@@ -65,8 +65,8 @@ Popup {
                     default: return Theme.colors.info
                 }
             }
-            width: 48
-            height: 48
+            width: Theme.layout.iconSizeLarge
+            height: Theme.layout.iconSizeLarge
         }
 
         Text {

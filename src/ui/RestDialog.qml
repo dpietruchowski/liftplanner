@@ -13,7 +13,7 @@ Rectangle {
 
     visible: dialogVisible
     width: parent.width
-    height: 120
+    height: Theme.layout.dialogBarHeight
     anchors.top: parent.top
     color: Theme.colors.dialogSurface
     radius: Theme.radius.medium
@@ -46,7 +46,6 @@ Rectangle {
             if (diff <= 0) {
                 restDialog.remainingSeconds = 0
                 restDialog.hideDialog()
-                ActiveWorkoutService.onRestFinished()
             } else {
                 restDialog.remainingSeconds = diff
             }

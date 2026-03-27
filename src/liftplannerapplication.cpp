@@ -28,7 +28,7 @@ void LiftPlannerApplication::registerQmlTypes(QmlRegistrator &registrator)
 {
     registrator.registerEnums(Notification::staticMetaObject, "Notification");
 
-    registrator.registerType<ColoredSvgProvider>("ColoredSvgProvider");
+    registrator.registerType<ColoredSvgProvider>("Themed.Components", "ColoredSvgProvider");
 
     registrator.registerSingletonInstance("RoutineService", m_routineViewModel.get());
     registrator.registerSingletonInstance("ActiveWorkoutService", m_activeWorkoutViewModel.get());
@@ -36,4 +36,5 @@ void LiftPlannerApplication::registerQmlTypes(QmlRegistrator &registrator)
     registrator.registerSingletonInstance("ClipboardHelper", m_clipboardHelper.get());
 
     registrator.registerSingletonType("Theme.qml", "Theme");
+    registrator.registerSingletonType("Themed.Components", "Theme.qml", "Theme");
 }

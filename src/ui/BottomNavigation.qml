@@ -5,7 +5,7 @@ import Themed.Components
 
 Rectangle {
     id: bottomNav
-    height: 60
+    height: Theme.layout.navBarHeight
     color: Theme.colors.surface
 
     property var model: []
@@ -14,13 +14,13 @@ Rectangle {
 
     Row {
         anchors.centerIn: parent
-        spacing: 25
+        spacing: Theme.layout.navBarSpacing
 
         Repeater {
             model: bottomNav.model
             delegate: Rectangle {
-                width: 70
-                height: 50
+                width: Theme.layout.navItemWidth
+                height: Theme.layout.navItemHeight
                 color: "transparent"
 
                 property bool active: stackView.currentItem === modelData.screen
@@ -38,6 +38,7 @@ Rectangle {
                     Text {
                         text: modelData.label
                         color: textColor
+                        font.pixelSize: Theme.fontSize.small
                         font.bold: active === index
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
