@@ -40,6 +40,9 @@ Makefile
 # QML cache
 .qmlcache/
 
+# Database files
+*.db
+
 .vscode/
 
 *.keystore

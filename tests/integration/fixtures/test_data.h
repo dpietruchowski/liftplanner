@@ -5,7 +5,7 @@
 namespace TestData
 {
 
-inline const QString THREE_WORKOUTS_JSON = R"([
+    inline const QString THREE_WORKOUTS_JSON = R"([
     {
         "name": "Push Day",
         "exercises": [
@@ -65,7 +65,7 @@ inline const QString THREE_WORKOUTS_JSON = R"([
     }
 ])";
 
-inline const QString SINGLE_WORKOUT_JSON = R"([
+    inline const QString SINGLE_WORKOUT_JSON = R"([
     {
         "name": "Full Body",
         "exercises": [
@@ -87,7 +87,7 @@ inline const QString SINGLE_WORKOUT_JSON = R"([
     }
 ])";
 
-inline const QString EMPTY_WORKOUT_JSON = R"([
+    inline const QString EMPTY_WORKOUT_JSON = R"([
     {
         "name": "Rest Day",
         "exercises": []

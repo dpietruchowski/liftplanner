@@ -18,17 +18,17 @@ Rectangle {
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: root.value
-            color: Theme.colors.textPrimary
-            font.pixelSize: Theme.fontSize.xlarge
-            font.bold: true
+            text: root.label
+            color: Theme.colors.textSecondary
+            font.pixelSize: Theme.fontSize.small
         }
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: root.label
-            color: Theme.colors.textSecondary
-            font.pixelSize: Theme.fontSize.small
+            text: root.value
+            color: Theme.colors.textPrimary
+            font.pixelSize: Theme.fontSize.xlarge
+            font.bold: true
         }
     }
 }

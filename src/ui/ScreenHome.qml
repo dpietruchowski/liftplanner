@@ -10,10 +10,6 @@ Rectangle {
 
     anchors.margins: Theme.padding.medium
 
-    property var lastWorkoutName: WorkoutHistoryService.lastWorkout ?
-                                      WorkoutHistoryService.lastWorkout.name : "---"
-    property var nextWorkoutName: PlannedWorkoutService.nextWorkout ?
-                                      PlannedWorkoutService.nextWorkout.name : "---"
 
     Loader {
         anchors.fill: parent
@@ -36,13 +32,13 @@ Rectangle {
             spacing: Theme.spacing.medium
 
             StatTile {
-                label: "Planned"
-                value: PlannedWorkoutService.workouts.length
+                label: "Done"
+                value: WorkoutHistoryService.workouts.length
             }
 
             StatTile {
-                label: "Done"
-                value: WorkoutHistoryService.workouts.length
+                label: "Planned"
+                value: PlannedWorkoutService.workouts.length
             }
         }
 
@@ -51,10 +47,7 @@ Rectangle {
             Layout.fillWidth: true
             implicitHeight: Theme.layout.cardHeight
             label: "planned workout"
-            workoutName: root.nextWorkoutName
-            dateText: PlannedWorkoutService.nextWorkout
-                      ? Qt.formatDate(PlannedWorkoutService.nextWorkout.plannedTime, "d MMM")
-                      : ""
+            workout: PlannedWorkoutService.nextWorkout
         }
 
         // Current workout (large, prominent)
@@ -63,22 +56,9 @@ Rectangle {
             implicitHeight: Theme.layout.cardHeight * 1.4
             cardVisible: true
             label: "current workout"
-            workoutName: ActiveWorkoutService.currentWorkout
-                         ? ActiveWorkoutService.currentWorkout.name : "-"
             nameSize: Theme.fontSize.xlarge
             nameColor: Theme.colors.textPrimary
-            dateText: Qt.formatDate(new Date(), "d MMM")
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    if (ActiveWorkoutService.currentWorkout) {
-                        startWorkoutPopup.open()
-                    } else {
-                        startWorkout()
-                    }
-                }
-            }
+            workout: ActiveWorkoutService.currentWorkout
         }
 
         // Last workout (smaller)
@@ -86,10 +66,24 @@ Rectangle {
             Layout.fillWidth: true
             implicitHeight: Theme.layout.cardHeight
             label: "last workout"
-            workoutName: root.lastWorkoutName
-            dateText: WorkoutHistoryService.lastWorkout
-                      ? Qt.formatDate(WorkoutHistoryService.lastWorkout.endedTime, "d MMM")
-                      : ""
+            workout: WorkoutHistoryService.lastWorkout
+        }
+    }
+
+    ThemedButton {
+        buttonSize: Theme.button.large
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: Theme.padding.medium
+        text: "Start workout"
+        visible: PlannedWorkoutService.workouts.length > 0
+
+        onClicked: {
+            if (ActiveWorkoutService.currentWorkout) {
+                startWorkoutPopup.open()
+            } else {
+                startWorkout()
+            }
         }
     }
 
