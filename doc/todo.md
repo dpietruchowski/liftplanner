@@ -1,8 +1,7 @@
 # TODO List
 
 ## P1 (Highest Priority)
-1. Zmienić layout rest dialog -> rozwiniety i nierozwniety
-2. Dodać funkcjonalność, aby usunąć ekran początkowy, jeśli nie ma zaplanowanych ćwiczeń
+1. Dodać funkcjonalność, aby usunąć ekran początkowy, jeśli nie ma zaplanowanych ćwiczeń
 
 ## P2
 1. Timer, rest dialog -> złe ikonki
@@ -22,3 +21,4 @@
 
 ## Done
 - ~~Dodać importowanie historii~~
+- ~~Zmienić layout rest dialog -> rozwiniety i nierozwniety~~

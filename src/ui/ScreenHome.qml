@@ -10,20 +10,11 @@ Rectangle {
 
     anchors.margins: Theme.padding.medium
 
-
-    Loader {
-        anchors.fill: parent
-        anchors.verticalCenter: parent.verticalCenter
-        active: PlannedWorkoutService.workouts.length === 0
-        sourceComponent: noPlannedInstruction
-    }
-
     ColumnLayout {
         width: parent.width - 2 * Theme.padding.medium
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: 2
-        visible: PlannedWorkoutService.workouts.length > 0
 
         // Stat tiles
         Row {
@@ -76,15 +67,26 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: Theme.padding.medium
         text: "Start workout"
-        visible: PlannedWorkoutService.workouts.length > 0
 
         onClicked: {
-            if (ActiveWorkoutService.currentWorkout) {
+            if (PlannedWorkoutService.workouts.length === 0) {
+                noPlannedPopup.open()
+            } else if (ActiveWorkoutService.currentWorkout) {
                 startWorkoutPopup.open()
             } else {
                 startWorkout()
             }
         }
+    }
+
+    NotificationPopup {
+        id: noPlannedPopup
+        text: "No planned workouts yet.\n\n" +
+              "Head to the 'Planned' tab and tap 'Prompt' — it will copy a ready-made prompt to your clipboard. " +
+              "Paste it into any AI assistant (ChatGPT, Gemini, etc.), describe your training goals, and let it generate a workout plan. " +
+              "Once you receive the JSON, come back and tap 'Import' in the 'Planned' tab."
+        type: Notification.Type.Info
+        buttons: Notification.Button.Ok
     }
 
     NotificationPopup {
@@ -104,28 +106,6 @@ Rectangle {
         PlannedWorkoutService.loadAll()
         if (stackView.currentItem !== activeWorkoutScreen) {
             stackView.replace(activeWorkoutScreen)
-        }
-    }
-
-    Component {
-        id: noPlannedInstruction
-
-        Rectangle {
-            radius: Theme.radius.medium
-            color: Theme.colors.surface
-
-            Text {
-                anchors.fill: parent
-                text: "You don't have any planned workouts yet.\n\n" +
-                      "Go to the 'Planned' tab and click 'Prompt'. " +
-                      "The prompt will be copied to your clipboard. " +
-                      "Paste it into any AI (ChatGPT, Gemini, etc.) and discuss your training goals. " +
-                      "Once the AI generates workouts in JSON format, copy the JSON and return to this app. " +
-                      "In the 'Planned' tab, click 'Import' to add your workouts."
-                color: Theme.colors.textPrimary
-                font.pixelSize: Theme.fontSize.medium
-                wrapMode: Text.WordWrap
-            }
         }
     }
 }
