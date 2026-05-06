@@ -6,11 +6,16 @@
 #include <QGuiApplication>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QJsonObject>
 #include "modules/workout/application/workoutservice.h"
+#include "modules/userprofile/application/userprofileservice.h"
+#include "modules/userprofile/infrastructure/serializers/userprofileserializer.h"
 #include "utils/workoutjson.h"
 
-PlannedWorkoutViewModel::PlannedWorkoutViewModel(WorkoutService *service, QObject *parent)
-    : QObject(parent), m_service(service)
+PlannedWorkoutViewModel::PlannedWorkoutViewModel(WorkoutService *service,
+                                                 UserProfileService *profileService,
+                                                 QObject *parent)
+    : QObject(parent), m_service(service), m_profileService(profileService)
 {
 }
 
@@ -61,7 +66,17 @@ void PlannedWorkoutViewModel::importFromJson(const QString &jsonData)
     try
     {
         QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
-        QJsonArray workoutsArray = doc.object().value("workouts").toArray();
+        QJsonObject root = doc.object();
+
+        QJsonValue profileValue = root.value("user_profile");
+        if (m_profileService && profileValue.isObject())
+        {
+            QVariantMap vm = profileValue.toObject().toVariantMap();
+            vm[UserProfileSerializer::user_id_key] = 1;
+            m_profileService->save(UserProfileSerializer::fromVariant(vm));
+        }
+
+        QJsonArray workoutsArray = root.value("workouts").toArray();
         auto workouts = WorkoutJson::workoutsFromJsonArray(workoutsArray);
 
         QDateTime baseTime = QDateTime::currentDateTime();
@@ -118,8 +133,20 @@ void PlannedWorkoutViewModel::generatePrompt()
     for (auto *w : m_workouts)
         plannedArray.append(WorkoutJson::workoutToJsonCompact(w->toEntity()));
 
+    QString profileJson = "null";
+    if (m_profileService)
+    {
+        auto profileOpt = m_profileService->load();
+        if (profileOpt.has_value())
+        {
+            QVariantMap vm = UserProfileSerializer::toVariant(*profileOpt);
+            vm.remove(UserProfileSerializer::user_id_key);
+            profileJson = QJsonDocument(QJsonObject::fromVariantMap(vm)).toJson(QJsonDocument::Indented);
+        }
+    }
+
     prompt.replace("{{CURRENT_DATE}}", QDate::currentDate().toString("yyyy-MM-dd"));
-    prompt.replace("{{USER_PROFILE}}", "");
+    prompt.replace("{{USER_PROFILE}}", profileJson);
     prompt.replace("{{HISTORY_JSON}}", QJsonDocument(historyArray).toJson(QJsonDocument::Indented));
     prompt.replace("{{PLANNED_JSON}}", QJsonDocument(plannedArray).toJson(QJsonDocument::Indented));
 

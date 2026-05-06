@@ -50,6 +50,7 @@ target_link_libraries(liftplanner
     PRIVATE
     core
     workout_module
+    userprofile_module
     qmllive
     dbtoolkit
     app_utils

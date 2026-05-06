@@ -5,6 +5,7 @@
 
 class DbStorage;
 class WorkoutRepositoryDb;
+class UserProfileRepositoryDb;
 
 class AppDbStorage : public QObject
 {
@@ -15,6 +16,7 @@ public:
     ~AppDbStorage() override;
 
     WorkoutRepositoryDb &workoutRepo();
+    UserProfileRepositoryDb &userProfileRepo();
 
 private:
     void initializeDatabase();
@@ -22,4 +24,5 @@ private:
     QSqlDatabase m_database;
     std::unique_ptr<DbStorage> m_dbStorage;
     std::unique_ptr<WorkoutRepositoryDb> m_workoutRepo;
+    std::unique_ptr<UserProfileRepositoryDb> m_userProfileRepo;
 };

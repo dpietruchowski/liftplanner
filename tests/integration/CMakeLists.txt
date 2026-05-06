@@ -28,6 +28,7 @@ target_link_libraries(integration_tests
     PRIVATE
         core
         workout_module
+        userprofile_module
         dbtoolkit
         gtest
         gmock

@@ -4,6 +4,8 @@
 #include <dbtoolkit/dbstorage.h>
 #include "modules/workout/application/workoutservice.h"
 #include "modules/workout/infrastructure/database/workoutrepositorydb.h"
+#include "modules/userprofile/application/userprofileservice.h"
+#include "modules/userprofile/infrastructure/database/userprofilerepositorydb.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
 #include "ui/viewmodels/workouthistoryviewmodel.h"
 #include "ui/viewmodels/plannedworkoutviewmodel.h"
@@ -27,9 +29,14 @@ TestApplication::TestApplication()
 
     m_workoutService = std::make_unique<WorkoutService>(*m_workoutRepo);
 
+    m_userProfileRepo = std::make_unique<UserProfileRepositoryDb>(*m_dbStorage);
+    m_userProfileRepo->createTable();
+    m_userProfileService = std::make_unique<UserProfileService>(*m_userProfileRepo);
+
     m_activeWorkoutViewModel = std::make_unique<ActiveWorkoutViewModel>(m_workoutService.get());
     m_workoutHistoryViewModel = std::make_unique<WorkoutHistoryViewModel>(m_workoutService.get());
-    m_plannedWorkoutViewModel = std::make_unique<PlannedWorkoutViewModel>(m_workoutService.get());
+    m_plannedWorkoutViewModel = std::make_unique<PlannedWorkoutViewModel>(m_workoutService.get(),
+                                                                          m_userProfileService.get());
 }
 
 TestApplication::~TestApplication()

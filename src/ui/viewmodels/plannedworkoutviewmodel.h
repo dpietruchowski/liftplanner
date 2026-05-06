@@ -5,6 +5,7 @@
 #include "ui/models/workoutmodel.h"
 
 class WorkoutService;
+class UserProfileService;
 
 class PlannedWorkoutViewModel : public QObject
 {
@@ -13,7 +14,9 @@ class PlannedWorkoutViewModel : public QObject
     Q_PROPERTY(WorkoutModel *nextWorkout READ nextWorkout NOTIFY workoutsChanged)
 
 public:
-    explicit PlannedWorkoutViewModel(WorkoutService *service, QObject *parent = nullptr);
+    explicit PlannedWorkoutViewModel(WorkoutService *service,
+                                     UserProfileService *profileService,
+                                     QObject *parent = nullptr);
     ~PlannedWorkoutViewModel();
 
     QList<WorkoutModel *> workouts() const;
@@ -34,5 +37,6 @@ private:
     static QString readTemplateFile(const QString &filePath);
 
     WorkoutService *m_service;
+    UserProfileService *m_profileService;
     QList<WorkoutModel *> m_workouts;
 };
