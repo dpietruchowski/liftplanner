@@ -119,7 +119,7 @@ TEST_F(PlannedWorkoutTest, ImportEmptyArray_ClearsAll)
     vm.loadAll();
     EXPECT_EQ(vm.workouts().size(), 3);
 
-    vm.importFromJson("[]");
+    vm.importFromJson(R"({"user_profile": null, "workouts": []})");
     vm.loadAll();
 
     EXPECT_EQ(vm.workouts().size(), 0);
