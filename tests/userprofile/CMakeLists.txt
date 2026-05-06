@@ -2,6 +2,7 @@ set(TEST_SOURCES
     domain/entities/userprofiletest.cpp
     infrastructure/serializers/userprofileserializertest.cpp
     infrastructure/database/userprofilerepositorydbtest.cpp
+    application/userprofileservicetest.cpp
 )
 
 add_executable(userprofile_tests ${TEST_SOURCES})
