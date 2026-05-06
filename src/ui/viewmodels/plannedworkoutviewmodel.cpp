@@ -61,7 +61,8 @@ void PlannedWorkoutViewModel::importFromJson(const QString &jsonData)
     try
     {
         QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
-        auto workouts = WorkoutJson::workoutsFromJsonArray(doc.array());
+        QJsonArray workoutsArray = doc.object().value("workouts").toArray();
+        auto workouts = WorkoutJson::workoutsFromJsonArray(workoutsArray);
 
         QDateTime baseTime = QDateTime::currentDateTime();
         for (size_t i = 0; i < workouts.size(); ++i)
@@ -137,13 +138,20 @@ bool PlannedWorkoutViewModel::validateJson(const QString &jsonData, QString &err
         return false;
     }
 
-    if (!doc.isArray())
+    if (!doc.isObject())
     {
-        errorMessage = "JSON is not an array of workouts";
+        errorMessage = "JSON must be an object with 'user_profile' and 'workouts' keys";
         return false;
     }
 
-    QJsonArray workoutsArray = doc.array();
+    QJsonObject root = doc.object();
+    if (!root.contains("workouts") || !root.value("workouts").isArray())
+    {
+        errorMessage = "JSON missing 'workouts' array";
+        return false;
+    }
+
+    QJsonArray workoutsArray = root.value("workouts").toArray();
     int index = 0;
     for (const QJsonValue &workoutValue : workoutsArray)
     {

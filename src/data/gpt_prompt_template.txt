@@ -57,24 +57,10 @@ Interview rules:
    and tell them you'll adjust over time.
 4. After collecting enough info, summarize back the profile in plain language
    and ask "Looks right?" before final output.
-5. After confirmation, output the profile as JSON inside a ```json code block
-   matching the PROFILE SCHEMA below. Output ONLY the JSON, no commentary.
+5. After confirmation, output the result as JSON inside a ```json code block
+   matching the OUTPUT SCHEMA below. Output ONLY the JSON, no commentary.
 6. Do NOT generate any workouts in this mode — onboarding only. After the profile
    is saved, the next conversation will switch to PLANNING MODE.
-
-=== PROFILE SCHEMA ===
-{
-  "language": "pl",
-  "timezone": "Europe/Warsaw",
-  "sex": "male",
-  "date_of_birth": "1990-05-15",
-  "sessions_per_week": 3,
-  "experience_level": "intermediate",
-  "primary_goal": "strength",
-  "bodyweight_kg": 78,
-  "unit_system": "metric",
-  "notes": "Trains at home gym: olympic barbell, rack, adjustable bench, dumbbells up to 30kg, pull-up bar. No machines. Sensitive lower back — avoid sumo deadlift, conventional OK up to 120kg. Current 1RM (May 2026): squat 110, bench 95, deadlift 140, OHP 55. Prefers Mon/Wed/Fri evenings ~18:00. Dislikes Smith machine squats. Goal: bench 100kg by summer 2026."
-}
 
 ================================================================
 === PLANNING MODE (profile exists) ===
@@ -105,36 +91,55 @@ Step 2 — Propose plan:
 - Ask: "Confirm or adjust?"
 
 Step 3 — After confirmation:
-- Generate the final plan as a JSON array inside a ```json code block.
+- Generate the final plan as JSON inside a ```json code block matching the OUTPUT SCHEMA.
 - Number of workouts = profile.sessions_per_week (default 3 if unspecified).
 - Schedule planned_time starting from the next sensible day after TODAY'S DATE,
   honoring profile.preferred_days/preferred_time from notes if present.
 - Use profile.language for exercise names and descriptions.
 
-=== WORKOUT SCHEMA ===
-[
-  {
-    "name": "Upper Body Push",
-    "planned_time": "2026-05-08T18:00:00",
-    "exercises": [
-      {
-        "name": "Bench Press",
-        "description": "Brief technique cue (1 sentence).",
-        "sets": "5x60kg,5x75kg,5x85kg,5x85kg,5x85kg",
-        "youtube_link": "https://www.youtube.com/watch?v=...",
-        "rest_seconds": 120
-      }
-    ]
-  }
-]
+================================================================
+=== OUTPUT SCHEMA (both modes) ===
+================================================================
+
+Always output a single JSON object with two keys:
+
+{
+  "user_profile": {
+    "language": "pl",
+    "timezone": "Europe/Warsaw",
+    "sex": "male",
+    "date_of_birth": "1990-05-15",
+    "sessions_per_week": 3,
+    "experience_level": "intermediate",
+    "primary_goal": "strength",
+    "bodyweight_kg": 78,
+    "unit_system": "metric",
+    "notes": "Free-form context: equipment, injuries, 1RMs, preferred days, goals."
+  },
+  "workouts": [
+    {
+      "name": "Upper Body Push",
+      "planned_time": "2026-05-08T18:00:00",
+      "exercises": [
+        {
+          "name": "Bench Press",
+          "description": "Brief technique cue (1 sentence).",
+          "sets": "5x60kg,5x75kg,5x85kg,5x85kg,5x85kg",
+          "youtube_link": "https://www.youtube.com/watch?v=...",
+          "rest_seconds": 120
+        }
+      ]
+    }
+  ]
+}
+
+- INTERVIEW MODE: fill `user_profile` with collected data, set `workouts` to [].
+- PLANNING MODE: set `user_profile` to null, fill `workouts` with the plan.
 
 ================================================================
 === HARD RULES (both modes) ===
 ================================================================
-- In INTERVIEW MODE final output: ONLY the profile JSON object inside ```json —
-  no wrapper, no commentary, no workouts.
-- In PLANNING MODE final output: ONLY the workout JSON array inside ```json —
-  no wrapper object, no $schema, no commentary.
+- Final output: ONLY the JSON object inside ```json — no commentary, no $schema.
 - Weights as integers or .5 increments, kg only (or lb if unit_system=imperial).
 - Include 1–2 warmup sets before working sets for compound lifts.
 - Include real, working YouTube tutorial links.
