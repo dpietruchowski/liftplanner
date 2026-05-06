@@ -11,6 +11,7 @@ ExperienceLevel UserProfile::experienceLevel() const { return m_experienceLevel;
 PrimaryGoal UserProfile::primaryGoal() const { return m_primaryGoal; }
 std::optional<double> UserProfile::bodyweightKg() const { return m_bodyweightKg; }
 UnitSystem UserProfile::unitSystem() const { return m_unitSystem; }
+const QString &UserProfile::notes() const { return m_notes; }
 
 void UserProfile::setUserId(int userId) { m_userId = userId; }
 void UserProfile::setLanguage(const QString &language) { m_language = language; }
@@ -21,6 +22,7 @@ void UserProfile::setExperienceLevel(ExperienceLevel experienceLevel) { m_experi
 void UserProfile::setPrimaryGoal(PrimaryGoal primaryGoal) { m_primaryGoal = primaryGoal; }
 void UserProfile::setBodyweightKg(std::optional<double> bodyweightKg) { m_bodyweightKg = bodyweightKg; }
 void UserProfile::setUnitSystem(UnitSystem unitSystem) { m_unitSystem = unitSystem; }
+void UserProfile::setNotes(const QString &notes) { m_notes = notes; }
 
 UserProfile UserProfile::createDefault()
 {

@@ -21,7 +21,8 @@ UserProfileRepositoryDb::UserProfileRepositoryDb(DbStorage &storage)
               UserProfileSerializer::experience_key,
               UserProfileSerializer::goal_key,
               UserProfileSerializer::bodyweight_key,
-              UserProfileSerializer::unit_system_key},
+              UserProfileSerializer::unit_system_key,
+              UserProfileSerializer::notes_key},
           storage, nullptr))
 {
 }
@@ -40,7 +41,8 @@ bool UserProfileRepositoryDb::createTable()
         .column(Column(UserProfileSerializer::experience_key).text().notNull().defaultValue(QStringLiteral("beginner")))
         .column(Column(UserProfileSerializer::goal_key).text().notNull().defaultValue(QStringLiteral("general_fitness")))
         .column(Column(UserProfileSerializer::bodyweight_key).real())
-        .column(Column(UserProfileSerializer::unit_system_key).text().notNull().defaultValue(QStringLiteral("metric")));
+        .column(Column(UserProfileSerializer::unit_system_key).text().notNull().defaultValue(QStringLiteral("metric")))
+        .column(Column(UserProfileSerializer::notes_key).text().notNull().defaultValue(QStringLiteral("")));
 
     return m_repo->createTable(table);
 }

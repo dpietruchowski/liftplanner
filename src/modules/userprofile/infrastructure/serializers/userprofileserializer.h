@@ -17,6 +17,7 @@ public:
     static constexpr const char *goal_key         = "primary_goal";
     static constexpr const char *bodyweight_key   = "bodyweight_kg";
     static constexpr const char *unit_system_key  = "unit_system";
+    static constexpr const char *notes_key        = "notes";
 
     static UserProfile fromVariant(const QVariantMap &data);
     static QVariantMap toVariant(const UserProfile &profile);

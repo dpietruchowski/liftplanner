@@ -21,6 +21,7 @@ public:
     PrimaryGoal primaryGoal() const;
     std::optional<double> bodyweightKg() const;
     UnitSystem unitSystem() const;
+    const QString &notes() const;
 
     void setUserId(int userId);
     void setLanguage(const QString &language);
@@ -31,6 +32,7 @@ public:
     void setPrimaryGoal(PrimaryGoal primaryGoal);
     void setBodyweightKg(std::optional<double> bodyweightKg);
     void setUnitSystem(UnitSystem unitSystem);
+    void setNotes(const QString &notes);
 
     static UserProfile createDefault();
 
@@ -44,4 +46,5 @@ private:
     PrimaryGoal m_primaryGoal{PrimaryGoal::GeneralFitness};
     std::optional<double> m_bodyweightKg;
     UnitSystem m_unitSystem{UnitSystem::Metric};
+    QString m_notes;
 };

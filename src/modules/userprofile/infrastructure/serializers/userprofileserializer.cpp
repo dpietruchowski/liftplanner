@@ -27,6 +27,8 @@ UserProfile UserProfileSerializer::fromVariant(const QVariantMap &data)
         profile.setBodyweightKg(data.value(bodyweight_key).toDouble());
     if (data.contains(unit_system_key))
         profile.setUnitSystem(unitSystemFromString(data.value(unit_system_key).toString()));
+    if (data.contains(notes_key))
+        profile.setNotes(data.value(notes_key).toString());
 
     return profile;
 }
@@ -46,6 +48,7 @@ QVariantMap UserProfileSerializer::toVariant(const UserProfile &profile)
                                     ? QVariant(profile.bodyweightKg().value())
                                     : QVariant());
     data.insert(unit_system_key, unitSystemToString(profile.unitSystem()));
+    data.insert(notes_key,       profile.notes());
 
     return data;
 }
