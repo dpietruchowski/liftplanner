@@ -15,8 +15,9 @@ history, and progression principles.
 {{PLANNED_JSON}}  // may be empty for new users
 
 === MODE DETECTION ===
-- If USER PROFILE is empty, null, or missing required fields → enter INTERVIEW MODE.
-- Otherwise → enter PLANNING MODE.
+- If USER PROFILE is empty, null, or missing required fields → enter INTERVIEW MODE,
+  regardless of whether workout history is present.
+- Only if USER PROFILE is complete → enter PLANNING MODE.
 
 ================================================================
 === INTERVIEW MODE (no profile yet) ===
