@@ -1,4 +1,5 @@
 #include "userprofileserializer.h"
+#include <QDate>
 #include "modules/userprofile/domain/entities/userprofile.h"
 #include "modules/userprofile/domain/entities/sex.h"
 #include "modules/userprofile/domain/entities/experiencelevel.h"
@@ -23,6 +24,12 @@ UserProfile UserProfileSerializer::fromVariant(const QVariantMap &data)
         profile.setExperienceLevel(experienceLevelFromString(data.value(experience_key).toString()));
     if (data.contains(goal_key))
         profile.setPrimaryGoal(primaryGoalFromString(data.value(goal_key).toString()));
+    if (data.contains(date_of_birth_key) && !data.value(date_of_birth_key).isNull())
+    {
+        QDate d = QDate::fromString(data.value(date_of_birth_key).toString(), Qt::ISODate);
+        if (d.isValid())
+            profile.setDateOfBirth(d);
+    }
     if (data.contains(bodyweight_key) && !data.value(bodyweight_key).isNull())
         profile.setBodyweightKg(data.value(bodyweight_key).toDouble());
     if (data.contains(unit_system_key))
@@ -44,6 +51,9 @@ QVariantMap UserProfileSerializer::toVariant(const UserProfile &profile)
     data.insert(sessions_key,   profile.sessionsPerWeek());
     data.insert(experience_key, experienceLevelToString(profile.experienceLevel()));
     data.insert(goal_key,       primaryGoalToString(profile.primaryGoal()));
+    data.insert(date_of_birth_key, profile.dateOfBirth().has_value()
+                                       ? QVariant(profile.dateOfBirth()->toString(Qt::ISODate))
+                                       : QVariant());
     data.insert(bodyweight_key, profile.bodyweightKg().has_value()
                                     ? QVariant(profile.bodyweightKg().value())
                                     : QVariant());

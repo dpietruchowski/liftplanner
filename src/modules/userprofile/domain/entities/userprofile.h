@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <QDate>
 #include <QString>
 #include "sex.h"
 #include "experiencelevel.h"
@@ -19,6 +20,7 @@ public:
     int sessionsPerWeek() const;
     ExperienceLevel experienceLevel() const;
     PrimaryGoal primaryGoal() const;
+    std::optional<QDate> dateOfBirth() const;
     std::optional<double> bodyweightKg() const;
     UnitSystem unitSystem() const;
     const QString &notes() const;
@@ -30,6 +32,7 @@ public:
     void setSessionsPerWeek(int sessionsPerWeek);
     void setExperienceLevel(ExperienceLevel experienceLevel);
     void setPrimaryGoal(PrimaryGoal primaryGoal);
+    void setDateOfBirth(std::optional<QDate> dateOfBirth);
     void setBodyweightKg(std::optional<double> bodyweightKg);
     void setUnitSystem(UnitSystem unitSystem);
     void setNotes(const QString &notes);
@@ -44,6 +47,7 @@ private:
     int m_sessionsPerWeek{3};
     ExperienceLevel m_experienceLevel{ExperienceLevel::Beginner};
     PrimaryGoal m_primaryGoal{PrimaryGoal::GeneralFitness};
+    std::optional<QDate> m_dateOfBirth;
     std::optional<double> m_bodyweightKg;
     UnitSystem m_unitSystem{UnitSystem::Metric};
     QString m_notes;
