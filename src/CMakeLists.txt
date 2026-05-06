@@ -5,6 +5,7 @@ qt_standard_project_setup()
 add_subdirectory(ui/models)
 add_subdirectory(core)
 add_subdirectory(modules/workout)
+add_subdirectory(modules/userprofile)
 
 if(NOT QML_LIVE_ENABLED)
     add_subdirectory(ui)
