@@ -89,6 +89,7 @@ Popup {
             wrapMode: Text.WordWrap
             textFormat: notificationPopup.textFormat
             visible: notificationPopup.text.length > 0
+            onLinkActivated: function(link) { Qt.openUrlExternally(link) }
         }
 
         ThemedButton {

@@ -74,6 +74,11 @@ bool WorkoutRepositoryDb::createTables()
     return ok;
 }
 
+void WorkoutRepositoryDb::registerMigrations(MigrationRunner& runner)
+{
+    m_exerciseRepo.registerMigrations(runner);
+}
+
 std::vector<Workout> WorkoutRepositoryDb::findAll(const WorkoutQuery& query) const
 {
     auto where = buildWhereClause(query);

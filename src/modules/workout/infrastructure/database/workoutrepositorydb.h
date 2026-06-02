@@ -11,6 +11,7 @@
 
 class DbStorage;
 class DbRepository;
+class MigrationRunner;
 
 class WorkoutRepositoryDb : public WorkoutRepository
 {
@@ -19,6 +20,7 @@ public:
     ~WorkoutRepositoryDb() override;
 
     bool createTables();
+    void registerMigrations(MigrationRunner& runner);
 
     std::vector<Workout> findAll(const WorkoutQuery& query) const override;
     std::optional<Workout> findOne(const WorkoutQuery& query) const override;

@@ -15,7 +15,6 @@ TEST_F(ExerciseTest, DefaultConstructor_SetsDefaults)
     EXPECT_TRUE(e.name().isEmpty());
     EXPECT_TRUE(e.description().isEmpty());
     EXPECT_EQ(e.restSeconds(), 120);
-    EXPECT_TRUE(e.youtubeLink().isEmpty());
 }
 
 TEST_F(ExerciseTest, ParameterizedConstructor_SetsNameAndRest)
@@ -37,14 +36,12 @@ TEST_F(ExerciseTest, Setters_UpdateAllFields)
     e.setName("Squat");
     e.setDescription("Barbell back squat");
     e.setRestSeconds(180);
-    e.setYoutubeLink("https://youtube.com/watch?v=abc");
 
     EXPECT_EQ(e.id(), 10);
     EXPECT_EQ(e.workoutId(), 5);
     EXPECT_EQ(e.name(), "Squat");
     EXPECT_EQ(e.description(), "Barbell back squat");
     EXPECT_EQ(e.restSeconds(), 180);
-    EXPECT_EQ(e.youtubeLink(), "https://youtube.com/watch?v=abc");
 }
 
 TEST_F(ExerciseTest, DefaultRestSeconds_Is120)

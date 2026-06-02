@@ -27,7 +27,6 @@ QJsonObject exerciseToJson(const Exercise& exercise)
     obj["name"] = exercise.name();
     obj["description"] = exercise.description();
     obj["rest_seconds"] = exercise.restSeconds();
-    obj["youtube_link"] = exercise.youtubeLink();
 
     QJsonArray setsArray;
     for (const auto& set : exercise.sets())
@@ -66,7 +65,6 @@ QJsonObject exerciseToJsonCompact(const Exercise& exercise)
     QJsonObject obj;
     obj["name"] = exercise.name();
     obj["rest_seconds"] = exercise.restSeconds();
-    obj["youtube_link"] = exercise.youtubeLink();
     obj["sets"] = exercise.setsToString();
     return obj;
 }
@@ -140,8 +138,6 @@ Exercise exerciseFromJson(const QJsonObject& json)
         e.setDescription(json["description"].toString());
     if (json.contains("rest_seconds"))
         e.setRestSeconds(json["rest_seconds"].toInt());
-    if (json.contains("youtube_link"))
-        e.setYoutubeLink(json["youtube_link"].toString());
 
     if (json.contains("sets"))
     {

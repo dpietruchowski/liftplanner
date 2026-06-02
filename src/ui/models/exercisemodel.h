@@ -12,7 +12,6 @@ class ExerciseModel : public QObject
     Q_PROPERTY(QString name READ name NOTIFY dataChanged)
     Q_PROPERTY(QString description READ description NOTIFY dataChanged)
     Q_PROPERTY(int restSeconds READ restSeconds NOTIFY dataChanged)
-    Q_PROPERTY(QString youtubeLink READ youtubeLink NOTIFY dataChanged)
     Q_PROPERTY(QQmlListProperty<SetModel> sets READ setsProperty NOTIFY setsChanged)
     Q_PROPERTY(bool completed READ isCompleted NOTIFY completedChanged)
 
@@ -23,7 +22,6 @@ public:
     QString name() const;
     QString description() const;
     int restSeconds() const;
-    QString youtubeLink() const;
     bool isCompleted() const;
 
     QQmlListProperty<SetModel> setsProperty();

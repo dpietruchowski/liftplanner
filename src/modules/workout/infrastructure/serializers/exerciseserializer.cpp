@@ -13,8 +13,6 @@ Exercise ExerciseSerializer::fromVariant(const QVariantMap& data)
         exercise.setName(data.value(name_key).toString());
     if (data.contains(description_key))
         exercise.setDescription(data.value(description_key).toString());
-    if (data.contains(youtube_link_key))
-        exercise.setYoutubeLink(data.value(youtube_link_key).toString());
     if (data.contains(rest_seconds_key))
         exercise.setRestSeconds(data.value(rest_seconds_key).toInt());
 
@@ -32,7 +30,6 @@ QVariantMap ExerciseSerializer::toVariant(const Exercise& exercise)
 
     data.insert(name_key, exercise.name());
     data.insert(description_key, exercise.description());
-    data.insert(youtube_link_key, exercise.youtubeLink());
     data.insert(rest_seconds_key, exercise.restSeconds());
 
     return data;

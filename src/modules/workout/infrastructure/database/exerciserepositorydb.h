@@ -6,6 +6,7 @@
 
 class DbStorage;
 class DbRepository;
+class MigrationRunner;
 
 class ExerciseRepositoryDb
 {
@@ -14,6 +15,7 @@ public:
     ~ExerciseRepositoryDb();
 
     bool createTable();
+    void registerMigrations(MigrationRunner& runner);
 
     std::vector<Exercise> findByWorkoutId(int workoutId) const;
     int save(const Exercise& exercise);

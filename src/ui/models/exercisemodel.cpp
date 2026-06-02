@@ -20,7 +20,6 @@ ExerciseModel::ExerciseModel(const Exercise& exercise, QObject* parent)
 QString ExerciseModel::name() const { return m_exercise.name(); }
 QString ExerciseModel::description() const { return m_exercise.description(); }
 int ExerciseModel::restSeconds() const { return m_exercise.restSeconds(); }
-QString ExerciseModel::youtubeLink() const { return m_exercise.youtubeLink(); }
 
 bool ExerciseModel::isCompleted() const
 {
@@ -81,7 +80,6 @@ Exercise ExerciseModel::toEntity() const
     e.setName(m_exercise.name());
     e.setDescription(m_exercise.description());
     e.setRestSeconds(m_exercise.restSeconds());
-    e.setYoutubeLink(m_exercise.youtubeLink());
     for (auto* s : m_sets)
         e.addSet(s->entity());
     return e;

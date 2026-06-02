@@ -14,7 +14,6 @@ TEST_F(ExerciseSerializerTest, ToVariant_FullExercise)
     e.setName("Bench Press");
     e.setDescription("Flat barbell bench press");
     e.setRestSeconds(120);
-    e.setYoutubeLink("https://youtube.com/watch?v=abc");
 
     QVariantMap data = ExerciseSerializer::toVariant(e);
 
@@ -24,8 +23,6 @@ TEST_F(ExerciseSerializerTest, ToVariant_FullExercise)
     EXPECT_EQ(data.value(ExerciseSerializer::description_key).toString(),
               "Flat barbell bench press");
     EXPECT_EQ(data.value(ExerciseSerializer::rest_seconds_key).toInt(), 120);
-    EXPECT_EQ(data.value(ExerciseSerializer::youtube_link_key).toString(),
-              "https://youtube.com/watch?v=abc");
 }
 
 TEST_F(ExerciseSerializerTest, ToVariant_NewExercise_NoId)
@@ -48,7 +45,6 @@ TEST_F(ExerciseSerializerTest, FromVariant_AllFields)
     data.insert(ExerciseSerializer::name_key, "Deadlift");
     data.insert(ExerciseSerializer::description_key, "Conventional deadlift");
     data.insert(ExerciseSerializer::rest_seconds_key, 180);
-    data.insert(ExerciseSerializer::youtube_link_key, "https://youtube.com/xyz");
 
     Exercise e = ExerciseSerializer::fromVariant(data);
 
@@ -57,7 +53,6 @@ TEST_F(ExerciseSerializerTest, FromVariant_AllFields)
     EXPECT_EQ(e.name(), "Deadlift");
     EXPECT_EQ(e.description(), "Conventional deadlift");
     EXPECT_EQ(e.restSeconds(), 180);
-    EXPECT_EQ(e.youtubeLink(), "https://youtube.com/xyz");
 }
 
 TEST_F(ExerciseSerializerTest, Roundtrip_PreservesData)
@@ -68,7 +63,6 @@ TEST_F(ExerciseSerializerTest, Roundtrip_PreservesData)
     original.setName("Pullup");
     original.setDescription("Bodyweight");
     original.setRestSeconds(60);
-    original.setYoutubeLink("https://yt.com/pull");
 
     QVariantMap data = ExerciseSerializer::toVariant(original);
     Exercise restored = ExerciseSerializer::fromVariant(data);
@@ -78,7 +72,6 @@ TEST_F(ExerciseSerializerTest, Roundtrip_PreservesData)
     EXPECT_EQ(restored.name(), original.name());
     EXPECT_EQ(restored.description(), original.description());
     EXPECT_EQ(restored.restSeconds(), original.restSeconds());
-    EXPECT_EQ(restored.youtubeLink(), original.youtubeLink());
 }
 
 TEST_F(ExerciseSerializerTest, TableName_IsCorrect)

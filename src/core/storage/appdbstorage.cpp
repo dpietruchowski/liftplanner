@@ -6,6 +6,7 @@
 #include "modules/userprofile/infrastructure/database/userprofilerepositorydb.h"
 #include "modules/workout/infrastructure/database/workoutrepositorydb.h"
 #include <dbtoolkit/dbstorage.h>
+#include <dbtoolkit/migrationrunner.h>
 
 AppDbStorage::AppDbStorage(const QString& dbPath, QObject* parent)
     : QObject(parent)
@@ -41,4 +42,9 @@ void AppDbStorage::initializeDatabase()
     m_workoutRepo->createTables();
     m_userProfileRepo = std::make_unique<UserProfileRepositoryDb>(*m_dbStorage);
     m_userProfileRepo->createTable();
+
+    MigrationRunner runner(*m_dbStorage);
+    m_workoutRepo->registerMigrations(runner);
+    m_userProfileRepo->registerMigrations(runner);
+    runner.run();
 }

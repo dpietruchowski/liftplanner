@@ -5,6 +5,7 @@
 
 class DbStorage;
 class DbRepository;
+class MigrationRunner;
 
 class UserProfileRepositoryDb : public UserProfileRepository
 {
@@ -13,6 +14,7 @@ public:
     ~UserProfileRepositoryDb() override;
 
     bool createTable();
+    void registerMigrations(MigrationRunner& runner);
 
     std::optional<UserProfile> find() const override;
     void save(const UserProfile& profile) override;

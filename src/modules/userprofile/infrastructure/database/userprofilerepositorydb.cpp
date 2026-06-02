@@ -63,6 +63,8 @@ bool UserProfileRepositoryDb::createTable()
     return m_repo->createTable(table);
 }
 
+void UserProfileRepositoryDb::registerMigrations(MigrationRunner&) { }
+
 std::optional<UserProfile> UserProfileRepositoryDb::find() const
 {
     auto rows = m_repo->select();

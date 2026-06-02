@@ -49,12 +49,12 @@ Rectangle {
                         exercise: modelData
                         onShowExerciseInfo: function(exercise) {
                             exerciseInfoPopup.title = exercise.name
+                            var searchUrl = "https://www.youtube.com/results?search_query="
+                                    + encodeURIComponent(exercise.name)
                             exerciseInfoPopup.text = exercise.description
                                     + "<br><br><a href=\""
-                                    + exercise.youtubeLink
-                                    + "\">"
-                                    + exercise.youtubeLink
-                                    + "</a>"
+                                    + searchUrl
+                                    + "\">YouTube</a>"
                             exerciseInfoPopup.open()
                         }
                     }

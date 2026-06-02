@@ -4,6 +4,8 @@
 
 #include <dbtoolkit/dbrepository.h>
 #include <dbtoolkit/dbstorage.h>
+#include <dbtoolkit/migrationrunner.h>
+#include <dbtoolkit/query/altertable.h>
 #include <dbtoolkit/query/column.h>
 #include <dbtoolkit/query/createtable.h>
 #include <dbtoolkit/query/order.h>
@@ -14,7 +16,6 @@ ExerciseRepositoryDb::ExerciseRepositoryDb(DbStorage& storage)
           ExerciseSerializer::table, ExerciseSerializer::id_key,
           QStringList { ExerciseSerializer::id_key, ExerciseSerializer::workout_id_key,
                         ExerciseSerializer::name_key, ExerciseSerializer::description_key,
-                        ExerciseSerializer::youtube_link_key,
                         ExerciseSerializer::rest_seconds_key },
           storage, nullptr))
 {
@@ -30,11 +31,24 @@ bool ExerciseRepositoryDb::createTable()
         .column(Column(ExerciseSerializer::workout_id_key).integer().notNull())
         .column(Column(ExerciseSerializer::name_key).text())
         .column(Column(ExerciseSerializer::description_key).text())
-        .column(Column(ExerciseSerializer::youtube_link_key).text())
         .column(Column(ExerciseSerializer::rest_seconds_key).integer())
         .foreignKey(ExerciseSerializer::workout_id_key, WorkoutSerializer::table,
                     WorkoutSerializer::id_key, OnDeleteAction::Cascade);
     return m_repository->createTable(table);
+}
+
+void ExerciseRepositoryDb::registerMigrations(MigrationRunner& runner)
+{
+    // v1: the youtube_link column was removed from the schema.
+    runner.add(1,
+               [](QSqlDatabase& db)
+               {
+                   return AlterTable(ExerciseSerializer::table)
+                              .dropColumn(QStringLiteral("youtube_link"))
+                              .execute(db)
+                              .toInt()
+                       != 0;
+               });
 }
 
 std::vector<Exercise> ExerciseRepositoryDb::findByWorkoutId(int workoutId) const

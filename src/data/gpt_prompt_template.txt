@@ -151,7 +151,6 @@ use profile.language; refresh notes; ALWAYS populate user_profile (never null).
           "name": "Bench Press",
           "description": "Brief technique cue.",
           "sets": "5x60kg,5x75kg,5x85kg,5x85kg,5x85kg",
-          "youtube_link": "https://www.youtube.com/watch?v=...",
           "rest_seconds": 120
         }
       ]
@@ -172,7 +171,6 @@ PLANNING STATE C:  user_profile populated (notes refreshed), workouts filled.
 - STATE C output: ```json block + one import line. Nothing else.
 - Weights: integers or .5 increments. kg (or lb if unit_system=imperial).
 - Include 1–2 warmup sets before working sets on compound lifts.
-- Real, working YouTube links.
 - Never reduce weight without stated reason in STATE B.
 - Never invent profile data — confirm in interview.
 - Never silently drop notes — only remove what user resolved.

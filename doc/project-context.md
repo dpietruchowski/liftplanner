@@ -26,7 +26,7 @@ Services take a plain repository reference and return plain types (`std::vector`
 - **Entities** ([domain/entities](../src/modules/workout/domain/entities)):
   - `Workout` — id, name, createdTime, plannedTime, startedTime, endedTime, `WorkoutStatus`
     {Planned, Started, Ended}, `vector<Exercise>`. Methods `start()`, `end()`, `isCompleted()`.
-  - `Exercise` — id, workoutId, name, description, restSeconds (default 120), youtubeLink,
+  - `Exercise` — id, workoutId, name, description, restSeconds (default 120),
     `vector<Set>`. `setsToString()`.
   - `Set` — id, exerciseId, repetitions(int), weight(double, supports .5), completed(bool).
 - **Repository**: `WorkoutRepository` interface (findAll/findOne/save/remove/count/exists, all take
