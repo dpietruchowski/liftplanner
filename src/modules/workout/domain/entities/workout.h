@@ -37,6 +37,10 @@ public:
     void removeExercise(int index);
     bool isCompleted() const;
 
+    int totalRepetitions() const;
+    int totalSets() const;
+    double totalWeight() const;
+
     static Workout createDefault(const QString& name);
 
 private:

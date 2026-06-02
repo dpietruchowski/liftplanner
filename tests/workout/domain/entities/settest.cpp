@@ -90,6 +90,37 @@ TEST_F(SetTest, CompletedToggle)
     EXPECT_FALSE(s.completed());
 }
 
+TEST_F(SetTest, TotalWeight_RepsTimesWeight)
+{
+    EXPECT_DOUBLE_EQ(Set(5, 100).totalWeight(), 500.0);
+    EXPECT_DOUBLE_EQ(Set(8, 60).totalWeight(), 480.0);
+    EXPECT_DOUBLE_EQ(Set(0, 100).totalWeight(), 0.0);
+}
+
+TEST_F(SetTest, OneRepMax_ZeroReps_IsZero)
+{
+    EXPECT_DOUBLE_EQ(Set(0, 100).oneRepMax(), 0.0);
+}
+
+TEST_F(SetTest, OneRepMax_SingleRep_IsWeight)
+{
+    EXPECT_DOUBLE_EQ(Set(1, 140).oneRepMax(), 140.0);
+}
+
+TEST_F(SetTest, OneRepMax_TwoToTenReps_UsesBrzycki)
+{
+    // Brzycki: weight * 36 / (37 - reps)
+    EXPECT_DOUBLE_EQ(Set(5, 100).oneRepMax(), 112.5);  // 3600 / 32
+    EXPECT_DOUBLE_EQ(Set(10, 90).oneRepMax(), 120.0);  // 3240 / 27
+}
+
+TEST_F(SetTest, OneRepMax_AboveTenReps_UsesEpley)
+{
+    // Epley: weight * (1 + reps / 30)
+    EXPECT_DOUBLE_EQ(Set(12, 60).oneRepMax(), 84.0);   // 60 * 1.4
+    EXPECT_DOUBLE_EQ(Set(15, 100).oneRepMax(), 150.0); // 100 * 1.5
+}
+
 TEST_F(SetTest, CopySemantics)
 {
     Set original(15, 50.5);

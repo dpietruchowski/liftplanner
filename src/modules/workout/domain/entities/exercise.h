@@ -31,6 +31,11 @@ public:
     bool isCompleted() const;
     QString setsToString() const;
 
+    double totalWeight() const;
+    int totalRepetitions() const;
+    double averageWeight() const;
+    double bestOneRepMax() const;
+
 private:
     void validate() const;
 

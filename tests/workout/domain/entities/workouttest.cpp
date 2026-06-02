@@ -173,6 +173,33 @@ TEST_F(WorkoutTest, CopySemantics_IncludesExercises)
     EXPECT_EQ(copy.exercises()[0].sets()[0].repetitions(), 10);
 }
 
+TEST_F(WorkoutTest, Aggregates_SumAcrossExercises)
+{
+    Workout w("Push", QDateTime::currentDateTime());
+
+    Exercise e1("Bench", 90);
+    e1.addSet(Set(5, 100));  // tw 500
+    e1.addSet(Set(5, 80));   // tw 400
+    w.addExercise(e1);
+
+    Exercise e2("OHP", 120);
+    e2.addSet(Set(10, 60));  // tw 600
+    w.addExercise(e2);
+
+    EXPECT_EQ(w.totalRepetitions(), 20);
+    EXPECT_EQ(w.totalSets(), 3);
+    EXPECT_DOUBLE_EQ(w.totalWeight(), 1500.0);
+}
+
+TEST_F(WorkoutTest, Aggregates_NoExercises_AreZero)
+{
+    Workout w;
+
+    EXPECT_EQ(w.totalRepetitions(), 0);
+    EXPECT_EQ(w.totalSets(), 0);
+    EXPECT_DOUBLE_EQ(w.totalWeight(), 0.0);
+}
+
 // --- WorkoutStatus ---
 
 TEST_F(WorkoutTest, SetStatus_ChangesStatus)

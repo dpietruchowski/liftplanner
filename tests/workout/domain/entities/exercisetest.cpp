@@ -160,6 +160,29 @@ TEST_F(ExerciseTest, SetsToString_Empty_ReturnsEmpty)
     EXPECT_EQ(e.setsToString(), "");
 }
 
+TEST_F(ExerciseTest, Aggregates_SumAcrossSets)
+{
+    Exercise e("Bench Press", 90);
+    e.addSet(Set(5, 100));  // tw 500, 1RM 112.5
+    e.addSet(Set(5, 80));   // tw 400, 1RM 90
+    e.addSet(Set(10, 60));  // tw 600, 1RM 80
+
+    EXPECT_DOUBLE_EQ(e.totalWeight(), 1500.0);
+    EXPECT_EQ(e.totalRepetitions(), 20);
+    EXPECT_DOUBLE_EQ(e.averageWeight(), 80.0);  // (100 + 80 + 60) / 3
+    EXPECT_DOUBLE_EQ(e.bestOneRepMax(), 112.5);
+}
+
+TEST_F(ExerciseTest, Aggregates_NoSets_AreZero)
+{
+    Exercise e("Empty", 60);
+
+    EXPECT_DOUBLE_EQ(e.totalWeight(), 0.0);
+    EXPECT_EQ(e.totalRepetitions(), 0);
+    EXPECT_DOUBLE_EQ(e.averageWeight(), 0.0);
+    EXPECT_DOUBLE_EQ(e.bestOneRepMax(), 0.0);
+}
+
 TEST_F(ExerciseTest, CopySemantics_IncludesSets)
 {
     Exercise original("Bench", 90);

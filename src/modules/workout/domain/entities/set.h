@@ -12,6 +12,9 @@ public:
     double weight() const;
     bool completed() const;
 
+    double totalWeight() const;
+    double oneRepMax() const;
+
     void setId(int id);
     void setExerciseId(int exerciseId);
     void setRepetitions(int repetitions);

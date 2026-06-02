@@ -61,6 +61,30 @@ bool Workout::isCompleted() const
     return true;
 }
 
+int Workout::totalRepetitions() const
+{
+    int total = 0;
+    for (const auto& e : m_exercises)
+        total += e.totalRepetitions();
+    return total;
+}
+
+int Workout::totalSets() const
+{
+    int total = 0;
+    for (const auto& e : m_exercises)
+        total += static_cast<int>(e.sets().size());
+    return total;
+}
+
+double Workout::totalWeight() const
+{
+    double total = 0.0;
+    for (const auto& e : m_exercises)
+        total += e.totalWeight();
+    return total;
+}
+
 Workout Workout::createDefault(const QString& name)
 {
     return Workout(name, QDateTime::currentDateTime());

@@ -1,5 +1,6 @@
 #include "exercise.h"
 #include <QStringList>
+#include <algorithm>
 
 Exercise::Exercise() = default;
 
@@ -54,6 +55,41 @@ QString Exercise::setsToString() const
         parts.append(
             QString("%1x%2kg").arg(s.repetitions()).arg(QString::number(s.weight(), 'g', 6)));
     return parts.join(", ");
+}
+
+double Exercise::totalWeight() const
+{
+    double total = 0.0;
+    for (const auto& s : m_sets)
+        total += s.totalWeight();
+    return total;
+}
+
+int Exercise::totalRepetitions() const
+{
+    int total = 0;
+    for (const auto& s : m_sets)
+        total += s.repetitions();
+    return total;
+}
+
+double Exercise::averageWeight() const
+{
+    if (m_sets.empty())
+        return 0.0;
+
+    double total = 0.0;
+    for (const auto& s : m_sets)
+        total += s.weight();
+    return total / m_sets.size();
+}
+
+double Exercise::bestOneRepMax() const
+{
+    double best = 0.0;
+    for (const auto& s : m_sets)
+        best = std::max(best, s.oneRepMax());
+    return best;
 }
 
 void Exercise::validate() const { }
