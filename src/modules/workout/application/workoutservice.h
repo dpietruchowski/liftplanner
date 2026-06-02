@@ -25,8 +25,9 @@ public:
     void importPlannedWorkouts(const std::vector<Workout>& workouts);
     void removeAllPlannedWorkouts();
 
-    // History (started/completed workouts)
-    std::vector<Workout> loadHistory() const;
+    // History (started/completed workouts), newest first. A positive limit
+    // restricts the result to the latest N workouts.
+    std::vector<Workout> loadHistory(int limit = -1) const;
     void importHistory(const std::vector<Workout>& workouts);
 
     // Most frequently performed exercises across the most recent workouts,

@@ -32,11 +32,13 @@ void WorkoutService::removeAllPlannedWorkouts()
     m_repository.remove(query);
 }
 
-std::vector<Workout> WorkoutService::loadHistory() const
+std::vector<Workout> WorkoutService::loadHistory(int limit) const
 {
     WorkoutQuery query;
     query.whereStatus(WorkoutStatus::Ended);
     query.orderByStartedTime(SortDirection::Descending);
+    if (limit > 0)
+        query.withLimit(limit);
     return m_repository.findAll(query);
 }
 
@@ -56,14 +58,13 @@ void WorkoutService::importHistory(const std::vector<Workout>& workouts)
 std::vector<WorkoutService::ExerciseFrequency> WorkoutService::topExercises(int topN,
                                                                            int recentWorkouts) const
 {
-    const std::vector<Workout> history = loadHistory();
+    const std::vector<Workout> history = loadHistory(recentWorkouts);
 
     QHash<QString, ExerciseFrequency> byName;
 
-    const int limit = std::min(recentWorkouts, static_cast<int>(history.size()));
-    for (int i = 0; i < limit; ++i)
+    for (const auto& workout : history)
     {
-        for (const auto& exercise : history[i].exercises())
+        for (const auto& exercise : workout.exercises())
         {
             ExerciseFrequency& entry = byName[exercise.name()];
             entry.name = exercise.name();

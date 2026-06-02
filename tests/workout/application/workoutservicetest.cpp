@@ -229,21 +229,18 @@ TEST_F(WorkoutServiceTest, TopExercises_RanksByFrequencyThenBestOneRepMax)
     EXPECT_DOUBLE_EQ(result[1].bestOneRepMax, 157.5);
 }
 
-TEST_F(WorkoutServiceTest, TopExercises_OnlyConsidersRecentWorkouts)
+TEST_F(WorkoutServiceTest, TopExercises_LimitsHistoryQueryToRecentWorkouts)
 {
-    std::vector<Workout> history = {
-        makeWorkoutWithExercise("Bench", 5, 100),
-        makeWorkoutWithExercise("Squat", 5, 120),
-        makeWorkoutWithExercise("Squat", 5, 120),  // beyond the recent window
-    };
+    EXPECT_CALL(m_repo, findAll(::testing::_))
+        .WillOnce(
+            [](const WorkoutQuery& query)
+            {
+                EXPECT_TRUE(query.limit().has_value());
+                EXPECT_EQ(query.limit().value(), 5);
+                return std::vector<Workout> {};
+            });
 
-    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
-
-    auto result = m_service->topExercises(2, 2);
-
-    ASSERT_EQ(result.size(), 2u);
-    EXPECT_EQ(result[0].count, 1);
-    EXPECT_EQ(result[1].count, 1);
+    m_service->topExercises(2, 5);
 }
 
 TEST_F(WorkoutServiceTest, TopExercises_EmptyHistory_ReturnsEmpty)
