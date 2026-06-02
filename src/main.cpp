@@ -2,10 +2,15 @@
 #include "utils/qmlregistrator.h"
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQuickStyle>
 
 int main(int argc, char* argv[])
 {
     QGuiApplication app(argc, argv);
+
+    // Use the same controls style on every platform (Android defaults to
+    // Material, desktop to Basic) so the UI renders identically everywhere.
+    QQuickStyle::setStyle("Basic");
 
     LiftPlannerApplication liftApp("liftplanner.db");
     liftApp.initialize();

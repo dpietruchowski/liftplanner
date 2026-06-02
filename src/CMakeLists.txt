@@ -1,4 +1,4 @@
-find_package(Qt6 6.4 REQUIRED COMPONENTS Quick Sql Qml)
+find_package(Qt6 6.4 REQUIRED COMPONENTS Quick Sql Qml QuickControls2)
 
 qt_standard_project_setup()
 
@@ -57,6 +57,7 @@ target_link_libraries(liftplanner
     themed_components_qml
     themed_icons
     Qt6::Quick
+    Qt6::QuickControls2
     Qt6::Sql
     Qt6::Qml
 )
