@@ -1,7 +1,7 @@
 #include "setserializer.h"
 #include "modules/workout/domain/entities/set.h"
 
-Set SetSerializer::fromVariant(const QVariantMap &data)
+Set SetSerializer::fromVariant(const QVariantMap& data)
 {
     Set set;
 
@@ -17,7 +17,7 @@ Set SetSerializer::fromVariant(const QVariantMap &data)
     return set;
 }
 
-QVariantMap SetSerializer::toVariant(const Set &set)
+QVariantMap SetSerializer::toVariant(const Set& set)
 {
     QVariantMap data;
 

@@ -1,7 +1,7 @@
 #include "exerciseserializer.h"
 #include "modules/workout/domain/entities/exercise.h"
 
-Exercise ExerciseSerializer::fromVariant(const QVariantMap &data)
+Exercise ExerciseSerializer::fromVariant(const QVariantMap& data)
 {
     Exercise exercise;
 
@@ -21,7 +21,7 @@ Exercise ExerciseSerializer::fromVariant(const QVariantMap &data)
     return exercise;
 }
 
-QVariantMap ExerciseSerializer::toVariant(const Exercise &exercise)
+QVariantMap ExerciseSerializer::toVariant(const Exercise& exercise)
 {
     QVariantMap data;
 

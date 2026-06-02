@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-#include "modules/workout/domain/entities/exercise.h"
 #include "modules/workout/infrastructure/serializers/exerciseserializer.h"
+#include "modules/workout/domain/entities/exercise.h"
+#include <gtest/gtest.h>
 
 class ExerciseSerializerTest : public ::testing::Test
 {
@@ -21,9 +21,11 @@ TEST_F(ExerciseSerializerTest, ToVariant_FullExercise)
     EXPECT_EQ(data.value(ExerciseSerializer::id_key).toInt(), 10);
     EXPECT_EQ(data.value(ExerciseSerializer::workout_id_key).toInt(), 5);
     EXPECT_EQ(data.value(ExerciseSerializer::name_key).toString(), "Bench Press");
-    EXPECT_EQ(data.value(ExerciseSerializer::description_key).toString(), "Flat barbell bench press");
+    EXPECT_EQ(data.value(ExerciseSerializer::description_key).toString(),
+              "Flat barbell bench press");
     EXPECT_EQ(data.value(ExerciseSerializer::rest_seconds_key).toInt(), 120);
-    EXPECT_EQ(data.value(ExerciseSerializer::youtube_link_key).toString(), "https://youtube.com/watch?v=abc");
+    EXPECT_EQ(data.value(ExerciseSerializer::youtube_link_key).toString(),
+              "https://youtube.com/watch?v=abc");
 }
 
 TEST_F(ExerciseSerializerTest, ToVariant_NewExercise_NoId)

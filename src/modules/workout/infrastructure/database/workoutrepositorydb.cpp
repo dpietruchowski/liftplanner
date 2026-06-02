@@ -1,35 +1,30 @@
 #include "workoutrepositorydb.h"
-#include "modules/workout/domain/entities/workout.h"
 #include "modules/workout/domain/entities/exercise.h"
 #include "modules/workout/domain/entities/set.h"
+#include "modules/workout/domain/entities/workout.h"
 #include "modules/workout/domain/entities/workoutstatus.h"
 #include "modules/workout/domain/repositories/workoutquery.h"
 #include "modules/workout/infrastructure/serializers/workoutserializer.h"
 
 #include <dbtoolkit/dbrepository.h>
 #include <dbtoolkit/dbstorage.h>
-#include <dbtoolkit/query/createtable.h>
 #include <dbtoolkit/query/column.h>
-#include <dbtoolkit/query/where.h>
+#include <dbtoolkit/query/createtable.h>
 #include <dbtoolkit/query/order.h>
+#include <dbtoolkit/query/where.h>
 
 #include <QSqlQuery>
 
-WorkoutRepositoryDb::WorkoutRepositoryDb(DbStorage &storage)
+WorkoutRepositoryDb::WorkoutRepositoryDb(DbStorage& storage)
     : m_workoutRepo(std::make_unique<DbRepository>(
-          WorkoutSerializer::table,
-          WorkoutSerializer::id_key,
-          QStringList{
-              WorkoutSerializer::id_key,
-              WorkoutSerializer::name_key,
-              WorkoutSerializer::created_time_key,
-              WorkoutSerializer::planned_time_key,
-              WorkoutSerializer::started_time_key,
-              WorkoutSerializer::ended_time_key,
-              WorkoutSerializer::status_key},
-          storage, nullptr)),
-      m_exerciseRepo(storage),
-      m_setRepo(storage)
+          WorkoutSerializer::table, WorkoutSerializer::id_key,
+          QStringList { WorkoutSerializer::id_key, WorkoutSerializer::name_key,
+                        WorkoutSerializer::created_time_key, WorkoutSerializer::planned_time_key,
+                        WorkoutSerializer::started_time_key, WorkoutSerializer::ended_time_key,
+                        WorkoutSerializer::status_key },
+          storage, nullptr))
+    , m_exerciseRepo(storage)
+    , m_setRepo(storage)
 {
 }
 
@@ -47,7 +42,8 @@ bool WorkoutRepositoryDb::createTables()
         .column(Column(WorkoutSerializer::ended_time_key).text())
         .column(Column(WorkoutSerializer::status_key).text());
 
-    bool ok = m_workoutRepo->createTable(workouts) && m_exerciseRepo.createTable() && m_setRepo.createTable();
+    bool ok = m_workoutRepo->createTable(workouts) && m_exerciseRepo.createTable()
+        && m_setRepo.createTable();
 
     // Migration: add status column if missing (existing databases)
     QSqlQuery pragmaQuery(m_workoutRepo->storage().database());
@@ -67,16 +63,18 @@ bool WorkoutRepositoryDb::createTables()
         alter.exec(QStringLiteral("ALTER TABLE %1 ADD COLUMN %2 TEXT DEFAULT 'Planned'")
                        .arg(WorkoutSerializer::table, WorkoutSerializer::status_key));
         alter.exec(QStringLiteral("UPDATE %1 SET %2 = 'Ended' WHERE %3 IS NOT NULL")
-                       .arg(WorkoutSerializer::table, WorkoutSerializer::status_key, WorkoutSerializer::ended_time_key));
-        alter.exec(QStringLiteral("UPDATE %1 SET %2 = 'Started' WHERE %3 IS NOT NULL AND %4 IS NULL")
                        .arg(WorkoutSerializer::table, WorkoutSerializer::status_key,
-                            WorkoutSerializer::started_time_key, WorkoutSerializer::ended_time_key));
+                            WorkoutSerializer::ended_time_key));
+        alter.exec(
+            QStringLiteral("UPDATE %1 SET %2 = 'Started' WHERE %3 IS NOT NULL AND %4 IS NULL")
+                .arg(WorkoutSerializer::table, WorkoutSerializer::status_key,
+                     WorkoutSerializer::started_time_key, WorkoutSerializer::ended_time_key));
     }
 
     return ok;
 }
 
-std::vector<Workout> WorkoutRepositoryDb::findAll(const WorkoutQuery &query) const
+std::vector<Workout> WorkoutRepositoryDb::findAll(const WorkoutQuery& query) const
 {
     auto where = buildWhereClause(query);
     auto order = buildOrderClause(query);
@@ -87,7 +85,7 @@ std::vector<Workout> WorkoutRepositoryDb::findAll(const WorkoutQuery &query) con
 
     std::vector<Workout> results;
     results.reserve(rows.size());
-    for (const auto &row : rows)
+    for (const auto& row : rows)
     {
         Workout w = WorkoutSerializer::fromVariant(row);
         loadChildren(w);
@@ -96,7 +94,7 @@ std::vector<Workout> WorkoutRepositoryDb::findAll(const WorkoutQuery &query) con
     return results;
 }
 
-std::optional<Workout> WorkoutRepositoryDb::findOne(const WorkoutQuery &query) const
+std::optional<Workout> WorkoutRepositoryDb::findOne(const WorkoutQuery& query) const
 {
     auto where = buildWhereClause(query);
     auto rows = m_workoutRepo->select(where, Order(), 1);
@@ -108,7 +106,7 @@ std::optional<Workout> WorkoutRepositoryDb::findOne(const WorkoutQuery &query) c
     return w;
 }
 
-int WorkoutRepositoryDb::save(const Workout &workout)
+int WorkoutRepositoryDb::save(const Workout& workout)
 {
     QVariantMap data = WorkoutSerializer::toVariant(workout);
 
@@ -135,48 +133,48 @@ int WorkoutRepositoryDb::save(const Workout &workout)
     return workoutId;
 }
 
-bool WorkoutRepositoryDb::remove(const WorkoutQuery &query)
+bool WorkoutRepositoryDb::remove(const WorkoutQuery& query)
 {
     auto where = buildWhereClause(query);
     return m_workoutRepo->remove(where) > 0;
 }
 
-int WorkoutRepositoryDb::count(const WorkoutQuery &query) const
+int WorkoutRepositoryDb::count(const WorkoutQuery& query) const
 {
     auto where = buildWhereClause(query);
     return m_workoutRepo->count(where);
 }
 
-bool WorkoutRepositoryDb::exists(const WorkoutQuery &query) const
+bool WorkoutRepositoryDb::exists(const WorkoutQuery& query) const
 {
     auto where = buildWhereClause(query);
     return m_workoutRepo->exists(where);
 }
 
-void WorkoutRepositoryDb::loadChildren(Workout &workout) const
+void WorkoutRepositoryDb::loadChildren(Workout& workout) const
 {
     auto exercises = m_exerciseRepo.findByWorkoutId(workout.id());
 
-    for (auto &exercise : exercises)
+    for (auto& exercise : exercises)
     {
         auto sets = m_setRepo.findByExerciseId(exercise.id());
-        for (auto &set : sets)
+        for (auto& set : sets)
             exercise.addSet(set);
 
         workout.addExercise(exercise);
     }
 }
 
-void WorkoutRepositoryDb::saveChildren(int workoutId, const Workout &workout)
+void WorkoutRepositoryDb::saveChildren(int workoutId, const Workout& workout)
 {
-    for (const auto &exercise : workout.exercises())
+    for (const auto& exercise : workout.exercises())
     {
         Exercise e = exercise;
         e.setWorkoutId(workoutId);
 
         int exerciseId = m_exerciseRepo.save(e);
 
-        for (const auto &set : exercise.sets())
+        for (const auto& set : exercise.sets())
         {
             Set s = set;
             s.setExerciseId(exerciseId);
@@ -185,7 +183,7 @@ void WorkoutRepositoryDb::saveChildren(int workoutId, const Workout &workout)
     }
 }
 
-Where WorkoutRepositoryDb::buildWhereClause(const WorkoutQuery &query) const
+Where WorkoutRepositoryDb::buildWhereClause(const WorkoutQuery& query) const
 {
     Where where;
 
@@ -200,15 +198,17 @@ Where WorkoutRepositoryDb::buildWhereClause(const WorkoutQuery &query) const
 
     if (query.createdAfter().has_value())
     {
-        auto afterWhere = Where(WorkoutSerializer::created_time_key)
-                              .greaterThanOrEquals(query.createdAfter().value().toString(Qt::ISODate));
+        auto afterWhere
+            = Where(WorkoutSerializer::created_time_key)
+                  .greaterThanOrEquals(query.createdAfter().value().toString(Qt::ISODate));
         where = where.isEmpty() ? afterWhere : where.and_(afterWhere);
     }
 
     if (query.createdBefore().has_value())
     {
-        auto beforeWhere = Where(WorkoutSerializer::created_time_key)
-                               .lessThanOrEquals(query.createdBefore().value().toString(Qt::ISODate));
+        auto beforeWhere
+            = Where(WorkoutSerializer::created_time_key)
+                  .lessThanOrEquals(query.createdBefore().value().toString(Qt::ISODate));
         where = where.isEmpty() ? beforeWhere : where.and_(beforeWhere);
     }
 
@@ -242,7 +242,7 @@ Where WorkoutRepositoryDb::buildWhereClause(const WorkoutQuery &query) const
     return where;
 }
 
-Order WorkoutRepositoryDb::buildOrderClause(const WorkoutQuery &query) const
+Order WorkoutRepositoryDb::buildOrderClause(const WorkoutQuery& query) const
 {
     Order order;
 

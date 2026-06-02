@@ -1,9 +1,9 @@
-#include <gtest/gtest.h>
 #include "modules/userprofile/domain/entities/userprofile.h"
-#include "modules/userprofile/domain/entities/sex.h"
 #include "modules/userprofile/domain/entities/experiencelevel.h"
 #include "modules/userprofile/domain/entities/primarygoal.h"
+#include "modules/userprofile/domain/entities/sex.h"
 #include "modules/userprofile/domain/entities/unitsystem.h"
+#include <gtest/gtest.h>
 
 class UserProfileTest : public ::testing::Test
 {
@@ -101,88 +101,96 @@ TEST_F(UserProfileTest, CopySemantics)
 
 TEST_F(UserProfileTest, Sex_ToStringFromString_Roundtrip)
 {
-    EXPECT_EQ(sexFromString(sexToString(Sex::Male)),   Sex::Male);
+    EXPECT_EQ(sexFromString(sexToString(Sex::Male)), Sex::Male);
     EXPECT_EQ(sexFromString(sexToString(Sex::Female)), Sex::Female);
-    EXPECT_EQ(sexFromString(sexToString(Sex::Other)),  Sex::Other);
+    EXPECT_EQ(sexFromString(sexToString(Sex::Other)), Sex::Other);
 }
 
 TEST_F(UserProfileTest, Sex_ToString_CorrectValues)
 {
-    EXPECT_EQ(sexToString(Sex::Male),   "male");
+    EXPECT_EQ(sexToString(Sex::Male), "male");
     EXPECT_EQ(sexToString(Sex::Female), "female");
-    EXPECT_EQ(sexToString(Sex::Other),  "other");
+    EXPECT_EQ(sexToString(Sex::Other), "other");
 }
 
 TEST_F(UserProfileTest, Sex_FromString_UnknownFallsToOther)
 {
     EXPECT_EQ(sexFromString("unknown"), Sex::Other);
-    EXPECT_EQ(sexFromString(""),        Sex::Other);
+    EXPECT_EQ(sexFromString(""), Sex::Other);
 }
 
 // --- ExperienceLevel enum ---
 
 TEST_F(UserProfileTest, ExperienceLevel_ToStringFromString_Roundtrip)
 {
-    EXPECT_EQ(experienceLevelFromString(experienceLevelToString(ExperienceLevel::Beginner)),     ExperienceLevel::Beginner);
-    EXPECT_EQ(experienceLevelFromString(experienceLevelToString(ExperienceLevel::Intermediate)), ExperienceLevel::Intermediate);
-    EXPECT_EQ(experienceLevelFromString(experienceLevelToString(ExperienceLevel::Advanced)),     ExperienceLevel::Advanced);
+    EXPECT_EQ(experienceLevelFromString(experienceLevelToString(ExperienceLevel::Beginner)),
+              ExperienceLevel::Beginner);
+    EXPECT_EQ(experienceLevelFromString(experienceLevelToString(ExperienceLevel::Intermediate)),
+              ExperienceLevel::Intermediate);
+    EXPECT_EQ(experienceLevelFromString(experienceLevelToString(ExperienceLevel::Advanced)),
+              ExperienceLevel::Advanced);
 }
 
 TEST_F(UserProfileTest, ExperienceLevel_ToString_CorrectValues)
 {
-    EXPECT_EQ(experienceLevelToString(ExperienceLevel::Beginner),     "beginner");
+    EXPECT_EQ(experienceLevelToString(ExperienceLevel::Beginner), "beginner");
     EXPECT_EQ(experienceLevelToString(ExperienceLevel::Intermediate), "intermediate");
-    EXPECT_EQ(experienceLevelToString(ExperienceLevel::Advanced),     "advanced");
+    EXPECT_EQ(experienceLevelToString(ExperienceLevel::Advanced), "advanced");
 }
 
 TEST_F(UserProfileTest, ExperienceLevel_FromString_UnknownFallsToBeginner)
 {
     EXPECT_EQ(experienceLevelFromString("unknown"), ExperienceLevel::Beginner);
-    EXPECT_EQ(experienceLevelFromString(""),        ExperienceLevel::Beginner);
+    EXPECT_EQ(experienceLevelFromString(""), ExperienceLevel::Beginner);
 }
 
 // --- PrimaryGoal enum ---
 
 TEST_F(UserProfileTest, PrimaryGoal_ToStringFromString_Roundtrip)
 {
-    EXPECT_EQ(primaryGoalFromString(primaryGoalToString(PrimaryGoal::GeneralFitness)), PrimaryGoal::GeneralFitness);
-    EXPECT_EQ(primaryGoalFromString(primaryGoalToString(PrimaryGoal::WeightLoss)),     PrimaryGoal::WeightLoss);
-    EXPECT_EQ(primaryGoalFromString(primaryGoalToString(PrimaryGoal::MuscleGain)),     PrimaryGoal::MuscleGain);
-    EXPECT_EQ(primaryGoalFromString(primaryGoalToString(PrimaryGoal::Strength)),       PrimaryGoal::Strength);
-    EXPECT_EQ(primaryGoalFromString(primaryGoalToString(PrimaryGoal::Endurance)),      PrimaryGoal::Endurance);
+    EXPECT_EQ(primaryGoalFromString(primaryGoalToString(PrimaryGoal::GeneralFitness)),
+              PrimaryGoal::GeneralFitness);
+    EXPECT_EQ(primaryGoalFromString(primaryGoalToString(PrimaryGoal::WeightLoss)),
+              PrimaryGoal::WeightLoss);
+    EXPECT_EQ(primaryGoalFromString(primaryGoalToString(PrimaryGoal::MuscleGain)),
+              PrimaryGoal::MuscleGain);
+    EXPECT_EQ(primaryGoalFromString(primaryGoalToString(PrimaryGoal::Strength)),
+              PrimaryGoal::Strength);
+    EXPECT_EQ(primaryGoalFromString(primaryGoalToString(PrimaryGoal::Endurance)),
+              PrimaryGoal::Endurance);
 }
 
 TEST_F(UserProfileTest, PrimaryGoal_ToString_CorrectValues)
 {
     EXPECT_EQ(primaryGoalToString(PrimaryGoal::GeneralFitness), "general_fitness");
-    EXPECT_EQ(primaryGoalToString(PrimaryGoal::WeightLoss),     "weight_loss");
-    EXPECT_EQ(primaryGoalToString(PrimaryGoal::MuscleGain),     "muscle_gain");
-    EXPECT_EQ(primaryGoalToString(PrimaryGoal::Strength),       "strength");
-    EXPECT_EQ(primaryGoalToString(PrimaryGoal::Endurance),      "endurance");
+    EXPECT_EQ(primaryGoalToString(PrimaryGoal::WeightLoss), "weight_loss");
+    EXPECT_EQ(primaryGoalToString(PrimaryGoal::MuscleGain), "muscle_gain");
+    EXPECT_EQ(primaryGoalToString(PrimaryGoal::Strength), "strength");
+    EXPECT_EQ(primaryGoalToString(PrimaryGoal::Endurance), "endurance");
 }
 
 TEST_F(UserProfileTest, PrimaryGoal_FromString_UnknownFallsToGeneralFitness)
 {
     EXPECT_EQ(primaryGoalFromString("unknown"), PrimaryGoal::GeneralFitness);
-    EXPECT_EQ(primaryGoalFromString(""),        PrimaryGoal::GeneralFitness);
+    EXPECT_EQ(primaryGoalFromString(""), PrimaryGoal::GeneralFitness);
 }
 
 // --- UnitSystem enum ---
 
 TEST_F(UserProfileTest, UnitSystem_ToStringFromString_Roundtrip)
 {
-    EXPECT_EQ(unitSystemFromString(unitSystemToString(UnitSystem::Metric)),   UnitSystem::Metric);
+    EXPECT_EQ(unitSystemFromString(unitSystemToString(UnitSystem::Metric)), UnitSystem::Metric);
     EXPECT_EQ(unitSystemFromString(unitSystemToString(UnitSystem::Imperial)), UnitSystem::Imperial);
 }
 
 TEST_F(UserProfileTest, UnitSystem_ToString_CorrectValues)
 {
-    EXPECT_EQ(unitSystemToString(UnitSystem::Metric),   "metric");
+    EXPECT_EQ(unitSystemToString(UnitSystem::Metric), "metric");
     EXPECT_EQ(unitSystemToString(UnitSystem::Imperial), "imperial");
 }
 
 TEST_F(UserProfileTest, UnitSystem_FromString_UnknownFallsToMetric)
 {
     EXPECT_EQ(unitSystemFromString("unknown"), UnitSystem::Metric);
-    EXPECT_EQ(unitSystemFromString(""),        UnitSystem::Metric);
+    EXPECT_EQ(unitSystemFromString(""), UnitSystem::Metric);
 }

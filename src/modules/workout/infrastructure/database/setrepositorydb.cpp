@@ -1,23 +1,19 @@
 #include "setrepositorydb.h"
-#include "modules/workout/infrastructure/serializers/setserializer.h"
 #include "modules/workout/infrastructure/serializers/exerciseserializer.h"
+#include "modules/workout/infrastructure/serializers/setserializer.h"
 
 #include <dbtoolkit/dbrepository.h>
 #include <dbtoolkit/dbstorage.h>
-#include <dbtoolkit/query/createtable.h>
 #include <dbtoolkit/query/column.h>
-#include <dbtoolkit/query/where.h>
+#include <dbtoolkit/query/createtable.h>
 #include <dbtoolkit/query/order.h>
+#include <dbtoolkit/query/where.h>
 
-SetRepositoryDb::SetRepositoryDb(DbStorage &storage)
+SetRepositoryDb::SetRepositoryDb(DbStorage& storage)
     : m_repository(std::make_unique<DbRepository>(
-          SetSerializer::table,
-          SetSerializer::id_key,
-          QStringList{
-              SetSerializer::id_key,
-              SetSerializer::exercise_id_key,
-              SetSerializer::repetitions_key,
-              SetSerializer::weight_key},
+          SetSerializer::table, SetSerializer::id_key,
+          QStringList { SetSerializer::id_key, SetSerializer::exercise_id_key,
+                        SetSerializer::repetitions_key, SetSerializer::weight_key },
           storage, nullptr))
 {
 }
@@ -32,10 +28,8 @@ bool SetRepositoryDb::createTable()
         .column(Column(SetSerializer::exercise_id_key).integer().notNull())
         .column(Column(SetSerializer::repetitions_key).integer())
         .column(Column(SetSerializer::weight_key).real())
-        .foreignKey(SetSerializer::exercise_id_key,
-                    ExerciseSerializer::table,
-                    ExerciseSerializer::id_key,
-                    OnDeleteAction::Cascade);
+        .foreignKey(SetSerializer::exercise_id_key, ExerciseSerializer::table,
+                    ExerciseSerializer::id_key, OnDeleteAction::Cascade);
     return m_repository->createTable(table);
 }
 
@@ -46,12 +40,12 @@ std::vector<Set> SetRepositoryDb::findByExerciseId(int exerciseId) const
 
     std::vector<Set> results;
     results.reserve(rows.size());
-    for (const auto &row : rows)
+    for (const auto& row : rows)
         results.push_back(SetSerializer::fromVariant(row));
     return results;
 }
 
-int SetRepositoryDb::save(const Set &set)
+int SetRepositoryDb::save(const Set& set)
 {
     QVariantMap data = SetSerializer::toVariant(set);
 

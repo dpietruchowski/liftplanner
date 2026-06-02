@@ -5,7 +5,7 @@
 namespace TestData
 {
 
-    inline const QString THREE_WORKOUTS_JSON = R"({
+inline const QString THREE_WORKOUTS_JSON = R"({
     "user_profile": null,
     "workouts": [
         {
@@ -68,7 +68,7 @@ namespace TestData
     ]
 })";
 
-    inline const QString SINGLE_WORKOUT_JSON = R"({
+inline const QString SINGLE_WORKOUT_JSON = R"({
     "user_profile": null,
     "workouts": [
         {
@@ -93,7 +93,7 @@ namespace TestData
     ]
 })";
 
-    inline const QString EMPTY_WORKOUT_JSON = R"({
+inline const QString EMPTY_WORKOUT_JSON = R"({
     "user_profile": null,
     "workouts": [
         {
@@ -103,4 +103,4 @@ namespace TestData
     ]
 })";
 
-} // namespace TestData
+}  // namespace TestData

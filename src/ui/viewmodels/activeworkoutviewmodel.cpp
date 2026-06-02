@@ -1,36 +1,31 @@
 #include "activeworkoutviewmodel.h"
+#include "modules/workout/application/workoutservice.h"
+#include "utils/workoutjson.h"
 #include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QStandardPaths>
-#include "utils/workoutjson.h"
-#include "modules/workout/application/workoutservice.h"
 
-ActiveWorkoutViewModel::ActiveWorkoutViewModel(WorkoutService *service, QObject *parent)
-    : QObject(parent), m_service(service), m_currentWorkout(nullptr), m_currentExercise(nullptr),
-      m_currentSet(nullptr), m_isActive(false)
+ActiveWorkoutViewModel::ActiveWorkoutViewModel(WorkoutService* service, QObject* parent)
+    : QObject(parent)
+    , m_service(service)
+    , m_currentWorkout(nullptr)
+    , m_currentExercise(nullptr)
+    , m_currentSet(nullptr)
+    , m_isActive(false)
 {
-    connect(this,
-            &ActiveWorkoutViewModel::currentWorkoutChanged,
-            this,
+    connect(this, &ActiveWorkoutViewModel::currentWorkoutChanged, this,
             &ActiveWorkoutViewModel::saveCurrentWorkout);
-    connect(this,
-            &ActiveWorkoutViewModel::currentExerciseChanged,
-            this,
+    connect(this, &ActiveWorkoutViewModel::currentExerciseChanged, this,
             &ActiveWorkoutViewModel::saveCurrentWorkout);
-    connect(this,
-            &ActiveWorkoutViewModel::currentSetChanged,
-            this,
+    connect(this, &ActiveWorkoutViewModel::currentSetChanged, this,
             &ActiveWorkoutViewModel::saveCurrentWorkout);
     loadCurrentWorkout();
 }
 
-ActiveWorkoutViewModel::~ActiveWorkoutViewModel()
-{
-    saveCurrentWorkout();
-}
+ActiveWorkoutViewModel::~ActiveWorkoutViewModel() { saveCurrentWorkout(); }
 
 void ActiveWorkoutViewModel::saveCurrentWorkout()
 {
@@ -62,7 +57,8 @@ void ActiveWorkoutViewModel::saveCurrentWorkout()
 
 void ActiveWorkoutViewModel::loadCurrentWorkout()
 {
-    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/current_workout.json";
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+        + "/current_workout.json";
 
     QFile file(path);
     if (!file.exists() || !file.open(QIODevice::ReadOnly))
@@ -76,7 +72,7 @@ void ActiveWorkoutViewModel::loadCurrentWorkout()
         return;
 
     Workout entity = WorkoutJson::workoutFromJson(doc.object());
-    auto *loadedWorkout = new WorkoutModel(entity, this);
+    auto* loadedWorkout = new WorkoutModel(entity, this);
 
     setCurrentWorkout(loadedWorkout);
     updateCurrentExercise();
@@ -84,7 +80,7 @@ void ActiveWorkoutViewModel::loadCurrentWorkout()
     setIsActive(true);
 }
 
-void ActiveWorkoutViewModel::startWorkout(WorkoutModel *workout)
+void ActiveWorkoutViewModel::startWorkout(WorkoutModel* workout)
 {
     if (!workout)
     {
@@ -92,7 +88,7 @@ void ActiveWorkoutViewModel::startWorkout(WorkoutModel *workout)
         return;
     }
 
-    auto *clonedWorkout = workout->clone(nullptr);
+    auto* clonedWorkout = workout->clone(nullptr);
     clonedWorkout->start();
 
     setCurrentWorkout(clonedWorkout);
@@ -180,7 +176,7 @@ void ActiveWorkoutViewModel::endWorkout()
     saveToDb();
     emit workoutCompleted();
 
-    auto *oldWorkout = m_currentWorkout;
+    auto* oldWorkout = m_currentWorkout;
 
     setIsActive(false);
     setCurrentWorkout(nullptr);
@@ -190,16 +186,16 @@ void ActiveWorkoutViewModel::endWorkout()
     oldWorkout->deleteLater();
 }
 
-void ActiveWorkoutViewModel::duplicateSet(SetModel *set)
+void ActiveWorkoutViewModel::duplicateSet(SetModel* set)
 {
     if (!set)
         return;
 
-    auto *exercise = qobject_cast<ExerciseModel *>(set->parent());
+    auto* exercise = qobject_cast<ExerciseModel*>(set->parent());
     if (!exercise)
         return;
 
-    SetModel *clone = set->clone(exercise);
+    SetModel* clone = set->clone(exercise);
     if (!clone)
         return;
 
@@ -210,12 +206,12 @@ void ActiveWorkoutViewModel::duplicateSet(SetModel *set)
     saveCurrentWorkout();
 }
 
-void ActiveWorkoutViewModel::removeSet(SetModel *set)
+void ActiveWorkoutViewModel::removeSet(SetModel* set)
 {
     if (!set)
         return;
 
-    auto *exercise = qobject_cast<ExerciseModel *>(set->parent());
+    auto* exercise = qobject_cast<ExerciseModel*>(set->parent());
     if (!exercise)
         return;
 
@@ -250,10 +246,8 @@ void ActiveWorkoutViewModel::saveCompletedSet()
 
     m_currentSet->setCompleted(true);
 
-    qDebug() << "Completed set:"
-             << (m_currentExercise ? m_currentExercise->name() : "Unknown")
-             << m_currentSet->repetitions() << "reps x"
-             << m_currentSet->weight() << "kg";
+    qDebug() << "Completed set:" << (m_currentExercise ? m_currentExercise->name() : "Unknown")
+             << m_currentSet->repetitions() << "reps x" << m_currentSet->weight() << "kg";
 }
 
 void ActiveWorkoutViewModel::updateCurrentExercise()

@@ -2,10 +2,14 @@
 #include <QClipboard>
 #include <QGuiApplication>
 
-ClipboardHelper::ClipboardHelper(QObject *parent)
-    : QObject(parent) {}
+ClipboardHelper::ClipboardHelper(QObject* parent)
+    : QObject(parent)
+{
+}
 
-void ClipboardHelper::setText(const QString &text) {
-    QClipboard *clipboard = QGuiApplication::clipboard();
-    if (clipboard) clipboard->setText(text);
+void ClipboardHelper::setText(const QString& text)
+{
+    QClipboard* clipboard = QGuiApplication::clipboard();
+    if (clipboard)
+        clipboard->setText(text);
 }

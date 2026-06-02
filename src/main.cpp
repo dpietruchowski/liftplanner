@@ -1,9 +1,9 @@
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
 #include "liftplannerapplication.h"
 #include "utils/qmlregistrator.h"
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     QGuiApplication app(argc, argv);
 
@@ -13,12 +13,8 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
 
     QObject::connect(
-        &engine,
-        &QQmlApplicationEngine::objectCreationFailed,
-        &app,
-        []()
-        { QCoreApplication::exit(-1); },
-        Qt::QueuedConnection);
+        &engine, &QQmlApplicationEngine::objectCreationFailed, &app,
+        []() { QCoreApplication::exit(-1); }, Qt::QueuedConnection);
 
 #ifdef QML_LIVE_ENABLED
     const QString uiRootDir = "/home/damian/dev/lift-planner/src/ui";

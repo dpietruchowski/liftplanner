@@ -3,11 +3,11 @@
 #include <QSqlError>
 #include <QSqlQuery>
 
-#include <dbtoolkit/dbstorage.h>
-#include "modules/workout/infrastructure/database/workoutrepositorydb.h"
 #include "modules/userprofile/infrastructure/database/userprofilerepositorydb.h"
+#include "modules/workout/infrastructure/database/workoutrepositorydb.h"
+#include <dbtoolkit/dbstorage.h>
 
-AppDbStorage::AppDbStorage(const QString &dbPath, QObject *parent)
+AppDbStorage::AppDbStorage(const QString& dbPath, QObject* parent)
     : QObject(parent)
 {
     m_database = QSqlDatabase::addDatabase("QSQLITE");
@@ -30,15 +30,9 @@ AppDbStorage::AppDbStorage(const QString &dbPath, QObject *parent)
 
 AppDbStorage::~AppDbStorage() = default;
 
-WorkoutRepositoryDb &AppDbStorage::workoutRepo()
-{
-    return *m_workoutRepo;
-}
+WorkoutRepositoryDb& AppDbStorage::workoutRepo() { return *m_workoutRepo; }
 
-UserProfileRepositoryDb &AppDbStorage::userProfileRepo()
-{
-    return *m_userProfileRepo;
-}
+UserProfileRepositoryDb& AppDbStorage::userProfileRepo() { return *m_userProfileRepo; }
 
 void AppDbStorage::initializeDatabase()
 {

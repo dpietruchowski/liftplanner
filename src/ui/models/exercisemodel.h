@@ -1,10 +1,10 @@
 #pragma once
 
-#include <QObject>
-#include <QList>
-#include <QQmlListProperty>
 #include "modules/workout/domain/entities/exercise.h"
 #include "setmodel.h"
+#include <QList>
+#include <QObject>
+#include <QQmlListProperty>
 
 class ExerciseModel : public QObject
 {
@@ -17,8 +17,8 @@ class ExerciseModel : public QObject
     Q_PROPERTY(bool completed READ isCompleted NOTIFY completedChanged)
 
 public:
-    explicit ExerciseModel(QObject *parent = nullptr);
-    explicit ExerciseModel(const Exercise &exercise, QObject *parent = nullptr);
+    explicit ExerciseModel(QObject* parent = nullptr);
+    explicit ExerciseModel(const Exercise& exercise, QObject* parent = nullptr);
 
     QString name() const;
     QString description() const;
@@ -27,15 +27,15 @@ public:
     bool isCompleted() const;
 
     QQmlListProperty<SetModel> setsProperty();
-    QList<SetModel *> sets() const;
+    QList<SetModel*> sets() const;
 
     Q_INVOKABLE QString setsToString() const;
 
-    void addSet(SetModel *set);
-    void removeSet(SetModel *set);
+    void addSet(SetModel* set);
+    void removeSet(SetModel* set);
 
     Exercise toEntity() const;
-    ExerciseModel *clone(QObject *parent = nullptr) const;
+    ExerciseModel* clone(QObject* parent = nullptr) const;
 
 signals:
     void dataChanged();
@@ -44,5 +44,5 @@ signals:
 
 private:
     Exercise m_exercise;
-    QList<SetModel *> m_sets;
+    QList<SetModel*> m_sets;
 };

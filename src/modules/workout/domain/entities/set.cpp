@@ -3,7 +3,8 @@
 Set::Set() = default;
 
 Set::Set(int repetitions, double weight)
-    : m_repetitions(repetitions), m_weight(weight)
+    : m_repetitions(repetitions)
+    , m_weight(weight)
 {
     validate();
 }
@@ -20,6 +21,4 @@ void Set::setRepetitions(int repetitions) { m_repetitions = repetitions; }
 void Set::setWeight(double weight) { m_weight = weight; }
 void Set::setCompleted(bool completed) { m_completed = completed; }
 
-void Set::validate() const
-{
-}
+void Set::validate() const { }

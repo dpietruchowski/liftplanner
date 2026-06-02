@@ -1,4 +1,8 @@
 #include "plannedworkoutviewmodel.h"
+#include "modules/userprofile/application/userprofileservice.h"
+#include "modules/userprofile/infrastructure/serializers/userprofileserializer.h"
+#include "modules/workout/application/workoutservice.h"
+#include "utils/workoutjson.h"
 #include <QClipboard>
 #include <QDate>
 #include <QDebug>
@@ -7,15 +11,13 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include "modules/workout/application/workoutservice.h"
-#include "modules/userprofile/application/userprofileservice.h"
-#include "modules/userprofile/infrastructure/serializers/userprofileserializer.h"
-#include "utils/workoutjson.h"
 
-PlannedWorkoutViewModel::PlannedWorkoutViewModel(WorkoutService *service,
-                                                 UserProfileService *profileService,
-                                                 QObject *parent)
-    : QObject(parent), m_service(service), m_profileService(profileService)
+PlannedWorkoutViewModel::PlannedWorkoutViewModel(WorkoutService* service,
+                                                 UserProfileService* profileService,
+                                                 QObject* parent)
+    : QObject(parent)
+    , m_service(service)
+    , m_profileService(profileService)
 {
 }
 
@@ -25,12 +27,9 @@ PlannedWorkoutViewModel::~PlannedWorkoutViewModel()
     m_workouts.clear();
 }
 
-QList<WorkoutModel *> PlannedWorkoutViewModel::workouts() const
-{
-    return m_workouts;
-}
+QList<WorkoutModel*> PlannedWorkoutViewModel::workouts() const { return m_workouts; }
 
-WorkoutModel *PlannedWorkoutViewModel::nextWorkout() const
+WorkoutModel* PlannedWorkoutViewModel::nextWorkout() const
 {
     return m_workouts.isEmpty() ? nullptr : m_workouts.first();
 }
@@ -43,18 +42,18 @@ void PlannedWorkoutViewModel::loadAll()
         m_workouts.clear();
 
         auto entities = m_service->loadPlannedWorkouts();
-        for (const auto &entity : entities)
+        for (const auto& entity : entities)
             m_workouts.append(new WorkoutModel(entity, this));
 
         emit workoutsChanged();
     }
-    catch (const std::exception &e)
+    catch (const std::exception& e)
     {
         emit errorOccurred(QString("Failed to load planned workouts: %1").arg(e.what()));
     }
 }
 
-void PlannedWorkoutViewModel::importFromJson(const QString &jsonData)
+void PlannedWorkoutViewModel::importFromJson(const QString& jsonData)
 {
     QString validationError;
     if (!validateJson(jsonData, validationError))
@@ -89,7 +88,7 @@ void PlannedWorkoutViewModel::importFromJson(const QString &jsonData)
         m_service->importPlannedWorkouts(workouts);
         loadAll();
     }
-    catch (const std::exception &e)
+    catch (const std::exception& e)
     {
         emit errorOccurred(QString("Import failed: %1").arg(e.what()));
     }
@@ -99,7 +98,7 @@ void PlannedWorkoutViewModel::importFromClipboard()
 {
     try
     {
-        QClipboard *clipboard = QGuiApplication::clipboard();
+        QClipboard* clipboard = QGuiApplication::clipboard();
         QString jsonData = clipboard->text();
 
         if (jsonData.isEmpty())
@@ -110,7 +109,7 @@ void PlannedWorkoutViewModel::importFromClipboard()
 
         importFromJson(jsonData);
     }
-    catch (const std::exception &e)
+    catch (const std::exception& e)
     {
         emit errorOccurred(QString("Import from clipboard failed: %1").arg(e.what()));
     }
@@ -130,7 +129,7 @@ void PlannedWorkoutViewModel::generatePrompt()
         historyArray.append(WorkoutJson::workoutToJsonCompact(history[i]));
 
     QJsonArray plannedArray;
-    for (auto *w : m_workouts)
+    for (auto* w : m_workouts)
         plannedArray.append(WorkoutJson::workoutToJsonCompact(w->toEntity()));
 
     QString profileJson = "null";
@@ -141,7 +140,8 @@ void PlannedWorkoutViewModel::generatePrompt()
         {
             QVariantMap vm = UserProfileSerializer::toVariant(*profileOpt);
             vm.remove(UserProfileSerializer::user_id_key);
-            profileJson = QJsonDocument(QJsonObject::fromVariantMap(vm)).toJson(QJsonDocument::Indented);
+            profileJson
+                = QJsonDocument(QJsonObject::fromVariantMap(vm)).toJson(QJsonDocument::Indented);
         }
     }
 
@@ -150,12 +150,12 @@ void PlannedWorkoutViewModel::generatePrompt()
     prompt.replace("{{HISTORY_JSON}}", QJsonDocument(historyArray).toJson(QJsonDocument::Indented));
     prompt.replace("{{PLANNED_JSON}}", QJsonDocument(plannedArray).toJson(QJsonDocument::Indented));
 
-    QClipboard *clipboard = QGuiApplication::clipboard();
+    QClipboard* clipboard = QGuiApplication::clipboard();
     clipboard->setText(prompt);
     emit promptGenerated();
 }
 
-bool PlannedWorkoutViewModel::validateJson(const QString &jsonData, QString &errorMessage)
+bool PlannedWorkoutViewModel::validateJson(const QString& jsonData, QString& errorMessage)
 {
     QJsonParseError parseError;
     QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8(), &parseError);
@@ -180,7 +180,7 @@ bool PlannedWorkoutViewModel::validateJson(const QString &jsonData, QString &err
 
     QJsonArray workoutsArray = root.value("workouts").toArray();
     int index = 0;
-    for (const QJsonValue &workoutValue : workoutsArray)
+    for (const QJsonValue& workoutValue : workoutsArray)
     {
         if (!workoutValue.isObject())
         {
@@ -199,7 +199,8 @@ bool PlannedWorkoutViewModel::validateJson(const QString &jsonData, QString &err
         {
             if (!workoutObj["exercises"].isArray())
             {
-                errorMessage = QString("Workout at index %1: 'exercises' is not an array").arg(index);
+                errorMessage
+                    = QString("Workout at index %1: 'exercises' is not an array").arg(index);
                 return false;
             }
 
@@ -208,7 +209,8 @@ bool PlannedWorkoutViewModel::validateJson(const QString &jsonData, QString &err
             {
                 if (!exercisesArray[j].isObject())
                 {
-                    errorMessage = QString("Workout %1, exercise %2: not a valid object").arg(index).arg(j);
+                    errorMessage
+                        = QString("Workout %1, exercise %2: not a valid object").arg(index).arg(j);
                     return false;
                 }
 
@@ -230,7 +232,7 @@ bool PlannedWorkoutViewModel::validateJson(const QString &jsonData, QString &err
     return true;
 }
 
-QString PlannedWorkoutViewModel::readTemplateFile(const QString &filePath)
+QString PlannedWorkoutViewModel::readTemplateFile(const QString& filePath)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))

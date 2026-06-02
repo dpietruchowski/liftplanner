@@ -2,39 +2,39 @@
 
 #include "core/types.h"
 #include "modules/workout/domain/entities/workoutstatus.h"
-#include <optional>
 #include <QDateTime>
+#include <optional>
 
 class WorkoutQuery final
 {
 public:
-    WorkoutQuery &whereId(int id);
-    WorkoutQuery &whereName(const QString &name);
-    WorkoutQuery &whereCreatedAfter(const QDateTime &dateTime);
-    WorkoutQuery &whereCreatedBefore(const QDateTime &dateTime);
-    WorkoutQuery &whereStartedTimeIsNull();
-    WorkoutQuery &whereStartedTimeIsNotNull();
-    WorkoutQuery &wherePlannedTimeIsNull();
-    WorkoutQuery &wherePlannedTimeIsNotNull();
-    WorkoutQuery &whereStatus(WorkoutStatus status);
-    WorkoutQuery &orderByCreatedTime(SortDirection direction);
-    WorkoutQuery &orderByStartedTime(SortDirection direction);
-    WorkoutQuery &orderByPlannedTime(SortDirection direction);
-    WorkoutQuery &withLimit(int limit);
-    WorkoutQuery &withOffset(int offset);
+    WorkoutQuery& whereId(int id);
+    WorkoutQuery& whereName(const QString& name);
+    WorkoutQuery& whereCreatedAfter(const QDateTime& dateTime);
+    WorkoutQuery& whereCreatedBefore(const QDateTime& dateTime);
+    WorkoutQuery& whereStartedTimeIsNull();
+    WorkoutQuery& whereStartedTimeIsNotNull();
+    WorkoutQuery& wherePlannedTimeIsNull();
+    WorkoutQuery& wherePlannedTimeIsNotNull();
+    WorkoutQuery& whereStatus(WorkoutStatus status);
+    WorkoutQuery& orderByCreatedTime(SortDirection direction);
+    WorkoutQuery& orderByStartedTime(SortDirection direction);
+    WorkoutQuery& orderByPlannedTime(SortDirection direction);
+    WorkoutQuery& withLimit(int limit);
+    WorkoutQuery& withOffset(int offset);
 
-    const std::optional<int> &id() const;
-    const std::optional<QString> &name() const;
-    const std::optional<QDateTime> &createdAfter() const;
-    const std::optional<QDateTime> &createdBefore() const;
-    const std::optional<bool> &startedTimeIsNull() const;
-    const std::optional<bool> &plannedTimeIsNull() const;
-    const std::optional<WorkoutStatus> &status() const;
-    const std::optional<SortDirection> &orderByCreatedTimeDirection() const;
-    const std::optional<SortDirection> &orderByStartedTimeDirection() const;
-    const std::optional<SortDirection> &orderByPlannedTimeDirection() const;
-    const std::optional<int> &limit() const;
-    const std::optional<int> &offset() const;
+    const std::optional<int>& id() const;
+    const std::optional<QString>& name() const;
+    const std::optional<QDateTime>& createdAfter() const;
+    const std::optional<QDateTime>& createdBefore() const;
+    const std::optional<bool>& startedTimeIsNull() const;
+    const std::optional<bool>& plannedTimeIsNull() const;
+    const std::optional<WorkoutStatus>& status() const;
+    const std::optional<SortDirection>& orderByCreatedTimeDirection() const;
+    const std::optional<SortDirection>& orderByStartedTimeDirection() const;
+    const std::optional<SortDirection>& orderByPlannedTimeDirection() const;
+    const std::optional<int>& limit() const;
+    const std::optional<int>& offset() const;
 
 private:
     std::optional<int> m_id;

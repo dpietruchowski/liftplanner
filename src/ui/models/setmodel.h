@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QObject>
 #include "modules/workout/domain/entities/set.h"
+#include <QObject>
 
 class SetModel : public QObject
 {
@@ -11,8 +11,8 @@ class SetModel : public QObject
     Q_PROPERTY(bool completed READ completed WRITE setCompleted NOTIFY completedChanged)
 
 public:
-    explicit SetModel(QObject *parent = nullptr);
-    explicit SetModel(const Set &set, QObject *parent = nullptr);
+    explicit SetModel(QObject* parent = nullptr);
+    explicit SetModel(const Set& set, QObject* parent = nullptr);
 
     int repetitions() const;
     double weight() const;
@@ -22,8 +22,8 @@ public:
     void setWeight(double value);
     void setCompleted(bool value);
 
-    const Set &entity() const;
-    SetModel *clone(QObject *parent = nullptr) const;
+    const Set& entity() const;
+    SetModel* clone(QObject* parent = nullptr) const;
 
 signals:
     void repetitionsChanged();

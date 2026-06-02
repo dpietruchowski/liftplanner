@@ -1,13 +1,13 @@
-#include <gtest/gtest.h>
+#include "modules/workout/infrastructure/database/workoutrepositorydb.h"
+#include "modules/workout/domain/entities/exercise.h"
+#include "modules/workout/domain/entities/set.h"
+#include "modules/workout/domain/entities/workout.h"
+#include "modules/workout/domain/entities/workoutstatus.h"
+#include "modules/workout/domain/repositories/workoutquery.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <dbtoolkit/dbstorage.h>
-#include "modules/workout/domain/entities/workout.h"
-#include "modules/workout/domain/entities/workoutstatus.h"
-#include "modules/workout/domain/entities/exercise.h"
-#include "modules/workout/domain/entities/set.h"
-#include "modules/workout/domain/repositories/workoutquery.h"
-#include "modules/workout/infrastructure/database/workoutrepositorydb.h"
+#include <gtest/gtest.h>
 
 class WorkoutRepositoryDbTest : public ::testing::Test
 {
@@ -35,12 +35,9 @@ protected:
         QSqlDatabase::removeDatabase(m_connectionName);
     }
 
-    Workout makeWorkout(const QString &name)
-    {
-        return Workout(name, QDateTime::currentDateTime());
-    }
+    Workout makeWorkout(const QString& name) { return Workout(name, QDateTime::currentDateTime()); }
 
-    Workout makeFullWorkout(const QString &name)
+    Workout makeFullWorkout(const QString& name)
     {
         Workout w(name, QDateTime::currentDateTime());
 
@@ -103,7 +100,7 @@ TEST_F(WorkoutRepositoryDbTest, FindAll_WithNameFilter)
     auto results = m_repo->findAll(WorkoutQuery().whereName("Push"));
 
     EXPECT_EQ(results.size(), 2u);
-    for (const auto &w : results)
+    for (const auto& w : results)
         EXPECT_EQ(w.name(), "Push");
 }
 
@@ -197,7 +194,7 @@ TEST_F(WorkoutRepositoryDbTest, Save_FullAggregate_LoadsExercisesAndSets)
     EXPECT_EQ(found->name(), "Full Day");
     ASSERT_EQ(found->exercises().size(), 2u);
 
-    const auto &e1 = found->exercises()[0];
+    const auto& e1 = found->exercises()[0];
     EXPECT_EQ(e1.name(), "Bench Press");
     EXPECT_EQ(e1.restSeconds(), 120);
     ASSERT_EQ(e1.sets().size(), 2u);
@@ -206,7 +203,7 @@ TEST_F(WorkoutRepositoryDbTest, Save_FullAggregate_LoadsExercisesAndSets)
     EXPECT_EQ(e1.sets()[1].repetitions(), 8);
     EXPECT_EQ(e1.sets()[1].weight(), 85);
 
-    const auto &e2 = found->exercises()[1];
+    const auto& e2 = found->exercises()[1];
     EXPECT_EQ(e2.name(), "Squat");
     ASSERT_EQ(e2.sets().size(), 1u);
     EXPECT_EQ(e2.sets()[0].repetitions(), 5);
@@ -221,7 +218,7 @@ TEST_F(WorkoutRepositoryDbTest, FindAll_LoadsChildrenForAll)
     auto all = m_repo->findAll(WorkoutQuery());
     EXPECT_EQ(all.size(), 2u);
 
-    for (const auto &w : all)
+    for (const auto& w : all)
     {
         EXPECT_EQ(w.exercises().size(), 2u);
         EXPECT_FALSE(w.exercises()[0].sets().empty());

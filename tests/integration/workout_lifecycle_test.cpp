@@ -13,18 +13,18 @@
 class WorkoutLifecycleTest : public ::testing::Test
 {
 protected:
-    void importWorkouts(const QString &json)
+    void importWorkouts(const QString& json)
     {
         app.plannedWorkoutViewModel().importFromJson(json);
         app.plannedWorkoutViewModel().loadAll();
     }
 
-    void completeAllSets(ActiveWorkoutViewModel &vm)
+    void completeAllSets(ActiveWorkoutViewModel& vm)
     {
         if (!vm.currentWorkout())
             return;
 
-        for (auto *exercise : vm.currentWorkout()->exercises())
+        for (auto* exercise : vm.currentWorkout()->exercises())
         {
             for (int i = 0; i < exercise->sets().size(); ++i)
             {
@@ -40,10 +40,10 @@ TEST_F(WorkoutLifecycleTest, ImportPlanStartAndEnd_AppearsInHistory)
 {
     importWorkouts(TestData::THREE_WORKOUTS_JSON);
 
-    auto &planned = app.plannedWorkoutViewModel();
+    auto& planned = app.plannedWorkoutViewModel();
     ASSERT_EQ(planned.workouts().size(), 3);
 
-    auto &active = app.activeWorkoutViewModel();
+    auto& active = app.activeWorkoutViewModel();
     active.startWorkout(planned.workouts().first());
 
     EXPECT_TRUE(active.isActive());
@@ -57,7 +57,7 @@ TEST_F(WorkoutLifecycleTest, ImportPlanStartAndEnd_AppearsInHistory)
     EXPECT_EQ(active.currentWorkout(), nullptr);
 
     app.workoutHistoryViewModel().loadAllWorkouts();
-    auto &history = app.workoutHistoryViewModel();
+    auto& history = app.workoutHistoryViewModel();
     ASSERT_EQ(history.workouts().size(), 1);
     EXPECT_EQ(history.workouts().first()->name(), "Push Day");
     EXPECT_TRUE(history.workouts().first()->endedTime().isValid());
@@ -67,8 +67,8 @@ TEST_F(WorkoutLifecycleTest, CompletedWorkout_HasCorrectStatus)
 {
     importWorkouts(TestData::SINGLE_WORKOUT_JSON);
 
-    auto &planned = app.plannedWorkoutViewModel();
-    auto &active = app.activeWorkoutViewModel();
+    auto& planned = app.plannedWorkoutViewModel();
+    auto& active = app.activeWorkoutViewModel();
 
     active.startWorkout(planned.workouts().first());
     EXPECT_EQ(active.currentWorkout()->statusString(), "Started");
@@ -76,7 +76,7 @@ TEST_F(WorkoutLifecycleTest, CompletedWorkout_HasCorrectStatus)
     active.endWorkout();
 
     app.workoutHistoryViewModel().loadAllWorkouts();
-    auto *last = app.workoutHistoryViewModel().lastWorkout();
+    auto* last = app.workoutHistoryViewModel().lastWorkout();
     ASSERT_NE(last, nullptr);
     EXPECT_EQ(last->statusString(), "Ended");
 }
@@ -85,12 +85,12 @@ TEST_F(WorkoutLifecycleTest, CompletedWorkout_HasAllTimestamps)
 {
     importWorkouts(TestData::SINGLE_WORKOUT_JSON);
 
-    auto &active = app.activeWorkoutViewModel();
+    auto& active = app.activeWorkoutViewModel();
     active.startWorkout(app.plannedWorkoutViewModel().workouts().first());
     active.endWorkout();
 
     app.workoutHistoryViewModel().loadAllWorkouts();
-    auto *last = app.workoutHistoryViewModel().lastWorkout();
+    auto* last = app.workoutHistoryViewModel().lastWorkout();
     ASSERT_NE(last, nullptr);
 
     EXPECT_TRUE(last->startedTime().isValid());
@@ -102,8 +102,8 @@ TEST_F(WorkoutLifecycleTest, MultipleWorkouts_AllAppearInHistory)
 {
     importWorkouts(TestData::THREE_WORKOUTS_JSON);
 
-    auto &planned = app.plannedWorkoutViewModel();
-    auto &active = app.activeWorkoutViewModel();
+    auto& planned = app.plannedWorkoutViewModel();
+    auto& active = app.activeWorkoutViewModel();
 
     // Start and end first workout
     active.startWorkout(planned.workouts().at(0));
@@ -121,12 +121,12 @@ TEST_F(WorkoutLifecycleTest, StartWorkout_ClonesNotModifiesOriginal)
 {
     importWorkouts(TestData::SINGLE_WORKOUT_JSON);
 
-    auto &planned = app.plannedWorkoutViewModel();
-    auto *originalWorkout = planned.workouts().first();
+    auto& planned = app.plannedWorkoutViewModel();
+    auto* originalWorkout = planned.workouts().first();
     QString originalName = originalWorkout->name();
     int originalId = originalWorkout->id();
 
-    auto &active = app.activeWorkoutViewModel();
+    auto& active = app.activeWorkoutViewModel();
     active.startWorkout(originalWorkout);
 
     // Original planned workout should be unchanged
@@ -142,7 +142,7 @@ TEST_F(WorkoutLifecycleTest, CompleteAllSets_ThenEndWorkout)
 {
     importWorkouts(TestData::SINGLE_WORKOUT_JSON);
 
-    auto &active = app.activeWorkoutViewModel();
+    auto& active = app.activeWorkoutViewModel();
     active.startWorkout(app.plannedWorkoutViewModel().workouts().first());
 
     ASSERT_NE(active.currentExercise(), nullptr);
@@ -154,7 +154,7 @@ TEST_F(WorkoutLifecycleTest, CompleteAllSets_ThenEndWorkout)
     active.endWorkout();
 
     app.workoutHistoryViewModel().loadAllWorkouts();
-    auto *last = app.workoutHistoryViewModel().lastWorkout();
+    auto* last = app.workoutHistoryViewModel().lastWorkout();
     ASSERT_NE(last, nullptr);
     EXPECT_EQ(last->name(), "Full Body");
 }
@@ -163,11 +163,11 @@ TEST_F(WorkoutLifecycleTest, DeleteFromHistory)
 {
     importWorkouts(TestData::SINGLE_WORKOUT_JSON);
 
-    auto &active = app.activeWorkoutViewModel();
+    auto& active = app.activeWorkoutViewModel();
     active.startWorkout(app.plannedWorkoutViewModel().workouts().first());
     active.endWorkout();
 
-    auto &history = app.workoutHistoryViewModel();
+    auto& history = app.workoutHistoryViewModel();
     history.loadAllWorkouts();
     ASSERT_EQ(history.workouts().size(), 1);
 

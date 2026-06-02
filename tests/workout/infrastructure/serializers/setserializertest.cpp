@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-#include "modules/workout/domain/entities/set.h"
 #include "modules/workout/infrastructure/serializers/setserializer.h"
+#include "modules/workout/domain/entities/set.h"
+#include <gtest/gtest.h>
 
 class SetSerializerTest : public ::testing::Test
 {
@@ -115,7 +115,4 @@ TEST_F(SetSerializerTest, Roundtrip_FractionalWeight)
     EXPECT_EQ(restored.id(), 3);
 }
 
-TEST_F(SetSerializerTest, TableName_IsCorrect)
-{
-    EXPECT_STREQ(SetSerializer::table, "sets");
-}
+TEST_F(SetSerializerTest, TableName_IsCorrect) { EXPECT_STREQ(SetSerializer::table, "sets"); }

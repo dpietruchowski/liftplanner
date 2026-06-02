@@ -10,22 +10,22 @@ class WorkoutRepository;
 class WorkoutService
 {
 public:
-    explicit WorkoutService(WorkoutRepository &repository);
+    explicit WorkoutService(WorkoutRepository& repository);
 
     // Planned workouts (not yet started, ordered by plannedTime)
     std::vector<Workout> loadPlannedWorkouts() const;
-    void importPlannedWorkouts(const std::vector<Workout> &workouts);
+    void importPlannedWorkouts(const std::vector<Workout>& workouts);
     void removeAllPlannedWorkouts();
 
     // History (started/completed workouts)
     std::vector<Workout> loadHistory() const;
-    void importHistory(const std::vector<Workout> &workouts);
+    void importHistory(const std::vector<Workout>& workouts);
 
     // General CRUD
     std::optional<Workout> findWorkout(int id) const;
-    int saveWorkout(const Workout &workout);
+    int saveWorkout(const Workout& workout);
     bool deleteWorkout(int id);
 
 private:
-    WorkoutRepository &m_repository;
+    WorkoutRepository& m_repository;
 };

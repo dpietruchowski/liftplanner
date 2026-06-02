@@ -16,11 +16,11 @@ class ClipboardHelper;
 class LiftPlannerApplication final
 {
 public:
-    explicit LiftPlannerApplication(const QString &dbPath);
+    explicit LiftPlannerApplication(const QString& dbPath);
     ~LiftPlannerApplication();
 
     void initialize();
-    void registerQmlTypes(QmlRegistrator &registrator);
+    void registerQmlTypes(QmlRegistrator& registrator);
 
 private:
     std::unique_ptr<AppDbStorage> m_storage;

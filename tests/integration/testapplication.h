@@ -1,7 +1,7 @@
 #pragma once
 
-#include <memory>
 #include <QSqlDatabase>
+#include <memory>
 
 class DbStorage;
 class WorkoutRepositoryDb;
@@ -18,11 +18,11 @@ public:
     TestApplication();
     ~TestApplication();
 
-    ActiveWorkoutViewModel &activeWorkoutViewModel();
-    WorkoutHistoryViewModel &workoutHistoryViewModel();
-    PlannedWorkoutViewModel &plannedWorkoutViewModel();
+    ActiveWorkoutViewModel& activeWorkoutViewModel();
+    WorkoutHistoryViewModel& workoutHistoryViewModel();
+    PlannedWorkoutViewModel& plannedWorkoutViewModel();
 
-    WorkoutService &workoutService();
+    WorkoutService& workoutService();
 
 private:
     static int s_connectionCounter;

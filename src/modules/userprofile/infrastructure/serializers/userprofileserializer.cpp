@@ -1,12 +1,12 @@
 #include "userprofileserializer.h"
-#include <QDate>
-#include "modules/userprofile/domain/entities/userprofile.h"
-#include "modules/userprofile/domain/entities/sex.h"
 #include "modules/userprofile/domain/entities/experiencelevel.h"
 #include "modules/userprofile/domain/entities/primarygoal.h"
+#include "modules/userprofile/domain/entities/sex.h"
 #include "modules/userprofile/domain/entities/unitsystem.h"
+#include "modules/userprofile/domain/entities/userprofile.h"
+#include <QDate>
 
-UserProfile UserProfileSerializer::fromVariant(const QVariantMap &data)
+UserProfile UserProfileSerializer::fromVariant(const QVariantMap& data)
 {
     UserProfile profile;
 
@@ -21,7 +21,8 @@ UserProfile UserProfileSerializer::fromVariant(const QVariantMap &data)
     if (data.contains(sessions_key))
         profile.setSessionsPerWeek(data.value(sessions_key).toInt());
     if (data.contains(experience_key))
-        profile.setExperienceLevel(experienceLevelFromString(data.value(experience_key).toString()));
+        profile.setExperienceLevel(
+            experienceLevelFromString(data.value(experience_key).toString()));
     if (data.contains(goal_key))
         profile.setPrimaryGoal(primaryGoalFromString(data.value(goal_key).toString()));
     if (data.contains(date_of_birth_key) && !data.value(date_of_birth_key).isNull())
@@ -40,25 +41,26 @@ UserProfile UserProfileSerializer::fromVariant(const QVariantMap &data)
     return profile;
 }
 
-QVariantMap UserProfileSerializer::toVariant(const UserProfile &profile)
+QVariantMap UserProfileSerializer::toVariant(const UserProfile& profile)
 {
     QVariantMap data;
 
-    data.insert(user_id_key,    profile.userId());
-    data.insert(language_key,   profile.language());
-    data.insert(timezone_key,   profile.timezone());
-    data.insert(sex_key,        sexToString(profile.sex()));
-    data.insert(sessions_key,   profile.sessionsPerWeek());
+    data.insert(user_id_key, profile.userId());
+    data.insert(language_key, profile.language());
+    data.insert(timezone_key, profile.timezone());
+    data.insert(sex_key, sexToString(profile.sex()));
+    data.insert(sessions_key, profile.sessionsPerWeek());
     data.insert(experience_key, experienceLevelToString(profile.experienceLevel()));
-    data.insert(goal_key,       primaryGoalToString(profile.primaryGoal()));
-    data.insert(date_of_birth_key, profile.dateOfBirth().has_value()
-                                       ? QVariant(profile.dateOfBirth()->toString(Qt::ISODate))
-                                       : QVariant());
-    data.insert(bodyweight_key, profile.bodyweightKg().has_value()
-                                    ? QVariant(profile.bodyweightKg().value())
-                                    : QVariant());
+    data.insert(goal_key, primaryGoalToString(profile.primaryGoal()));
+    data.insert(date_of_birth_key,
+                profile.dateOfBirth().has_value()
+                    ? QVariant(profile.dateOfBirth()->toString(Qt::ISODate))
+                    : QVariant());
+    data.insert(bodyweight_key,
+                profile.bodyweightKg().has_value() ? QVariant(profile.bodyweightKg().value())
+                                                   : QVariant());
     data.insert(unit_system_key, unitSystemToString(profile.unitSystem()));
-    data.insert(notes_key,       profile.notes());
+    data.insert(notes_key, profile.notes());
 
     return data;
 }

@@ -3,7 +3,7 @@
 #include "modules/workout/domain/repositories/workoutquery.h"
 #include "modules/workout/domain/repositories/workoutrepository.h"
 
-WorkoutService::WorkoutService(WorkoutRepository &repository)
+WorkoutService::WorkoutService(WorkoutRepository& repository)
     : m_repository(repository)
 {
 }
@@ -16,10 +16,10 @@ std::vector<Workout> WorkoutService::loadPlannedWorkouts() const
     return m_repository.findAll(query);
 }
 
-void WorkoutService::importPlannedWorkouts(const std::vector<Workout> &workouts)
+void WorkoutService::importPlannedWorkouts(const std::vector<Workout>& workouts)
 {
     removeAllPlannedWorkouts();
-    for (const auto &workout : workouts)
+    for (const auto& workout : workouts)
         m_repository.save(workout);
 }
 
@@ -38,7 +38,7 @@ std::vector<Workout> WorkoutService::loadHistory() const
     return m_repository.findAll(query);
 }
 
-void WorkoutService::importHistory(const std::vector<Workout> &workouts)
+void WorkoutService::importHistory(const std::vector<Workout>& workouts)
 {
     for (auto workout : workouts)
     {
@@ -58,10 +58,7 @@ std::optional<Workout> WorkoutService::findWorkout(int id) const
     return m_repository.findOne(query);
 }
 
-int WorkoutService::saveWorkout(const Workout &workout)
-{
-    return m_repository.save(workout);
-}
+int WorkoutService::saveWorkout(const Workout& workout) { return m_repository.save(workout); }
 
 bool WorkoutService::deleteWorkout(int id)
 {

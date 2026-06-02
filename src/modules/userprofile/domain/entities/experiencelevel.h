@@ -13,16 +13,21 @@ inline QString experienceLevelToString(ExperienceLevel level)
 {
     switch (level)
     {
-    case ExperienceLevel::Beginner:     return QStringLiteral("beginner");
-    case ExperienceLevel::Intermediate: return QStringLiteral("intermediate");
-    case ExperienceLevel::Advanced:     return QStringLiteral("advanced");
+        case ExperienceLevel::Beginner:
+            return QStringLiteral("beginner");
+        case ExperienceLevel::Intermediate:
+            return QStringLiteral("intermediate");
+        case ExperienceLevel::Advanced:
+            return QStringLiteral("advanced");
     }
     return QStringLiteral("beginner");
 }
 
-inline ExperienceLevel experienceLevelFromString(const QString &str)
+inline ExperienceLevel experienceLevelFromString(const QString& str)
 {
-    if (str == QStringLiteral("intermediate")) return ExperienceLevel::Intermediate;
-    if (str == QStringLiteral("advanced"))     return ExperienceLevel::Advanced;
+    if (str == QStringLiteral("intermediate"))
+        return ExperienceLevel::Intermediate;
+    if (str == QStringLiteral("advanced"))
+        return ExperienceLevel::Advanced;
     return ExperienceLevel::Beginner;
 }

@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include "modules/workout/domain/entities/set.h"
+#include <gtest/gtest.h>
 
 class SetTest : public ::testing::Test
 {

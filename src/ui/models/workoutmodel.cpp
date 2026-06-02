@@ -1,17 +1,19 @@
 #include "workoutmodel.h"
 
-WorkoutModel::WorkoutModel(QObject *parent)
+WorkoutModel::WorkoutModel(QObject* parent)
     : QObject(parent)
 {
 }
 
-WorkoutModel::WorkoutModel(const Workout &workout, QObject *parent)
-    : QObject(parent), m_workout(workout)
+WorkoutModel::WorkoutModel(const Workout& workout, QObject* parent)
+    : QObject(parent)
+    , m_workout(workout)
 {
-    for (const auto &exercise : workout.exercises())
+    for (const auto& exercise : workout.exercises())
     {
-        auto *exerciseModel = new ExerciseModel(exercise, this);
-        connect(exerciseModel, &ExerciseModel::completedChanged, this, &WorkoutModel::completedChanged);
+        auto* exerciseModel = new ExerciseModel(exercise, this);
+        connect(exerciseModel, &ExerciseModel::completedChanged, this,
+                &WorkoutModel::completedChanged);
         m_exercises.append(exerciseModel);
     }
 }
@@ -27,7 +29,7 @@ bool WorkoutModel::isCompleted() const
 {
     if (m_exercises.isEmpty())
         return false;
-    for (auto *e : m_exercises)
+    for (auto* e : m_exercises)
     {
         if (!e->isCompleted())
             return false;
@@ -43,18 +45,15 @@ QQmlListProperty<ExerciseModel> WorkoutModel::exercisesProperty()
     return QQmlListProperty<ExerciseModel>(this, &m_exercises);
 }
 
-QList<ExerciseModel *> WorkoutModel::exercises() const
-{
-    return m_exercises;
-}
+QList<ExerciseModel*> WorkoutModel::exercises() const { return m_exercises; }
 
-void WorkoutModel::setStartedTime(const QDateTime &time)
+void WorkoutModel::setStartedTime(const QDateTime& time)
 {
     m_workout.setStartedTime(time);
     emit dataChanged();
 }
 
-void WorkoutModel::setEndedTime(const QDateTime &time)
+void WorkoutModel::setEndedTime(const QDateTime& time)
 {
     m_workout.setEndedTime(time);
     emit dataChanged();
@@ -72,7 +71,7 @@ void WorkoutModel::end()
     emit dataChanged();
 }
 
-void WorkoutModel::addExercise(ExerciseModel *exercise)
+void WorkoutModel::addExercise(ExerciseModel* exercise)
 {
     if (exercise && !m_exercises.contains(exercise))
     {
@@ -94,12 +93,12 @@ Workout WorkoutModel::toEntity() const
     w.setStartedTime(m_workout.startedTime());
     w.setEndedTime(m_workout.endedTime());
     w.setStatus(m_workout.status());
-    for (auto *e : m_exercises)
+    for (auto* e : m_exercises)
         w.addExercise(e->toEntity());
     return w;
 }
 
-WorkoutModel *WorkoutModel::clone(QObject *parent) const
+WorkoutModel* WorkoutModel::clone(QObject* parent) const
 {
     return new WorkoutModel(toEntity(), parent);
 }

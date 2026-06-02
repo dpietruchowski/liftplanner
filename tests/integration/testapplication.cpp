@@ -1,14 +1,14 @@
 #include "testapplication.h"
 
-#include <QSqlQuery>
-#include <dbtoolkit/dbstorage.h>
-#include "modules/workout/application/workoutservice.h"
-#include "modules/workout/infrastructure/database/workoutrepositorydb.h"
 #include "modules/userprofile/application/userprofileservice.h"
 #include "modules/userprofile/infrastructure/database/userprofilerepositorydb.h"
+#include "modules/workout/application/workoutservice.h"
+#include "modules/workout/infrastructure/database/workoutrepositorydb.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
-#include "ui/viewmodels/workouthistoryviewmodel.h"
 #include "ui/viewmodels/plannedworkoutviewmodel.h"
+#include "ui/viewmodels/workouthistoryviewmodel.h"
+#include <QSqlQuery>
+#include <dbtoolkit/dbstorage.h>
 
 int TestApplication::s_connectionCounter = 0;
 
@@ -35,8 +35,8 @@ TestApplication::TestApplication()
 
     m_activeWorkoutViewModel = std::make_unique<ActiveWorkoutViewModel>(m_workoutService.get());
     m_workoutHistoryViewModel = std::make_unique<WorkoutHistoryViewModel>(m_workoutService.get());
-    m_plannedWorkoutViewModel = std::make_unique<PlannedWorkoutViewModel>(m_workoutService.get(),
-                                                                          m_userProfileService.get());
+    m_plannedWorkoutViewModel = std::make_unique<PlannedWorkoutViewModel>(
+        m_workoutService.get(), m_userProfileService.get());
 }
 
 TestApplication::~TestApplication()
@@ -52,7 +52,16 @@ TestApplication::~TestApplication()
     QSqlDatabase::removeDatabase(m_connectionName);
 }
 
-ActiveWorkoutViewModel &TestApplication::activeWorkoutViewModel() { return *m_activeWorkoutViewModel; }
-WorkoutHistoryViewModel &TestApplication::workoutHistoryViewModel() { return *m_workoutHistoryViewModel; }
-PlannedWorkoutViewModel &TestApplication::plannedWorkoutViewModel() { return *m_plannedWorkoutViewModel; }
-WorkoutService &TestApplication::workoutService() { return *m_workoutService; }
+ActiveWorkoutViewModel& TestApplication::activeWorkoutViewModel()
+{
+    return *m_activeWorkoutViewModel;
+}
+WorkoutHistoryViewModel& TestApplication::workoutHistoryViewModel()
+{
+    return *m_workoutHistoryViewModel;
+}
+PlannedWorkoutViewModel& TestApplication::plannedWorkoutViewModel()
+{
+    return *m_plannedWorkoutViewModel;
+}
+WorkoutService& TestApplication::workoutService() { return *m_workoutService; }

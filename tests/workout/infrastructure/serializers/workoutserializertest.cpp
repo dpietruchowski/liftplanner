@@ -1,7 +1,7 @@
-#include <gtest/gtest.h>
+#include "modules/workout/infrastructure/serializers/workoutserializer.h"
 #include "modules/workout/domain/entities/workout.h"
 #include "modules/workout/domain/entities/workoutstatus.h"
-#include "modules/workout/infrastructure/serializers/workoutserializer.h"
+#include <gtest/gtest.h>
 
 class WorkoutSerializerTest : public ::testing::Test
 {

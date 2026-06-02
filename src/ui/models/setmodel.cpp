@@ -1,12 +1,13 @@
 #include "setmodel.h"
 
-SetModel::SetModel(QObject *parent)
+SetModel::SetModel(QObject* parent)
     : QObject(parent)
 {
 }
 
-SetModel::SetModel(const Set &set, QObject *parent)
-    : QObject(parent), m_set(set)
+SetModel::SetModel(const Set& set, QObject* parent)
+    : QObject(parent)
+    , m_set(set)
 {
 }
 
@@ -41,9 +42,6 @@ void SetModel::setCompleted(bool value)
     }
 }
 
-const Set &SetModel::entity() const { return m_set; }
+const Set& SetModel::entity() const { return m_set; }
 
-SetModel *SetModel::clone(QObject *parent) const
-{
-    return new SetModel(m_set, parent);
-}
+SetModel* SetModel::clone(QObject* parent) const { return new SetModel(m_set, parent); }

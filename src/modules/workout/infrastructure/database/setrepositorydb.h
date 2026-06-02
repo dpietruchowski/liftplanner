@@ -1,8 +1,8 @@
 #pragma once
 
+#include "modules/workout/domain/entities/set.h"
 #include <memory>
 #include <vector>
-#include "modules/workout/domain/entities/set.h"
 
 class DbStorage;
 class DbRepository;
@@ -10,13 +10,13 @@ class DbRepository;
 class SetRepositoryDb
 {
 public:
-    explicit SetRepositoryDb(DbStorage &storage);
+    explicit SetRepositoryDb(DbStorage& storage);
     ~SetRepositoryDb();
 
     bool createTable();
 
     std::vector<Set> findByExerciseId(int exerciseId) const;
-    int save(const Set &set);
+    int save(const Set& set);
     void removeByExerciseId(int exerciseId);
 
 private:

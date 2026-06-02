@@ -1,8 +1,8 @@
-#include <gtest/gtest.h>
 #include "modules/workout/domain/entities/workout.h"
-#include "modules/workout/domain/entities/workoutstatus.h"
 #include "modules/workout/domain/entities/exercise.h"
 #include "modules/workout/domain/entities/set.h"
+#include "modules/workout/domain/entities/workoutstatus.h"
+#include <gtest/gtest.h>
 
 class WorkoutTest : public ::testing::Test
 {
@@ -150,7 +150,7 @@ TEST_F(WorkoutTest, IsCompleted_SomeNotCompleted_ReturnsFalse)
     e1.addSet(s1);
 
     Exercise e2("OHP", 120);
-    e2.addSet(Set(8, 40)); // not completed
+    e2.addSet(Set(8, 40));  // not completed
 
     w.addExercise(e1);
     w.addExercise(e2);

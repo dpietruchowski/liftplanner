@@ -4,22 +4,18 @@
 
 #include <dbtoolkit/dbrepository.h>
 #include <dbtoolkit/dbstorage.h>
-#include <dbtoolkit/query/createtable.h>
 #include <dbtoolkit/query/column.h>
-#include <dbtoolkit/query/where.h>
+#include <dbtoolkit/query/createtable.h>
 #include <dbtoolkit/query/order.h>
+#include <dbtoolkit/query/where.h>
 
-ExerciseRepositoryDb::ExerciseRepositoryDb(DbStorage &storage)
+ExerciseRepositoryDb::ExerciseRepositoryDb(DbStorage& storage)
     : m_repository(std::make_unique<DbRepository>(
-          ExerciseSerializer::table,
-          ExerciseSerializer::id_key,
-          QStringList{
-              ExerciseSerializer::id_key,
-              ExerciseSerializer::workout_id_key,
-              ExerciseSerializer::name_key,
-              ExerciseSerializer::description_key,
-              ExerciseSerializer::youtube_link_key,
-              ExerciseSerializer::rest_seconds_key},
+          ExerciseSerializer::table, ExerciseSerializer::id_key,
+          QStringList { ExerciseSerializer::id_key, ExerciseSerializer::workout_id_key,
+                        ExerciseSerializer::name_key, ExerciseSerializer::description_key,
+                        ExerciseSerializer::youtube_link_key,
+                        ExerciseSerializer::rest_seconds_key },
           storage, nullptr))
 {
 }
@@ -36,10 +32,8 @@ bool ExerciseRepositoryDb::createTable()
         .column(Column(ExerciseSerializer::description_key).text())
         .column(Column(ExerciseSerializer::youtube_link_key).text())
         .column(Column(ExerciseSerializer::rest_seconds_key).integer())
-        .foreignKey(ExerciseSerializer::workout_id_key,
-                    WorkoutSerializer::table,
-                    WorkoutSerializer::id_key,
-                    OnDeleteAction::Cascade);
+        .foreignKey(ExerciseSerializer::workout_id_key, WorkoutSerializer::table,
+                    WorkoutSerializer::id_key, OnDeleteAction::Cascade);
     return m_repository->createTable(table);
 }
 
@@ -50,12 +44,12 @@ std::vector<Exercise> ExerciseRepositoryDb::findByWorkoutId(int workoutId) const
 
     std::vector<Exercise> results;
     results.reserve(rows.size());
-    for (const auto &row : rows)
+    for (const auto& row : rows)
         results.push_back(ExerciseSerializer::fromVariant(row));
     return results;
 }
 
-int ExerciseRepositoryDb::save(const Exercise &exercise)
+int ExerciseRepositoryDb::save(const Exercise& exercise)
 {
     QVariantMap data = ExerciseSerializer::toVariant(exercise);
 

@@ -1,22 +1,13 @@
 #include "userprofileservice.h"
 #include "modules/userprofile/domain/repositories/userprofilerepository.h"
 
-UserProfileService::UserProfileService(UserProfileRepository &repository)
+UserProfileService::UserProfileService(UserProfileRepository& repository)
     : m_repository(repository)
 {
 }
 
-std::optional<UserProfile> UserProfileService::load() const
-{
-    return m_repository.find();
-}
+std::optional<UserProfile> UserProfileService::load() const { return m_repository.find(); }
 
-void UserProfileService::save(const UserProfile &profile)
-{
-    m_repository.save(profile);
-}
+void UserProfileService::save(const UserProfile& profile) { m_repository.save(profile); }
 
-bool UserProfileService::exists() const
-{
-    return m_repository.find().has_value();
-}
+bool UserProfileService::exists() const { return m_repository.find().has_value(); }

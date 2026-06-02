@@ -1,13 +1,13 @@
-#include <gtest/gtest.h>
+#include "modules/userprofile/infrastructure/database/userprofilerepositorydb.h"
+#include "modules/userprofile/domain/entities/experiencelevel.h"
+#include "modules/userprofile/domain/entities/primarygoal.h"
+#include "modules/userprofile/domain/entities/sex.h"
+#include "modules/userprofile/domain/entities/unitsystem.h"
+#include "modules/userprofile/domain/entities/userprofile.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <dbtoolkit/dbstorage.h>
-#include "modules/userprofile/domain/entities/userprofile.h"
-#include "modules/userprofile/domain/entities/sex.h"
-#include "modules/userprofile/domain/entities/experiencelevel.h"
-#include "modules/userprofile/domain/entities/primarygoal.h"
-#include "modules/userprofile/domain/entities/unitsystem.h"
-#include "modules/userprofile/infrastructure/database/userprofilerepositorydb.h"
+#include <gtest/gtest.h>
 
 class UserProfileRepositoryDbTest : public ::testing::Test
 {
@@ -147,7 +147,8 @@ TEST_F(UserProfileRepositoryDbTest, Save_ClearBodyweight_UpdatesToNull)
 
 TEST_F(UserProfileRepositoryDbTest, AllEnumValues_RoundtripThroughDb)
 {
-    auto testEnum = [&](Sex sex, ExperienceLevel level, PrimaryGoal goal, UnitSystem unit) {
+    auto testEnum = [&](Sex sex, ExperienceLevel level, PrimaryGoal goal, UnitSystem unit)
+    {
         UserProfile p;
         p.setUserId(1);
         p.setSex(sex);
@@ -164,11 +165,13 @@ TEST_F(UserProfileRepositoryDbTest, AllEnumValues_RoundtripThroughDb)
         EXPECT_EQ(found->unitSystem(), unit);
     };
 
-    testEnum(Sex::Male,   ExperienceLevel::Beginner,     PrimaryGoal::GeneralFitness, UnitSystem::Metric);
-    testEnum(Sex::Female, ExperienceLevel::Intermediate,  PrimaryGoal::WeightLoss,     UnitSystem::Imperial);
-    testEnum(Sex::Other,  ExperienceLevel::Advanced,      PrimaryGoal::MuscleGain,     UnitSystem::Metric);
-    testEnum(Sex::Male,   ExperienceLevel::Beginner,      PrimaryGoal::Strength,       UnitSystem::Imperial);
-    testEnum(Sex::Female, ExperienceLevel::Intermediate,  PrimaryGoal::Endurance,      UnitSystem::Metric);
+    testEnum(Sex::Male, ExperienceLevel::Beginner, PrimaryGoal::GeneralFitness, UnitSystem::Metric);
+    testEnum(Sex::Female, ExperienceLevel::Intermediate, PrimaryGoal::WeightLoss,
+             UnitSystem::Imperial);
+    testEnum(Sex::Other, ExperienceLevel::Advanced, PrimaryGoal::MuscleGain, UnitSystem::Metric);
+    testEnum(Sex::Male, ExperienceLevel::Beginner, PrimaryGoal::Strength, UnitSystem::Imperial);
+    testEnum(Sex::Female, ExperienceLevel::Intermediate, PrimaryGoal::Endurance,
+             UnitSystem::Metric);
 }
 
 TEST_F(UserProfileRepositoryDbTest, CreateTable_IsIdempotent)

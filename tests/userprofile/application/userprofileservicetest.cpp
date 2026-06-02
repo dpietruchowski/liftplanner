@@ -1,26 +1,23 @@
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
 #include "modules/userprofile/application/userprofileservice.h"
-#include "modules/userprofile/domain/entities/userprofile.h"
-#include "modules/userprofile/domain/entities/sex.h"
 #include "modules/userprofile/domain/entities/experiencelevel.h"
 #include "modules/userprofile/domain/entities/primarygoal.h"
+#include "modules/userprofile/domain/entities/sex.h"
+#include "modules/userprofile/domain/entities/userprofile.h"
 #include "modules/userprofile/domain/repositories/userprofilerepository.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 class MockUserProfileRepository : public UserProfileRepository
 {
 public:
     MOCK_METHOD(std::optional<UserProfile>, find, (), (const, override));
-    MOCK_METHOD(void, save, (const UserProfile &profile), (override));
+    MOCK_METHOD(void, save, (const UserProfile& profile), (override));
 };
 
 class UserProfileServiceTest : public ::testing::Test
 {
 protected:
-    void SetUp() override
-    {
-        m_service = std::make_unique<UserProfileService>(m_repo);
-    }
+    void SetUp() override { m_service = std::make_unique<UserProfileService>(m_repo); }
 
     UserProfile makeProfile()
     {
@@ -43,8 +40,7 @@ protected:
 
 TEST_F(UserProfileServiceTest, Load_DelegatesToRepository)
 {
-    EXPECT_CALL(m_repo, find())
-        .WillOnce(::testing::Return(std::nullopt));
+    EXPECT_CALL(m_repo, find()).WillOnce(::testing::Return(std::nullopt));
 
     m_service->load();
 }
@@ -53,8 +49,7 @@ TEST_F(UserProfileServiceTest, Load_ReturnsProfileFromRepository)
 {
     UserProfile p = makeProfile();
 
-    EXPECT_CALL(m_repo, find())
-        .WillOnce(::testing::Return(std::optional<UserProfile>{p}));
+    EXPECT_CALL(m_repo, find()).WillOnce(::testing::Return(std::optional<UserProfile> { p }));
 
     auto result = m_service->load();
 
@@ -71,8 +66,7 @@ TEST_F(UserProfileServiceTest, Load_ReturnsProfileFromRepository)
 
 TEST_F(UserProfileServiceTest, Load_ReturnsNulloptWhenNoProfile)
 {
-    EXPECT_CALL(m_repo, find())
-        .WillOnce(::testing::Return(std::nullopt));
+    EXPECT_CALL(m_repo, find()).WillOnce(::testing::Return(std::nullopt));
 
     auto result = m_service->load();
 
@@ -86,10 +80,12 @@ TEST_F(UserProfileServiceTest, Save_DelegatesToRepository)
     UserProfile p = makeProfile();
 
     EXPECT_CALL(m_repo, save(::testing::_))
-        .WillOnce([](const UserProfile &saved) {
-            EXPECT_EQ(saved.userId(), 1);
-            EXPECT_EQ(saved.language(), "pl");
-        });
+        .WillOnce(
+            [](const UserProfile& saved)
+            {
+                EXPECT_EQ(saved.userId(), 1);
+                EXPECT_EQ(saved.language(), "pl");
+            });
 
     m_service->save(p);
 }
@@ -102,7 +98,7 @@ TEST_F(UserProfileServiceTest, Save_PassesProfileUnmodified)
 
     std::optional<UserProfile> captured;
     EXPECT_CALL(m_repo, save(::testing::_))
-        .WillOnce([&captured](const UserProfile &saved) { captured = saved; });
+        .WillOnce([&captured](const UserProfile& saved) { captured = saved; });
 
     m_service->save(p);
 
@@ -117,15 +113,14 @@ TEST_F(UserProfileServiceTest, Save_PassesProfileUnmodified)
 TEST_F(UserProfileServiceTest, Exists_ReturnsTrueWhenProfileFound)
 {
     EXPECT_CALL(m_repo, find())
-        .WillOnce(::testing::Return(std::optional<UserProfile>{makeProfile()}));
+        .WillOnce(::testing::Return(std::optional<UserProfile> { makeProfile() }));
 
     EXPECT_TRUE(m_service->exists());
 }
 
 TEST_F(UserProfileServiceTest, Exists_ReturnsFalseWhenNoProfile)
 {
-    EXPECT_CALL(m_repo, find())
-        .WillOnce(::testing::Return(std::nullopt));
+    EXPECT_CALL(m_repo, find()).WillOnce(::testing::Return(std::nullopt));
 
     EXPECT_FALSE(m_service->exists());
 }

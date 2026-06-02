@@ -1,19 +1,19 @@
 #include "liftplannerapplication.h"
 
 #include "core/storage/appdbstorage.h"
-#include "modules/workout/application/workoutservice.h"
-#include "modules/workout/infrastructure/database/workoutrepositorydb.h"
 #include "modules/userprofile/application/userprofileservice.h"
 #include "modules/userprofile/infrastructure/database/userprofilerepositorydb.h"
+#include "modules/workout/application/workoutservice.h"
+#include "modules/workout/infrastructure/database/workoutrepositorydb.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
-#include "ui/viewmodels/workouthistoryviewmodel.h"
 #include "ui/viewmodels/plannedworkoutviewmodel.h"
+#include "ui/viewmodels/workouthistoryviewmodel.h"
 #include "utils/clipboardhelper.h"
 #include "utils/coloredsvgprovider.h"
 #include "utils/notificationtypes.h"
 #include "utils/qmlregistrator.h"
 
-LiftPlannerApplication::LiftPlannerApplication(const QString &dbPath)
+LiftPlannerApplication::LiftPlannerApplication(const QString& dbPath)
 {
     m_storage = std::make_unique<AppDbStorage>(dbPath);
 }
@@ -27,12 +27,12 @@ void LiftPlannerApplication::initialize()
 
     m_activeWorkoutViewModel = std::make_unique<ActiveWorkoutViewModel>(m_workoutService.get());
     m_workoutHistoryViewModel = std::make_unique<WorkoutHistoryViewModel>(m_workoutService.get());
-    m_plannedWorkoutViewModel = std::make_unique<PlannedWorkoutViewModel>(m_workoutService.get(),
-                                                                          m_userProfileService.get());
+    m_plannedWorkoutViewModel = std::make_unique<PlannedWorkoutViewModel>(
+        m_workoutService.get(), m_userProfileService.get());
     m_clipboardHelper = std::make_unique<ClipboardHelper>();
 }
 
-void LiftPlannerApplication::registerQmlTypes(QmlRegistrator &registrator)
+void LiftPlannerApplication::registerQmlTypes(QmlRegistrator& registrator)
 {
     registrator.registerEnums(Notification::staticMetaObject, "Notification");
 

@@ -1,10 +1,10 @@
-#include <gtest/gtest.h>
-#include "modules/userprofile/domain/entities/userprofile.h"
-#include "modules/userprofile/domain/entities/sex.h"
+#include "modules/userprofile/infrastructure/serializers/userprofileserializer.h"
 #include "modules/userprofile/domain/entities/experiencelevel.h"
 #include "modules/userprofile/domain/entities/primarygoal.h"
+#include "modules/userprofile/domain/entities/sex.h"
 #include "modules/userprofile/domain/entities/unitsystem.h"
-#include "modules/userprofile/infrastructure/serializers/userprofileserializer.h"
+#include "modules/userprofile/domain/entities/userprofile.h"
+#include <gtest/gtest.h>
 
 class UserProfileSerializerTest : public ::testing::Test
 {
@@ -93,13 +93,13 @@ TEST_F(UserProfileSerializerTest, ToVariant_BodyweightKg_NullWhenNotSet)
 TEST_F(UserProfileSerializerTest, FromVariant_DeserializesAllFields)
 {
     QVariantMap data;
-    data.insert(UserProfileSerializer::user_id_key,    1);
-    data.insert(UserProfileSerializer::language_key,   "pl");
-    data.insert(UserProfileSerializer::timezone_key,   "Europe/Warsaw");
-    data.insert(UserProfileSerializer::sex_key,        "male");
-    data.insert(UserProfileSerializer::sessions_key,   4);
+    data.insert(UserProfileSerializer::user_id_key, 1);
+    data.insert(UserProfileSerializer::language_key, "pl");
+    data.insert(UserProfileSerializer::timezone_key, "Europe/Warsaw");
+    data.insert(UserProfileSerializer::sex_key, "male");
+    data.insert(UserProfileSerializer::sessions_key, 4);
     data.insert(UserProfileSerializer::experience_key, "intermediate");
-    data.insert(UserProfileSerializer::goal_key,       "weight_loss");
+    data.insert(UserProfileSerializer::goal_key, "weight_loss");
     data.insert(UserProfileSerializer::bodyweight_key, 75.0);
     data.insert(UserProfileSerializer::unit_system_key, "imperial");
 
@@ -120,7 +120,7 @@ TEST_F(UserProfileSerializerTest, FromVariant_DeserializesAllFields)
 TEST_F(UserProfileSerializerTest, FromVariant_NullBodyweight_YieldsNullopt)
 {
     QVariantMap data;
-    data.insert(UserProfileSerializer::user_id_key,    1);
+    data.insert(UserProfileSerializer::user_id_key, 1);
     data.insert(UserProfileSerializer::bodyweight_key, QVariant());
 
     UserProfile p = UserProfileSerializer::fromVariant(data);

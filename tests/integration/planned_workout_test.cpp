@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include <QSignalSpy>
+#include <gtest/gtest.h>
 
 #include "fixtures/test_data.h"
 #include "testapplication.h"
@@ -18,7 +18,7 @@ protected:
 
 TEST_F(PlannedWorkoutTest, EmptyState_NoWorkouts)
 {
-    auto &vm = app.plannedWorkoutViewModel();
+    auto& vm = app.plannedWorkoutViewModel();
     vm.loadAll();
 
     EXPECT_TRUE(vm.workouts().isEmpty());
@@ -27,7 +27,7 @@ TEST_F(PlannedWorkoutTest, EmptyState_NoWorkouts)
 
 TEST_F(PlannedWorkoutTest, ImportFromJson_LoadsWorkouts)
 {
-    auto &vm = app.plannedWorkoutViewModel();
+    auto& vm = app.plannedWorkoutViewModel();
     vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
     vm.loadAll();
 
@@ -39,36 +39,34 @@ TEST_F(PlannedWorkoutTest, ImportFromJson_LoadsWorkouts)
 
 TEST_F(PlannedWorkoutTest, ImportFromJson_SetsPlannedTime)
 {
-    auto &vm = app.plannedWorkoutViewModel();
+    auto& vm = app.plannedWorkoutViewModel();
     vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
     vm.loadAll();
 
-    for (auto *w : vm.workouts())
+    for (auto* w : vm.workouts())
     {
         EXPECT_TRUE(w->plannedTime().isValid());
     }
 
     // Should be ordered by planned time ascending
-    EXPECT_LT(vm.workouts().at(0)->plannedTime(),
-              vm.workouts().at(1)->plannedTime());
-    EXPECT_LT(vm.workouts().at(1)->plannedTime(),
-              vm.workouts().at(2)->plannedTime());
+    EXPECT_LT(vm.workouts().at(0)->plannedTime(), vm.workouts().at(1)->plannedTime());
+    EXPECT_LT(vm.workouts().at(1)->plannedTime(), vm.workouts().at(2)->plannedTime());
 }
 
 TEST_F(PlannedWorkoutTest, NextWorkout_ReturnsFirst)
 {
-    auto &vm = app.plannedWorkoutViewModel();
+    auto& vm = app.plannedWorkoutViewModel();
     vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
     vm.loadAll();
 
-    auto *next = vm.nextWorkout();
+    auto* next = vm.nextWorkout();
     ASSERT_NE(next, nullptr);
     EXPECT_EQ(next->name(), "Push Day");
 }
 
 TEST_F(PlannedWorkoutTest, ReImport_ReplacesAll)
 {
-    auto &vm = app.plannedWorkoutViewModel();
+    auto& vm = app.plannedWorkoutViewModel();
 
     vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
     vm.loadAll();
@@ -83,11 +81,11 @@ TEST_F(PlannedWorkoutTest, ReImport_ReplacesAll)
 
 TEST_F(PlannedWorkoutTest, ImportedWorkouts_HaveExercisesAndSets)
 {
-    auto &vm = app.plannedWorkoutViewModel();
+    auto& vm = app.plannedWorkoutViewModel();
     vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
     vm.loadAll();
 
-    auto *pushDay = vm.workouts().at(0);
+    auto* pushDay = vm.workouts().at(0);
     auto exercises = pushDay->exercises();
     ASSERT_EQ(exercises.size(), 2);
 
@@ -103,7 +101,7 @@ TEST_F(PlannedWorkoutTest, ImportedWorkouts_HaveExercisesAndSets)
 
 TEST_F(PlannedWorkoutTest, ImportInvalidJson_EmitsError)
 {
-    auto &vm = app.plannedWorkoutViewModel();
+    auto& vm = app.plannedWorkoutViewModel();
 
     QSignalSpy errorSpy(&vm, &PlannedWorkoutViewModel::errorOccurred);
     vm.importFromJson("not valid json");
@@ -113,7 +111,7 @@ TEST_F(PlannedWorkoutTest, ImportInvalidJson_EmitsError)
 
 TEST_F(PlannedWorkoutTest, ImportEmptyArray_ClearsAll)
 {
-    auto &vm = app.plannedWorkoutViewModel();
+    auto& vm = app.plannedWorkoutViewModel();
 
     vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
     vm.loadAll();
@@ -127,11 +125,11 @@ TEST_F(PlannedWorkoutTest, ImportEmptyArray_ClearsAll)
 
 TEST_F(PlannedWorkoutTest, PlannedWorkouts_HaveStatusPlanned)
 {
-    auto &vm = app.plannedWorkoutViewModel();
+    auto& vm = app.plannedWorkoutViewModel();
     vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
     vm.loadAll();
 
-    for (auto *w : vm.workouts())
+    for (auto* w : vm.workouts())
     {
         EXPECT_EQ(w->statusString(), "Planned");
     }
@@ -139,11 +137,11 @@ TEST_F(PlannedWorkoutTest, PlannedWorkouts_HaveStatusPlanned)
 
 TEST_F(PlannedWorkoutTest, PlannedWorkouts_NotInHistory)
 {
-    auto &planned = app.plannedWorkoutViewModel();
+    auto& planned = app.plannedWorkoutViewModel();
     planned.importFromJson(TestData::THREE_WORKOUTS_JSON);
     planned.loadAll();
 
-    auto &history = app.workoutHistoryViewModel();
+    auto& history = app.workoutHistoryViewModel();
     history.loadAllWorkouts();
 
     EXPECT_EQ(history.workouts().size(), 0);

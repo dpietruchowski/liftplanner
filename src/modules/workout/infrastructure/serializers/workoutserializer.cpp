@@ -4,7 +4,7 @@
 
 #include <QDateTime>
 
-Workout WorkoutSerializer::fromVariant(const QVariantMap &data)
+Workout WorkoutSerializer::fromVariant(const QVariantMap& data)
 {
     Workout workout;
 
@@ -13,20 +13,24 @@ Workout WorkoutSerializer::fromVariant(const QVariantMap &data)
     if (data.contains(name_key))
         workout.setName(data.value(name_key).toString());
     if (data.contains(created_time_key))
-        workout.setCreatedTime(QDateTime::fromString(data.value(created_time_key).toString(), Qt::ISODate));
+        workout.setCreatedTime(
+            QDateTime::fromString(data.value(created_time_key).toString(), Qt::ISODate));
     if (data.contains(planned_time_key))
-        workout.setPlannedTime(QDateTime::fromString(data.value(planned_time_key).toString(), Qt::ISODate));
+        workout.setPlannedTime(
+            QDateTime::fromString(data.value(planned_time_key).toString(), Qt::ISODate));
     if (data.contains(started_time_key))
-        workout.setStartedTime(QDateTime::fromString(data.value(started_time_key).toString(), Qt::ISODate));
+        workout.setStartedTime(
+            QDateTime::fromString(data.value(started_time_key).toString(), Qt::ISODate));
     if (data.contains(ended_time_key))
-        workout.setEndedTime(QDateTime::fromString(data.value(ended_time_key).toString(), Qt::ISODate));
+        workout.setEndedTime(
+            QDateTime::fromString(data.value(ended_time_key).toString(), Qt::ISODate));
     if (data.contains(status_key))
         workout.setStatus(workoutStatusFromString(data.value(status_key).toString()));
 
     return workout;
 }
 
-QVariantMap WorkoutSerializer::toVariant(const Workout &workout)
+QVariantMap WorkoutSerializer::toVariant(const Workout& workout)
 {
     QVariantMap data;
 

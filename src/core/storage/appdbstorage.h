@@ -12,11 +12,11 @@ class AppDbStorage : public QObject
     Q_OBJECT
 
 public:
-    explicit AppDbStorage(const QString &dbPath, QObject *parent = nullptr);
+    explicit AppDbStorage(const QString& dbPath, QObject* parent = nullptr);
     ~AppDbStorage() override;
 
-    WorkoutRepositoryDb &workoutRepo();
-    UserProfileRepositoryDb &userProfileRepo();
+    WorkoutRepositoryDb& workoutRepo();
+    UserProfileRepositoryDb& userProfileRepo();
 
 private:
     void initializeDatabase();
