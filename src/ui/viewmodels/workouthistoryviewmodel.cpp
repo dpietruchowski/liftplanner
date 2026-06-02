@@ -1,13 +1,13 @@
 #include "workouthistoryviewmodel.h"
 #include "modules/workout/application/workoutservice.h"
 #include "utils/workoutjson.h"
+#include "utils/workouttext.h"
 
-WorkoutHistoryViewModel::WorkoutHistoryViewModel(WorkoutService *service, QObject *parent)
-    : QObject(parent), m_service(service)
+WorkoutHistoryViewModel::WorkoutHistoryViewModel(WorkoutService* service, QObject* parent)
+    : QObject(parent)
+    , m_service(service)
 {
-    connect(this,
-            &WorkoutHistoryViewModel::workoutsChanged,
-            this,
+    connect(this, &WorkoutHistoryViewModel::workoutsChanged, this,
             &WorkoutHistoryViewModel::lastWorkoutChanged);
 
     loadAllWorkouts();
@@ -19,13 +19,13 @@ void WorkoutHistoryViewModel::loadAllWorkouts()
     m_workouts.clear();
 
     auto entities = m_service->loadHistory();
-    for (const auto &entity : entities)
+    for (const auto& entity : entities)
         m_workouts.append(new WorkoutModel(entity, this));
 
     emit workoutsChanged();
 }
 
-void WorkoutHistoryViewModel::saveWorkout(WorkoutModel *workout)
+void WorkoutHistoryViewModel::saveWorkout(WorkoutModel* workout)
 {
     if (!m_service || !workout)
         return;
@@ -37,7 +37,7 @@ void WorkoutHistoryViewModel::saveWorkout(WorkoutModel *workout)
     loadAllWorkouts();
 }
 
-void WorkoutHistoryViewModel::deleteWorkout(WorkoutModel *workout)
+void WorkoutHistoryViewModel::deleteWorkout(WorkoutModel* workout)
 {
     if (!m_service || !workout)
         return;
@@ -53,7 +53,7 @@ QJsonArray WorkoutHistoryViewModel::recentWorkoutsToJson(int count)
     int actualCount = qMin(count, m_workouts.size());
     for (int i = 0; i < actualCount; ++i)
     {
-        WorkoutModel *workout = m_workouts.at(i);
+        WorkoutModel* workout = m_workouts.at(i);
         if (workout)
             jsonArray.append(WorkoutJson::workoutToJsonCompact(workout->toEntity()));
     }
@@ -61,7 +61,7 @@ QJsonArray WorkoutHistoryViewModel::recentWorkoutsToJson(int count)
     return jsonArray;
 }
 
-WorkoutModel *WorkoutHistoryViewModel::lastWorkout() const
+WorkoutModel* WorkoutHistoryViewModel::lastWorkout() const
 {
     if (m_workouts.isEmpty())
         return nullptr;
@@ -69,7 +69,7 @@ WorkoutModel *WorkoutHistoryViewModel::lastWorkout() const
     return m_workouts.first();
 }
 
-void WorkoutHistoryViewModel::importFromJson(const QString &jsonData)
+void WorkoutHistoryViewModel::importFromJson(const QString& jsonData)
 {
     try
     {
@@ -84,7 +84,7 @@ void WorkoutHistoryViewModel::importFromJson(const QString &jsonData)
         m_service->importHistory(workouts);
         loadAllWorkouts();
     }
-    catch (const std::exception &e)
+    catch (const std::exception& e)
     {
         emit errorOccurred(QString("Import failed: %1").arg(e.what()));
     }
@@ -94,7 +94,7 @@ void WorkoutHistoryViewModel::importFromClipboard()
 {
     try
     {
-        QClipboard *clipboard = QGuiApplication::clipboard();
+        QClipboard* clipboard = QGuiApplication::clipboard();
         QString jsonData = clipboard->text();
 
         if (jsonData.isEmpty())
@@ -105,7 +105,7 @@ void WorkoutHistoryViewModel::importFromClipboard()
 
         importFromJson(jsonData);
     }
-    catch (const std::exception &e)
+    catch (const std::exception& e)
     {
         emit errorOccurred(QString("Import from clipboard failed: %1").arg(e.what()));
     }
@@ -123,12 +123,30 @@ void WorkoutHistoryViewModel::exportToClipboard(int limit)
         QJsonDocument doc(jsonArray);
         QString jsonString = doc.toJson(QJsonDocument::Indented);
 
-        QClipboard *clipboard = QGuiApplication::clipboard();
+        QClipboard* clipboard = QGuiApplication::clipboard();
         clipboard->setText(jsonString);
 
         emit exportedToClipboard();
     }
-    catch (const std::exception &e)
+    catch (const std::exception& e)
+    {
+        emit errorOccurred(QString("Export failed: %1").arg(e.what()));
+    }
+}
+
+void WorkoutHistoryViewModel::exportWorkoutToClipboard(WorkoutModel* workout)
+{
+    if (!workout)
+        return;
+
+    try
+    {
+        QClipboard* clipboard = QGuiApplication::clipboard();
+        clipboard->setText(WorkoutText::workoutToText(workout->toEntity()));
+
+        emit exportedToClipboard();
+    }
+    catch (const std::exception& e)
     {
         emit errorOccurred(QString("Export failed: %1").arg(e.what()));
     }

@@ -12,6 +12,7 @@ ColumnLayout {
     property bool expanded: false
 
     signal deleteWorkout(var workout)
+    signal exportWorkout(var workout)
 
     Rectangle {
         Layout.fillWidth: true
@@ -71,6 +72,14 @@ ColumnLayout {
                 spacing: Theme.spacing.medium
 
                 Item { Layout.fillWidth: true }
+
+                ThemedButton {
+                    iconSource: Theme.icons.copy
+                    circular: true
+                    buttonSize: Theme.button.square
+                    buttonStyle: Theme.button.secondary
+                    onClicked: root.exportWorkout(workout)
+                }
 
                 ThemedButton {
                     iconSource: Theme.icons.close

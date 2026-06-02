@@ -18,6 +18,7 @@ set(APP_SOURCES
     ${PROJECT_SOURCE_DIR}/src/ui/models/exercisemodel.cpp
     ${PROJECT_SOURCE_DIR}/src/ui/models/setmodel.cpp
     ${PROJECT_SOURCE_DIR}/src/utils/workoutjson.cpp
+    ${PROJECT_SOURCE_DIR}/src/utils/workouttext.cpp
 )
 
 add_executable(integration_tests ${TEST_SOURCES} ${APP_SOURCES})

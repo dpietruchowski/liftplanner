@@ -20,6 +20,10 @@ Rectangle {
                 root.workoutToDelete = workout
                 deletePopup.open()
             }
+
+            onExportWorkout: function(workout) {
+                WorkoutHistoryService.exportWorkoutToClipboard(workout)
+            }
         }
         buttonsRow: RowLayout {
             Layout.fillWidth: true
@@ -69,7 +73,7 @@ Rectangle {
 
     NotificationPopup {
         id: exportedPopup
-        text: "History copied to clipboard!"
+        text: "Copied to clipboard!"
         type: Notification.Type.Info
         buttons: Notification.Button.Ok
     }
