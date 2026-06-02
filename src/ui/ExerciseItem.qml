@@ -7,7 +7,7 @@ import Themed.Components
 Rectangle {
     id: root
     Layout.fillWidth: true
-    Layout.preferredHeight: Theme.layout.exerciseItemHeight
+    Layout.preferredHeight: column.implicitHeight
     radius: Theme.radius.medium / 2
     color: Theme.colors.background
     anchors.leftMargin: Theme.padding.medium
@@ -15,10 +15,10 @@ Rectangle {
 
     property var exercise
 
-    RowLayout {
-        id: row
+    ColumnLayout {
+        id: column
         anchors.fill: parent
-        spacing: Theme.spacing.medium
+        spacing: Theme.spacing.xsmall
 
         Text {
             text: exercise.name
@@ -26,15 +26,16 @@ Rectangle {
             font.bold: true
             color: Theme.colors.textPrimary
             Layout.fillWidth: true
+            horizontalAlignment: Text.AlignLeft
             elide: Text.ElideRight
-            verticalAlignment: Text.AlignVCenter
         }
 
         Text {
             text: exercise.setsToString()
             font.pixelSize: Theme.fontSize.small
             color: Theme.colors.textSecondary
-            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+            Layout.fillWidth: true
+            horizontalAlignment: Text.AlignLeft
             elide: Text.ElideRight
         }
     }
