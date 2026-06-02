@@ -192,6 +192,68 @@ TEST_F(WorkoutServiceTest, LoadHistory_ReturnsWorkoutsFromRepo)
     EXPECT_EQ(result.size(), 2u);
 }
 
+// --- topExercises ---
+
+namespace
+{
+Workout makeWorkoutWithExercise(const QString& exerciseName, int reps, double weight)
+{
+    Workout w(exerciseName, QDateTime::currentDateTime());
+    Exercise e(exerciseName, 90);
+    e.addSet(Set(reps, weight));
+    w.addExercise(e);
+    return w;
+}
+}  // namespace
+
+TEST_F(WorkoutServiceTest, TopExercises_RanksByFrequencyThenBestOneRepMax)
+{
+    std::vector<Workout> history = {
+        makeWorkoutWithExercise("Bench", 5, 100),  // 1RM 112.5
+        makeWorkoutWithExercise("Bench", 5, 80),   // 1RM 90
+        makeWorkoutWithExercise("Squat", 5, 120),  // 1RM 135
+        makeWorkoutWithExercise("Deadlift", 5, 140),  // 1RM 157.5
+    };
+
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+
+    auto result = m_service->topExercises(2, 20);
+
+    // Bench wins on frequency; the Squat/Deadlift tie is broken by best 1RM.
+    ASSERT_EQ(result.size(), 2u);
+    EXPECT_EQ(result[0].name, "Bench");
+    EXPECT_EQ(result[0].count, 2);
+    EXPECT_DOUBLE_EQ(result[0].bestOneRepMax, 112.5);
+    EXPECT_EQ(result[1].name, "Deadlift");
+    EXPECT_EQ(result[1].count, 1);
+    EXPECT_DOUBLE_EQ(result[1].bestOneRepMax, 157.5);
+}
+
+TEST_F(WorkoutServiceTest, TopExercises_OnlyConsidersRecentWorkouts)
+{
+    std::vector<Workout> history = {
+        makeWorkoutWithExercise("Bench", 5, 100),
+        makeWorkoutWithExercise("Squat", 5, 120),
+        makeWorkoutWithExercise("Squat", 5, 120),  // beyond the recent window
+    };
+
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+
+    auto result = m_service->topExercises(2, 2);
+
+    ASSERT_EQ(result.size(), 2u);
+    EXPECT_EQ(result[0].count, 1);
+    EXPECT_EQ(result[1].count, 1);
+}
+
+TEST_F(WorkoutServiceTest, TopExercises_EmptyHistory_ReturnsEmpty)
+{
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(std::vector<Workout> {}));
+
+    auto result = m_service->topExercises(2, 20);
+    EXPECT_TRUE(result.empty());
+}
+
 // --- findWorkout ---
 
 TEST_F(WorkoutServiceTest, FindWorkout_QueriesById)

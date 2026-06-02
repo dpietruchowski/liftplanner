@@ -16,20 +16,19 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: 2
 
-        // Stat tiles
+        // Top exercises (most frequent in recent workouts) with best 1RM
         Row {
             Layout.alignment: Qt.AlignHCenter
             Layout.bottomMargin: Theme.spacing.large
             spacing: Theme.spacing.medium
 
-            StatTile {
-                label: "Done"
-                value: WorkoutHistoryService.workouts.length
-            }
+            Repeater {
+                model: WorkoutHistoryService.topExercises
 
-            StatTile {
-                label: "Planned"
-                value: PlannedWorkoutService.workouts.length
+                StatTile {
+                    label: modelData.name
+                    value: Math.round(modelData.oneRepMax) + " kg"
+                }
             }
         }
 

@@ -5,7 +5,7 @@ Rectangle {
     id: root
 
     property string label: ""
-    property int value: 0
+    property string value: ""
 
     width: 120
     height: 64
@@ -14,10 +14,13 @@ Rectangle {
 
     Column {
         anchors.centerIn: parent
+        width: parent.width - 2 * Theme.padding.small
         spacing: 2
 
         Text {
-            anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width
+            horizontalAlignment: Text.AlignHCenter
+            elide: Text.ElideRight
             text: root.label
             color: Theme.colors.textSecondary
             font.pixelSize: Theme.fontSize.small
@@ -27,7 +30,7 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             text: root.value
             color: Theme.colors.textPrimary
-            font.pixelSize: Theme.fontSize.xlarge
+            font.pixelSize: Theme.fontSize.large
             font.bold: true
         }
     }

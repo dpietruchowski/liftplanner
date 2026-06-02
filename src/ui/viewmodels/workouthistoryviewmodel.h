@@ -9,6 +9,7 @@
 #include <QJsonDocument>
 #include <QList>
 #include <QObject>
+#include <QVariantList>
 
 class WorkoutService;
 
@@ -18,6 +19,7 @@ class WorkoutHistoryViewModel : public QObject
 
     DECLARE_PROPERTY(QList<WorkoutModel*>, workouts, setWorkouts)
     Q_PROPERTY(WorkoutModel* lastWorkout READ lastWorkout NOTIFY lastWorkoutChanged)
+    Q_PROPERTY(QVariantList topExercises READ topExercises NOTIFY topExercisesChanged)
 
 public:
     explicit WorkoutHistoryViewModel(WorkoutService* service, QObject* parent = nullptr);
@@ -33,10 +35,12 @@ public:
     Q_INVOKABLE QJsonArray recentWorkoutsToJson(int count = 10);
 
     WorkoutModel* lastWorkout() const;
+    QVariantList topExercises() const;
 
 signals:
     void errorOccurred(const QString& errorMessage);
     void lastWorkoutChanged();
+    void topExercisesChanged();
     void exportedToClipboard();
 
 private:

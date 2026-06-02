@@ -9,6 +9,8 @@ WorkoutHistoryViewModel::WorkoutHistoryViewModel(WorkoutService* service, QObjec
 {
     connect(this, &WorkoutHistoryViewModel::workoutsChanged, this,
             &WorkoutHistoryViewModel::lastWorkoutChanged);
+    connect(this, &WorkoutHistoryViewModel::workoutsChanged, this,
+            &WorkoutHistoryViewModel::topExercisesChanged);
 
     loadAllWorkouts();
 }
@@ -67,6 +69,24 @@ WorkoutModel* WorkoutHistoryViewModel::lastWorkout() const
         return nullptr;
 
     return m_workouts.first();
+}
+
+QVariantList WorkoutHistoryViewModel::topExercises() const
+{
+    QVariantList result;
+    if (!m_service)
+        return result;
+
+    for (const auto& entry : m_service->topExercises(2, 20))
+    {
+        QVariantMap item;
+        item["name"] = entry.name;
+        item["count"] = entry.count;
+        item["oneRepMax"] = entry.bestOneRepMax;
+        result.append(item);
+    }
+
+    return result;
 }
 
 void WorkoutHistoryViewModel::importFromJson(const QString& jsonData)
