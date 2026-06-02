@@ -14,13 +14,15 @@ ColumnLayout {
 
     Rectangle {
         Layout.fillWidth: true
-        Layout.preferredHeight: Theme.layout.listItemHeightLarge
+        Layout.preferredHeight: Math.max(Theme.layout.listItemHeightLarge,
+                                         contentRow.implicitHeight + 2 * Theme.padding.medium)
         radius: Theme.radius.medium
         color: Theme.colors.surface
         border.color: Theme.colors.primary
         border.width: Theme.border.thin
 
         RowLayout {
+            id: contentRow
             anchors.fill: parent
             spacing: Theme.spacing.medium
             anchors.margins: Theme.padding.medium
