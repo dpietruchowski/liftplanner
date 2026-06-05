@@ -61,3 +61,8 @@ target_link_libraries(liftplanner
     Qt6::Sql
     Qt6::Qml
 )
+
+target_compile_definitions(liftplanner
+    PRIVATE
+    APP_VERSION="${QT_ANDROID_VERSION_NAME}"
+)

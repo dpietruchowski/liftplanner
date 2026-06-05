@@ -4,9 +4,16 @@
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 
+#ifndef APP_VERSION
+#define APP_VERSION "dev"
+#endif
+
 int main(int argc, char* argv[])
 {
     QGuiApplication app(argc, argv);
+
+    app.setApplicationName("LiftPlanner");
+    app.setApplicationVersion(QStringLiteral(APP_VERSION));
 
     // Use the same controls style on every platform (Android defaults to
     // Material, desktop to Basic) so the UI renders identically everywhere.
