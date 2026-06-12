@@ -9,11 +9,14 @@
 #include <dbtoolkit/query/order.h>
 #include <dbtoolkit/query/where.h>
 
+#include <QSqlQuery>
+
 SetRepositoryDb::SetRepositoryDb(DbStorage& storage)
     : m_repository(std::make_unique<DbRepository>(
           SetSerializer::table, SetSerializer::id_key,
           QStringList { SetSerializer::id_key, SetSerializer::exercise_id_key,
-                        SetSerializer::repetitions_key, SetSerializer::weight_key },
+                        SetSerializer::repetitions_key, SetSerializer::weight_key,
+                        SetSerializer::completed_key },
           storage, nullptr))
 {
 }
@@ -28,14 +31,50 @@ bool SetRepositoryDb::createTable()
         .column(Column(SetSerializer::exercise_id_key).integer().notNull())
         .column(Column(SetSerializer::repetitions_key).integer())
         .column(Column(SetSerializer::weight_key).real())
+        .column(Column(SetSerializer::completed_key).integer().defaultValue(0))
         .foreignKey(SetSerializer::exercise_id_key, ExerciseSerializer::table,
                     ExerciseSerializer::id_key, OnDeleteAction::Cascade);
-    return m_repository->createTable(table);
+    bool ok = m_repository->createTable(table);
+
+    QSqlQuery pragmaQuery(m_repository->storage().database());
+    pragmaQuery.exec(QStringLiteral("PRAGMA table_info(%1)").arg(SetSerializer::table));
+    bool hasCompletedColumn = false;
+    while (pragmaQuery.next())
+    {
+        if (pragmaQuery.value(1).toString() == SetSerializer::completed_key)
+        {
+            hasCompletedColumn = true;
+            break;
+        }
+    }
+    if (!hasCompletedColumn)
+    {
+        QSqlQuery alter(m_repository->storage().database());
+        alter.exec(QStringLiteral("ALTER TABLE %1 ADD COLUMN %2 INTEGER DEFAULT 0")
+                       .arg(SetSerializer::table, SetSerializer::completed_key));
+    }
+
+    return ok;
 }
 
 std::vector<Set> SetRepositoryDb::findByExerciseId(int exerciseId) const
 {
     auto where = Where(SetSerializer::exercise_id_key).equals(exerciseId);
+    auto rows = m_repository->select(where);
+
+    std::vector<Set> results;
+    results.reserve(rows.size());
+    for (const auto& row : rows)
+        results.push_back(SetSerializer::fromVariant(row));
+    return results;
+}
+
+std::vector<Set> SetRepositoryDb::findByExerciseIds(const QList<int>& exerciseIds) const
+{
+    if (exerciseIds.isEmpty())
+        return {};
+
+    auto where = Where(SetSerializer::exercise_id_key).in(exerciseIds);
     auto rows = m_repository->select(where);
 
     std::vector<Set> results;
@@ -60,10 +99,4 @@ int SetRepositoryDb::save(const Set& set)
     }
 
     return m_repository->insert(data).toInt();
-}
-
-void SetRepositoryDb::removeByExerciseId(int exerciseId)
-{
-    auto where = Where(SetSerializer::exercise_id_key).equals(exerciseId);
-    m_repository->remove(where);
 }

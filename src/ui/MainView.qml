@@ -33,7 +33,7 @@ Item {
     }
 
     Connections {
-        target: PlannedWorkoutService
+        target: PlannedWorkoutViewModel
         function onErrorOccurred(error) {
             notificationPopup.type = Notification.Type.Error
             notificationPopup.text = error

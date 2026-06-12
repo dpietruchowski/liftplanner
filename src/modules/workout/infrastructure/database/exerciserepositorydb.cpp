@@ -63,6 +63,21 @@ std::vector<Exercise> ExerciseRepositoryDb::findByWorkoutId(int workoutId) const
     return results;
 }
 
+std::vector<Exercise> ExerciseRepositoryDb::findByWorkoutIds(const QList<int>& workoutIds) const
+{
+    if (workoutIds.isEmpty())
+        return {};
+
+    auto where = Where(ExerciseSerializer::workout_id_key).in(workoutIds);
+    auto rows = m_repository->select(where);
+
+    std::vector<Exercise> results;
+    results.reserve(rows.size());
+    for (const auto& row : rows)
+        results.push_back(ExerciseSerializer::fromVariant(row));
+    return results;
+}
+
 int ExerciseRepositoryDb::save(const Exercise& exercise)
 {
     QVariantMap data = ExerciseSerializer::toVariant(exercise);

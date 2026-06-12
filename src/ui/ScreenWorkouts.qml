@@ -14,7 +14,7 @@ Rectangle {
 
     property var historyMonths: {
         var groups = []
-        var workouts = WorkoutHistoryService.workouts
+        var workouts = WorkoutHistoryViewModel.workouts
         var current = null
         for (var i = 0; i < workouts.length; ++i) {
             var key = Qt.formatDateTime(workouts[i].startedTime, "yyyy-MM")
@@ -31,7 +31,7 @@ Rectangle {
         return groups
     }
 
-    Component.onCompleted: PlannedWorkoutService.loadAll()
+    Component.onCompleted: PlannedWorkoutViewModel.loadAll()
 
     ScrollView {
         id: scrollView
@@ -53,7 +53,7 @@ Rectangle {
                     circular: true
                     buttonSize: Theme.button.square
                     buttonStyle: Theme.button.primary
-                    onClicked: PlannedWorkoutService.generatePrompt()
+                    onClicked: PlannedWorkoutViewModel.generatePrompt()
                     ToolTip.visible: hovered
                     ToolTip.text: "Generate prompt for AI"
                     ToolTip.delay: 500
@@ -73,12 +73,12 @@ Rectangle {
 
             Repeater {
                 id: plannedRepeater
-                model: plannedSection.expanded ? PlannedWorkoutService.workouts : []
+                model: plannedSection.expanded ? PlannedWorkoutViewModel.workouts : []
                 delegate: PlannedWorkoutItem {
                     workout: modelData
                     onStartWorkoutRequest: function(workout) {
                         root.currentWorkout = workout
-                        if (ActiveWorkoutService.currentWorkout) {
+                        if (ActiveWorkoutViewModel.currentWorkout) {
                             startWorkoutPopup.open()
                         } else {
                             startWorkout()
@@ -108,7 +108,7 @@ Rectangle {
                     circular: true
                     buttonSize: Theme.button.square
                     buttonStyle: Theme.button.primary
-                    onClicked: WorkoutHistoryService.exportToClipboard(50)
+                    onClicked: WorkoutHistoryViewModel.exportToClipboard(50)
                     ToolTip.visible: hovered
                     ToolTip.text: "Export recent workouts"
                     ToolTip.delay: 500
@@ -139,7 +139,7 @@ Rectangle {
                         deletePopup.open()
                     }
                     onExportWorkoutRequest: function(workout) {
-                        WorkoutHistoryService.exportWorkoutToClipboard(workout)
+                        WorkoutHistoryViewModel.exportWorkoutToClipboard(workout)
                     }
                 }
             }
@@ -158,8 +158,8 @@ Rectangle {
     function startWorkout() {
         if (!currentWorkout)
             return
-        ActiveWorkoutService.startWorkout(currentWorkout)
-        PlannedWorkoutService.loadAll()
+        ActiveWorkoutViewModel.startWorkout(currentWorkout)
+        PlannedWorkoutViewModel.loadAll()
         if (stackView.currentItem !== activeWorkoutScreen) {
             stackView.replace(activeWorkoutScreen)
         }
@@ -181,7 +181,7 @@ Rectangle {
         type: Notification.Type.Warning
         buttons: Notification.Button.Ok | Notification.Button.Cancel
         onAccepted: {
-            PlannedWorkoutService.importFromClipboard()
+            PlannedWorkoutViewModel.importFromClipboard()
         }
     }
 
@@ -191,7 +191,7 @@ Rectangle {
         type: Notification.Type.Info
         buttons: Notification.Button.Ok | Notification.Button.Cancel
         onAccepted: {
-            WorkoutHistoryService.importFromClipboard()
+            WorkoutHistoryViewModel.importFromClipboard()
         }
     }
 
@@ -202,7 +202,7 @@ Rectangle {
         buttons: Notification.Button.Ok | Notification.Button.Cancel
         onAccepted: {
             if (root.workoutToDelete) {
-                WorkoutHistoryService.deleteWorkout(root.workoutToDelete)
+                WorkoutHistoryViewModel.deleteWorkout(root.workoutToDelete)
                 root.workoutToDelete = null
             }
         }
@@ -216,7 +216,7 @@ Rectangle {
     }
 
     Connections {
-        target: WorkoutHistoryService
+        target: WorkoutHistoryViewModel
         function onExportedToClipboard() { exportedPopup.open() }
     }
 }

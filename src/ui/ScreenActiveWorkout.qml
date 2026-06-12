@@ -27,18 +27,8 @@ Rectangle {
             id: plannedSection
             Layout.fillWidth: true
             titleFont.pixelSize: Theme.fontSize.large
-            title: ActiveWorkoutService.currentWorkout ? ActiveWorkoutService.currentWorkout.name : "Workout"
+            title: ActiveWorkoutViewModel.currentWorkout ? ActiveWorkoutViewModel.currentWorkout.name : "Workout"
             visible: !restDialog.isVisible
-
-            ThemedButton {
-                iconSource: Theme.icons.ai
-                circular: true
-                buttonSize: Theme.button.square
-                buttonStyle: Theme.button.primary
-                ToolTip.visible: hovered
-                ToolTip.text: "Generate prompt for AI"
-                ToolTip.delay: 500
-            }
         }
 
         ScrollView {
@@ -53,7 +43,7 @@ Rectangle {
                 spacing: Theme.spacing.medium / 2
 
                 Repeater {
-                    model: ActiveWorkoutService.currentWorkout ? ActiveWorkoutService.currentWorkout.exercises : []
+                    model: ActiveWorkoutViewModel.currentWorkout ? ActiveWorkoutViewModel.currentWorkout.exercises : []
 
                     delegate: ActiveWorkoutExerciseItem {
                         exercise: modelData
@@ -78,25 +68,25 @@ Rectangle {
 
             ThemedButton {
                 iconSource: Theme.icons.previous
-                enabled: ActiveWorkoutService.isActive
+                enabled: ActiveWorkoutViewModel.isActive
                 buttonSize: Theme.button.medium
                 buttonStyle: Theme.button.primary
-                onClicked: ActiveWorkoutService.navigateToPrevious()
+                onClicked: ActiveWorkoutViewModel.navigateToPrevious()
             }
 
             ThemedButton {
-                text: ActiveWorkoutService.currentWorkout && ActiveWorkoutService.currentWorkout.completed ? "End" : "Done"
-                enabled: ActiveWorkoutService.isActive && ActiveWorkoutService.currentSet
+                text: ActiveWorkoutViewModel.currentWorkout && ActiveWorkoutViewModel.currentWorkout.completed ? "End" : "Done"
+                enabled: ActiveWorkoutViewModel.isActive && ActiveWorkoutViewModel.currentSet
                 buttonSize: Theme.button.medium
-                buttonStyle: ActiveWorkoutService.currentWorkout && ActiveWorkoutService.currentWorkout.completed
+                buttonStyle: ActiveWorkoutViewModel.currentWorkout && ActiveWorkoutViewModel.currentWorkout.completed
                              ? Theme.button.primary
                              : Theme.button.success
                 onClicked: {
-                    if (ActiveWorkoutService.currentWorkout.completed) {
+                    if (ActiveWorkoutViewModel.currentWorkout.completed) {
                         endWorkoutPopup.open()
                     } else {
-                        ActiveWorkoutService.completeCurrentSet()
-                        var rs = ActiveWorkoutService.currentExercise ? ActiveWorkoutService.currentExercise.restSeconds : 0
+                        ActiveWorkoutViewModel.completeCurrentSet()
+                        var rs = ActiveWorkoutViewModel.currentExercise ? ActiveWorkoutViewModel.currentExercise.restSeconds : 0
                         if (rs > 0) {
                             restDialog.show(rs)
                         }
@@ -106,10 +96,10 @@ Rectangle {
 
             ThemedButton {
                 iconSource: Theme.icons.next
-                enabled: ActiveWorkoutService.isActive
+                enabled: ActiveWorkoutViewModel.isActive
                 buttonSize: Theme.button.medium
                 buttonStyle: Theme.button.primary
-                onClicked: ActiveWorkoutService.navigateToNext()
+                onClicked: ActiveWorkoutViewModel.navigateToNext()
             }
         }
     }
@@ -127,15 +117,15 @@ Rectangle {
         type: Notification.Type.Info
         buttons: Notification.Button.Ok | Notification.Button.Cancel
         onAccepted: {
-            ActiveWorkoutService.endWorkout()
+            ActiveWorkoutViewModel.endWorkout()
         }
     }
 
     Connections {
-        target: ActiveWorkoutService
+        target: ActiveWorkoutViewModel
         function onWorkoutCompleted() {
-            WorkoutHistoryService.saveWorkout(ActiveWorkoutService.currentWorkout)
-            stackView.pop()
+            stackView.replace(homeScreen)
+            bottomNav.currentIndex = 1
         }
     }
 }

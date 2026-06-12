@@ -13,6 +13,8 @@ Set SetSerializer::fromVariant(const QVariantMap& data)
         set.setRepetitions(data.value(repetitions_key).toInt());
     if (data.contains(weight_key))
         set.setWeight(data.value(weight_key).toDouble());
+    if (data.contains(completed_key))
+        set.setCompleted(data.value(completed_key).toBool());
 
     return set;
 }
@@ -28,6 +30,7 @@ QVariantMap SetSerializer::toVariant(const Set& set)
 
     data.insert(repetitions_key, set.repetitions());
     data.insert(weight_key, set.weight());
+    data.insert(completed_key, set.completed());
 
     return data;
 }

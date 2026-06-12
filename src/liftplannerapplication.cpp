@@ -41,10 +41,10 @@ void LiftPlannerApplication::registerQmlTypes(QmlRegistrator& registrator)
 
     registrator.registerType<ColoredSvgProvider>("Themed.Components", "ColoredSvgProvider");
 
-    registrator.registerSingletonInstance("ActiveWorkoutService", m_activeWorkoutViewModel.get());
-    registrator.registerSingletonInstance("WorkoutHistoryService", m_workoutHistoryViewModel.get());
-    registrator.registerSingletonInstance("PlannedWorkoutService", m_plannedWorkoutViewModel.get());
-    registrator.registerSingletonInstance("UserProfileService", m_userProfileViewModel.get());
+    registrator.registerSingletonInstance("ActiveWorkoutViewModel", m_activeWorkoutViewModel.get());
+    registrator.registerSingletonInstance("WorkoutHistoryViewModel", m_workoutHistoryViewModel.get());
+    registrator.registerSingletonInstance("PlannedWorkoutViewModel", m_plannedWorkoutViewModel.get());
+    registrator.registerSingletonInstance("UserProfileViewModel", m_userProfileViewModel.get());
     registrator.registerSingletonInstance("ClipboardHelper", m_clipboardHelper.get());
 
     registrator.registerSingletonType("Theme.qml", "Theme");

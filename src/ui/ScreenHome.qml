@@ -23,7 +23,7 @@ Rectangle {
             spacing: Theme.spacing.medium
 
             Repeater {
-                model: WorkoutHistoryService.topExercises
+                model: WorkoutHistoryViewModel.topExercises
 
                 StatTile {
                     label: modelData.name
@@ -36,7 +36,7 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: Theme.spacing.large
             Layout.bottomMargin: Theme.spacing.large
-            activity: WorkoutHistoryService.weekActivity
+            activity: WorkoutHistoryViewModel.weekActivity
             todayIndex: (new Date().getDay() + 6) % 7
         }
 
@@ -45,7 +45,7 @@ Rectangle {
             Layout.fillWidth: true
             implicitHeight: Theme.layout.cardHeight
             label: "planned workout"
-            workout: PlannedWorkoutService.nextWorkout
+            workout: PlannedWorkoutViewModel.nextWorkout
         }
 
         // Current workout (large, prominent)
@@ -56,7 +56,7 @@ Rectangle {
             label: "current workout"
             nameSize: Theme.fontSize.xlarge
             nameColor: Theme.colors.textPrimary
-            workout: ActiveWorkoutService.currentWorkout
+            workout: ActiveWorkoutViewModel.currentWorkout
         }
 
         // Last workout (smaller)
@@ -64,7 +64,7 @@ Rectangle {
             Layout.fillWidth: true
             implicitHeight: Theme.layout.cardHeight
             label: "last workout"
-            workout: WorkoutHistoryService.lastWorkout
+            workout: WorkoutHistoryViewModel.lastWorkout
         }
 
         // Start workout button
@@ -75,9 +75,9 @@ Rectangle {
             buttonStyle: Theme.button.primary
             buttonSize: Theme.button.large
             onClicked: {
-                if (ActiveWorkoutService.currentWorkout)
+                if (ActiveWorkoutViewModel.currentWorkout)
                     startWorkoutPopup.open()
-                else if (!PlannedWorkoutService.nextWorkout)
+                else if (!PlannedWorkoutViewModel.nextWorkout)
                     noPlannedPopup.open()
                 else
                     startWorkout()
@@ -106,10 +106,10 @@ Rectangle {
     }
 
     function startWorkout() {
-        if (!PlannedWorkoutService.nextWorkout)
+        if (!PlannedWorkoutViewModel.nextWorkout)
             return
-        ActiveWorkoutService.startWorkout(PlannedWorkoutService.nextWorkout)
-        PlannedWorkoutService.loadAll()
+        ActiveWorkoutViewModel.startWorkout(PlannedWorkoutViewModel.nextWorkout)
+        PlannedWorkoutViewModel.loadAll()
         if (stackView.currentItem !== activeWorkoutScreen) {
             stackView.replace(activeWorkoutScreen)
         }

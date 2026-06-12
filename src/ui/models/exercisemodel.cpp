@@ -21,17 +21,7 @@ QString ExerciseModel::name() const { return m_exercise.name(); }
 QString ExerciseModel::description() const { return m_exercise.description(); }
 int ExerciseModel::restSeconds() const { return m_exercise.restSeconds(); }
 
-bool ExerciseModel::isCompleted() const
-{
-    if (m_sets.isEmpty())
-        return false;
-    for (auto* s : m_sets)
-    {
-        if (!s->completed())
-            return false;
-    }
-    return true;
-}
+bool ExerciseModel::isCompleted() const { return toEntity().isCompleted(); }
 
 QQmlListProperty<SetModel> ExerciseModel::setsProperty()
 {
@@ -40,14 +30,7 @@ QQmlListProperty<SetModel> ExerciseModel::setsProperty()
 
 QList<SetModel*> ExerciseModel::sets() const { return m_sets; }
 
-QString ExerciseModel::setsToString() const
-{
-    QStringList parts;
-    for (auto* s : m_sets)
-        parts.append(
-            QString("%1x%2kg").arg(s->repetitions()).arg(QString::number(s->weight(), 'g', 6)));
-    return parts.join(", ");
-}
+QString ExerciseModel::setsToString() const { return toEntity().setsToString(); }
 
 void ExerciseModel::addSet(SetModel* set)
 {
@@ -83,9 +66,4 @@ Exercise ExerciseModel::toEntity() const
     for (auto* s : m_sets)
         e.addSet(s->entity());
     return e;
-}
-
-ExerciseModel* ExerciseModel::clone(QObject* parent) const
-{
-    return new ExerciseModel(toEntity(), parent);
 }

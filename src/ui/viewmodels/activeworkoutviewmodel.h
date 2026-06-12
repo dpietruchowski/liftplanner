@@ -20,7 +20,7 @@ public:
     explicit ActiveWorkoutViewModel(WorkoutService* service, QObject* parent = nullptr);
     ~ActiveWorkoutViewModel();
 
-    void saveCurrentWorkout();
+    Q_INVOKABLE void saveCurrentWorkout();
     void loadCurrentWorkout();
 
     Q_INVOKABLE void startWorkout(WorkoutModel* workout);
@@ -40,6 +40,7 @@ private:
     void saveCompletedSet();
     void updateCurrentExercise();
     void updateCurrentSet();
+    void selectFirstIncomplete();
     void saveToDb();
 
     WorkoutService* m_service;

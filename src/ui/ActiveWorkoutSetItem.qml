@@ -13,8 +13,8 @@ Rectangle {
     height: actionsVisible ? Theme.layout.listItemHeight + Theme.button.square.size + Theme.padding.small * 2 : Theme.layout.listItemHeight
     radius: Theme.radius.medium
     color: Theme.colors.surface
-    border.width: ActiveWorkoutService.currentSet === setData ? Theme.border.thick : Theme.border.thin
-    border.color: ActiveWorkoutService.currentSet === setData ? Theme.colors.primaryVariant : Theme.colors.border
+    border.width: ActiveWorkoutViewModel.currentSet === setData ? Theme.border.thick : Theme.border.thin
+    border.color: ActiveWorkoutViewModel.currentSet === setData ? Theme.colors.primaryVariant : Theme.colors.border
 
     Behavior on color { ColorAnimation { duration: 200 } }
     Behavior on height { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
@@ -23,7 +23,7 @@ Rectangle {
 
     MouseArea {
         anchors.fill: parent
-        onClicked: ActiveWorkoutService.currentSet = setData
+        onClicked: ActiveWorkoutViewModel.currentSet = setData
     }
 
     Column {
@@ -116,14 +116,20 @@ Rectangle {
                         iconSource: Theme.icons.minus
                         buttonSize: Theme.button.square
                         buttonStyle: Theme.button.ghost
-                        onClicked: { if (setData.repetitions > 0) setData.repetitions -= 1 }
+                        onClicked: {
+                            if (setData.repetitions > 0) setData.repetitions -= 1
+                            ActiveWorkoutViewModel.saveCurrentWorkout()
+                        }
                     }
 
                     ThemedButton {
                         iconSource: Theme.icons.plus
                         buttonSize: Theme.button.square
                         buttonStyle: Theme.button.ghost
-                        onClicked: setData.repetitions += 1
+                        onClicked: {
+                            setData.repetitions += 1
+                            ActiveWorkoutViewModel.saveCurrentWorkout()
+                        }
                     }
                 }
             }
@@ -141,14 +147,20 @@ Rectangle {
                         iconSource: Theme.icons.minus
                         buttonSize: Theme.button.square
                         buttonStyle: Theme.button.ghost
-                        onClicked: { if (setData.weight >= 2.5) setData.weight -= 2.5 }
+                        onClicked: {
+                            if (setData.weight >= 2.5) setData.weight -= 2.5
+                            ActiveWorkoutViewModel.saveCurrentWorkout()
+                        }
                     }
 
                     ThemedButton {
                         iconSource: Theme.icons.plus
                         buttonSize: Theme.button.square
                         buttonStyle: Theme.button.ghost
-                        onClicked: setData.weight += 2.5
+                        onClicked: {
+                            setData.weight += 2.5
+                            ActiveWorkoutViewModel.saveCurrentWorkout()
+                        }
                     }
                 }
             }
@@ -165,14 +177,14 @@ Rectangle {
                     iconSource: Theme.icons.addSet
                     buttonSize: Theme.button.square
                     buttonStyle: Theme.button.ghost
-                    onClicked: ActiveWorkoutService.duplicateSet(modelData)
+                    onClicked: ActiveWorkoutViewModel.duplicateSet(modelData)
                 }
 
                 ThemedButton {
                     iconSource: Theme.icons.removeSet
                     buttonSize: Theme.button.square
                     buttonStyle: Theme.button.ghost
-                    onClicked: ActiveWorkoutService.removeSet(modelData)
+                    onClicked: ActiveWorkoutViewModel.removeSet(modelData)
                 }
             }
         }

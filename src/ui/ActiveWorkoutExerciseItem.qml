@@ -12,7 +12,7 @@ Column {
     spacing: Theme.spacing.medium / 2
 
     function getBorderColor() {
-        if (ActiveWorkoutService.currentExercise === exercise) {
+        if (ActiveWorkoutViewModel.currentExercise === exercise) {
             return Theme.colors.primary
         } else {
             return Theme.colors.border
@@ -20,7 +20,7 @@ Column {
     }
 
     function getBorderWidth() {
-        if (ActiveWorkoutService.currentExercise === exercise) {
+        if (ActiveWorkoutViewModel.currentExercise === exercise) {
             return Theme.border.thick
         } else {
             return Theme.border.medium
@@ -83,7 +83,7 @@ Column {
 
         MouseArea {
             anchors.fill: parent
-            onClicked: ActiveWorkoutService.currentExercise = exercise
+            onClicked: ActiveWorkoutViewModel.currentExercise = exercise
         }
     }
 
@@ -91,7 +91,7 @@ Column {
         id: setsColumn
         width: exerciseDelegate.width
         spacing: Theme.spacing.medium / 2
-        height: ActiveWorkoutService.currentExercise === exercise ? implicitHeight : 0
+        height: ActiveWorkoutViewModel.currentExercise === exercise ? implicitHeight : 0
         visible: height > 0
         clip: true
 

@@ -1,4 +1,5 @@
 #include "workoutjson.h"
+#include "modules/workout/domain/entities/workoutstatus.h"
 #include <QJsonDocument>
 
 namespace WorkoutJson
@@ -51,6 +52,8 @@ QJsonObject workoutToJson(const Workout& workout)
         obj["started_time"] = workout.startedTime().toString(Qt::ISODate);
     if (workout.endedTime().isValid())
         obj["ended_time"] = workout.endedTime().toString(Qt::ISODate);
+
+    obj["status"] = workoutStatusToString(workout.status());
 
     QJsonArray exercisesArray;
     for (const auto& exercise : workout.exercises())
@@ -172,6 +175,8 @@ Workout workoutFromJson(const QJsonObject& json)
         w.setStartedTime(QDateTime::fromString(json["started_time"].toString(), Qt::ISODate));
     if (json.contains("ended_time"))
         w.setEndedTime(QDateTime::fromString(json["ended_time"].toString(), Qt::ISODate));
+    if (json.contains("status"))
+        w.setStatus(workoutStatusFromString(json["status"].toString()));
 
     if (json.contains("exercises"))
     {

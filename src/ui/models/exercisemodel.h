@@ -33,7 +33,6 @@ public:
     void removeSet(SetModel* set);
 
     Exercise toEntity() const;
-    ExerciseModel* clone(QObject* parent = nullptr) const;
 
 signals:
     void dataChanged();

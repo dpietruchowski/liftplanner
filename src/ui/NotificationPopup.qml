@@ -14,7 +14,7 @@ Popup {
     dim: true
 
     property bool iconVisible: true
-    property string type: "info"
+    property int type: Notification.Type.Info
     property int buttons: NotificationPopup.Ok
     property string title: ""
     property string text: ""
@@ -51,17 +51,17 @@ Popup {
             visible: notificationPopup.iconVisible
             svgSource: {
                 switch (notificationPopup.type) {
-                    case "error": return Theme.icons.error || ""
-                    case "warning": return Theme.icons.warning || ""
-                    case "success": return Theme.icons.check || ""
+                    case Notification.Type.Error: return Theme.icons.error || ""
+                    case Notification.Type.Warning: return Theme.icons.warning || ""
+                    case Notification.Type.Success: return Theme.icons.check || ""
                     default: return Theme.icons.info || ""
                 }
             }
             color: {
                 switch (notificationPopup.type) {
-                    case "error": return Theme.colors.error
-                    case "warning": return Theme.colors.warning
-                    case "success": return Theme.colors.success
+                    case Notification.Type.Error: return Theme.colors.error
+                    case Notification.Type.Warning: return Theme.colors.warning
+                    case Notification.Type.Success: return Theme.colors.success
                     default: return Theme.colors.info
                 }
             }
@@ -98,7 +98,7 @@ Popup {
             text: qsTr("Copy")
             buttonSize: Theme.button.medium
             buttonStyle: Theme.button.secondary
-            onClicked: ClipboardHelper.copyToClipboard(notificationPopup.text)
+            onClicked: ClipboardHelper.setText(notificationPopup.text)
         }
 
         RowLayout {

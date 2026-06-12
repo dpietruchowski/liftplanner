@@ -23,7 +23,6 @@ public:
     void setCompleted(bool value);
 
     const Set& entity() const;
-    SetModel* clone(QObject* parent = nullptr) const;
 
 signals:
     void repetitionsChanged();

@@ -43,5 +43,3 @@ void SetModel::setCompleted(bool value)
 }
 
 const Set& SetModel::entity() const { return m_set; }
-
-SetModel* SetModel::clone(QObject* parent) const { return new SetModel(m_set, parent); }

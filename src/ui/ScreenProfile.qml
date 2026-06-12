@@ -24,14 +24,14 @@ Rectangle {
         property string field
 
         function sync() {
-            currentIndex = values.indexOf(UserProfileService[field])
+            currentIndex = values.indexOf(UserProfileViewModel[field])
         }
 
         Layout.preferredWidth: root.controlWidth
         Layout.alignment: Qt.AlignRight
 
         Component.onCompleted: sync()
-        onActivated: UserProfileService[field] = values[currentIndex]
+        onActivated: UserProfileViewModel[field] = values[currentIndex]
     }
 
     // ThemedInput restyled to match ThemedComboBox (same width, radius and border)
@@ -61,30 +61,30 @@ Rectangle {
         experienceCombo.sync()
         unitsCombo.sync()
         languageCombo.sync()
-        sessionsSpin.value = UserProfileService.sessionsPerWeek
+        sessionsSpin.value = UserProfileViewModel.sessionsPerWeek
         if (!dobField.activeFocus) {
-            dobField.text = UserProfileService.dateOfBirth
+            dobField.text = UserProfileViewModel.dateOfBirth
             root.dobInvalid = false
         }
         if (!bodyweightField.activeFocus)
-            bodyweightField.text = UserProfileService.bodyweight > 0
-                ? UserProfileService.bodyweight.toFixed(1) : ""
+            bodyweightField.text = UserProfileViewModel.bodyweight > 0
+                ? UserProfileViewModel.bodyweight.toFixed(1) : ""
         if (!timezoneField.activeFocus)
-            timezoneField.text = UserProfileService.timezone
-        if (notesArea.text !== UserProfileService.notes)
-            notesArea.text = UserProfileService.notes
+            timezoneField.text = UserProfileViewModel.timezone
+        if (notesArea.text !== UserProfileViewModel.notes)
+            notesArea.text = UserProfileViewModel.notes
     }
 
     Component.onCompleted: syncForm()
 
     // Pick up changes made outside this screen (e.g. profile imported with an AI plan)
     StackView.onActivated: {
-        if (!UserProfileService.dirty)
-            UserProfileService.load()
+        if (!UserProfileViewModel.dirty)
+            UserProfileViewModel.load()
     }
 
     Connections {
-        target: UserProfileService
+        target: UserProfileViewModel
         function onProfileChanged() { root.syncForm() }
         function onSaved() { toast.showMessage("Profile saved") }
     }
@@ -147,22 +147,22 @@ Rectangle {
                 StatTile {
                     width: 100
                     label: "Age"
-                    value: UserProfileService.age >= 0 ? UserProfileService.age : "—"
+                    value: UserProfileViewModel.age >= 0 ? UserProfileViewModel.age : "—"
                 }
 
                 StatTile {
                     width: 100
                     label: "Bodyweight"
-                    value: UserProfileService.bodyweight > 0
-                           ? UserProfileService.bodyweight.toFixed(1) + " "
-                             + UserProfileService.bodyweightUnit
+                    value: UserProfileViewModel.bodyweight > 0
+                           ? UserProfileViewModel.bodyweight.toFixed(1) + " "
+                             + UserProfileViewModel.bodyweightUnit
                            : "—"
                 }
 
                 StatTile {
                     width: 100
                     label: "Per week"
-                    value: UserProfileService.sessionsPerWeek + "×"
+                    value: UserProfileViewModel.sessionsPerWeek + "×"
                 }
             }
 
@@ -198,10 +198,10 @@ Rectangle {
                     onTextChanged: {
                         var t = text.trim()
                         if (t === "") {
-                            UserProfileService.dateOfBirth = ""
+                            UserProfileViewModel.dateOfBirth = ""
                             root.dobInvalid = false
                         } else if (isValidDate(t)) {
-                            UserProfileService.dateOfBirth = t
+                            UserProfileViewModel.dateOfBirth = t
                             root.dobInvalid = false
                         }
                     }
@@ -217,7 +217,7 @@ Rectangle {
                     color: Theme.colors.error
                 }
 
-                FormLabel { text: "Bodyweight (" + UserProfileService.bodyweightUnit + ")" }
+                FormLabel { text: "Bodyweight (" + UserProfileViewModel.bodyweightUnit + ")" }
                 FormInput {
                     id: bodyweightField
                     placeholder: "e.g. 82.5"
@@ -225,7 +225,7 @@ Rectangle {
                     validator: RegularExpressionValidator {
                         regularExpression: /^\d{0,3}([.,]\d?)?$/
                     }
-                    onTextChanged: UserProfileService.bodyweight =
+                    onTextChanged: UserProfileViewModel.bodyweight =
                                        parseFloat(text.replace(",", ".")) || 0
                 }
             }
@@ -267,7 +267,7 @@ Rectangle {
                     Layout.alignment: Qt.AlignRight
                     from: 1
                     to: 7
-                    onValueModified: UserProfileService.sessionsPerWeek = value
+                    onValueModified: UserProfileViewModel.sessionsPerWeek = value
                 }
             }
 
@@ -304,7 +304,7 @@ Rectangle {
                     id: timezoneField
                     placeholder: "Europe/Warsaw"
                     font.pixelSize: Theme.fontSize.small
-                    onTextChanged: UserProfileService.timezone = text.trim()
+                    onTextChanged: UserProfileViewModel.timezone = text.trim()
                 }
             }
 
@@ -319,8 +319,8 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
                 onTextChanged: {
-                    if (text !== UserProfileService.notes)
-                        UserProfileService.notes = text
+                    if (text !== UserProfileViewModel.notes)
+                        UserProfileViewModel.notes = text
                 }
             }
 
@@ -356,11 +356,11 @@ Rectangle {
             id: saveButton
             anchors.centerIn: parent
             width: parent.width - 2 * Theme.padding.medium
-            text: UserProfileService.dirty ? "Save profile" : "Saved"
-            enabled: UserProfileService.dirty
+            text: UserProfileViewModel.dirty ? "Save profile" : "Saved"
+            enabled: UserProfileViewModel.dirty
             buttonStyle: Theme.button.primary
             buttonSize: Theme.button.large
-            onClicked: UserProfileService.save()
+            onClicked: UserProfileViewModel.save()
         }
     }
 

@@ -241,6 +241,75 @@ TEST_F(WorkoutRepositoryDbTest, Remove_CascadesDeleteToChildren)
     EXPECT_EQ(found->exercises().size(), 2u);
 }
 
+TEST_F(WorkoutRepositoryDbTest, Save_RemovedSet_DeletesOrphanRow)
+{
+    int id = m_repo->save(makeFullWorkout("Trim"));
+
+    auto loaded = m_repo->findOne(WorkoutQuery().whereId(id));
+    ASSERT_TRUE(loaded.has_value());
+    ASSERT_EQ(loaded->exercises()[0].sets().size(), 2u);
+
+    Workout edited = *loaded;
+    edited.exercises()[0].removeSet(0);
+    m_repo->save(edited);
+
+    auto reloaded = m_repo->findOne(WorkoutQuery().whereId(id));
+    ASSERT_TRUE(reloaded.has_value());
+    EXPECT_EQ(reloaded->exercises()[0].sets().size(), 1u);
+}
+
+TEST_F(WorkoutRepositoryDbTest, Save_RemovedExercise_DeletesOrphanRows)
+{
+    int id = m_repo->save(makeFullWorkout("Trim"));
+
+    auto loaded = m_repo->findOne(WorkoutQuery().whereId(id));
+    ASSERT_TRUE(loaded.has_value());
+    ASSERT_EQ(loaded->exercises().size(), 2u);
+
+    Workout edited = *loaded;
+    edited.removeExercise(1);
+    m_repo->save(edited);
+
+    auto reloaded = m_repo->findOne(WorkoutQuery().whereId(id));
+    ASSERT_TRUE(reloaded.has_value());
+    EXPECT_EQ(reloaded->exercises().size(), 1u);
+    EXPECT_EQ(reloaded->exercises()[0].name(), "Bench Press");
+}
+
+TEST_F(WorkoutRepositoryDbTest, Save_Update_PreservesChildIds)
+{
+    int id = m_repo->save(makeFullWorkout("Stable"));
+
+    auto loaded = m_repo->findOne(WorkoutQuery().whereId(id));
+    ASSERT_TRUE(loaded.has_value());
+    const int benchSetId = loaded->exercises()[0].sets()[0].id();
+
+    m_repo->save(*loaded);
+
+    auto reloaded = m_repo->findOne(WorkoutQuery().whereId(id));
+    ASSERT_TRUE(reloaded.has_value());
+    EXPECT_EQ(reloaded->exercises()[0].sets()[0].id(), benchSetId);
+}
+
+TEST_F(WorkoutRepositoryDbTest, Save_PreservesSetCompleted)
+{
+    Workout w("Session", QDateTime::currentDateTime());
+    Exercise e("Bench Press", 120);
+    Set done(10, 80);
+    done.setCompleted(true);
+    e.addSet(done);
+    e.addSet(Set(8, 85));
+    w.addExercise(e);
+
+    int id = m_repo->save(w);
+
+    auto loaded = m_repo->findOne(WorkoutQuery().whereId(id));
+    ASSERT_TRUE(loaded.has_value());
+    ASSERT_EQ(loaded->exercises()[0].sets().size(), 2u);
+    EXPECT_TRUE(loaded->exercises()[0].sets()[0].completed());
+    EXPECT_FALSE(loaded->exercises()[0].sets()[1].completed());
+}
+
 TEST_F(WorkoutRepositoryDbTest, PlannedTimeFilter_FindsPlannedWorkouts)
 {
     Workout planned = makeWorkout("Planned");

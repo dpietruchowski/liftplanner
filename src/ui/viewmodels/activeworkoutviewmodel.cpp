@@ -75,8 +75,7 @@ void ActiveWorkoutViewModel::loadCurrentWorkout()
     auto* loadedWorkout = new WorkoutModel(entity, this);
 
     setCurrentWorkout(loadedWorkout);
-    updateCurrentExercise();
-    updateCurrentSet();
+    selectFirstIncomplete();
     setIsActive(true);
 }
 
@@ -88,6 +87,8 @@ void ActiveWorkoutViewModel::startWorkout(WorkoutModel* workout)
         return;
     }
 
+    auto* previousWorkout = m_currentWorkout;
+
     auto* clonedWorkout = workout->clone(nullptr);
     clonedWorkout->start();
 
@@ -96,6 +97,13 @@ void ActiveWorkoutViewModel::startWorkout(WorkoutModel* workout)
 
     updateCurrentExercise();
     updateCurrentSet();
+
+    if (previousWorkout)
+    {
+        if (m_service && previousWorkout->id() != -1)
+            m_service->deleteWorkout(previousWorkout->id());
+        previousWorkout->deleteLater();
+    }
 
     qDebug() << "Workout started:" << clonedWorkout->name();
 }
@@ -195,12 +203,12 @@ void ActiveWorkoutViewModel::duplicateSet(SetModel* set)
     if (!exercise)
         return;
 
-    SetModel* clone = set->clone(exercise);
-    if (!clone)
-        return;
+    Set duplicate = set->entity();
+    duplicate.setId(-1);
+    duplicate.setExerciseId(-1);
+    duplicate.setCompleted(false);
 
-    clone->setCompleted(false);
-
+    auto* clone = new SetModel(duplicate, exercise);
     exercise->addSet(clone);
     setCurrentSet(clone);
     saveCurrentWorkout();
@@ -270,6 +278,32 @@ void ActiveWorkoutViewModel::updateCurrentSet()
     }
 
     setCurrentSet(m_currentExercise->sets().first());
+}
+
+void ActiveWorkoutViewModel::selectFirstIncomplete()
+{
+    if (!m_currentWorkout || m_currentWorkout->exercises().isEmpty())
+    {
+        setCurrentExercise(nullptr);
+        setCurrentSet(nullptr);
+        return;
+    }
+
+    for (auto* exercise : m_currentWorkout->exercises())
+    {
+        for (auto* set : exercise->sets())
+        {
+            if (!set->completed())
+            {
+                setCurrentExercise(exercise);
+                setCurrentSet(set);
+                return;
+            }
+        }
+    }
+
+    updateCurrentExercise();
+    updateCurrentSet();
 }
 
 void ActiveWorkoutViewModel::saveToDb()

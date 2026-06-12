@@ -13,6 +13,7 @@
 #include <dbtoolkit/query/order.h>
 #include <dbtoolkit/query/where.h>
 
+#include <QHash>
 #include <QSqlQuery>
 
 WorkoutRepositoryDb::WorkoutRepositoryDb(DbStorage& storage)
@@ -91,18 +92,17 @@ std::vector<Workout> WorkoutRepositoryDb::findAll(const WorkoutQuery& query) con
     std::vector<Workout> results;
     results.reserve(rows.size());
     for (const auto& row : rows)
-    {
-        Workout w = WorkoutSerializer::fromVariant(row);
-        loadChildren(w);
-        results.push_back(std::move(w));
-    }
+        results.push_back(WorkoutSerializer::fromVariant(row));
+
+    loadChildren(results);
     return results;
 }
 
 std::optional<Workout> WorkoutRepositoryDb::findOne(const WorkoutQuery& query) const
 {
     auto where = buildWhereClause(query);
-    auto rows = m_workoutRepo->select(where, Order(), 1);
+    auto order = buildOrderClause(query);
+    auto rows = m_workoutRepo->select(where, order, 1);
     if (rows.isEmpty())
         return std::nullopt;
 
@@ -113,6 +113,9 @@ std::optional<Workout> WorkoutRepositoryDb::findOne(const WorkoutQuery& query) c
 
 int WorkoutRepositoryDb::save(const Workout& workout)
 {
+    DbStorage& storage = m_workoutRepo->storage();
+    storage.beginTransaction();
+
     QVariantMap data = WorkoutSerializer::toVariant(workout);
 
     int workoutId;
@@ -135,6 +138,8 @@ int WorkoutRepositoryDb::save(const Workout& workout)
     }
 
     saveChildren(workoutId, workout);
+
+    storage.commit();
     return workoutId;
 }
 
@@ -170,8 +175,55 @@ void WorkoutRepositoryDb::loadChildren(Workout& workout) const
     }
 }
 
+void WorkoutRepositoryDb::loadChildren(std::vector<Workout>& workouts) const
+{
+    if (workouts.empty())
+        return;
+
+    QList<int> workoutIds;
+    workoutIds.reserve(static_cast<int>(workouts.size()));
+    for (const auto& workout : workouts)
+        workoutIds.append(workout.id());
+
+    auto exercises = m_exerciseRepo.findByWorkoutIds(workoutIds);
+
+    QList<int> exerciseIds;
+    exerciseIds.reserve(static_cast<int>(exercises.size()));
+    for (const auto& exercise : exercises)
+        exerciseIds.append(exercise.id());
+
+    auto sets = m_setRepo.findByExerciseIds(exerciseIds);
+
+    QHash<int, std::vector<Set>> setsByExercise;
+    for (auto& set : sets)
+        setsByExercise[set.exerciseId()].push_back(std::move(set));
+
+    QHash<int, std::vector<Exercise>> exercisesByWorkout;
+    for (auto& exercise : exercises)
+    {
+        auto it = setsByExercise.find(exercise.id());
+        if (it != setsByExercise.end())
+        {
+            for (auto& set : it.value())
+                exercise.addSet(set);
+        }
+        exercisesByWorkout[exercise.workoutId()].push_back(std::move(exercise));
+    }
+
+    for (auto& workout : workouts)
+    {
+        auto it = exercisesByWorkout.find(workout.id());
+        if (it == exercisesByWorkout.end())
+            continue;
+        for (const auto& exercise : it.value())
+            workout.addExercise(exercise);
+    }
+}
+
 void WorkoutRepositoryDb::saveChildren(int workoutId, const Workout& workout)
 {
+    m_exerciseRepo.removeByWorkoutId(workoutId);
+
     for (const auto& exercise : workout.exercises())
     {
         Exercise e = exercise;
@@ -251,42 +303,27 @@ Order WorkoutRepositoryDb::buildOrderClause(const WorkoutQuery& query) const
 {
     Order order;
 
-    if (query.orderByCreatedTimeDirection().has_value())
+    const auto appendOrder = [&](const char* column, SortDirection direction)
     {
-        order = Order(WorkoutSerializer::created_time_key);
-        if (query.orderByCreatedTimeDirection().value() == SortDirection::Ascending)
+        if (order.isEmpty())
+            order = Order(column);
+        else
+            order.then(column);
+
+        if (direction == SortDirection::Ascending)
             order.asc();
         else
             order.desc();
-    }
+    };
+
+    if (query.orderByCreatedTimeDirection().has_value())
+        appendOrder(WorkoutSerializer::created_time_key, query.orderByCreatedTimeDirection().value());
 
     if (query.orderByStartedTimeDirection().has_value())
-    {
-        auto stOrder = Order(WorkoutSerializer::started_time_key);
-        if (query.orderByStartedTimeDirection().value() == SortDirection::Ascending)
-            stOrder.asc();
-        else
-            stOrder.desc();
-        order = order.isEmpty() ? stOrder : order.then(WorkoutSerializer::started_time_key);
-        if (query.orderByStartedTimeDirection().value() == SortDirection::Ascending)
-            order.asc();
-        else
-            order.desc();
-    }
+        appendOrder(WorkoutSerializer::started_time_key, query.orderByStartedTimeDirection().value());
 
     if (query.orderByPlannedTimeDirection().has_value())
-    {
-        auto ptOrder = Order(WorkoutSerializer::planned_time_key);
-        if (query.orderByPlannedTimeDirection().value() == SortDirection::Ascending)
-            ptOrder.asc();
-        else
-            ptOrder.desc();
-        order = order.isEmpty() ? ptOrder : order.then(WorkoutSerializer::planned_time_key);
-        if (query.orderByPlannedTimeDirection().value() == SortDirection::Ascending)
-            order.asc();
-        else
-            order.desc();
-    }
+        appendOrder(WorkoutSerializer::planned_time_key, query.orderByPlannedTimeDirection().value());
 
     return order;
 }

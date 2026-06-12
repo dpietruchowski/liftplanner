@@ -31,6 +31,7 @@ public:
 
 private:
     void loadChildren(Workout& workout) const;
+    void loadChildren(std::vector<Workout>& workouts) const;
     void saveChildren(int workoutId, const Workout& workout);
 
     Where buildWhereClause(const WorkoutQuery& query) const;

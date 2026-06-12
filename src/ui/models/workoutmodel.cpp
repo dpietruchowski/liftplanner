@@ -25,17 +25,7 @@ QDateTime WorkoutModel::plannedTime() const { return m_workout.plannedTime(); }
 QDateTime WorkoutModel::startedTime() const { return m_workout.startedTime(); }
 QDateTime WorkoutModel::endedTime() const { return m_workout.endedTime(); }
 
-bool WorkoutModel::isCompleted() const
-{
-    if (m_exercises.isEmpty())
-        return false;
-    for (auto* e : m_exercises)
-    {
-        if (!e->isCompleted())
-            return false;
-    }
-    return true;
-}
+bool WorkoutModel::isCompleted() const { return toEntity().isCompleted(); }
 
 WorkoutStatus WorkoutModel::status() const { return m_workout.status(); }
 QString WorkoutModel::statusString() const { return workoutStatusToString(m_workout.status()); }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "modules/workout/domain/entities/exercise.h"
+#include <QList>
 #include <memory>
 #include <vector>
 
@@ -18,6 +19,7 @@ public:
     void registerMigrations(MigrationRunner& runner);
 
     std::vector<Exercise> findByWorkoutId(int workoutId) const;
+    std::vector<Exercise> findByWorkoutIds(const QList<int>& workoutIds) const;
     int save(const Exercise& exercise);
     void removeByWorkoutId(int workoutId);
 
