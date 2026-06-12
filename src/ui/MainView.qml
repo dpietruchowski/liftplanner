@@ -10,6 +10,7 @@ Item {
     property var activeWorkoutScreen: ScreenActiveWorkout {}
     property var homeScreen: ScreenHome {}
     property var workoutsScreen: ScreenWorkouts {}
+    property var profileScreen: ScreenProfile {}
 
     StackView {
         id: stackView
@@ -56,7 +57,8 @@ Item {
         model: [
             { label: "Workout", screen: activeWorkoutScreen, icon: Theme.icons.barbell },
             { label: "Home", screen: homeScreen, icon: Theme.icons.home },
-            { label: "Workouts", screen: workoutsScreen, icon: Theme.icons.calendar }
+            { label: "Workouts", screen: workoutsScreen, icon: Theme.icons.calendar },
+            { label: "Profile", screen: profileScreen, icon: Theme.icons.user }
         ]
     }
 }

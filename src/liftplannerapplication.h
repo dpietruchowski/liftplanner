@@ -11,6 +11,7 @@ class UserProfileService;
 class ActiveWorkoutViewModel;
 class WorkoutHistoryViewModel;
 class PlannedWorkoutViewModel;
+class UserProfileViewModel;
 class ClipboardHelper;
 
 class LiftPlannerApplication final
@@ -30,5 +31,6 @@ private:
     std::unique_ptr<ActiveWorkoutViewModel> m_activeWorkoutViewModel;
     std::unique_ptr<WorkoutHistoryViewModel> m_workoutHistoryViewModel;
     std::unique_ptr<PlannedWorkoutViewModel> m_plannedWorkoutViewModel;
+    std::unique_ptr<UserProfileViewModel> m_userProfileViewModel;
     std::unique_ptr<ClipboardHelper> m_clipboardHelper;
 };

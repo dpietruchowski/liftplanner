@@ -7,6 +7,7 @@
 #include "modules/workout/infrastructure/database/workoutrepositorydb.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
 #include "ui/viewmodels/plannedworkoutviewmodel.h"
+#include "ui/viewmodels/userprofileviewmodel.h"
 #include "ui/viewmodels/workouthistoryviewmodel.h"
 #include "utils/clipboardhelper.h"
 #include "utils/coloredsvgprovider.h"
@@ -29,6 +30,7 @@ void LiftPlannerApplication::initialize()
     m_workoutHistoryViewModel = std::make_unique<WorkoutHistoryViewModel>(m_workoutService.get());
     m_plannedWorkoutViewModel = std::make_unique<PlannedWorkoutViewModel>(
         m_workoutService.get(), m_userProfileService.get());
+    m_userProfileViewModel = std::make_unique<UserProfileViewModel>(m_userProfileService.get());
     m_clipboardHelper = std::make_unique<ClipboardHelper>();
 }
 
@@ -41,6 +43,7 @@ void LiftPlannerApplication::registerQmlTypes(QmlRegistrator& registrator)
     registrator.registerSingletonInstance("ActiveWorkoutService", m_activeWorkoutViewModel.get());
     registrator.registerSingletonInstance("WorkoutHistoryService", m_workoutHistoryViewModel.get());
     registrator.registerSingletonInstance("PlannedWorkoutService", m_plannedWorkoutViewModel.get());
+    registrator.registerSingletonInstance("UserProfileService", m_userProfileViewModel.get());
     registrator.registerSingletonInstance("ClipboardHelper", m_clipboardHelper.get());
 
     registrator.registerSingletonType("Theme.qml", "Theme");
