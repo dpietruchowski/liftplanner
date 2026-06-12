@@ -47,7 +47,7 @@ ColumnLayout {
                     iconSource: expanded ? Theme.icons.collapse : Theme.icons.expand
                     circular: true
                     buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.primary
+                    buttonStyle: Theme.button.outline
                     onClicked: expanded = !expanded
                     ToolTip.visible: hovered
                     ToolTip.text: expanded ? "Collapse" : "Expand"

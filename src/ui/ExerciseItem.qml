@@ -18,7 +18,7 @@ Rectangle {
     ColumnLayout {
         id: column
         anchors.fill: parent
-        spacing: Theme.spacing.xsmall
+        spacing: Theme.spacing.xSmall
 
         Text {
             text: exercise.name

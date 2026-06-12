@@ -12,7 +12,7 @@ Rectangle {
     width: setsColumn.width
     height: actionsVisible ? Theme.layout.listItemHeight + Theme.button.square.size + Theme.padding.small * 2 : Theme.layout.listItemHeight
     radius: Theme.radius.medium
-    color: setData.completed ? Theme.colors.success : Theme.colors.surface
+    color: Theme.colors.surface
     border.width: ActiveWorkoutService.currentSet === setData ? Theme.border.thick : Theme.border.thin
     border.color: ActiveWorkoutService.currentSet === setData ? Theme.colors.primaryVariant : Theme.colors.border
 
@@ -41,7 +41,7 @@ Rectangle {
                 text: "Set " + (index + 1)
                 font.pixelSize: Theme.fontSize.small
                 font.bold: true
-                color: setData.completed ? Theme.colors.buttonText : Theme.colors.textPrimary
+                color: Theme.colors.textPrimary
                 Layout.preferredWidth: 60
                 Layout.alignment: Qt.AlignVCenter
                 leftPadding: Theme.padding.medium
@@ -56,7 +56,7 @@ Rectangle {
                     anchors.centerIn: parent
                     text: setData.repetitions + " reps"
                     font.pixelSize: Theme.fontSize.small
-                    color: setData.completed ? Theme.colors.buttonText : Theme.colors.textSecondary
+                    color: Theme.colors.textSecondary
                 }
             }
 
@@ -69,7 +69,7 @@ Rectangle {
                     anchors.centerIn: parent
                     text: setData.weight + " kg"
                     font.pixelSize: Theme.fontSize.small
-                    color: setData.completed ? Theme.colors.buttonText : Theme.colors.textSecondary
+                    color: Theme.colors.textSecondary
                 }
             }
 
@@ -80,7 +80,7 @@ Rectangle {
                 width: Theme.layout.indicatorSize
                 height: Theme.layout.indicatorSize
                 radius: Theme.layout.indicatorSize / 2
-                color: setData.completed ? Theme.colors.buttonText : "transparent"
+                color: setData.completed ? Theme.colors.success : "transparent"
                 border.color: setData.completed ? Theme.colors.success : Theme.colors.border
                 border.width: Theme.border.medium
                 Layout.alignment: Qt.AlignVCenter
@@ -110,7 +110,7 @@ Rectangle {
 
                 RowLayout {
                     anchors.centerIn: parent
-                    spacing: Theme.spacing.xsmall
+                    spacing: Theme.spacing.xSmall
 
                     ThemedButton {
                         iconSource: Theme.icons.minus
@@ -135,7 +135,7 @@ Rectangle {
 
                 RowLayout {
                     anchors.centerIn: parent
-                    spacing: Theme.spacing.xsmall
+                    spacing: Theme.spacing.xSmall
 
                     ThemedButton {
                         iconSource: Theme.icons.minus
@@ -157,7 +157,7 @@ Rectangle {
 
             // Add/remove set under indicator
             RowLayout {
-                spacing: Theme.spacing.xsmall
+                spacing: Theme.spacing.xSmall
                 Layout.alignment: Qt.AlignVCenter
                 Layout.rightMargin: Theme.padding.medium
 

@@ -23,12 +23,22 @@ Rectangle {
 
         Behavior on anchors.topMargin { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
-        Text {
-            text: ActiveWorkoutService.currentWorkout ? ActiveWorkoutService.currentWorkout.name : "Workout"
-            color: Theme.colors.textPrimary
-            font.pixelSize: Theme.fontSize.large
-            font.bold: true
-            Layout.alignment: Qt.AlignHCenter
+        SectionHeader {
+            id: plannedSection
+            Layout.fillWidth: true
+            titleFont.pixelSize: Theme.fontSize.large
+            title: ActiveWorkoutService.currentWorkout ? ActiveWorkoutService.currentWorkout.name : "Workout"
+            visible: !restDialog.isVisible
+
+            ThemedButton {
+                iconSource: Theme.icons.ai
+                circular: true
+                buttonSize: Theme.button.square
+                buttonStyle: Theme.button.primary
+                ToolTip.visible: hovered
+                ToolTip.text: "Generate prompt for AI"
+                ToolTip.delay: 500
+            }
         }
 
         ScrollView {

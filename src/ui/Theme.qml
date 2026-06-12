@@ -40,6 +40,7 @@ QtObject {
         property int large: 22
         property int medium: 18
         property int small: 14
+        property int xSmall: 11
     }
 
     property var radius: QtObject {
@@ -49,14 +50,14 @@ QtObject {
     }
 
     property var padding: QtObject {
-        property int xsmall: 4
+        property int xSmall: 4
         property int small: 6
         property int medium: 12
         property int large: 18
     }
 
     property var spacing: QtObject {
-        property int xsmall: 4
+        property int xSmall: 4
         property int small: 6
         property int medium: 12
         property int large: 18
@@ -211,6 +212,15 @@ QtObject {
             property color pressed: "#25FFFFFF"
             property color border: "#70FFFFFF"
             property color text: "#FFFFFF"
+        }
+
+        property var outline: QtObject {
+            property color background: "transparent"
+            property color hovered: "#15FFFFFF"
+            property color pressed: "#08FFFFFF"
+
+            property color border: "#80FFFFFF"
+            property color text: "#BBBBBB"
         }
     }
 }

@@ -10,6 +10,7 @@ Item {
     implicitWidth: row.implicitWidth
 
     property string title
+    property alias titleFont: titleText.font
     property bool expandable: false
     property bool expanded: true
     default property alias actions: actionsRow.data
@@ -49,6 +50,7 @@ Item {
         }
 
         Text {
+            id: titleText
             text: root.title
             font.pixelSize: Theme.fontSize.small
             font.bold: true
