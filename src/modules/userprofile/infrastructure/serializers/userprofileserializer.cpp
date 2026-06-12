@@ -60,7 +60,7 @@ QVariantMap UserProfileSerializer::toVariant(const UserProfile& profile)
                 profile.bodyweightKg().has_value() ? QVariant(profile.bodyweightKg().value())
                                                    : QVariant());
     data.insert(unit_system_key, unitSystemToString(profile.unitSystem()));
-    data.insert(notes_key, profile.notes());
+    data.insert(notes_key, profile.notes().isNull() ? QStringLiteral("") : profile.notes());
 
     return data;
 }
