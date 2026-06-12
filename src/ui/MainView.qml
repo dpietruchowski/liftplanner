@@ -9,8 +9,7 @@ Item {
 
     property var activeWorkoutScreen: ScreenActiveWorkout {}
     property var homeScreen: ScreenHome {}
-    property var plannedScreen: ScreenPlannedWorkouts {}
-    property var historyScreen: ScreenHistory {}
+    property var workoutsScreen: ScreenWorkouts {}
 
     StackView {
         id: stackView
@@ -45,20 +44,19 @@ Item {
             notificationPopup.text =
                 "Prompt copied to clipboard.\n\n" +
                 "Paste it into any AI (ChatGPT, Gemini, etc.) and discuss your training plan. " +
-                "Then copy the generated JSON and click the 'Import' button to add planned workouts."
+                "Then copy the generated JSON and tap the import button next to 'Planned' to add planned workouts."
             notificationPopup.open()
         }
     }
 
-    BottomNavigation {
+    ThemedBottomNavigation {
         id: bottomNav
         anchors.bottom: parent.bottom
         width: parent.width
         model: [
             { label: "Workout", screen: activeWorkoutScreen, icon: Theme.icons.barbell },
             { label: "Home", screen: homeScreen, icon: Theme.icons.home },
-            { label: "Planned", screen: plannedScreen, icon: Theme.icons.planned },
-            { label: "History", screen: historyScreen, icon: Theme.icons.calendar }
+            { label: "Workouts", screen: workoutsScreen, icon: Theme.icons.calendar }
         ]
     }
 }

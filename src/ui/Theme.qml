@@ -75,10 +75,6 @@ QtObject {
     property real dialogOpacity: 0.98
 
     property var layout: QtObject {
-        property int navBarHeight: 60
-        property int navItemWidth: 70
-        property int navItemHeight: 50
-        property int navBarSpacing: 24
         property int listItemHeight: 50
         property int listItemHeightLarge: 56
         property int cardHeight: 100
@@ -86,6 +82,16 @@ QtObject {
         property int indicatorSize: 20
         property int iconSizeLarge: 48
         property int exerciseItemHeight: 25
+    }
+
+    property var navigation: QtObject {
+        property int barHeight: 60
+    }
+
+    property var icon: QtObject {
+        property int small: 16
+        property int medium: 24
+        property int large: 32
     }
 
     property var icons: QtObject {
@@ -106,6 +112,9 @@ QtObject {
 
         property string check: "qrc:/LiftPlanner/ui/icons/check.svg"
         property string copy: "qrc:/LiftPlanner/ui/icons/copy.svg"
+        property string ai: "qrc:/LiftPlanner/ui/icons/ai.svg"
+        property string importData: "qrc:/LiftPlanner/ui/icons/import.svg"
+        property string exportData: "qrc:/LiftPlanner/ui/icons/export.svg"
 
         property string addSet: "qrc:/LiftPlanner/ui/icons/add-set.svg"
         property string removeSet: "qrc:/LiftPlanner/ui/icons/remove-set.svg"

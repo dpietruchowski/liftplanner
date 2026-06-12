@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Controls.impl
 import LiftPlanner 1.0
 import Themed.Components
 
@@ -15,13 +16,16 @@ ColumnLayout {
     signal exportWorkout(var workout)
 
     Rectangle {
+        id: card
+        property real baseHeight: Math.max(Theme.layout.listItemHeightLarge,
+                                           headerRow.implicitHeight + 2 * Theme.padding.medium)
         Layout.fillWidth: true
         Layout.preferredHeight: expanded
-            ? Theme.layout.listItemHeightLarge + Theme.spacing.small + Theme.button.square.size
-            : Theme.layout.listItemHeightLarge
+            ? baseHeight + Theme.spacing.small + Theme.button.square.size
+            : baseHeight
         radius: Theme.radius.medium
         color: Theme.colors.surface
-        border.color: Theme.colors.primary
+        border.color: Theme.colors.border
         border.width: Theme.border.thin
         clip: true
 
@@ -35,8 +39,8 @@ ColumnLayout {
             spacing: Theme.spacing.small
 
             RowLayout {
+                id: headerRow
                 Layout.fillWidth: true
-                Layout.fillHeight: true
                 spacing: Theme.spacing.medium
 
                 ThemedButton {
@@ -45,23 +49,29 @@ ColumnLayout {
                     buttonSize: Theme.button.square
                     buttonStyle: Theme.button.primary
                     onClicked: expanded = !expanded
+                    ToolTip.visible: hovered
+                    ToolTip.text: expanded ? "Collapse" : "Expand"
+                    ToolTip.delay: 500
                 }
 
-                Text {
-                    text: workout ? workout.name : ""
-                    font.pixelSize: Theme.fontSize.medium
-                    font.bold: true
-                    color: Theme.colors.textPrimary
+                Column {
                     Layout.fillWidth: true
-                    elide: Text.ElideRight
-                    verticalAlignment: Text.AlignVCenter
-                }
 
-                Text {
-                    text: workout ? Qt.formatDateTime(workout.startedTime, "dd.MM.yyyy") : ""
-                    font.pixelSize: Theme.fontSize.small
-                    color: Theme.colors.textSecondary
-                    verticalAlignment: Text.AlignVCenter
+                    Text {
+                        text: workout ? workout.name : ""
+                        font.pixelSize: Theme.fontSize.medium
+                        font.bold: true
+                        color: Theme.colors.textPrimary
+                        elide: Text.ElideRight
+                        width: parent.width
+                    }
+
+                    Text {
+                        text: workout ? Qt.formatDateTime(workout.startedTime, "ddd, d MMM yyyy") : ""
+                        font.pixelSize: Theme.fontSize.small
+                        color: Theme.colors.textSecondary
+                        visible: text.length > 0
+                    }
                 }
             }
 
@@ -77,8 +87,11 @@ ColumnLayout {
                     iconSource: Theme.icons.copy
                     circular: true
                     buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.secondary
+                    buttonStyle: Theme.button.primary
                     onClicked: root.exportWorkout(workout)
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Copy to clipboard"
+                    ToolTip.delay: 500
                 }
 
                 ThemedButton {
@@ -87,6 +100,9 @@ ColumnLayout {
                     buttonSize: Theme.button.square
                     buttonStyle: Theme.button.danger
                     onClicked: root.deleteWorkout(workout)
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Delete workout"
+                    ToolTip.delay: 500
                 }
             }
         }
@@ -101,6 +117,7 @@ ColumnLayout {
     }
 
     Rectangle {
+        visible: expanded
         Layout.fillWidth: true
         height: Theme.border.thin
         color: Theme.colors.border

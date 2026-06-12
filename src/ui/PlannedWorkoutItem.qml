@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Controls.impl
 import LiftPlanner 1.0
 import Themed.Components
 
@@ -33,6 +34,9 @@ ColumnLayout {
                 buttonSize: Theme.button.square
                 buttonStyle: Theme.button.primary
                 onClicked: expanded = !expanded
+                ToolTip.visible: hovered
+                ToolTip.text: expanded ? "Collapse" : "Expand"
+                ToolTip.delay: 500
             }
 
             Column {
@@ -63,6 +67,9 @@ ColumnLayout {
                 onClicked: {
                     startWorkoutRequest(workout)
                 }
+                ToolTip.visible: hovered
+                ToolTip.text: "Start workout"
+                ToolTip.delay: 500
             }
         }
     }
@@ -76,6 +83,7 @@ ColumnLayout {
     }
 
     Rectangle {
+        visible: expanded
         Layout.fillWidth: true
         height: Theme.border.thin
         color: Theme.colors.border

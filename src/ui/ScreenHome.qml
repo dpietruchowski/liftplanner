@@ -80,9 +80,9 @@ Rectangle {
     NotificationPopup {
         id: noPlannedPopup
         text: "No planned workouts yet.\n\n" +
-              "Head to the 'Planned' tab and tap 'Prompt' — it will copy a ready-made prompt to your clipboard. " +
+              "Head to the workouts tab (calendar icon) and tap the AI button — it will copy a ready-made prompt to your clipboard. " +
               "Paste it into any AI assistant (ChatGPT, Gemini, etc.), describe your training goals, and let it generate a workout plan. " +
-              "Once you receive the JSON, come back and tap 'Import' in the 'Planned' tab."
+              "Once you receive the JSON, come back and tap the import button next to 'Planned'."
         type: Notification.Type.Info
         buttons: Notification.Button.Ok
     }
