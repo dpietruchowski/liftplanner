@@ -1,16 +1,31 @@
 #include "workouthistoryviewmodel.h"
 #include "modules/workout/application/workoutservice.h"
+#include "ui/viewmodels/activeworkoutviewmodel.h"
 #include "utils/workoutjson.h"
 #include "utils/workouttext.h"
+#include <QDate>
 
-WorkoutHistoryViewModel::WorkoutHistoryViewModel(WorkoutService* service, QObject* parent)
+WorkoutHistoryViewModel::WorkoutHistoryViewModel(WorkoutService* service,
+                                                 ActiveWorkoutViewModel* activeWorkoutViewModel,
+                                                 QObject* parent)
     : QObject(parent)
     , m_service(service)
+    , m_activeWorkoutViewModel(activeWorkoutViewModel)
 {
     connect(this, &WorkoutHistoryViewModel::workoutsChanged, this,
             &WorkoutHistoryViewModel::lastWorkoutChanged);
     connect(this, &WorkoutHistoryViewModel::workoutsChanged, this,
             &WorkoutHistoryViewModel::topExercisesChanged);
+    connect(this, &WorkoutHistoryViewModel::workoutsChanged, this,
+            &WorkoutHistoryViewModel::weekActivityChanged);
+
+    if (m_activeWorkoutViewModel)
+    {
+        connect(m_activeWorkoutViewModel, &ActiveWorkoutViewModel::currentWorkoutChanged, this,
+                &WorkoutHistoryViewModel::weekActivityChanged);
+        connect(m_activeWorkoutViewModel, &ActiveWorkoutViewModel::workoutCompleted, this,
+                &WorkoutHistoryViewModel::loadAllWorkouts);
+    }
 
     loadAllWorkouts();
 }
@@ -69,6 +84,32 @@ WorkoutModel* WorkoutHistoryViewModel::lastWorkout() const
         return nullptr;
 
     return m_workouts.first();
+}
+
+QVariantList WorkoutHistoryViewModel::weekActivity() const
+{
+    QVariantList activity;
+    for (int i = 0; i < 7; ++i)
+        activity.append(false);
+
+    const QDate today = QDate::currentDate();
+    const QDate monday = today.addDays(1 - today.dayOfWeek());
+
+    const auto markDay = [&](const WorkoutModel* workout) {
+        if (!workout || !workout->startedTime().isValid())
+            return;
+        const int dayIndex = static_cast<int>(monday.daysTo(workout->startedTime().date()));
+        if (dayIndex >= 0 && dayIndex < 7)
+            activity[dayIndex] = true;
+    };
+
+    for (const auto* workout : m_workouts)
+        markDay(workout);
+
+    if (m_activeWorkoutViewModel)
+        markDay(m_activeWorkoutViewModel->currentWorkout());
+
+    return activity;
 }
 
 QVariantList WorkoutHistoryViewModel::topExercises() const

@@ -55,6 +55,7 @@ target_link_libraries(liftplanner
     dbtoolkit
     app_utils
     themed_components_qml
+    app_components_qml
     themed_icons
     Qt6::Quick
     Qt6::QuickControls2

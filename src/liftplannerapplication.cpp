@@ -27,7 +27,8 @@ void LiftPlannerApplication::initialize()
     m_userProfileService = std::make_unique<UserProfileService>(m_storage->userProfileRepo());
 
     m_activeWorkoutViewModel = std::make_unique<ActiveWorkoutViewModel>(m_workoutService.get());
-    m_workoutHistoryViewModel = std::make_unique<WorkoutHistoryViewModel>(m_workoutService.get());
+    m_workoutHistoryViewModel = std::make_unique<WorkoutHistoryViewModel>(
+        m_workoutService.get(), m_activeWorkoutViewModel.get());
     m_plannedWorkoutViewModel = std::make_unique<PlannedWorkoutViewModel>(
         m_workoutService.get(), m_userProfileService.get());
     m_userProfileViewModel = std::make_unique<UserProfileViewModel>(m_userProfileService.get());

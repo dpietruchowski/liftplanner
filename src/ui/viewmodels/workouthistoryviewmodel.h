@@ -12,6 +12,7 @@
 #include <QVariantList>
 
 class WorkoutService;
+class ActiveWorkoutViewModel;
 
 class WorkoutHistoryViewModel : public QObject
 {
@@ -20,9 +21,12 @@ class WorkoutHistoryViewModel : public QObject
     DECLARE_PROPERTY(QList<WorkoutModel*>, workouts, setWorkouts)
     Q_PROPERTY(WorkoutModel* lastWorkout READ lastWorkout NOTIFY lastWorkoutChanged)
     Q_PROPERTY(QVariantList topExercises READ topExercises NOTIFY topExercisesChanged)
+    Q_PROPERTY(QVariantList weekActivity READ weekActivity NOTIFY weekActivityChanged)
 
 public:
-    explicit WorkoutHistoryViewModel(WorkoutService* service, QObject* parent = nullptr);
+    explicit WorkoutHistoryViewModel(WorkoutService* service,
+                                     ActiveWorkoutViewModel* activeWorkoutViewModel = nullptr,
+                                     QObject* parent = nullptr);
 
     Q_INVOKABLE void loadAllWorkouts();
     Q_INVOKABLE void saveWorkout(WorkoutModel* workout);
@@ -36,13 +40,16 @@ public:
 
     WorkoutModel* lastWorkout() const;
     QVariantList topExercises() const;
+    QVariantList weekActivity() const;
 
 signals:
     void errorOccurred(const QString& errorMessage);
     void lastWorkoutChanged();
     void topExercisesChanged();
+    void weekActivityChanged();
     void exportedToClipboard();
 
 private:
     WorkoutService* m_service;
+    ActiveWorkoutViewModel* m_activeWorkoutViewModel;
 };

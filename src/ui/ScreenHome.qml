@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import LiftPlanner 1.0
 import Themed.Components
+import App.Components
 
 Rectangle {
     id: root
@@ -19,7 +20,6 @@ Rectangle {
         // Top exercises (most frequent in recent workouts) with best 1RM
         Row {
             Layout.alignment: Qt.AlignHCenter
-            Layout.bottomMargin: Theme.spacing.large
             spacing: Theme.spacing.medium
 
             Repeater {
@@ -30,6 +30,14 @@ Rectangle {
                     value: Math.round(modelData.oneRepMax) + " kg"
                 }
             }
+        }
+
+        WeekActivityDots {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: Theme.spacing.large
+            Layout.bottomMargin: Theme.spacing.large
+            activity: WorkoutHistoryService.weekActivity
+            todayIndex: (new Date().getDay() + 6) % 7
         }
 
         // Next planned (smaller)
