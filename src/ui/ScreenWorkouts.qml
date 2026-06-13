@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls.impl
 import LiftPlanner 1.0
 import Themed.Components
+import App.Components
 
 Rectangle {
     id: root

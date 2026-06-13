@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Themed.Components
+import App.Components
 
 ColumnLayout {
     id: root
