@@ -25,22 +25,29 @@ UserProfileViewModel::UserProfileViewModel(UserProfileService* service, QObject*
 
 void UserProfileViewModel::load()
 {
-    auto loaded = m_service ? m_service->load() : std::nullopt;
-    if (loaded.has_value())
-    {
-        m_profile = *loaded;
-    }
-    else
-    {
-        m_profile = UserProfile::createDefault();
-        m_profile.setUserId(default_user_id);
-        m_profile.setTimezone(QString::fromUtf8(QTimeZone::systemTimeZoneId()));
-        m_profile.setLanguage(QLocale::system().name().left(2));
-    }
+    if (!m_service)
+        return;
 
-    m_dirty = false;
-    emit profileChanged();
-    emit dirtyChanged();
+    m_service->load().then(this,
+                           [this](std::optional<UserProfile> loaded)
+                           {
+                               if (loaded.has_value())
+                               {
+                                   m_profile = *loaded;
+                               }
+                               else
+                               {
+                                   m_profile = UserProfile::createDefault();
+                                   m_profile.setUserId(default_user_id);
+                                   m_profile.setTimezone(
+                                       QString::fromUtf8(QTimeZone::systemTimeZoneId()));
+                                   m_profile.setLanguage(QLocale::system().name().left(2));
+                               }
+
+                               m_dirty = false;
+                               emit profileChanged();
+                               emit dirtyChanged();
+                           });
 }
 
 void UserProfileViewModel::save()

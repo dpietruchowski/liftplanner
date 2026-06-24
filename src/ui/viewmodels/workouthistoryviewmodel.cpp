@@ -15,8 +15,6 @@ WorkoutHistoryViewModel::WorkoutHistoryViewModel(WorkoutService* service,
     connect(this, &WorkoutHistoryViewModel::workoutsChanged, this,
             &WorkoutHistoryViewModel::lastWorkoutChanged);
     connect(this, &WorkoutHistoryViewModel::workoutsChanged, this,
-            &WorkoutHistoryViewModel::topExercisesChanged);
-    connect(this, &WorkoutHistoryViewModel::workoutsChanged, this,
             &WorkoutHistoryViewModel::weekActivityChanged);
 
     if (m_activeWorkoutViewModel)
@@ -32,14 +30,42 @@ WorkoutHistoryViewModel::WorkoutHistoryViewModel(WorkoutService* service,
 
 void WorkoutHistoryViewModel::loadAllWorkouts()
 {
-    qDeleteAll(m_workouts);
-    m_workouts.clear();
+    if (!m_service)
+        return;
 
-    auto entities = m_service->loadHistory();
-    for (const auto& entity : entities)
-        m_workouts.append(new WorkoutModel(entity, this));
+    m_service->loadHistory().then(this,
+                                  [this](std::vector<Workout> entities)
+                                  {
+                                      qDeleteAll(m_workouts);
+                                      m_workouts.clear();
+                                      for (const auto& entity : entities)
+                                          m_workouts.append(new WorkoutModel(entity, this));
 
-    emit workoutsChanged();
+                                      emit workoutsChanged();
+                                      refreshTopExercises();
+                                  });
+}
+
+void WorkoutHistoryViewModel::refreshTopExercises()
+{
+    if (!m_service)
+        return;
+
+    m_service->topExercises(2, 20).then(
+        this,
+        [this](std::vector<WorkoutService::ExerciseFrequency> entries)
+        {
+            m_topExercises.clear();
+            for (const auto& entry : entries)
+            {
+                QVariantMap item;
+                item["name"] = entry.name;
+                item["count"] = entry.count;
+                item["oneRepMax"] = entry.bestOneRepMax;
+                m_topExercises.append(item);
+            }
+            emit topExercisesChanged();
+        });
 }
 
 void WorkoutHistoryViewModel::saveWorkout(WorkoutModel* workout)
@@ -49,8 +75,7 @@ void WorkoutHistoryViewModel::saveWorkout(WorkoutModel* workout)
     if (!workout->startedTime().isValid())
         return;
 
-    Workout entity = workout->toEntity();
-    m_service->saveWorkout(entity);
+    m_service->saveWorkout(workout->toEntity());
     loadAllWorkouts();
 }
 
@@ -112,23 +137,7 @@ QVariantList WorkoutHistoryViewModel::weekActivity() const
     return activity;
 }
 
-QVariantList WorkoutHistoryViewModel::topExercises() const
-{
-    QVariantList result;
-    if (!m_service)
-        return result;
-
-    for (const auto& entry : m_service->topExercises(2, 20))
-    {
-        QVariantMap item;
-        item["name"] = entry.name;
-        item["count"] = entry.count;
-        item["oneRepMax"] = entry.bestOneRepMax;
-        result.append(item);
-    }
-
-    return result;
-}
+QVariantList WorkoutHistoryViewModel::topExercises() const { return m_topExercises; }
 
 void WorkoutHistoryViewModel::importFromJson(const QString& jsonData)
 {
@@ -142,7 +151,8 @@ void WorkoutHistoryViewModel::importFromJson(const QString& jsonData)
         }
 
         auto workouts = WorkoutJson::workoutsFromJsonArray(doc.array());
-        m_service->importHistory(workouts);
+        if (m_service)
+            m_service->importHistory(workouts);
         loadAllWorkouts();
     }
     catch (const std::exception& e)

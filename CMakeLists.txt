@@ -17,6 +17,10 @@ set(QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/android")
 
 set(QML_LIVE_ENABLED OFF)
 
+if(NOT ANDROID)
+    add_compile_definitions(LIBS_TESTING)
+endif()
+
 add_subdirectory(libs)
 add_subdirectory(src)
 

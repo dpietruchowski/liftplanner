@@ -1,8 +1,9 @@
 #pragma once
 #include <QObject>
-#include <QSqlDatabase>
+#include <QString>
 #include <memory>
 
+class QSqlDatabase;
 class DbStorage;
 class WorkoutRepositoryDb;
 class UserProfileRepositoryDb;
@@ -15,13 +16,13 @@ public:
     explicit AppDbStorage(const QString& dbPath, QObject* parent = nullptr);
     ~AppDbStorage() override;
 
+    bool open();
+
     WorkoutRepositoryDb& workoutRepo();
     UserProfileRepositoryDb& userProfileRepo();
 
 private:
-    void initializeDatabase();
-
-    QSqlDatabase m_database;
+    std::unique_ptr<QSqlDatabase> m_database;
     std::unique_ptr<DbStorage> m_dbStorage;
     std::unique_ptr<WorkoutRepositoryDb> m_workoutRepo;
     std::unique_ptr<UserProfileRepositoryDb> m_userProfileRepo;

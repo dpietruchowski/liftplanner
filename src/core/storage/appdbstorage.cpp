@@ -1,5 +1,6 @@
 #include "appdbstorage.h"
 #include <QDebug>
+#include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQuery>
 
@@ -11,33 +12,28 @@
 AppDbStorage::AppDbStorage(const QString& dbPath, QObject* parent)
     : QObject(parent)
 {
-    m_database = QSqlDatabase::addDatabase("QSQLITE");
-    m_database.setDatabaseName(dbPath);
+    m_database = std::make_unique<QSqlDatabase>(
+        QSqlDatabase::addDatabase("QSQLITE", "liftplanner_connection"));
+    m_database->setDatabaseName(dbPath);
+}
 
-    if (!m_database.open())
+AppDbStorage::~AppDbStorage() = default;
+
+bool AppDbStorage::open()
+{
+    if (!m_database->open())
     {
-        qWarning() << "Failed to open database:" << m_database.lastError().text();
-        return;
+        qWarning() << "Failed to open database:" << m_database->lastError().text();
+        return false;
     }
 
-    QSqlQuery pragmaQuery(m_database);
+    QSqlQuery pragmaQuery(*m_database);
     if (!pragmaQuery.exec("PRAGMA foreign_keys = ON;"))
     {
         qWarning() << "Failed to enable foreign keys:" << pragmaQuery.lastError().text();
     }
 
-    initializeDatabase();
-}
-
-AppDbStorage::~AppDbStorage() = default;
-
-WorkoutRepositoryDb& AppDbStorage::workoutRepo() { return *m_workoutRepo; }
-
-UserProfileRepositoryDb& AppDbStorage::userProfileRepo() { return *m_userProfileRepo; }
-
-void AppDbStorage::initializeDatabase()
-{
-    m_dbStorage = std::make_unique<DbStorage>(m_database);
+    m_dbStorage = std::make_unique<DbStorage>(*m_database);
     m_workoutRepo = std::make_unique<WorkoutRepositoryDb>(*m_dbStorage);
     m_workoutRepo->createTables();
     m_userProfileRepo = std::make_unique<UserProfileRepositoryDb>(*m_dbStorage);
@@ -47,4 +43,10 @@ void AppDbStorage::initializeDatabase()
     m_workoutRepo->registerMigrations(runner);
     m_userProfileRepo->registerMigrations(runner);
     runner.run();
+
+    return true;
 }
+
+WorkoutRepositoryDb& AppDbStorage::workoutRepo() { return *m_workoutRepo; }
+
+UserProfileRepositoryDb& AppDbStorage::userProfileRepo() { return *m_userProfileRepo; }

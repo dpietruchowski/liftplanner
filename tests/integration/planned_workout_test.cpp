@@ -20,6 +20,7 @@ TEST_F(PlannedWorkoutTest, EmptyState_NoWorkouts)
 {
     auto& vm = app.plannedWorkoutViewModel();
     vm.loadAll();
+    app.drain();
 
     EXPECT_TRUE(vm.workouts().isEmpty());
     EXPECT_EQ(vm.nextWorkout(), nullptr);
@@ -30,6 +31,7 @@ TEST_F(PlannedWorkoutTest, ImportFromJson_LoadsWorkouts)
     auto& vm = app.plannedWorkoutViewModel();
     vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
     vm.loadAll();
+    app.drain();
 
     EXPECT_EQ(vm.workouts().size(), 3);
     EXPECT_EQ(vm.workouts().at(0)->name(), "Push Day");
@@ -42,6 +44,7 @@ TEST_F(PlannedWorkoutTest, ImportFromJson_SetsPlannedTime)
     auto& vm = app.plannedWorkoutViewModel();
     vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
     vm.loadAll();
+    app.drain();
 
     for (auto* w : vm.workouts())
     {
@@ -58,6 +61,7 @@ TEST_F(PlannedWorkoutTest, NextWorkout_ReturnsFirst)
     auto& vm = app.plannedWorkoutViewModel();
     vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
     vm.loadAll();
+    app.drain();
 
     auto* next = vm.nextWorkout();
     ASSERT_NE(next, nullptr);
@@ -70,10 +74,12 @@ TEST_F(PlannedWorkoutTest, ReImport_ReplacesAll)
 
     vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
     vm.loadAll();
+    app.drain();
     EXPECT_EQ(vm.workouts().size(), 3);
 
     vm.importFromJson(TestData::SINGLE_WORKOUT_JSON);
     vm.loadAll();
+    app.drain();
 
     EXPECT_EQ(vm.workouts().size(), 1);
     EXPECT_EQ(vm.workouts().first()->name(), "Full Body");
@@ -84,6 +90,7 @@ TEST_F(PlannedWorkoutTest, ImportedWorkouts_HaveExercisesAndSets)
     auto& vm = app.plannedWorkoutViewModel();
     vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
     vm.loadAll();
+    app.drain();
 
     auto* pushDay = vm.workouts().at(0);
     auto exercises = pushDay->exercises();
@@ -115,10 +122,12 @@ TEST_F(PlannedWorkoutTest, ImportEmptyArray_ClearsAll)
 
     vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
     vm.loadAll();
+    app.drain();
     EXPECT_EQ(vm.workouts().size(), 3);
 
     vm.importFromJson(R"({"user_profile": null, "workouts": []})");
     vm.loadAll();
+    app.drain();
 
     EXPECT_EQ(vm.workouts().size(), 0);
 }
@@ -128,6 +137,7 @@ TEST_F(PlannedWorkoutTest, PlannedWorkouts_HaveStatusPlanned)
     auto& vm = app.plannedWorkoutViewModel();
     vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
     vm.loadAll();
+    app.drain();
 
     for (auto* w : vm.workouts())
     {
@@ -140,9 +150,11 @@ TEST_F(PlannedWorkoutTest, PlannedWorkouts_NotInHistory)
     auto& planned = app.plannedWorkoutViewModel();
     planned.importFromJson(TestData::THREE_WORKOUTS_JSON);
     planned.loadAll();
+    app.drain();
 
     auto& history = app.workoutHistoryViewModel();
     history.loadAllWorkouts();
+    app.drain();
 
     EXPECT_EQ(history.workouts().size(), 0);
 }

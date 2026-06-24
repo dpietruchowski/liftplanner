@@ -9,13 +9,17 @@
 #include "ui/viewmodels/plannedworkoutviewmodel.h"
 #include "ui/viewmodels/userprofileviewmodel.h"
 #include "ui/viewmodels/workouthistoryviewmodel.h"
+#include "utils/backendworker.h"
 #include "utils/clipboardhelper.h"
 #include "utils/coloredsvgprovider.h"
 #include "utils/notificationtypes.h"
 #include "utils/qmlregistrator.h"
+#include <QDebug>
+#include <QMetaObject>
 
 LiftPlannerApplication::LiftPlannerApplication(const QString& dbPath)
 {
+    m_worker = std::make_unique<BackendWorker>();
     m_storage = std::make_unique<AppDbStorage>(dbPath);
 }
 
@@ -23,8 +27,28 @@ LiftPlannerApplication::~LiftPlannerApplication() = default;
 
 void LiftPlannerApplication::initialize()
 {
-    m_workoutService = std::make_unique<WorkoutService>(m_storage->workoutRepo());
-    m_userProfileService = std::make_unique<UserProfileService>(m_storage->userProfileRepo());
+    bool opened = true;
+    QMetaObject::invokeMethod(
+        m_worker.get(),
+        [this, &opened]()
+        {
+            if (!m_storage->open())
+            {
+                opened = false;
+                return;
+            }
+            m_workoutService
+                = std::make_unique<WorkoutService>(m_storage->workoutRepo(), m_worker.get());
+            m_userProfileService
+                = std::make_unique<UserProfileService>(m_storage->userProfileRepo(), m_worker.get());
+        },
+        Qt::BlockingQueuedConnection);
+
+    if (!opened)
+    {
+        qCritical() << "Failed to open database";
+        return;
+    }
 
     m_activeWorkoutViewModel = std::make_unique<ActiveWorkoutViewModel>(m_workoutService.get());
     m_workoutHistoryViewModel = std::make_unique<WorkoutHistoryViewModel>(

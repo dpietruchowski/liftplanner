@@ -17,6 +17,7 @@ protected:
     {
         app.plannedWorkoutViewModel().importFromJson(json);
         app.plannedWorkoutViewModel().loadAll();
+        app.drain();
     }
 
     void completeAllSets(ActiveWorkoutViewModel& vm)
@@ -57,6 +58,7 @@ TEST_F(WorkoutLifecycleTest, ImportPlanStartAndEnd_AppearsInHistory)
     EXPECT_EQ(active.currentWorkout(), nullptr);
 
     app.workoutHistoryViewModel().loadAllWorkouts();
+    app.drain();
     auto& history = app.workoutHistoryViewModel();
     ASSERT_EQ(history.workouts().size(), 1);
     EXPECT_EQ(history.workouts().first()->name(), "Push Day");
@@ -76,6 +78,7 @@ TEST_F(WorkoutLifecycleTest, CompletedWorkout_HasCorrectStatus)
     active.endWorkout();
 
     app.workoutHistoryViewModel().loadAllWorkouts();
+    app.drain();
     auto* last = app.workoutHistoryViewModel().lastWorkout();
     ASSERT_NE(last, nullptr);
     EXPECT_EQ(last->statusString(), "Ended");
@@ -90,6 +93,7 @@ TEST_F(WorkoutLifecycleTest, CompletedWorkout_HasAllTimestamps)
     active.endWorkout();
 
     app.workoutHistoryViewModel().loadAllWorkouts();
+    app.drain();
     auto* last = app.workoutHistoryViewModel().lastWorkout();
     ASSERT_NE(last, nullptr);
 
@@ -114,6 +118,7 @@ TEST_F(WorkoutLifecycleTest, MultipleWorkouts_AllAppearInHistory)
     active.endWorkout();
 
     app.workoutHistoryViewModel().loadAllWorkouts();
+    app.drain();
     EXPECT_EQ(app.workoutHistoryViewModel().workouts().size(), 2);
 }
 
@@ -154,6 +159,7 @@ TEST_F(WorkoutLifecycleTest, CompleteAllSets_ThenEndWorkout)
     active.endWorkout();
 
     app.workoutHistoryViewModel().loadAllWorkouts();
+    app.drain();
     auto* last = app.workoutHistoryViewModel().lastWorkout();
     ASSERT_NE(last, nullptr);
     EXPECT_EQ(last->name(), "Full Body");
@@ -169,8 +175,10 @@ TEST_F(WorkoutLifecycleTest, DeleteFromHistory)
 
     auto& history = app.workoutHistoryViewModel();
     history.loadAllWorkouts();
+    app.drain();
     ASSERT_EQ(history.workouts().size(), 1);
 
     history.deleteWorkout(history.workouts().first());
+    app.drain();
     EXPECT_EQ(history.workouts().size(), 0);
 }

@@ -17,6 +17,7 @@ protected:
     {
         app.plannedWorkoutViewModel().importFromJson(TestData::THREE_WORKOUTS_JSON);
         app.plannedWorkoutViewModel().loadAll();
+        app.drain();
     }
 
     void startFirstWorkout()
@@ -243,6 +244,7 @@ TEST_F(ActiveWorkoutEmptyTest, StartEmptyWorkout_NoExerciseOrSet)
 {
     app.plannedWorkoutViewModel().importFromJson(TestData::EMPTY_WORKOUT_JSON);
     app.plannedWorkoutViewModel().loadAll();
+    app.drain();
 
     auto& vm = app.activeWorkoutViewModel();
     vm.startWorkout(app.plannedWorkoutViewModel().workouts().first());

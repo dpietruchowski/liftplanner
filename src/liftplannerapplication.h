@@ -5,6 +5,7 @@
 
 class QmlRegistrator;
 
+class BackendWorker;
 class AppDbStorage;
 class WorkoutService;
 class UserProfileService;
@@ -24,6 +25,7 @@ public:
     void registerQmlTypes(QmlRegistrator& registrator);
 
 private:
+    std::unique_ptr<BackendWorker> m_worker;
     std::unique_ptr<AppDbStorage> m_storage;
     std::unique_ptr<WorkoutService> m_workoutService;
     std::unique_ptr<UserProfileService> m_userProfileService;

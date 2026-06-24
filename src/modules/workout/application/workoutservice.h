@@ -5,10 +5,12 @@
 #include <vector>
 
 #include "modules/workout/domain/entities/workout.h"
+#include "utils/service.h"
+#include "utils/testing.h"
 
 class WorkoutRepository;
 
-class WorkoutService
+class WorkoutService final : public Service
 {
 public:
     struct ExerciseFrequency
@@ -18,28 +20,33 @@ public:
         double bestOneRepMax { 0.0 };
     };
 
-    explicit WorkoutService(WorkoutRepository& repository);
+    WorkoutService(WorkoutRepository& repository, QObject* worker);
 
-    // Planned workouts (not yet started, ordered by plannedTime)
-    std::vector<Workout> loadPlannedWorkouts() const;
-    void importPlannedWorkouts(const std::vector<Workout>& workouts);
-    void removeAllPlannedWorkouts();
+    Task<std::vector<Workout>> loadPlannedWorkouts();
+    Task<void> importPlannedWorkouts(const std::vector<Workout>& workouts);
+    Task<void> removeAllPlannedWorkouts();
 
-    // History (started/completed workouts), newest first. A positive limit
-    // restricts the result to the latest N workouts.
-    std::vector<Workout> loadHistory(int limit = -1) const;
-    void importHistory(const std::vector<Workout>& workouts);
+    Task<std::vector<Workout>> loadHistory(int limit = -1);
+    Task<void> importHistory(const std::vector<Workout>& workouts);
 
-    // Most frequently performed exercises across the most recent workouts,
-    // each with its highest estimated one-rep max. Sorted by frequency
-    // descending, then bestOneRepMax descending, then name.
-    std::vector<ExerciseFrequency> topExercises(int topN, int recentWorkouts) const;
+    Task<std::vector<ExerciseFrequency>> topExercises(int topN, int recentWorkouts);
 
-    // General CRUD
-    std::optional<Workout> findWorkout(int id) const;
-    int saveWorkout(const Workout& workout);
-    bool deleteWorkout(int id);
+    Task<std::optional<Workout>> findWorkout(int id);
+    Task<int> saveWorkout(const Workout& workout);
+    Task<bool> deleteWorkout(int id);
 
 private:
+    LIBS_TEST_FRIEND(WorkoutServiceTest)
+
+    Result<std::vector<Workout>> loadPlannedWorkoutsCore();
+    Result<void> importPlannedWorkoutsCore(const std::vector<Workout>& workouts);
+    Result<void> removeAllPlannedWorkoutsCore();
+    Result<std::vector<Workout>> loadHistoryCore(int limit);
+    Result<void> importHistoryCore(const std::vector<Workout>& workouts);
+    Result<std::vector<ExerciseFrequency>> topExercisesCore(int topN, int recentWorkouts);
+    Result<std::optional<Workout>> findWorkoutCore(int id);
+    Result<int> saveWorkoutCore(const Workout& workout);
+    Result<bool> deleteWorkoutCore(int id);
+
     WorkoutRepository& m_repository;
 };

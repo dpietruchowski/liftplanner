@@ -1,19 +1,27 @@
 #pragma once
 
 #include "modules/userprofile/domain/entities/userprofile.h"
+#include "utils/service.h"
+#include "utils/testing.h"
 #include <optional>
 
 class UserProfileRepository;
 
-class UserProfileService
+class UserProfileService final : public Service
 {
 public:
-    explicit UserProfileService(UserProfileRepository& repository);
+    UserProfileService(UserProfileRepository& repository, QObject* worker);
 
-    std::optional<UserProfile> load() const;
-    void save(const UserProfile& profile);
-    bool exists() const;
+    Task<std::optional<UserProfile>> load();
+    Task<void> save(const UserProfile& profile);
+    Task<bool> exists();
 
 private:
+    LIBS_TEST_FRIEND(UserProfileServiceTest)
+
+    Result<std::optional<UserProfile>> loadCore();
+    Result<void> saveCore(const UserProfile& profile);
+    Result<bool> existsCore();
+
     UserProfileRepository& m_repository;
 };

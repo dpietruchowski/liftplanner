@@ -50,6 +50,9 @@ signals:
     void exportedToClipboard();
 
 private:
+    void refreshTopExercises();
+
     WorkoutService* m_service;
     ActiveWorkoutViewModel* m_activeWorkoutViewModel;
+    QVariantList m_topExercises;
 };

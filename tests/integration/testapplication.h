@@ -3,6 +3,7 @@
 #include <QSqlDatabase>
 #include <memory>
 
+class BackendWorker;
 class DbStorage;
 class WorkoutRepositoryDb;
 class WorkoutService;
@@ -24,9 +25,12 @@ public:
 
     WorkoutService& workoutService();
 
+    void drain();
+
 private:
     static int s_connectionCounter;
 
+    std::unique_ptr<BackendWorker> m_worker;
     QString m_connectionName;
     QSqlDatabase m_database;
     std::unique_ptr<DbStorage> m_dbStorage;

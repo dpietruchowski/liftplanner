@@ -13,6 +13,7 @@ target_include_directories(${LIBRARY_NAME}
 target_link_libraries(${LIBRARY_NAME}
     PUBLIC
         dbtoolkit
+        app_utils
         Qt6::Core
         Qt6::Sql
         Qt6::Qml

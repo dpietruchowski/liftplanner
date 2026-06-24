@@ -5,44 +5,93 @@
 #include <QHash>
 #include <algorithm>
 
-WorkoutService::WorkoutService(WorkoutRepository& repository)
-    : m_repository(repository)
+WorkoutService::WorkoutService(WorkoutRepository& repository, QObject* worker)
+    : Service(worker)
+    , m_repository(repository)
 {
 }
 
-std::vector<Workout> WorkoutService::loadPlannedWorkouts() const
+Task<std::vector<Workout>> WorkoutService::loadPlannedWorkouts()
+{
+    return invoke([this] { return loadPlannedWorkoutsCore(); });
+}
+
+Task<void> WorkoutService::importPlannedWorkouts(const std::vector<Workout>& workouts)
+{
+    return invoke([this, workouts] { return importPlannedWorkoutsCore(workouts); });
+}
+
+Task<void> WorkoutService::removeAllPlannedWorkouts()
+{
+    return invoke([this] { return removeAllPlannedWorkoutsCore(); });
+}
+
+Task<std::vector<Workout>> WorkoutService::loadHistory(int limit)
+{
+    return invoke([this, limit] { return loadHistoryCore(limit); });
+}
+
+Task<void> WorkoutService::importHistory(const std::vector<Workout>& workouts)
+{
+    return invoke([this, workouts] { return importHistoryCore(workouts); });
+}
+
+Task<std::vector<WorkoutService::ExerciseFrequency>> WorkoutService::topExercises(int topN,
+                                                                                 int recentWorkouts)
+{
+    return invoke([this, topN, recentWorkouts] { return topExercisesCore(topN, recentWorkouts); });
+}
+
+Task<std::optional<Workout>> WorkoutService::findWorkout(int id)
+{
+    return invoke([this, id] { return findWorkoutCore(id); });
+}
+
+Task<int> WorkoutService::saveWorkout(const Workout& workout)
+{
+    return invoke([this, workout] { return saveWorkoutCore(workout); });
+}
+
+Task<bool> WorkoutService::deleteWorkout(int id)
+{
+    return invoke([this, id] { return deleteWorkoutCore(id); });
+}
+
+Result<std::vector<Workout>> WorkoutService::loadPlannedWorkoutsCore()
 {
     WorkoutQuery query;
     query.whereStatus(WorkoutStatus::Planned);
     query.orderByPlannedTime(SortDirection::Ascending);
-    return m_repository.findAll(query);
+    return Result<std::vector<Workout>>::success(m_repository.findAll(query));
 }
 
-void WorkoutService::importPlannedWorkouts(const std::vector<Workout>& workouts)
+Result<void> WorkoutService::importPlannedWorkoutsCore(const std::vector<Workout>& workouts)
 {
-    removeAllPlannedWorkouts();
+    removeAllPlannedWorkoutsCore();
     for (const auto& workout : workouts)
         m_repository.save(workout);
+    return Result<void>::success();
 }
 
-void WorkoutService::removeAllPlannedWorkouts()
+Result<void> WorkoutService::removeAllPlannedWorkoutsCore()
 {
     WorkoutQuery query;
     query.whereStatus(WorkoutStatus::Planned);
     m_repository.remove(query);
+    return Result<void>::success();
 }
 
-std::vector<Workout> WorkoutService::loadHistory(int limit) const
+Result<std::vector<Workout>> WorkoutService::loadHistoryCore(int limit)
 {
     WorkoutQuery query;
     query.whereStatus(WorkoutStatus::Ended);
     query.orderByStartedTime(SortDirection::Descending);
     if (limit > 0)
         query.withLimit(limit);
-    return m_repository.findAll(query);
+    return Result<std::vector<Workout>>::success(m_repository.findAll(query));
 }
 
-void WorkoutService::importHistory(const std::vector<Workout>& workouts)
+Result<void> WorkoutService::importHistoryCore(const std::vector<Workout>& workouts)
 {
     for (auto workout : workouts)
     {
@@ -53,12 +102,13 @@ void WorkoutService::importHistory(const std::vector<Workout>& workouts)
             workout.setEndedTime(workout.startedTime().addSecs(3600));
         m_repository.save(workout);
     }
+    return Result<void>::success();
 }
 
-std::vector<WorkoutService::ExerciseFrequency> WorkoutService::topExercises(int topN,
-                                                                           int recentWorkouts) const
+Result<std::vector<WorkoutService::ExerciseFrequency>>
+WorkoutService::topExercisesCore(int topN, int recentWorkouts)
 {
-    const std::vector<Workout> history = loadHistory(recentWorkouts);
+    const std::vector<Workout> history = loadHistoryCore(recentWorkouts).value();
 
     QHash<QString, ExerciseFrequency> byName;
 
@@ -87,21 +137,24 @@ std::vector<WorkoutService::ExerciseFrequency> WorkoutService::topExercises(int 
     if (topN >= 0 && static_cast<int>(result.size()) > topN)
         result.resize(topN);
 
-    return result;
+    return Result<std::vector<ExerciseFrequency>>::success(result);
 }
 
-std::optional<Workout> WorkoutService::findWorkout(int id) const
+Result<std::optional<Workout>> WorkoutService::findWorkoutCore(int id)
 {
     WorkoutQuery query;
     query.whereId(id);
-    return m_repository.findOne(query);
+    return Result<std::optional<Workout>>::success(m_repository.findOne(query));
 }
 
-int WorkoutService::saveWorkout(const Workout& workout) { return m_repository.save(workout); }
+Result<int> WorkoutService::saveWorkoutCore(const Workout& workout)
+{
+    return Result<int>::success(m_repository.save(workout));
+}
 
-bool WorkoutService::deleteWorkout(int id)
+Result<bool> WorkoutService::deleteWorkoutCore(int id)
 {
     WorkoutQuery query;
     query.whereId(id);
-    return m_repository.remove(query);
+    return Result<bool>::success(m_repository.remove(query));
 }

@@ -36,21 +36,19 @@ WorkoutModel* PlannedWorkoutViewModel::nextWorkout() const
 
 void PlannedWorkoutViewModel::loadAll()
 {
-    try
-    {
-        qDeleteAll(m_workouts);
-        m_workouts.clear();
+    if (!m_service)
+        return;
 
-        auto entities = m_service->loadPlannedWorkouts();
-        for (const auto& entity : entities)
-            m_workouts.append(new WorkoutModel(entity, this));
+    m_service->loadPlannedWorkouts().then(this,
+                                          [this](std::vector<Workout> entities)
+                                          {
+                                              qDeleteAll(m_workouts);
+                                              m_workouts.clear();
+                                              for (const auto& entity : entities)
+                                                  m_workouts.append(new WorkoutModel(entity, this));
 
-        emit workoutsChanged();
-    }
-    catch (const std::exception& e)
-    {
-        emit errorOccurred(QString("Failed to load planned workouts: %1").arg(e.what()));
-    }
+                                              emit workoutsChanged();
+                                          });
 }
 
 void PlannedWorkoutViewModel::importFromJson(const QString& jsonData)
@@ -117,42 +115,61 @@ void PlannedWorkoutViewModel::importFromClipboard()
 
 void PlannedWorkoutViewModel::generatePrompt()
 {
+    if (!m_service)
+        return;
+
     QString prompt = readTemplateFile(":/LiftPlanner/data/gpt_prompt_template.txt");
     if (prompt.isEmpty())
         return;
 
-    auto history = m_service->loadHistory();
-
-    QJsonArray historyArray;
-    int count = std::min(9, static_cast<int>(history.size()));
-    for (int i = 0; i < count; ++i)
-        historyArray.append(WorkoutJson::workoutToJsonCompact(history[i]));
-
-    QJsonArray plannedArray;
-    for (auto* w : m_workouts)
-        plannedArray.append(WorkoutJson::workoutToJsonCompact(w->toEntity()));
-
-    QString profileJson = "null";
-    if (m_profileService)
+    auto finish = [this](QString prompt, QString profileJson)
     {
-        auto profileOpt = m_profileService->load();
-        if (profileOpt.has_value())
-        {
-            QVariantMap vm = UserProfileSerializer::toVariant(*profileOpt);
-            vm.remove(UserProfileSerializer::user_id_key);
-            profileJson
-                = QJsonDocument(QJsonObject::fromVariantMap(vm)).toJson(QJsonDocument::Indented);
-        }
+        m_service->loadHistory().then(
+            this,
+            [this, prompt, profileJson](std::vector<Workout> history) mutable
+            {
+                QJsonArray historyArray;
+                int count = std::min(9, static_cast<int>(history.size()));
+                for (int i = 0; i < count; ++i)
+                    historyArray.append(WorkoutJson::workoutToJsonCompact(history[i]));
+
+                QJsonArray plannedArray;
+                for (auto* w : m_workouts)
+                    plannedArray.append(WorkoutJson::workoutToJsonCompact(w->toEntity()));
+
+                prompt.replace("{{CURRENT_DATE}}", QDate::currentDate().toString("yyyy-MM-dd"));
+                prompt.replace("{{USER_PROFILE}}", profileJson);
+                prompt.replace("{{HISTORY_JSON}}",
+                               QJsonDocument(historyArray).toJson(QJsonDocument::Indented));
+                prompt.replace("{{PLANNED_JSON}}",
+                               QJsonDocument(plannedArray).toJson(QJsonDocument::Indented));
+
+                QClipboard* clipboard = QGuiApplication::clipboard();
+                clipboard->setText(prompt);
+                emit promptGenerated();
+            });
+    };
+
+    if (!m_profileService)
+    {
+        finish(prompt, "null");
+        return;
     }
 
-    prompt.replace("{{CURRENT_DATE}}", QDate::currentDate().toString("yyyy-MM-dd"));
-    prompt.replace("{{USER_PROFILE}}", profileJson);
-    prompt.replace("{{HISTORY_JSON}}", QJsonDocument(historyArray).toJson(QJsonDocument::Indented));
-    prompt.replace("{{PLANNED_JSON}}", QJsonDocument(plannedArray).toJson(QJsonDocument::Indented));
-
-    QClipboard* clipboard = QGuiApplication::clipboard();
-    clipboard->setText(prompt);
-    emit promptGenerated();
+    m_profileService->load().then(this,
+                                  [prompt, finish](std::optional<UserProfile> profileOpt) mutable
+                                  {
+                                      QString profileJson = "null";
+                                      if (profileOpt.has_value())
+                                      {
+                                          QVariantMap vm
+                                              = UserProfileSerializer::toVariant(*profileOpt);
+                                          vm.remove(UserProfileSerializer::user_id_key);
+                                          profileJson = QJsonDocument(QJsonObject::fromVariantMap(vm))
+                                                            .toJson(QJsonDocument::Indented);
+                                      }
+                                      finish(prompt, profileJson);
+                                  });
 }
 
 bool PlannedWorkoutViewModel::validateJson(const QString& jsonData, QString& errorMessage)

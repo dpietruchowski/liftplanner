@@ -20,7 +20,28 @@ public:
 class WorkoutServiceTest : public ::testing::Test
 {
 protected:
-    void SetUp() override { m_service = std::make_unique<WorkoutService>(m_repo); }
+    void SetUp() override { m_service = std::make_unique<WorkoutService>(m_repo, nullptr); }
+
+    std::vector<Workout> loadPlannedWorkouts()
+    {
+        return m_service->loadPlannedWorkoutsCore().value();
+    }
+    void importPlannedWorkouts(const std::vector<Workout>& workouts)
+    {
+        m_service->importPlannedWorkoutsCore(workouts);
+    }
+    void removeAllPlannedWorkouts() { m_service->removeAllPlannedWorkoutsCore(); }
+    std::vector<Workout> loadHistory(int limit = -1)
+    {
+        return m_service->loadHistoryCore(limit).value();
+    }
+    std::vector<WorkoutService::ExerciseFrequency> topExercises(int topN, int recentWorkouts)
+    {
+        return m_service->topExercisesCore(topN, recentWorkouts).value();
+    }
+    std::optional<Workout> findWorkout(int id) { return m_service->findWorkoutCore(id).value(); }
+    int saveWorkout(const Workout& workout) { return m_service->saveWorkoutCore(workout).value(); }
+    bool deleteWorkout(int id) { return m_service->deleteWorkoutCore(id).value(); }
 
     Workout makePlannedWorkout(const QString& name, int daysFromNow = 1)
     {
@@ -61,7 +82,7 @@ TEST_F(WorkoutServiceTest, LoadPlannedWorkouts_QueriesStatusPlanned)
                 return std::vector<Workout> {};
             });
 
-    m_service->loadPlannedWorkouts();
+    loadPlannedWorkouts();
 }
 
 TEST_F(WorkoutServiceTest, LoadPlannedWorkouts_OrdersByPlannedTimeAscending)
@@ -75,7 +96,7 @@ TEST_F(WorkoutServiceTest, LoadPlannedWorkouts_OrdersByPlannedTimeAscending)
                 return std::vector<Workout> {};
             });
 
-    m_service->loadPlannedWorkouts();
+    loadPlannedWorkouts();
 }
 
 TEST_F(WorkoutServiceTest, LoadPlannedWorkouts_ReturnsWorkoutsFromRepo)
@@ -84,7 +105,7 @@ TEST_F(WorkoutServiceTest, LoadPlannedWorkouts_ReturnsWorkoutsFromRepo)
 
     EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(planned));
 
-    auto result = m_service->loadPlannedWorkouts();
+    auto result = loadPlannedWorkouts();
     EXPECT_EQ(result.size(), 2u);
     EXPECT_EQ(result[0].name(), "Day A");
     EXPECT_EQ(result[1].name(), "Day B");
@@ -108,7 +129,7 @@ TEST_F(WorkoutServiceTest, ImportPlannedWorkouts_RemovesExistingFirst)
     EXPECT_CALL(m_repo, save(::testing::_)).Times(2).WillRepeatedly(::testing::Return(1));
 
     std::vector<Workout> workouts = { makePlannedWorkout("W1"), makePlannedWorkout("W2") };
-    m_service->importPlannedWorkouts(workouts);
+    importPlannedWorkouts(workouts);
 }
 
 TEST_F(WorkoutServiceTest, ImportPlannedWorkouts_SavesEachWorkout)
@@ -127,7 +148,7 @@ TEST_F(WorkoutServiceTest, ImportPlannedWorkouts_SavesEachWorkout)
 
     std::vector<Workout> workouts
         = { makePlannedWorkout("Push"), makePlannedWorkout("Pull"), makePlannedWorkout("Legs") };
-    m_service->importPlannedWorkouts(workouts);
+    importPlannedWorkouts(workouts);
 
     EXPECT_EQ(savedNames.size(), 3);
     EXPECT_EQ(savedNames[0], "Push");
@@ -148,7 +169,7 @@ TEST_F(WorkoutServiceTest, RemoveAllPlannedWorkouts_QueriesStatusPlanned)
                 return true;
             });
 
-    m_service->removeAllPlannedWorkouts();
+    removeAllPlannedWorkouts();
 }
 
 // --- loadHistory ---
@@ -164,7 +185,7 @@ TEST_F(WorkoutServiceTest, LoadHistory_QueriesStatusEnded)
                 return std::vector<Workout> {};
             });
 
-    m_service->loadHistory();
+    loadHistory();
 }
 
 TEST_F(WorkoutServiceTest, LoadHistory_OrdersByStartedTimeDescending)
@@ -178,7 +199,7 @@ TEST_F(WorkoutServiceTest, LoadHistory_OrdersByStartedTimeDescending)
                 return std::vector<Workout> {};
             });
 
-    m_service->loadHistory();
+    loadHistory();
 }
 
 TEST_F(WorkoutServiceTest, LoadHistory_ReturnsWorkoutsFromRepo)
@@ -188,7 +209,7 @@ TEST_F(WorkoutServiceTest, LoadHistory_ReturnsWorkoutsFromRepo)
 
     EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
 
-    auto result = m_service->loadHistory();
+    auto result = loadHistory();
     EXPECT_EQ(result.size(), 2u);
 }
 
@@ -217,7 +238,7 @@ TEST_F(WorkoutServiceTest, TopExercises_RanksByFrequencyThenBestOneRepMax)
 
     EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
 
-    auto result = m_service->topExercises(2, 20);
+    auto result = topExercises(2, 20);
 
     // Bench wins on frequency; the Squat/Deadlift tie is broken by best 1RM.
     ASSERT_EQ(result.size(), 2u);
@@ -240,14 +261,14 @@ TEST_F(WorkoutServiceTest, TopExercises_LimitsHistoryQueryToRecentWorkouts)
                 return std::vector<Workout> {};
             });
 
-    m_service->topExercises(2, 5);
+    topExercises(2, 5);
 }
 
 TEST_F(WorkoutServiceTest, TopExercises_EmptyHistory_ReturnsEmpty)
 {
     EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(std::vector<Workout> {}));
 
-    auto result = m_service->topExercises(2, 20);
+    auto result = topExercises(2, 20);
     EXPECT_TRUE(result.empty());
 }
 
@@ -269,7 +290,7 @@ TEST_F(WorkoutServiceTest, FindWorkout_QueriesById)
                 return std::optional<Workout> { found };
             });
 
-    auto result = m_service->findWorkout(42);
+    auto result = findWorkout(42);
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(result->id(), 42);
 }
@@ -278,7 +299,7 @@ TEST_F(WorkoutServiceTest, FindWorkout_ReturnsNulloptWhenNotFound)
 {
     EXPECT_CALL(m_repo, findOne(::testing::_)).WillOnce(::testing::Return(std::nullopt));
 
-    auto result = m_service->findWorkout(999);
+    auto result = findWorkout(999);
     EXPECT_FALSE(result.has_value());
 }
 
@@ -290,7 +311,7 @@ TEST_F(WorkoutServiceTest, SaveWorkout_DelegatesToRepo)
 
     EXPECT_CALL(m_repo, save(::testing::_)).WillOnce(::testing::Return(7));
 
-    int id = m_service->saveWorkout(w);
+    int id = saveWorkout(w);
     EXPECT_EQ(id, 7);
 }
 
@@ -307,7 +328,7 @@ TEST_F(WorkoutServiceTest, DeleteWorkout_QueriesById)
                 return true;
             });
 
-    bool result = m_service->deleteWorkout(5);
+    bool result = deleteWorkout(5);
     EXPECT_TRUE(result);
 }
 
@@ -315,6 +336,6 @@ TEST_F(WorkoutServiceTest, DeleteWorkout_ReturnsFalseWhenNotFound)
 {
     EXPECT_CALL(m_repo, remove(::testing::_)).WillOnce(::testing::Return(false));
 
-    bool result = m_service->deleteWorkout(999);
+    bool result = deleteWorkout(999);
     EXPECT_FALSE(result);
 }

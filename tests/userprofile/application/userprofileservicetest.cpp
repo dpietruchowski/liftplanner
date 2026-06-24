@@ -17,7 +17,11 @@ public:
 class UserProfileServiceTest : public ::testing::Test
 {
 protected:
-    void SetUp() override { m_service = std::make_unique<UserProfileService>(m_repo); }
+    void SetUp() override { m_service = std::make_unique<UserProfileService>(m_repo, nullptr); }
+
+    std::optional<UserProfile> load() { return m_service->loadCore().value(); }
+    void save(const UserProfile& profile) { m_service->saveCore(profile); }
+    bool exists() { return m_service->existsCore().value(); }
 
     UserProfile makeProfile()
     {
@@ -42,7 +46,7 @@ TEST_F(UserProfileServiceTest, Load_DelegatesToRepository)
 {
     EXPECT_CALL(m_repo, find()).WillOnce(::testing::Return(std::nullopt));
 
-    m_service->load();
+    load();
 }
 
 TEST_F(UserProfileServiceTest, Load_ReturnsProfileFromRepository)
@@ -51,7 +55,7 @@ TEST_F(UserProfileServiceTest, Load_ReturnsProfileFromRepository)
 
     EXPECT_CALL(m_repo, find()).WillOnce(::testing::Return(std::optional<UserProfile> { p }));
 
-    auto result = m_service->load();
+    auto result = load();
 
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(result->userId(), 1);
@@ -68,7 +72,7 @@ TEST_F(UserProfileServiceTest, Load_ReturnsNulloptWhenNoProfile)
 {
     EXPECT_CALL(m_repo, find()).WillOnce(::testing::Return(std::nullopt));
 
-    auto result = m_service->load();
+    auto result = load();
 
     EXPECT_FALSE(result.has_value());
 }
@@ -87,7 +91,7 @@ TEST_F(UserProfileServiceTest, Save_DelegatesToRepository)
                 EXPECT_EQ(saved.language(), "pl");
             });
 
-    m_service->save(p);
+    save(p);
 }
 
 TEST_F(UserProfileServiceTest, Save_PassesProfileUnmodified)
@@ -100,7 +104,7 @@ TEST_F(UserProfileServiceTest, Save_PassesProfileUnmodified)
     EXPECT_CALL(m_repo, save(::testing::_))
         .WillOnce([&captured](const UserProfile& saved) { captured = saved; });
 
-    m_service->save(p);
+    save(p);
 
     ASSERT_TRUE(captured.has_value());
     ASSERT_TRUE(captured->bodyweightKg().has_value());
@@ -115,12 +119,12 @@ TEST_F(UserProfileServiceTest, Exists_ReturnsTrueWhenProfileFound)
     EXPECT_CALL(m_repo, find())
         .WillOnce(::testing::Return(std::optional<UserProfile> { makeProfile() }));
 
-    EXPECT_TRUE(m_service->exists());
+    EXPECT_TRUE(exists());
 }
 
 TEST_F(UserProfileServiceTest, Exists_ReturnsFalseWhenNoProfile)
 {
     EXPECT_CALL(m_repo, find()).WillOnce(::testing::Return(std::nullopt));
 
-    EXPECT_FALSE(m_service->exists());
+    EXPECT_FALSE(exists());
 }
