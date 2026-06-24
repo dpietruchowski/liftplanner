@@ -63,6 +63,10 @@ target_link_libraries(liftplanner
     Qt6::Qml
 )
 
+if(NOT ANDROID)
+    target_link_libraries(liftplanner PRIVATE app_automation)
+endif()
+
 target_compile_definitions(liftplanner
     PRIVATE
     APP_VERSION="${QT_ANDROID_VERSION_NAME}"

@@ -52,13 +52,14 @@ Item {
 
     ThemedBottomNavigation {
         id: bottomNav
+        objectName: "bottomNav"
         anchors.bottom: parent.bottom
         width: parent.width
         model: [
-            { label: "Workout", screen: activeWorkoutScreen, icon: Theme.icons.barbell },
-            { label: "Home", screen: homeScreen, icon: Theme.icons.home },
-            { label: "Workouts", screen: workoutsScreen, icon: Theme.icons.calendar },
-            { label: "Profile", screen: profileScreen, icon: Theme.icons.user }
+            { name: "navWorkoutButton", label: "Workout", screen: activeWorkoutScreen, icon: Theme.icons.barbell },
+            { name: "navHomeButton", label: "Home", screen: homeScreen, icon: Theme.icons.home },
+            { name: "navWorkoutsButton", label: "Workouts", screen: workoutsScreen, icon: Theme.icons.calendar },
+            { name: "navProfileButton", label: "Profile", screen: profileScreen, icon: Theme.icons.user }
         ]
     }
 }

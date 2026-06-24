@@ -7,6 +7,7 @@ import App.Components
 
 Rectangle {
     id: root
+    objectName: "screenActiveWorkout"
     color: Theme.colors.background
 
     RestDialog {
@@ -34,6 +35,7 @@ Rectangle {
 
         ScrollView {
             id: sv
+            objectName: "workoutExerciseList"
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
@@ -68,6 +70,7 @@ Rectangle {
             spacing: Theme.spacing.medium
 
             ThemedButton {
+                objectName: "previousSetButton"
                 iconSource: Theme.icons.previous
                 enabled: ActiveWorkoutViewModel.isActive
                 buttonSize: Theme.button.medium
@@ -76,6 +79,7 @@ Rectangle {
             }
 
             ThemedButton {
+                objectName: "completeSetButton"
                 text: ActiveWorkoutViewModel.currentWorkout && ActiveWorkoutViewModel.currentWorkout.completed ? "End" : "Done"
                 enabled: ActiveWorkoutViewModel.isActive && ActiveWorkoutViewModel.currentSet
                 buttonSize: Theme.button.medium
@@ -96,6 +100,7 @@ Rectangle {
             }
 
             ThemedButton {
+                objectName: "nextSetButton"
                 iconSource: Theme.icons.next
                 enabled: ActiveWorkoutViewModel.isActive
                 buttonSize: Theme.button.medium

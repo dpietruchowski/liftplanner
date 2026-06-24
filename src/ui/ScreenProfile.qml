@@ -7,6 +7,7 @@ import App.Components
 
 Rectangle {
     id: root
+    objectName: "screenProfile"
     color: Theme.colors.background
 
     property bool dobInvalid: false
@@ -92,6 +93,7 @@ Rectangle {
 
     ScrollView {
         id: scrollView
+        objectName: "profileScrollView"
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
@@ -355,6 +357,7 @@ Rectangle {
 
         ThemedButton {
             id: saveButton
+            objectName: "saveProfileButton"
             anchors.centerIn: parent
             width: parent.width - 2 * Theme.padding.medium
             text: UserProfileViewModel.dirty ? "Save profile" : "Saved"

@@ -8,6 +8,7 @@ import App.Components
 
 Rectangle {
     id: root
+    objectName: "screenWorkouts"
     color: Theme.colors.background
 
     property var currentWorkout
@@ -36,6 +37,7 @@ Rectangle {
 
     ScrollView {
         id: scrollView
+        objectName: "workoutsScrollView"
         anchors.fill: parent
         anchors.margins: Theme.padding.medium
 
@@ -50,6 +52,7 @@ Rectangle {
                 expandable: true
 
                 ThemedButton {
+                    objectName: "generatePromptButton"
                     iconSource: Theme.icons.ai
                     circular: true
                     buttonSize: Theme.button.square
@@ -61,6 +64,7 @@ Rectangle {
                 }
 
                 ThemedButton {
+                    objectName: "importPlannedButton"
                     iconSource: Theme.icons.importData
                     circular: true
                     buttonSize: Theme.button.square
@@ -105,6 +109,7 @@ Rectangle {
                 expandable: true
 
                 ThemedButton {
+                    objectName: "exportHistoryButton"
                     iconSource: Theme.icons.exportData
                     circular: true
                     buttonSize: Theme.button.square
@@ -116,6 +121,7 @@ Rectangle {
                 }
 
                 ThemedButton {
+                    objectName: "importHistoryButton"
                     iconSource: Theme.icons.importData
                     circular: true
                     buttonSize: Theme.button.square

@@ -11,7 +11,7 @@
 # Qt generated files
 moc_*
 qrc_*
-ui_*
+ui_*.h
 *.moc
 *.qmlc
 *.jsc
@@ -50,3 +50,7 @@ prompt.json
 .vscode/
 
 *.keystore
+
+# Python
+__pycache__/
+*.pyc

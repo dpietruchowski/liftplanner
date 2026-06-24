@@ -7,6 +7,7 @@ import App.Components
 
 Rectangle {
     id: root
+    objectName: "screenHome"
     color: Theme.colors.background
 
     anchors.margins: Theme.padding.medium
@@ -69,6 +70,7 @@ Rectangle {
 
         // Start workout button
         ThemedButton {
+            objectName: "startWorkoutButton"
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: Theme.spacing.large
             text: "Start workout"
