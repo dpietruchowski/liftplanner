@@ -21,6 +21,31 @@ if(NOT ANDROID)
     add_compile_definitions(LIBS_TESTING)
 endif()
 
+find_program(CLANG_FORMAT "clang-format")
+
+if(CLANG_FORMAT)
+    file(GLOB_RECURSE FORMAT_FILES CONFIGURE_DEPENDS
+        ${CMAKE_SOURCE_DIR}/src/*.cpp ${CMAKE_SOURCE_DIR}/src/*.h ${CMAKE_SOURCE_DIR}/src/*.hpp
+        ${CMAKE_SOURCE_DIR}/tests/*.cpp ${CMAKE_SOURCE_DIR}/tests/*.h ${CMAKE_SOURCE_DIR}/tests/*.hpp)
+    list(FILTER FORMAT_FILES EXCLUDE REGEX "/tests/third_party/")
+
+    add_custom_target(format
+        COMMAND ${CLANG_FORMAT} -style=file -i ${FORMAT_FILES}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMENT "Formatting src/ and tests/"
+    )
+
+    add_custom_target(format_check
+        COMMAND ${CLANG_FORMAT} -style=file --dry-run -Werror ${FORMAT_FILES}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMENT "Checking format of src/ and tests/"
+    )
+
+    message(STATUS "Clang-format found: ${CLANG_FORMAT}")
+else()
+    message(WARNING "Clang-format not found")
+endif()
+
 add_subdirectory(libs)
 add_subdirectory(src)
 
