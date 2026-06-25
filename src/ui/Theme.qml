@@ -15,7 +15,7 @@ QtObject {
         property color dialogSurface: "#2A2A2A"
         property color primary: "#1F618D"
         property color primaryVariant: "#2471A3"
-        property color secondary: "#03DAC6"
+        property color secondary: "#6C5CE7"
         property color info: "#3498db"
         property color success: "#27ae60"
         property color warning: "#f1c40f"
@@ -126,6 +126,10 @@ QtObject {
         property string expand: "qrc:/Themed/Icons/chevron-right.svg"
         property string collapse: "qrc:/Themed/Icons/chevron-down.svg"
         property string startWorkout: "qrc:/Themed/Icons/start-workout.svg"
+        property string moveUp: "qrc:/Themed/Icons/chevron-up.svg"
+        property string moveDown: "qrc:/Themed/Icons/chevron-down.svg"
+        property string reorder: "qrc:/Themed/Icons/reorder.svg"
+        property string timer: "qrc:/Themed/Icons/timer.svg"
     }
 
     property var button: QtObject {
@@ -183,11 +187,11 @@ QtObject {
         }
 
         property var secondary: QtObject {
-            property color background: "#03DAC6"
-            property color hovered: "#26E2D0"
-            property color pressed: "#00BFA5"
-            property color border: "#03DAC6"
-            property color text: "#212121"
+            property color background: "#6C5CE7"
+            property color hovered: "#7D6FF0"
+            property color pressed: "#5A4BD6"
+            property color border: "#6C5CE7"
+            property color text: "#FFFFFF"
         }
 
         property var success: QtObject {

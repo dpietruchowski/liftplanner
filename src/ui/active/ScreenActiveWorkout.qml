@@ -45,11 +45,31 @@ Rectangle {
                 width: sv.availableWidth
                 spacing: Theme.spacing.medium / 2
 
+                property var expandedExercise: ActiveWorkoutViewModel.currentExercise
+                property bool reorderMode: false
+
+                signal exerciseMoved(var exercise, int direction)
+
+                function requestMove(ex, from, dir) {
+                    ActiveWorkoutViewModel.moveExercise(from, from + dir)
+                    Qt.callLater(function() { contentColumn.exerciseMoved(ex, dir) })
+                }
+
+                Connections {
+                    target: ActiveWorkoutViewModel
+                    function onCurrentExerciseChanged() {
+                        contentColumn.expandedExercise = ActiveWorkoutViewModel.currentExercise
+                    }
+                }
+
                 Repeater {
+                    id: exerciseRepeater
                     model: ActiveWorkoutViewModel.currentWorkout ? ActiveWorkoutViewModel.currentWorkout.exercises : []
 
                     delegate: ActiveWorkoutExerciseItem {
                         exercise: modelData
+                        screen: contentColumn
+                        exerciseCount: exerciseRepeater.count
                         onShowExerciseInfo: function(exercise) {
                             exerciseInfoPopup.title = exercise.name
                             var searchUrl = "https://www.youtube.com/results?search_query="
@@ -66,17 +86,25 @@ Rectangle {
         }
 
         RowLayout {
-            Layout.alignment: Qt.AlignHCenter
+            Layout.fillWidth: true
             spacing: Theme.spacing.medium
 
             ThemedButton {
-                objectName: "previousSetButton"
-                iconSource: Theme.icons.previous
+                objectName: "startTimerButton"
+                iconSource: Theme.icons.timer
                 enabled: ActiveWorkoutViewModel.isActive
-                buttonSize: Theme.button.medium
+                buttonSize: Theme.button.mediumSquare
                 buttonStyle: Theme.button.primary
-                onClicked: ActiveWorkoutViewModel.navigateToPrevious()
+                onClicked: {
+                    var rs = ActiveWorkoutViewModel.currentExercise
+                            && ActiveWorkoutViewModel.currentExercise.restSeconds > 0
+                            ? ActiveWorkoutViewModel.currentExercise.restSeconds
+                            : 60
+                    restDialog.show(rs)
+                }
             }
+
+            Item { Layout.fillWidth: true }
 
             ThemedButton {
                 objectName: "completeSetButton"
@@ -99,13 +127,15 @@ Rectangle {
                 }
             }
 
+            Item { Layout.fillWidth: true }
+
             ThemedButton {
-                objectName: "nextSetButton"
-                iconSource: Theme.icons.next
+                objectName: "reorderButton"
+                iconSource: Theme.icons.reorder
                 enabled: ActiveWorkoutViewModel.isActive
-                buttonSize: Theme.button.medium
-                buttonStyle: Theme.button.primary
-                onClicked: ActiveWorkoutViewModel.navigateToNext()
+                buttonSize: Theme.button.mediumSquare
+                buttonStyle: contentColumn.reorderMode ? Theme.button.primary : Theme.button.outline
+                onClicked: contentColumn.reorderMode = !contentColumn.reorderMode
             }
         }
     }

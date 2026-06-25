@@ -45,6 +45,7 @@ public:
     void end();
 
     void addExercise(ExerciseModel* exercise);
+    void moveExercise(int from, int to);
 
     Workout toEntity() const;
     WorkoutModel* clone(QObject* parent = nullptr) const;

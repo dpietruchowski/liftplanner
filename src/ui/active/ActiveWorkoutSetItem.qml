@@ -22,27 +22,53 @@ Rectangle {
     clip: true
 
     MouseArea {
+        id: rowMouse
         anchors.fill: parent
         onClicked: ActiveWorkoutViewModel.currentSet = setData
+        onPressAndHold: setRect.actionsVisible = !setRect.actionsVisible
+        onPressed: holdAnim.restart()
+        onReleased: { holdAnim.stop(); holdProgress.width = 0 }
+        onCanceled: { holdAnim.stop(); holdProgress.width = 0 }
+    }
+
+    NumberAnimation {
+        id: holdAnim
+        target: holdProgress
+        property: "width"
+        from: 0
+        to: setRect.width
+        duration: Application.styleHints.mousePressAndHoldInterval
+    }
+
+    Rectangle {
+        id: holdProgress
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        height: Theme.border.thick
+        width: 0
+        radius: height / 2
+        color: Theme.colors.primaryVariant
+        visible: width > 0
     }
 
     Column {
         anchors.fill: parent
         spacing: 0
 
-        // Row 1: Set N | reps | weight | indicator
+        // Row 1: N | reps | weight | indicator
         RowLayout {
             width: parent.width
             height: Theme.layout.listItemHeight
             spacing: 0
 
-            // "Set N" column
+            // Set number column
             Text {
-                text: "Set " + (index + 1)
+                text: index + 1
                 font.pixelSize: Theme.fontSize.small
                 font.bold: true
                 color: Theme.colors.textPrimary
-                Layout.preferredWidth: 60
+                horizontalAlignment: Text.AlignHCenter
+                Layout.preferredWidth: 40
                 Layout.alignment: Qt.AlignVCenter
                 leftPadding: Theme.padding.medium
             }
@@ -75,8 +101,9 @@ Rectangle {
 
             Item { Layout.fillWidth: true }
 
-            // Indicator column
+            // Indicator column (tap = toggle done)
             Rectangle {
+                id: indicator
                 width: Theme.layout.indicatorSize
                 height: Theme.layout.indicatorSize
                 radius: Theme.layout.indicatorSize / 2
@@ -86,9 +113,26 @@ Rectangle {
                 Layout.alignment: Qt.AlignVCenter
                 Layout.rightMargin: Theme.padding.medium
 
+                Behavior on color { ColorAnimation { duration: 200 } }
+                Behavior on border.color { ColorAnimation { duration: 200 } }
+
+                SequentialAnimation {
+                    id: pulseAnim
+                    NumberAnimation { target: indicator; property: "scale"; to: 1.4; duration: 110; easing.type: Easing.OutQuad }
+                    NumberAnimation { target: indicator; property: "scale"; to: 1.0; duration: 160; easing.type: Easing.OutBack }
+                }
+
+                Connections {
+                    target: setData
+                    function onCompletedChanged() {
+                        if (setData.completed)
+                            pulseAnim.restart()
+                    }
+                }
+
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: actionsVisible = !actionsVisible
+                    onClicked: ActiveWorkoutViewModel.toggleSetCompleted(setData)
                 }
             }
         }
@@ -100,8 +144,8 @@ Rectangle {
             height: Theme.button.square.size + Theme.padding.small
             spacing: 0
 
-            // Empty space under "Set N"
-            Item { Layout.preferredWidth: 60 }
+            // Empty space under number
+            Item { Layout.preferredWidth: 40 }
 
             // Reps -/+ under reps column
             Item {
@@ -177,14 +221,14 @@ Rectangle {
                     iconSource: Theme.icons.addSet
                     buttonSize: Theme.button.square
                     buttonStyle: Theme.button.ghost
-                    onClicked: ActiveWorkoutViewModel.duplicateSet(modelData)
+                    onClicked: ActiveWorkoutViewModel.duplicateSet(setData)
                 }
 
                 ThemedButton {
                     iconSource: Theme.icons.removeSet
                     buttonSize: Theme.button.square
                     buttonStyle: Theme.button.ghost
-                    onClicked: ActiveWorkoutViewModel.removeSet(modelData)
+                    onClicked: ActiveWorkoutViewModel.removeSet(setData)
                 }
             }
         }

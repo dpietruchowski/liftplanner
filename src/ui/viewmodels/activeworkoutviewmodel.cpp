@@ -117,7 +117,7 @@ void ActiveWorkoutViewModel::completeCurrentSet()
     }
 
     saveCompletedSet();
-    navigateToNext();
+    selectNextIncomplete();
     saveCurrentWorkout();
 }
 
@@ -247,6 +247,37 @@ void ActiveWorkoutViewModel::removeSet(SetModel* set)
     saveCurrentWorkout();
 }
 
+void ActiveWorkoutViewModel::toggleSetCompleted(SetModel* set)
+{
+    if (!m_isActive || !set)
+        return;
+
+    auto* exercise = qobject_cast<ExerciseModel*>(set->parent());
+    if (!exercise)
+        return;
+
+    bool nowCompleted = !set->completed();
+    set->setCompleted(nowCompleted);
+
+    setCurrentExercise(exercise);
+    setCurrentSet(set);
+
+    if (nowCompleted)
+        selectNextIncomplete();
+
+    saveCurrentWorkout();
+}
+
+void ActiveWorkoutViewModel::moveExercise(int from, int to)
+{
+    if (!m_currentWorkout)
+        return;
+
+    m_currentWorkout->moveExercise(from, to);
+    selectFirstIncomplete();
+    saveCurrentWorkout();
+}
+
 void ActiveWorkoutViewModel::saveCompletedSet()
 {
     if (!m_currentSet)
@@ -304,6 +335,33 @@ void ActiveWorkoutViewModel::selectFirstIncomplete()
 
     updateCurrentExercise();
     updateCurrentSet();
+}
+
+void ActiveWorkoutViewModel::selectNextIncomplete()
+{
+    if (!m_currentWorkout || !m_currentExercise)
+        return;
+
+    auto exercises = m_currentWorkout->exercises();
+    int exIdx = exercises.indexOf(m_currentExercise);
+    int setIdx = m_currentExercise->sets().indexOf(m_currentSet);
+
+    for (int e = exIdx; e >= 0 && e < exercises.size(); ++e)
+    {
+        auto sets = exercises[e]->sets();
+        int start = (e == exIdx) ? setIdx + 1 : 0;
+        for (int s = start; s < sets.size(); ++s)
+        {
+            if (!sets[s]->completed())
+            {
+                setCurrentExercise(exercises[e]);
+                setCurrentSet(sets[s]);
+                return;
+            }
+        }
+    }
+
+    selectFirstIncomplete();
 }
 
 void ActiveWorkoutViewModel::saveToDb()

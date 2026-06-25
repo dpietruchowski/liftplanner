@@ -31,6 +31,8 @@ public:
 
     Q_INVOKABLE void duplicateSet(SetModel* set);
     Q_INVOKABLE void removeSet(SetModel* set);
+    Q_INVOKABLE void toggleSetCompleted(SetModel* set);
+    Q_INVOKABLE void moveExercise(int from, int to);
 
 signals:
     void workoutCompleted();
@@ -41,6 +43,7 @@ private:
     void updateCurrentExercise();
     void updateCurrentSet();
     void selectFirstIncomplete();
+    void selectNextIncomplete();
     void saveToDb();
 
     WorkoutService* m_service;

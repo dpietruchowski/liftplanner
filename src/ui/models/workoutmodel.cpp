@@ -73,6 +73,15 @@ void WorkoutModel::addExercise(ExerciseModel* exercise)
     }
 }
 
+void WorkoutModel::moveExercise(int from, int to)
+{
+    if (from < 0 || from >= m_exercises.size() || to < 0 || to >= m_exercises.size() || from == to)
+        return;
+
+    m_exercises.move(from, to);
+    emit exercisesChanged();
+}
+
 Workout WorkoutModel::toEntity() const
 {
     Workout w;
