@@ -1,5 +1,6 @@
 #include "userprofileviewmodel.h"
 #include "modules/userprofile/application/userprofileservice.h"
+#include "utils/timeprovider.h"
 #include <QDate>
 #include <QLocale>
 #include <QTimeZone>
@@ -89,7 +90,7 @@ int UserProfileViewModel::age() const
     if (!m_profile.dateOfBirth().has_value())
         return -1;
 
-    const QDate today = QDate::currentDate();
+    const QDate today = TimeProvider::instance().currentDate();
     const QDate dob = *m_profile.dateOfBirth();
     int years = today.year() - dob.year();
     if (dob.addYears(years) > today)

@@ -2,6 +2,7 @@
 #include "modules/workout/domain/entities/workoutstatus.h"
 #include "modules/workout/domain/repositories/workoutquery.h"
 #include "modules/workout/domain/repositories/workoutrepository.h"
+#include "utils/timeprovider.h"
 #include <QHash>
 #include <algorithm>
 
@@ -97,7 +98,7 @@ Result<void> WorkoutService::importHistoryCore(const std::vector<Workout>& worko
     {
         workout.setStatus(WorkoutStatus::Ended);
         if (!workout.startedTime().isValid())
-            workout.setStartedTime(QDateTime::currentDateTime());
+            workout.setStartedTime(TimeProvider::instance().currentDateTime());
         if (!workout.endedTime().isValid())
             workout.setEndedTime(workout.startedTime().addSecs(3600));
         m_repository.save(workout);

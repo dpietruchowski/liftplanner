@@ -1,4 +1,5 @@
 #include "workout.h"
+#include "utils/timeprovider.h"
 
 Workout::Workout() = default;
 
@@ -28,13 +29,13 @@ void Workout::setStatus(WorkoutStatus status) { m_status = status; }
 
 void Workout::start()
 {
-    m_startedTime = QDateTime::currentDateTime();
+    m_startedTime = TimeProvider::instance().currentDateTime();
     m_status = WorkoutStatus::Started;
 }
 
 void Workout::end()
 {
-    m_endedTime = QDateTime::currentDateTime();
+    m_endedTime = TimeProvider::instance().currentDateTime();
     m_status = WorkoutStatus::Ended;
 }
 
@@ -87,7 +88,7 @@ double Workout::totalWeight() const
 
 Workout Workout::createDefault(const QString& name)
 {
-    return Workout(name, QDateTime::currentDateTime());
+    return Workout(name, TimeProvider::instance().currentDateTime());
 }
 
 void Workout::validate() const { }

@@ -2,6 +2,7 @@
 #include "modules/userprofile/application/userprofileservice.h"
 #include "modules/userprofile/infrastructure/serializers/userprofileserializer.h"
 #include "modules/workout/application/workoutservice.h"
+#include "utils/timeprovider.h"
 #include "utils/workoutjson.h"
 #include <QClipboard>
 #include <QDate>
@@ -76,7 +77,7 @@ void PlannedWorkoutViewModel::importFromJson(const QString& jsonData)
         QJsonArray workoutsArray = root.value("workouts").toArray();
         auto workouts = WorkoutJson::workoutsFromJsonArray(workoutsArray);
 
-        QDateTime baseTime = QDateTime::currentDateTime();
+        QDateTime baseTime = TimeProvider::instance().currentDateTime();
         for (size_t i = 0; i < workouts.size(); ++i)
         {
             if (!workouts[i].plannedTime().isValid())
@@ -137,7 +138,8 @@ void PlannedWorkoutViewModel::generatePrompt()
                 for (auto* w : m_workouts)
                     plannedArray.append(WorkoutJson::workoutToJsonCompact(w->toEntity()));
 
-                prompt.replace("{{CURRENT_DATE}}", QDate::currentDate().toString("yyyy-MM-dd"));
+                prompt.replace("{{CURRENT_DATE}}",
+                               TimeProvider::instance().currentDate().toString("yyyy-MM-dd"));
                 prompt.replace("{{USER_PROFILE}}", profileJson);
                 prompt.replace("{{HISTORY_JSON}}",
                                QJsonDocument(historyArray).toJson(QJsonDocument::Indented));

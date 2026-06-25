@@ -1,6 +1,7 @@
 #include "workouthistoryviewmodel.h"
 #include "modules/workout/application/workoutservice.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
+#include "utils/timeprovider.h"
 #include "utils/workoutjson.h"
 #include "utils/workouttext.h"
 #include <QDate>
@@ -117,7 +118,7 @@ QVariantList WorkoutHistoryViewModel::weekActivity() const
     for (int i = 0; i < 7; ++i)
         activity.append(false);
 
-    const QDate today = QDate::currentDate();
+    const QDate today = TimeProvider::instance().currentDate();
     const QDate monday = today.addDays(1 - today.dayOfWeek());
 
     const auto markDay = [&](const WorkoutModel* workout) {

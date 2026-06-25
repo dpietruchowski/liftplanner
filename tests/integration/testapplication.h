@@ -1,8 +1,11 @@
 #pragma once
 
+#include <QDate>
+#include <QDateTime>
 #include <QSqlDatabase>
 #include <memory>
 
+class MockTimeProvider;
 class BackendWorker;
 class DbStorage;
 class WorkoutRepositoryDb;
@@ -24,6 +27,13 @@ public:
     PlannedWorkoutViewModel& plannedWorkoutViewModel();
 
     WorkoutService& workoutService();
+
+    MockTimeProvider& timeProvider();
+    void setCurrentDate(const QDate& date);
+    void setCurrentDateTime(const QDateTime& dateTime);
+    void advanceDay();
+    void advanceDays(int days);
+    void advanceDate(const QDate& targetDate);
 
     void drain();
 

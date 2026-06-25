@@ -8,6 +8,8 @@
 #include "ui/viewmodels/plannedworkoutviewmodel.h"
 #include "ui/viewmodels/workouthistoryviewmodel.h"
 #include "utils/backendworker.h"
+#include "utils/mocktimeprovider.h"
+#include "utils/timeprovider.h"
 #include <QEventLoop>
 #include <QMetaObject>
 #include <QSqlQuery>
@@ -17,6 +19,9 @@ int TestApplication::s_connectionCounter = 0;
 
 TestApplication::TestApplication()
 {
+    TimeProvider::setInstance(std::make_unique<MockTimeProvider>());
+    timeProvider().setCurrentDateTime(QDateTime(QDate(2025, 1, 1), QTime(12, 0, 0)));
+
     m_worker = std::make_unique<BackendWorker>();
     m_connectionName = QString("integration_test_%1").arg(++s_connectionCounter);
 
@@ -75,6 +80,32 @@ TestApplication::~TestApplication()
         Qt::BlockingQueuedConnection);
 
     QSqlDatabase::removeDatabase(m_connectionName);
+
+    TimeProvider::setInstance(std::make_unique<SystemTimeProvider>());
+}
+
+MockTimeProvider& TestApplication::timeProvider()
+{
+    return dynamic_cast<MockTimeProvider&>(TimeProvider::instance());
+}
+
+void TestApplication::setCurrentDate(const QDate& date)
+{
+    timeProvider().setCurrentDate(date);
+}
+
+void TestApplication::setCurrentDateTime(const QDateTime& dateTime)
+{
+    timeProvider().setCurrentDateTime(dateTime);
+}
+
+void TestApplication::advanceDay() { timeProvider().advanceDays(1); }
+
+void TestApplication::advanceDays(int days) { timeProvider().advanceDays(days); }
+
+void TestApplication::advanceDate(const QDate& targetDate)
+{
+    timeProvider().advanceDate(targetDate);
 }
 
 ActiveWorkoutViewModel& TestApplication::activeWorkoutViewModel()

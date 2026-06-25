@@ -8,6 +8,7 @@ set(TEST_SOURCES
     workout_lifecycle_test.cpp
     planned_workout_test.cpp
     active_workout_test.cpp
+    time_travel_test.cpp
 )
 
 set(APP_SOURCES
