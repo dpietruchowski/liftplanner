@@ -1,8 +1,8 @@
-file(GLOB QML_FILES "*.qml")
+file(GLOB_RECURSE QML_FILES_FULL "${CMAKE_CURRENT_SOURCE_DIR}/*.qml")
 set(PROJECT_QML_SOURCES "")
-foreach(qml_file ${QML_FILES})
-    get_filename_component(file_name ${qml_file} NAME)
-    list(APPEND PROJECT_QML_SOURCES "ui/${file_name}")
+foreach(qml_file ${QML_FILES_FULL})
+    file(RELATIVE_PATH rel ${CMAKE_CURRENT_SOURCE_DIR} ${qml_file})
+    list(APPEND PROJECT_QML_SOURCES "ui/${rel}")
 endforeach()
 
 set(PROJECT_QML_SOURCES ${PROJECT_QML_SOURCES} PARENT_SCOPE)

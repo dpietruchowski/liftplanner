@@ -15,7 +15,7 @@ ApplicationWindow {
         asynchronous: true
         objectName: "mainLoader"
         anchors.fill: parent
-        source: "MainView.qml"
+        source: "common/MainView.qml"
     }
 
     Component.onCompleted: {

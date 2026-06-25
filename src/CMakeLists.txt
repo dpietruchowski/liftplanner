@@ -11,7 +11,6 @@ if(NOT QML_LIVE_ENABLED)
     add_subdirectory(ui)
 endif()
 
-add_subdirectory(ui/icons)
 add_subdirectory(ui/viewmodels)
 add_subdirectory(utils)
 
@@ -27,12 +26,6 @@ qt_add_qml_module(liftplanner
     VERSION 1.0
     QML_FILES
         ${PROJECT_QML_SOURCES}
-)
-
-qt_add_resources(liftplanner "liftplanner_icons"
-    PREFIX "/LiftPlanner"
-    FILES
-        ${PROJECT_ICON_SOURCES}
 )
 
 qt_add_resources(liftplanner "resources"
