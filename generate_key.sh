@@ -6,6 +6,7 @@ KEYSTORE_FILE="${KEYSTORE_DIR}/lift-planner.keystore"
 KEY_ALIAS="lift_planner_key"
 KEYSTORE_PASS="${KEYSTORE_PASS:-liftplanner123}"
 KEY_VALIDITY_DAYS=10000
+IMAGE_TAG=liftplanner-qt6-android:6.10-api36
 
 echo "🔐 Generating new keystore for Android signing..."
 
@@ -24,9 +25,11 @@ mkdir -p "$KEYSTORE_DIR"
 echo "📝 Generating keystore..."
 echo ""
 
+docker build -t "$IMAGE_TAG" - < Dockerfile.android
+
 docker run --rm -i \
     -v "${PWD}/${KEYSTORE_DIR}:/home/user/keystore" \
-    stateoftheartio/qt6:6.8-android-aqt \
+    "${IMAGE_TAG}" \
     sh -c "keytool -genkeypair \
         -v \
         -keystore /home/user/keystore/lift-planner.keystore \

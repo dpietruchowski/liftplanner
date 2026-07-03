@@ -13,20 +13,23 @@ fi
 echo "📌 Version: $VERSION"
 
 BUILD_DIR="build-android"
+IMAGE_TAG=liftplanner-qt6-android:6.10-api36
 KEYSTORE="/home/user/project/android/lift-planner.keystore"
 KEY_ALIAS="lift_planner_key"
 KEYSTORE_PASS="${KEYSTORE_PASS:-liftplanner123}"
 UNSIGNED_APK="/home/user/build/src/android-build/build/outputs/apk/release/android-build-release-unsigned.apk"
 SIGNED_APK="/home/user/build/liftplanner-${VERSION}-release-signed.apk"
 
-APKSIGNER_PATH="/opt/android-sdk/build-tools/34.0.0/apksigner"
+APKSIGNER_PATH="/opt/android-sdk/build-tools/36.0.0/apksigner"
+
+docker build -t "$IMAGE_TAG" - < Dockerfile.android
 
 # Sign the APK
 echo "🔑 Signing APK..."
 docker run --rm \
     -v "${PWD}:/home/user/project:ro" \
     -v "${PWD}/${BUILD_DIR}:/home/user/build" \
-    stateoftheartio/qt6:6.8-android-aqt \
+    "${IMAGE_TAG}" \
     sh -c "cd /home/user/build && \
            ${APKSIGNER_PATH} sign \
                --ks ${KEYSTORE} \
@@ -42,7 +45,7 @@ echo "🔍 Verifying signature..."
 if docker run --rm \
     -v "${PWD}:/home/user/project:ro" \
     -v "${PWD}/${BUILD_DIR}:/home/user/build" \
-    stateoftheartio/qt6:6.8-android-aqt \
+    "${IMAGE_TAG}" \
     sh -c "${APKSIGNER_PATH} verify --verbose ${SIGNED_APK}"; then
     echo '✅ Signature verification succeeded!'
 else
