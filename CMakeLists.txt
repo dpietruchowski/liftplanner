@@ -21,6 +21,11 @@ if(NOT ANDROID)
     add_compile_definitions(LIBS_TESTING)
 endif()
 
+add_compile_definitions(
+    $<$<NOT:$<CONFIG:Debug>>:QT_NO_DEBUG_OUTPUT>
+    $<$<NOT:$<CONFIG:Debug>>:QT_NO_INFO_OUTPUT>
+)
+
 find_program(CLANG_FORMAT "clang-format")
 
 if(CLANG_FORMAT)
