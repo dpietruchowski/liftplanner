@@ -56,7 +56,7 @@ target_link_libraries(liftplanner
     Qt6::Qml
 )
 
-if(NOT ANDROID)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_link_libraries(liftplanner PRIVATE app_automation)
 endif()
 

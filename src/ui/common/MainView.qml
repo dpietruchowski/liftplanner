@@ -12,6 +12,14 @@ Item {
     property var workoutsScreen: ScreenWorkouts {}
     property var profileScreen: ScreenProfile {}
 
+    function goBack() {
+        if (stackView.depth > 1) {
+            stackView.pop()
+            return true
+        }
+        return false
+    }
+
     StackView {
         id: stackView
         anchors.top: parent.top
