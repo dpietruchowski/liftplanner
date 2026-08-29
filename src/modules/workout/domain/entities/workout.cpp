@@ -86,6 +86,22 @@ double Workout::totalWeight() const
     return total;
 }
 
+int Workout::totalDurationSeconds() const
+{
+    int total = 0;
+    for (const auto& e : m_exercises)
+        total += e.totalDurationSeconds();
+    return total;
+}
+
+double Workout::totalDistanceMeters() const
+{
+    double total = 0.0;
+    for (const auto& e : m_exercises)
+        total += e.totalDistanceMeters();
+    return total;
+}
+
 Workout Workout::createDefault(const QString& name)
 {
     return Workout(name, TimeProvider::instance().currentDateTime());

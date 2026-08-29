@@ -263,3 +263,57 @@ TEST_F(WorkoutTest, CopySemantics_IncludesStatus)
     EXPECT_EQ(copy.status(), WorkoutStatus::Started);
     EXPECT_EQ(copy.startedTime(), original.startedTime());
 }
+
+TEST_F(WorkoutTest, Aggregates_MixedWorkout_SeparatesWeightFromTimeAndDistance)
+{
+    Workout w("Hybrid", QDateTime::currentDateTime());
+
+    Exercise strength("Bench Press", 120);
+    strength.addSet(Set(5, 100));
+    strength.addSet(Set(5, 80));
+    w.addExercise(strength);
+
+    Exercise tabata("Burpees", 60);
+    tabata.setKind(ExerciseKind::Interval);
+    for (int i = 0; i < 8; ++i)
+    {
+        Set work = Set::createDuration(20);
+        work.setRestSecondsOverride(10);
+        tabata.addSet(work);
+    }
+    w.addExercise(tabata);
+
+    Exercise run("Run", 0);
+    run.setKind(ExerciseKind::Cardio);
+    run.addSet(Set::createDistance(5000.0, 1500));
+    w.addExercise(run);
+
+    EXPECT_DOUBLE_EQ(w.totalWeight(), 900.0);
+    EXPECT_EQ(w.totalRepetitions(), 10);
+    EXPECT_EQ(w.totalSets(), 11);
+    EXPECT_EQ(w.totalDurationSeconds(), 1660);
+    EXPECT_DOUBLE_EQ(w.totalDistanceMeters(), 5000.0);
+}
+
+TEST_F(WorkoutTest, Aggregates_NoExercises_TimeAndDistanceAreZero)
+{
+    Workout w("Empty", QDateTime::currentDateTime());
+
+    EXPECT_EQ(w.totalDurationSeconds(), 0);
+    EXPECT_DOUBLE_EQ(w.totalDistanceMeters(), 0.0);
+}
+
+TEST_F(WorkoutTest, IsCompleted_CardioWorkout_TracksSetCompletion)
+{
+    Workout w("Cardio", QDateTime::currentDateTime());
+
+    Exercise run("Run", 0);
+    run.setKind(ExerciseKind::Cardio);
+    run.addSet(Set::createDistance(5000.0, 1500));
+    w.addExercise(run);
+
+    EXPECT_FALSE(w.isCompleted());
+
+    w.exercises()[0].sets()[0].setCompleted(true);
+    EXPECT_TRUE(w.isCompleted());
+}

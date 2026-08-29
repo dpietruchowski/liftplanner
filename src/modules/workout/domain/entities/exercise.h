@@ -1,5 +1,6 @@
 #pragma once
 
+#include "exercisekind.h"
 #include "set.h"
 #include <QString>
 #include <vector>
@@ -15,12 +16,15 @@ public:
     const QString& name() const;
     const QString& description() const;
     int restSeconds() const;
+    ExerciseKind kind() const;
+    int restSecondsForSet(int index) const;
 
     void setId(int id);
     void setWorkoutId(int workoutId);
     void setName(const QString& name);
     void setDescription(const QString& description);
     void setRestSeconds(int restSeconds);
+    void setKind(ExerciseKind kind);
 
     const std::vector<Set>& sets() const;
     std::vector<Set>& sets();
@@ -31,6 +35,8 @@ public:
 
     double totalWeight() const;
     int totalRepetitions() const;
+    int totalDurationSeconds() const;
+    double totalDistanceMeters() const;
     double averageWeight() const;
     double bestOneRepMax() const;
 
@@ -42,5 +48,6 @@ private:
     QString m_name;
     QString m_description;
     int m_restSeconds { 120 };
+    ExerciseKind m_kind { ExerciseKind::Strength };
     std::vector<Set> m_sets;
 };

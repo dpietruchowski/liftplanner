@@ -16,12 +16,23 @@ int Exercise::workoutId() const { return m_workoutId; }
 const QString& Exercise::name() const { return m_name; }
 const QString& Exercise::description() const { return m_description; }
 int Exercise::restSeconds() const { return m_restSeconds; }
+ExerciseKind Exercise::kind() const { return m_kind; }
 
 void Exercise::setId(int id) { m_id = id; }
 void Exercise::setWorkoutId(int workoutId) { m_workoutId = workoutId; }
 void Exercise::setName(const QString& name) { m_name = name; }
 void Exercise::setDescription(const QString& description) { m_description = description; }
 void Exercise::setRestSeconds(int restSeconds) { m_restSeconds = restSeconds; }
+void Exercise::setKind(ExerciseKind kind) { m_kind = kind; }
+
+int Exercise::restSecondsForSet(int index) const
+{
+    if (index < 0 || index >= static_cast<int>(m_sets.size()))
+        return m_restSeconds;
+
+    const int override_ = m_sets[index].restSecondsOverride();
+    return override_ >= 0 ? override_ : m_restSeconds;
+}
 
 const std::vector<Set>& Exercise::sets() const { return m_sets; }
 std::vector<Set>& Exercise::sets() { return m_sets; }
@@ -67,19 +78,41 @@ int Exercise::totalRepetitions() const
 {
     int total = 0;
     for (const auto& s : m_sets)
-        total += s.repetitions();
+    {
+        if (s.metric() == SetMetric::Reps)
+            total += s.repetitions();
+    }
+    return total;
+}
+
+int Exercise::totalDurationSeconds() const
+{
+    int total = 0;
+    for (const auto& s : m_sets)
+        total += s.durationSeconds();
+    return total;
+}
+
+double Exercise::totalDistanceMeters() const
+{
+    double total = 0.0;
+    for (const auto& s : m_sets)
+        total += s.distanceMeters();
     return total;
 }
 
 double Exercise::averageWeight() const
 {
-    if (m_sets.empty())
-        return 0.0;
-
     double total = 0.0;
+    int count = 0;
     for (const auto& s : m_sets)
+    {
+        if (!s.isWeighted())
+            continue;
         total += s.weight();
-    return total / m_sets.size();
+        ++count;
+    }
+    return count > 0 ? total / count : 0.0;
 }
 
 double Exercise::bestOneRepMax() const

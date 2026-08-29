@@ -192,3 +192,138 @@ TEST_F(ExerciseTest, CopySemantics_IncludesSets)
     EXPECT_EQ(copy.sets()[0].repetitions(), 10);
     EXPECT_EQ(copy.sets()[1].weight(), 85);
 }
+
+TEST_F(ExerciseTest, DefaultKind_IsStrength)
+{
+    Exercise e;
+    EXPECT_EQ(e.kind(), ExerciseKind::Strength);
+
+    e.setKind(ExerciseKind::Interval);
+    EXPECT_EQ(e.kind(), ExerciseKind::Interval);
+}
+
+TEST_F(ExerciseTest, KindToString_Roundtrips)
+{
+    EXPECT_EQ(exerciseKindFromString(exerciseKindToString(ExerciseKind::Strength)),
+              ExerciseKind::Strength);
+    EXPECT_EQ(exerciseKindFromString(exerciseKindToString(ExerciseKind::Bodyweight)),
+              ExerciseKind::Bodyweight);
+    EXPECT_EQ(exerciseKindFromString(exerciseKindToString(ExerciseKind::Cardio)),
+              ExerciseKind::Cardio);
+    EXPECT_EQ(exerciseKindFromString(exerciseKindToString(ExerciseKind::Interval)),
+              ExerciseKind::Interval);
+    EXPECT_EQ(exerciseKindFromString(exerciseKindToString(ExerciseKind::Mobility)),
+              ExerciseKind::Mobility);
+    EXPECT_EQ(exerciseKindFromString("nonsense"), ExerciseKind::Strength);
+}
+
+TEST_F(ExerciseTest, RestSecondsForSet_NoOverride_UsesExerciseDefault)
+{
+    Exercise e("Bench Press", 90);
+    e.addSet(Set(10, 80));
+    e.addSet(Set(8, 85));
+
+    EXPECT_EQ(e.restSecondsForSet(0), 90);
+    EXPECT_EQ(e.restSecondsForSet(1), 90);
+}
+
+TEST_F(ExerciseTest, RestSecondsForSet_Override_WinsOverDefault)
+{
+    Exercise e("Tabata", 60);
+    Set work = Set::createDuration(20);
+    work.setRestSecondsOverride(10);
+    e.addSet(work);
+    e.addSet(Set::createDuration(20));
+
+    EXPECT_EQ(e.restSecondsForSet(0), 10);
+    EXPECT_EQ(e.restSecondsForSet(1), 60);
+}
+
+TEST_F(ExerciseTest, RestSecondsForSet_ZeroOverride_MeansNoRest)
+{
+    Exercise e("Circuit", 60);
+    Set work = Set::createDuration(30);
+    work.setRestSecondsOverride(0);
+    e.addSet(work);
+
+    EXPECT_EQ(e.restSecondsForSet(0), 0);
+}
+
+TEST_F(ExerciseTest, RestSecondsForSet_InvalidIndex_UsesExerciseDefault)
+{
+    Exercise e("Squat", 180);
+    e.addSet(Set(5, 100));
+
+    EXPECT_EQ(e.restSecondsForSet(-1), 180);
+    EXPECT_EQ(e.restSecondsForSet(7), 180);
+}
+
+TEST_F(ExerciseTest, TotalDurationAndDistance_SumAcrossSets)
+{
+    Exercise e("Intervals", 60);
+    e.addSet(Set::createDuration(20));
+    e.addSet(Set::createDuration(20));
+    e.addSet(Set::createDistance(400.0, 90));
+
+    EXPECT_EQ(e.totalDurationSeconds(), 130);
+    EXPECT_DOUBLE_EQ(e.totalDistanceMeters(), 400.0);
+}
+
+TEST_F(ExerciseTest, TotalDurationAndDistance_StrengthSets_AreZero)
+{
+    Exercise e("Bench Press", 90);
+    e.addSet(Set(10, 80));
+
+    EXPECT_EQ(e.totalDurationSeconds(), 0);
+    EXPECT_DOUBLE_EQ(e.totalDistanceMeters(), 0.0);
+}
+
+TEST_F(ExerciseTest, Aggregates_BodyweightSets_ExcludedFromWeightMetrics)
+{
+    Exercise e("Pullup", 90);
+    Set s1(12, 0);
+    s1.setLoadType(LoadType::Bodyweight);
+    Set s2(10, 0);
+    s2.setLoadType(LoadType::Bodyweight);
+    e.addSet(s1);
+    e.addSet(s2);
+
+    EXPECT_DOUBLE_EQ(e.totalWeight(), 0.0);
+    EXPECT_DOUBLE_EQ(e.averageWeight(), 0.0);
+    EXPECT_DOUBLE_EQ(e.bestOneRepMax(), 0.0);
+    EXPECT_EQ(e.totalRepetitions(), 22);
+}
+
+TEST_F(ExerciseTest, Aggregates_MixedExercise_CountsOnlyWeightedSets)
+{
+    Exercise e("Mixed", 90);
+    e.addSet(Set(5, 100));
+    e.addSet(Set(5, 80));
+    e.addSet(Set::createDuration(60));
+    Set assisted(8, 20);
+    assisted.setLoadType(LoadType::Assisted);
+    e.addSet(assisted);
+
+    EXPECT_DOUBLE_EQ(e.totalWeight(), 900.0);
+    EXPECT_DOUBLE_EQ(e.averageWeight(), 90.0);
+    EXPECT_DOUBLE_EQ(e.bestOneRepMax(), 112.5);
+    EXPECT_EQ(e.totalRepetitions(), 18);
+    EXPECT_EQ(e.totalDurationSeconds(), 60);
+}
+
+TEST_F(ExerciseTest, IsCompleted_TimedSets_BehaveLikeRepSets)
+{
+    Exercise e("Plank", 60);
+    Set s1 = Set::createDuration(45);
+    Set s2 = Set::createDuration(45);
+    e.addSet(s1);
+    e.addSet(s2);
+
+    EXPECT_FALSE(e.isCompleted());
+
+    e.sets()[0].setCompleted(true);
+    EXPECT_FALSE(e.isCompleted());
+
+    e.sets()[1].setCompleted(true);
+    EXPECT_TRUE(e.isCompleted());
+}

@@ -40,6 +40,8 @@ public:
     int totalRepetitions() const;
     int totalSets() const;
     double totalWeight() const;
+    int totalDurationSeconds() const;
+    double totalDistanceMeters() const;
 
     static Workout createDefault(const QString& name);
 
