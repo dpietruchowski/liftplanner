@@ -116,3 +116,74 @@ TEST_F(SetSerializerTest, Roundtrip_FractionalWeight)
 }
 
 TEST_F(SetSerializerTest, TableName_IsCorrect) { EXPECT_STREQ(SetSerializer::table, "sets"); }
+
+TEST_F(SetSerializerTest, ToVariant_IncludesMetricAndLoadType)
+{
+    Set s(10, 80.0);
+
+    QVariantMap data = SetSerializer::toVariant(s);
+
+    EXPECT_EQ(data.value(SetSerializer::metric_key).toString(), "reps");
+    EXPECT_EQ(data.value(SetSerializer::load_type_key).toString(), "external");
+    EXPECT_EQ(data.value(SetSerializer::duration_seconds_key).toInt(), 0);
+    EXPECT_DOUBLE_EQ(data.value(SetSerializer::distance_meters_key).toDouble(), 0.0);
+    EXPECT_EQ(data.value(SetSerializer::rest_seconds_override_key).toInt(), -1);
+}
+
+TEST_F(SetSerializerTest, Roundtrip_TimedSetWithRestOverride)
+{
+    Set original = Set::createDuration(20);
+    original.setRestSecondsOverride(10);
+    original.setCompleted(true);
+
+    Set restored = SetSerializer::fromVariant(SetSerializer::toVariant(original));
+
+    EXPECT_EQ(restored.metric(), SetMetric::Duration);
+    EXPECT_EQ(restored.loadType(), LoadType::None);
+    EXPECT_EQ(restored.durationSeconds(), 20);
+    EXPECT_EQ(restored.restSecondsOverride(), 10);
+    EXPECT_TRUE(restored.completed());
+}
+
+TEST_F(SetSerializerTest, Roundtrip_DistanceSet)
+{
+    Set original = Set::createDistance(5000.0, 1500);
+
+    Set restored = SetSerializer::fromVariant(SetSerializer::toVariant(original));
+
+    EXPECT_EQ(restored.metric(), SetMetric::Distance);
+    EXPECT_DOUBLE_EQ(restored.distanceMeters(), 5000.0);
+    EXPECT_EQ(restored.durationSeconds(), 1500);
+}
+
+TEST_F(SetSerializerTest, Roundtrip_BodyweightSet)
+{
+    Set original(12, 0.0);
+    original.setLoadType(LoadType::Bodyweight);
+
+    Set restored = SetSerializer::fromVariant(SetSerializer::toVariant(original));
+
+    EXPECT_EQ(restored.metric(), SetMetric::Reps);
+    EXPECT_EQ(restored.loadType(), LoadType::Bodyweight);
+    EXPECT_EQ(restored.repetitions(), 12);
+    EXPECT_FALSE(restored.isWeighted());
+}
+
+TEST_F(SetSerializerTest, FromVariant_LegacyRow_FallsBackToWeightedReps)
+{
+    QVariantMap legacy;
+    legacy.insert(SetSerializer::id_key, 3);
+    legacy.insert(SetSerializer::exercise_id_key, 1);
+    legacy.insert(SetSerializer::repetitions_key, 10);
+    legacy.insert(SetSerializer::weight_key, 80.0);
+    legacy.insert(SetSerializer::completed_key, 1);
+
+    Set s = SetSerializer::fromVariant(legacy);
+
+    EXPECT_EQ(s.metric(), SetMetric::Reps);
+    EXPECT_EQ(s.loadType(), LoadType::External);
+    EXPECT_EQ(s.durationSeconds(), 0);
+    EXPECT_DOUBLE_EQ(s.distanceMeters(), 0.0);
+    EXPECT_EQ(s.restSecondsOverride(), -1);
+    EXPECT_TRUE(s.isWeighted());
+}

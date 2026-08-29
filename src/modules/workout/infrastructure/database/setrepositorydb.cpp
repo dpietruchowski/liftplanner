@@ -4,6 +4,8 @@
 
 #include <dbtoolkit/dbrepository.h>
 #include <dbtoolkit/dbstorage.h>
+#include <dbtoolkit/migrationrunner.h>
+#include <dbtoolkit/query/altertable.h>
 #include <dbtoolkit/query/column.h>
 #include <dbtoolkit/query/createtable.h>
 #include <dbtoolkit/query/order.h>
@@ -14,9 +16,11 @@
 SetRepositoryDb::SetRepositoryDb(DbStorage& storage)
     : m_repository(std::make_unique<DbRepository>(
           SetSerializer::table, SetSerializer::id_key,
-          QStringList { SetSerializer::id_key, SetSerializer::exercise_id_key,
-                        SetSerializer::repetitions_key, SetSerializer::weight_key,
-                        SetSerializer::completed_key },
+          QStringList {
+              SetSerializer::id_key, SetSerializer::exercise_id_key, SetSerializer::repetitions_key,
+              SetSerializer::weight_key, SetSerializer::completed_key, SetSerializer::metric_key,
+              SetSerializer::load_type_key, SetSerializer::duration_seconds_key,
+              SetSerializer::distance_meters_key, SetSerializer::rest_seconds_override_key },
           storage, nullptr))
 {
 }
@@ -32,6 +36,12 @@ bool SetRepositoryDb::createTable()
         .column(Column(SetSerializer::repetitions_key).integer())
         .column(Column(SetSerializer::weight_key).real())
         .column(Column(SetSerializer::completed_key).integer().defaultValue(0))
+        .column(Column(SetSerializer::metric_key).text().defaultValue(QStringLiteral("reps")))
+        .column(
+            Column(SetSerializer::load_type_key).text().defaultValue(QStringLiteral("external")))
+        .column(Column(SetSerializer::duration_seconds_key).integer().defaultValue(0))
+        .column(Column(SetSerializer::distance_meters_key).real().defaultValue(0.0))
+        .column(Column(SetSerializer::rest_seconds_override_key).integer().defaultValue(-1))
         .foreignKey(SetSerializer::exercise_id_key, ExerciseSerializer::table,
                     ExerciseSerializer::id_key, OnDeleteAction::Cascade);
     bool ok = m_repository->createTable(table);
@@ -55,6 +65,32 @@ bool SetRepositoryDb::createTable()
     }
 
     return ok;
+}
+
+void SetRepositoryDb::registerMigrations(MigrationRunner& runner)
+{
+    runner.add(
+        2,
+        [](QSqlDatabase& db)
+        {
+            return AlterTable(SetSerializer::table)
+                       .addColumn(Column(SetSerializer::metric_key)
+                                      .text()
+                                      .defaultValue(QStringLiteral("reps")))
+                       .addColumn(Column(SetSerializer::load_type_key)
+                                      .text()
+                                      .defaultValue(QStringLiteral("external")))
+                       .addColumn(
+                           Column(SetSerializer::duration_seconds_key).integer().defaultValue(0))
+                       .addColumn(
+                           Column(SetSerializer::distance_meters_key).real().defaultValue(0.0))
+                       .addColumn(Column(SetSerializer::rest_seconds_override_key)
+                                      .integer()
+                                      .defaultValue(-1))
+                       .execute(db)
+                       .toInt()
+                != 0;
+        });
 }
 
 std::vector<Set> SetRepositoryDb::findByExerciseId(int exerciseId) const

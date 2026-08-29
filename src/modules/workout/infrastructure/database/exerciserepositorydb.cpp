@@ -16,7 +16,7 @@ ExerciseRepositoryDb::ExerciseRepositoryDb(DbStorage& storage)
           ExerciseSerializer::table, ExerciseSerializer::id_key,
           QStringList { ExerciseSerializer::id_key, ExerciseSerializer::workout_id_key,
                         ExerciseSerializer::name_key, ExerciseSerializer::description_key,
-                        ExerciseSerializer::rest_seconds_key },
+                        ExerciseSerializer::rest_seconds_key, ExerciseSerializer::kind_key },
           storage, nullptr))
 {
 }
@@ -32,6 +32,8 @@ bool ExerciseRepositoryDb::createTable()
         .column(Column(ExerciseSerializer::name_key).text())
         .column(Column(ExerciseSerializer::description_key).text())
         .column(Column(ExerciseSerializer::rest_seconds_key).integer())
+        .column(
+            Column(ExerciseSerializer::kind_key).text().defaultValue(QStringLiteral("strength")))
         .foreignKey(ExerciseSerializer::workout_id_key, WorkoutSerializer::table,
                     WorkoutSerializer::id_key, OnDeleteAction::Cascade);
     return m_repository->createTable(table);
@@ -45,6 +47,18 @@ void ExerciseRepositoryDb::registerMigrations(MigrationRunner& runner)
                {
                    return AlterTable(ExerciseSerializer::table)
                               .dropColumn(QStringLiteral("youtube_link"))
+                              .execute(db)
+                              .toInt()
+                       != 0;
+               });
+
+    runner.add(3,
+               [](QSqlDatabase& db)
+               {
+                   return AlterTable(ExerciseSerializer::table)
+                              .addColumn(Column(ExerciseSerializer::kind_key)
+                                             .text()
+                                             .defaultValue(QStringLiteral("strength")))
                               .execute(db)
                               .toInt()
                        != 0;

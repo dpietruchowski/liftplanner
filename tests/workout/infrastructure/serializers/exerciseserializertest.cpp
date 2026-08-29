@@ -78,3 +78,36 @@ TEST_F(ExerciseSerializerTest, TableName_IsCorrect)
 {
     EXPECT_STREQ(ExerciseSerializer::table, "exercises");
 }
+
+TEST_F(ExerciseSerializerTest, ToVariant_IncludesKind)
+{
+    Exercise e("Burpees", 60);
+    e.setKind(ExerciseKind::Interval);
+
+    QVariantMap data = ExerciseSerializer::toVariant(e);
+
+    EXPECT_EQ(data.value(ExerciseSerializer::kind_key).toString(), "interval");
+}
+
+TEST_F(ExerciseSerializerTest, Roundtrip_PreservesKind)
+{
+    Exercise original("Run", 0);
+    original.setKind(ExerciseKind::Cardio);
+
+    Exercise restored = ExerciseSerializer::fromVariant(ExerciseSerializer::toVariant(original));
+
+    EXPECT_EQ(restored.kind(), ExerciseKind::Cardio);
+}
+
+TEST_F(ExerciseSerializerTest, FromVariant_LegacyRow_FallsBackToStrength)
+{
+    QVariantMap legacy;
+    legacy.insert(ExerciseSerializer::id_key, 4);
+    legacy.insert(ExerciseSerializer::workout_id_key, 1);
+    legacy.insert(ExerciseSerializer::name_key, "Bench Press");
+    legacy.insert(ExerciseSerializer::rest_seconds_key, 120);
+
+    Exercise e = ExerciseSerializer::fromVariant(legacy);
+
+    EXPECT_EQ(e.kind(), ExerciseKind::Strength);
+}

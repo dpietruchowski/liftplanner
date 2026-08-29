@@ -7,6 +7,7 @@
 
 class DbStorage;
 class DbRepository;
+class MigrationRunner;
 
 class SetRepositoryDb
 {
@@ -15,6 +16,7 @@ public:
     ~SetRepositoryDb();
 
     bool createTable();
+    void registerMigrations(MigrationRunner& runner);
 
     std::vector<Set> findByExerciseId(int exerciseId) const;
     std::vector<Set> findByExerciseIds(const QList<int>& exerciseIds) const;

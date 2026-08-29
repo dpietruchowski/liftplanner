@@ -6,6 +6,7 @@ set(TEST_SOURCES
     infrastructure/serializers/exerciseserializertest.cpp
     infrastructure/serializers/setserializertest.cpp
     infrastructure/database/workoutrepositorydbtest.cpp
+    infrastructure/database/migrationtest.cpp
     application/workoutservicetest.cpp
 )
 

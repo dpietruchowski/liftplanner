@@ -78,6 +78,7 @@ bool WorkoutRepositoryDb::createTables()
 void WorkoutRepositoryDb::registerMigrations(MigrationRunner& runner)
 {
     m_exerciseRepo.registerMigrations(runner);
+    m_setRepo.registerMigrations(runner);
 }
 
 std::vector<Workout> WorkoutRepositoryDb::findAll(const WorkoutQuery& query) const

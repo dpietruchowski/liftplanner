@@ -13,6 +13,7 @@ public:
     static constexpr const char* name_key = "name";
     static constexpr const char* description_key = "description";
     static constexpr const char* rest_seconds_key = "rest_seconds";
+    static constexpr const char* kind_key = "kind";
 
     static Exercise fromVariant(const QVariantMap& data);
     static QVariantMap toVariant(const Exercise& exercise);

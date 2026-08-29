@@ -515,3 +515,63 @@ TEST_F(WorkoutRepositoryDbTest, Save_Update_PreservesStatusChange)
     ASSERT_TRUE(found.has_value());
     EXPECT_EQ(found->status(), WorkoutStatus::Ended);
 }
+
+TEST_F(WorkoutRepositoryDbTest, Save_TimedSetWithRestOverride_Roundtrips)
+{
+    Workout w = makeWorkout("Tabata");
+    Exercise e("Burpees", 60);
+    e.setKind(ExerciseKind::Interval);
+    for (int i = 0; i < 3; ++i)
+    {
+        Set work = Set::createDuration(20);
+        work.setRestSecondsOverride(10);
+        e.addSet(work);
+    }
+    w.addExercise(e);
+
+    int id = m_repo->save(w);
+    auto found = m_repo->findOne(WorkoutQuery().whereId(id));
+
+    ASSERT_TRUE(found.has_value());
+    ASSERT_EQ(found->exercises().size(), 1u);
+    ASSERT_EQ(found->exercises()[0].sets().size(), 3u);
+    EXPECT_EQ(found->exercises()[0].kind(), ExerciseKind::Interval);
+    EXPECT_EQ(found->exercises()[0].restSecondsForSet(2), 10);
+    EXPECT_EQ(found->totalDurationSeconds(), 60);
+    EXPECT_DOUBLE_EQ(found->totalWeight(), 0.0);
+}
+
+TEST_F(WorkoutRepositoryDbTest, Save_BodyweightSet_KeepsLoadType)
+{
+    Workout w = makeWorkout("Calisthenics");
+    Exercise e("Pullup", 90);
+    e.setKind(ExerciseKind::Bodyweight);
+    Set s(12, 0.0);
+    s.setLoadType(LoadType::Bodyweight);
+    e.addSet(s);
+    w.addExercise(e);
+
+    int id = m_repo->save(w);
+    auto found = m_repo->findOne(WorkoutQuery().whereId(id));
+
+    ASSERT_TRUE(found.has_value());
+    ASSERT_EQ(found->exercises()[0].sets().size(), 1u);
+    EXPECT_EQ(found->exercises()[0].sets()[0].loadType(), LoadType::Bodyweight);
+    EXPECT_EQ(found->exercises()[0].sets()[0].repetitions(), 12);
+    EXPECT_FALSE(found->exercises()[0].sets()[0].isWeighted());
+}
+
+TEST_F(WorkoutRepositoryDbTest, Save_WeightedSets_StillRoundtripUnchanged)
+{
+    Workout w = makeFullWorkout("Push Day");
+
+    int id = m_repo->save(w);
+    auto found = m_repo->findOne(WorkoutQuery().whereId(id));
+
+    ASSERT_TRUE(found.has_value());
+    ASSERT_EQ(found->exercises().size(), 2u);
+    EXPECT_EQ(found->exercises()[0].kind(), ExerciseKind::Strength);
+    EXPECT_TRUE(found->exercises()[0].sets()[0].isWeighted());
+    EXPECT_EQ(found->exercises()[0].restSecondsForSet(0), 120);
+    EXPECT_DOUBLE_EQ(found->totalWeight(), w.totalWeight());
+}

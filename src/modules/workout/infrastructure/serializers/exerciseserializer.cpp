@@ -15,6 +15,8 @@ Exercise ExerciseSerializer::fromVariant(const QVariantMap& data)
         exercise.setDescription(data.value(description_key).toString());
     if (data.contains(rest_seconds_key))
         exercise.setRestSeconds(data.value(rest_seconds_key).toInt());
+    if (data.contains(kind_key))
+        exercise.setKind(exerciseKindFromString(data.value(kind_key).toString()));
 
     return exercise;
 }
@@ -31,6 +33,7 @@ QVariantMap ExerciseSerializer::toVariant(const Exercise& exercise)
     data.insert(name_key, exercise.name());
     data.insert(description_key, exercise.description());
     data.insert(rest_seconds_key, exercise.restSeconds());
+    data.insert(kind_key, exerciseKindToString(exercise.kind()));
 
     return data;
 }
