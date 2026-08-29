@@ -3,6 +3,7 @@
 #include "ui/models/workoutmodel.h"
 #include <QList>
 #include <QObject>
+#include <QStringList>
 
 class WorkoutService;
 class UserProfileService;
@@ -33,6 +34,7 @@ signals:
 
 private:
     bool validateJson(const QString& jsonData, QString& errorMessage);
+    static QString summarizeErrors(const QStringList& errors);
     static QString readTemplateFile(const QString& filePath);
 
     WorkoutService* m_service;

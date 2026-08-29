@@ -75,7 +75,8 @@ void PlannedWorkoutViewModel::importFromJson(const QString& jsonData)
         }
 
         QJsonArray workoutsArray = root.value("workouts").toArray();
-        auto workouts = WorkoutJson::workoutsFromJsonArray(workoutsArray);
+        QStringList setErrors;
+        auto workouts = WorkoutJson::workoutsFromJsonArray(workoutsArray, &setErrors);
 
         QDateTime baseTime = TimeProvider::instance().currentDateTime();
         for (size_t i = 0; i < workouts.size(); ++i)
@@ -86,6 +87,10 @@ void PlannedWorkoutViewModel::importFromJson(const QString& jsonData)
 
         m_service->importPlannedWorkouts(workouts);
         loadAll();
+
+        if (!setErrors.isEmpty())
+            emit errorOccurred(QString("Imported, but some sets were skipped: %1")
+                                   .arg(summarizeErrors(setErrors)));
     }
     catch (const std::exception& e)
     {
@@ -172,6 +177,18 @@ void PlannedWorkoutViewModel::generatePrompt()
                                       }
                                       finish(prompt, profileJson);
                                   });
+}
+
+QString PlannedWorkoutViewModel::summarizeErrors(const QStringList& errors)
+{
+    constexpr int max_listed = 3;
+
+    if (errors.size() <= max_listed)
+        return errors.join(QStringLiteral("; "));
+
+    return QStringLiteral("%1; (+%2 more)")
+        .arg(errors.mid(0, max_listed).join(QStringLiteral("; ")))
+        .arg(errors.size() - max_listed);
 }
 
 bool PlannedWorkoutViewModel::validateJson(const QString& jsonData, QString& errorMessage)

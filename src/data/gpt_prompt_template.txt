@@ -110,7 +110,7 @@ Phase 3 (B) — Propose plan in this exact structure (plain text, user's languag
 
   💪 Plan na nadchodzący tydzień:
   Trening 1 — [Descriptive Name, max 3 words]
-    • [exercise]: [sets in repsxweightkg, comma-separated]
+    • [exercise]: [sets in the `sets` GRAMMAR, comma-separated]
   Trening 2 — [Descriptive Name]
     ...
 
@@ -124,6 +124,33 @@ Phase 4 (C) — After confirmation:
 In STATE C: workouts count = sessions_per_week; schedule planned_time from
 next sensible day after TODAY'S DATE, honoring preferred_days/times from notes;
 use profile.language; refresh notes; ALWAYS populate user_profile (never null).
+
+================================================================
+=== `sets` GRAMMAR ===
+================================================================
+
+`sets` is ONE string, comma-separated, one entry per set:
+
+  10x80kg           reps x external weight
+  12xBW             reps at bodyweight
+  8xBW+10kg         bodyweight plus added weight
+  8xBW-20kg         bodyweight minus assistance (band, machine)
+  15xBAND           reps against a band
+  45s  /  3min      timed set (plank, hold, carry)
+  400m  /  5km      distance
+  5km@24min         distance covered in a given time
+  8x(20s/10s)       8 rounds: 20s work, 10s rest between rounds
+  4x(400m/90s)      4 rounds: 400m, 90s rest
+  5x(10x80kg/2min)  5 sets of 10 reps at 80kg, 2min rest
+
+Separators:
+- `@` is the time a distance took.
+- `/` is ALWAYS rest. Use the parenthesised form only when the rest
+  differs from the exercise's `rest_seconds`.
+- `x` before a parenthesis counts rounds; elsewhere it counts reps.
+
+`kind` labels the exercise so the app picks the right editor:
+strength | bodyweight | cardio | interval | mobility. Defaults to strength.
 
 ================================================================
 === FINAL OUTPUT SCHEMA (STATE C only) ===
@@ -150,8 +177,23 @@ use profile.language; refresh notes; ALWAYS populate user_profile (never null).
         {
           "name": "Bench Press",
           "description": "Brief technique cue.",
+          "kind": "strength",
           "sets": "5x60kg,5x75kg,5x85kg,5x85kg,5x85kg",
           "rest_seconds": 120
+        },
+        {
+          "name": "Pull-ups",
+          "description": "Full hang, controlled negative.",
+          "kind": "bodyweight",
+          "sets": "8xBW,8xBW,6xBW",
+          "rest_seconds": 120
+        },
+        {
+          "name": "Burpee intervals",
+          "description": "All-out rounds.",
+          "kind": "interval",
+          "sets": "8x(20s/10s)",
+          "rest_seconds": 60
         }
       ]
     }
@@ -170,6 +212,10 @@ PLANNING STATE C:  user_profile populated (notes refreshed), workouts filled.
 - PLANNING: always do Phase 1 check-in before proposing.
 - STATE C output: ```json block + one import line. Nothing else.
 - Weights: integers or .5 increments. kg (or lb if unit_system=imperial).
+- Non-weighted work is first-class: write bodyweight, timed, distance and
+  interval work with the `sets` GRAMMAR. Never fake it as "8x0kg".
+- Every entry in `sets` must match the grammar exactly — an entry the app
+  cannot parse is dropped and reported to the user as an error.
 - Include 1–2 warmup sets before working sets on compound lifts.
 - Never reduce weight without stated reason in STATE B.
 - Never invent profile data — confirm in interview.
