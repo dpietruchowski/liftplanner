@@ -6,6 +6,7 @@ QtObject {
 
     property int applicationWidth: 360
     property int applicationHeight: 640
+    property int contentMaxWidth: 600
 
     property bool isNightMode: true
 
@@ -36,9 +37,11 @@ QtObject {
 
     property var fontSize: QtObject {
         property int huge: 84
+        property int xxLarge: 40
         property int xlarge: 32
         property int large: 22
         property int medium: 18
+        property int normal: 16
         property int small: 14
         property int xSmall: 11
     }
@@ -47,6 +50,7 @@ QtObject {
         property int small: 4
         property int medium: 8
         property int large: 12
+        property int xLarge: 16
     }
 
     property var padding: QtObject {
@@ -61,12 +65,21 @@ QtObject {
         property int small: 6
         property int medium: 12
         property int large: 18
+        property int xLarge: 24
     }
 
     property var border: QtObject {
         property int thin: 1
         property int medium: 2
         property int thick: 3
+    }
+
+    property var elevation: QtObject {
+        property int shadowSteps: 4
+        property real shadowBlur: 12
+        property real shadowOffset: 2
+        property color shadowColor: "#000000"
+        property real shadowLayerOpacity: 0.12
     }
 
     property var card: QtObject {
@@ -130,9 +143,21 @@ QtObject {
         property string moveDown: "qrc:/Themed/Icons/chevron-down.svg"
         property string reorder: "qrc:/Themed/Icons/reorder.svg"
         property string timer: "qrc:/Themed/Icons/timer.svg"
+        property string back: "qrc:/Themed/Icons/previous.svg"
+        property string send: "qrc:/Themed/Icons/send.svg"
     }
 
     property var button: QtObject {
+        property int radius: theme.radius.medium
+
+        property var icon: QtObject {
+            property int size: theme.applicationHeight * 0.06
+            property int width: size
+            property int height: size
+            property int fontSize: theme.fontSize.small
+            property int iconSize: theme.icon.medium
+        }
+
         property var square: QtObject {
             property int size: 28
             property int width: size
