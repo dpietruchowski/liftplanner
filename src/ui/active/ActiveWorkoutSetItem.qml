@@ -55,7 +55,7 @@ Rectangle {
         anchors.fill: parent
         spacing: 0
 
-        // Row 1: N | reps | weight | indicator
+        // Row 1: N | primary | secondary | indicator
         RowLayout {
             width: parent.width
             height: Theme.layout.listItemHeight
@@ -73,27 +73,27 @@ Rectangle {
                 leftPadding: Theme.padding.medium
             }
 
-            // Reps column
+            // Primary column
             Item {
                 Layout.preferredWidth: 80
                 Layout.fillHeight: true
 
                 Text {
                     anchors.centerIn: parent
-                    text: setData.repetitions + " reps"
+                    text: setData.primaryText
                     font.pixelSize: Theme.fontSize.small
                     color: Theme.colors.textSecondary
                 }
             }
 
-            // Weight column
+            // Secondary column
             Item {
                 Layout.preferredWidth: 80
                 Layout.fillHeight: true
 
                 Text {
                     anchors.centerIn: parent
-                    text: setData.weight + " kg"
+                    text: setData.secondaryText
                     font.pixelSize: Theme.fontSize.small
                     color: Theme.colors.textSecondary
                 }
@@ -137,7 +137,7 @@ Rectangle {
             }
         }
 
-        // Row 2 (expanded): [-][+] under reps | [-][+] under weight | [-][+] add/remove
+        // Row 2 (expanded): [-][+] under primary | under secondary | add/remove
         RowLayout {
             visible: actionsVisible
             width: parent.width
@@ -147,7 +147,7 @@ Rectangle {
             // Empty space under number
             Item { Layout.preferredWidth: 40 }
 
-            // Reps -/+ under reps column
+            // Primary -/+
             Item {
                 Layout.preferredWidth: 80
                 Layout.fillHeight: true
@@ -157,28 +157,24 @@ Rectangle {
                     spacing: Theme.spacing.xSmall
 
                     ThemedButton {
+                        objectName: "primaryDecrementButton"
                         iconSource: Theme.icons.minus
                         buttonSize: Theme.button.square
                         buttonStyle: Theme.button.ghost
-                        onClicked: {
-                            if (setData.repetitions > 0) setData.repetitions -= 1
-                            ActiveWorkoutViewModel.saveCurrentWorkout()
-                        }
+                        onClicked: ActiveWorkoutViewModel.adjustSetPrimary(setData, -1)
                     }
 
                     ThemedButton {
+                        objectName: "primaryIncrementButton"
                         iconSource: Theme.icons.plus
                         buttonSize: Theme.button.square
                         buttonStyle: Theme.button.ghost
-                        onClicked: {
-                            setData.repetitions += 1
-                            ActiveWorkoutViewModel.saveCurrentWorkout()
-                        }
+                        onClicked: ActiveWorkoutViewModel.adjustSetPrimary(setData, 1)
                     }
                 }
             }
 
-            // Weight -/+ under weight column
+            // Secondary -/+
             Item {
                 Layout.preferredWidth: 80
                 Layout.fillHeight: true
@@ -186,25 +182,22 @@ Rectangle {
                 RowLayout {
                     anchors.centerIn: parent
                     spacing: Theme.spacing.xSmall
+                    visible: setData.secondaryAdjustable
 
                     ThemedButton {
+                        objectName: "secondaryDecrementButton"
                         iconSource: Theme.icons.minus
                         buttonSize: Theme.button.square
                         buttonStyle: Theme.button.ghost
-                        onClicked: {
-                            if (setData.weight >= 2.5) setData.weight -= 2.5
-                            ActiveWorkoutViewModel.saveCurrentWorkout()
-                        }
+                        onClicked: ActiveWorkoutViewModel.adjustSetSecondary(setData, -1)
                     }
 
                     ThemedButton {
+                        objectName: "secondaryIncrementButton"
                         iconSource: Theme.icons.plus
                         buttonSize: Theme.button.square
                         buttonStyle: Theme.button.ghost
-                        onClicked: {
-                            setData.weight += 2.5
-                            ActiveWorkoutViewModel.saveCurrentWorkout()
-                        }
+                        onClicked: ActiveWorkoutViewModel.adjustSetSecondary(setData, 1)
                     }
                 }
             }

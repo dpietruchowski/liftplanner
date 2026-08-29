@@ -10,6 +10,7 @@ set(TEST_SOURCES
     active_workout_test.cpp
     time_travel_test.cpp
     mixed_workout_import_test.cpp
+    set_editing_test.cpp
 )
 
 set(APP_SOURCES

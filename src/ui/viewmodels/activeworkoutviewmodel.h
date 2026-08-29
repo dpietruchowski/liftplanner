@@ -32,6 +32,8 @@ public:
     Q_INVOKABLE void duplicateSet(SetModel* set);
     Q_INVOKABLE void removeSet(SetModel* set);
     Q_INVOKABLE void toggleSetCompleted(SetModel* set);
+    Q_INVOKABLE void adjustSetPrimary(SetModel* set, int steps);
+    Q_INVOKABLE void adjustSetSecondary(SetModel* set, int steps);
     Q_INVOKABLE void moveExercise(int from, int to);
 
     Q_INVOKABLE void notifyRestFinished();
