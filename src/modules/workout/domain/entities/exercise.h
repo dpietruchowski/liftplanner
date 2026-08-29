@@ -31,6 +31,7 @@ public:
     void addSet(const Set& set);
     void removeSet(int index);
     bool isCompleted() const;
+    bool isWeighted() const;
     QString setsToString() const;
 
     double totalWeight() const;

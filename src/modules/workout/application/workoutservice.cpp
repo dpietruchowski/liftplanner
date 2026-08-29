@@ -37,10 +37,15 @@ Task<void> WorkoutService::importHistory(const std::vector<Workout>& workouts)
     return invoke([this, workouts] { return importHistoryCore(workouts); });
 }
 
-Task<std::vector<WorkoutService::ExerciseFrequency>> WorkoutService::topExercises(int topN,
-                                                                                 int recentWorkouts)
+Task<std::vector<WorkoutService::ExerciseFrequency>>
+WorkoutService::topExercises(int topN, int recentWorkouts)
 {
     return invoke([this, topN, recentWorkouts] { return topExercisesCore(topN, recentWorkouts); });
+}
+
+Task<WorkoutService::TrainingTotals> WorkoutService::recentTotals(int recentWorkouts)
+{
+    return invoke([this, recentWorkouts] { return recentTotalsCore(recentWorkouts); });
 }
 
 Task<std::optional<Workout>> WorkoutService::findWorkout(int id)
@@ -117,6 +122,9 @@ WorkoutService::topExercisesCore(int topN, int recentWorkouts)
     {
         for (const auto& exercise : workout.exercises())
         {
+            if (!exercise.isWeighted())
+                continue;
+
             ExerciseFrequency& entry = byName[exercise.name()];
             entry.name = exercise.name();
             entry.count += 1;
@@ -139,6 +147,32 @@ WorkoutService::topExercisesCore(int topN, int recentWorkouts)
         result.resize(topN);
 
     return Result<std::vector<ExerciseFrequency>>::success(result);
+}
+
+Result<WorkoutService::TrainingTotals> WorkoutService::recentTotalsCore(int recentWorkouts)
+{
+    const std::vector<Workout> history = loadHistoryCore(recentWorkouts).value();
+
+    TrainingTotals totals;
+    totals.workouts = static_cast<int>(history.size());
+
+    for (const auto& workout : history)
+    {
+        for (const auto& exercise : workout.exercises())
+        {
+            for (const auto& set : exercise.sets())
+            {
+                if (!set.completed())
+                    continue;
+
+                totals.totalWeight += set.totalWeight();
+                totals.totalDurationSeconds += set.durationSeconds();
+                totals.totalDistanceMeters += set.distanceMeters();
+            }
+        }
+    }
+
+    return Result<TrainingTotals>::success(totals);
 }
 
 Result<std::optional<Workout>> WorkoutService::findWorkoutCore(int id)

@@ -22,6 +22,7 @@ class WorkoutHistoryViewModel : public QObject
     Q_PROPERTY(WorkoutModel* lastWorkout READ lastWorkout NOTIFY lastWorkoutChanged)
     Q_PROPERTY(QVariantList topExercises READ topExercises NOTIFY topExercisesChanged)
     Q_PROPERTY(QVariantList weekActivity READ weekActivity NOTIFY weekActivityChanged)
+    Q_PROPERTY(QVariantList recentTotals READ recentTotals NOTIFY recentTotalsChanged)
 
 public:
     explicit WorkoutHistoryViewModel(WorkoutService* service,
@@ -40,19 +41,23 @@ public:
 
     WorkoutModel* lastWorkout() const;
     QVariantList topExercises() const;
+    QVariantList recentTotals() const;
     QVariantList weekActivity() const;
 
 signals:
     void errorOccurred(const QString& errorMessage);
     void lastWorkoutChanged();
     void topExercisesChanged();
+    void recentTotalsChanged();
     void weekActivityChanged();
     void exportedToClipboard();
 
 private:
     void refreshTopExercises();
+    void refreshRecentTotals();
 
     WorkoutService* m_service;
     ActiveWorkoutViewModel* m_activeWorkoutViewModel;
     QVariantList m_topExercises;
+    QVariantList m_recentTotals;
 };

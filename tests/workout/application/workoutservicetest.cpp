@@ -39,6 +39,10 @@ protected:
     {
         return m_service->topExercisesCore(topN, recentWorkouts).value();
     }
+    WorkoutService::TrainingTotals recentTotals(int recentWorkouts)
+    {
+        return m_service->recentTotalsCore(recentWorkouts).value();
+    }
     std::optional<Workout> findWorkout(int id) { return m_service->findWorkoutCore(id).value(); }
     int saveWorkout(const Workout& workout) { return m_service->saveWorkoutCore(workout).value(); }
     bool deleteWorkout(int id) { return m_service->deleteWorkoutCore(id).value(); }
@@ -270,6 +274,148 @@ TEST_F(WorkoutServiceTest, TopExercises_EmptyHistory_ReturnsEmpty)
 
     auto result = topExercises(2, 20);
     EXPECT_TRUE(result.empty());
+}
+
+// --- topExercises: non-weighted work has no 1RM to rank ---
+
+namespace
+{
+Workout makeWorkoutWithTimedExercise(const QString& exerciseName, int seconds)
+{
+    Workout w(exerciseName, QDateTime::currentDateTime());
+    Exercise e(exerciseName, 60);
+    e.setKind(ExerciseKind::Interval);
+    e.addSet(Set::createDuration(seconds));
+    w.addExercise(e);
+    return w;
+}
+
+Workout makeWorkoutWithDistanceExercise(const QString& exerciseName, double meters, int seconds)
+{
+    Workout w(exerciseName, QDateTime::currentDateTime());
+    Exercise e(exerciseName, 0);
+    e.setKind(ExerciseKind::Cardio);
+    e.addSet(Set::createDistance(meters, seconds));
+    w.addExercise(e);
+    return w;
+}
+
+Workout completedWorkout(Workout workout)
+{
+    for (auto& exercise : workout.exercises())
+        for (auto& set : exercise.sets())
+            set.setCompleted(true);
+    return workout;
+}
+
+Workout makeWorkoutWithBodyweightExercise(const QString& exerciseName, int reps)
+{
+    Workout w(exerciseName, QDateTime::currentDateTime());
+    Exercise e(exerciseName, 90);
+    e.setKind(ExerciseKind::Bodyweight);
+    Set set(reps, 0.0);
+    set.setLoadType(LoadType::Bodyweight);
+    e.addSet(set);
+    w.addExercise(e);
+    return w;
+}
+}  // namespace
+
+TEST_F(WorkoutServiceTest, TopExercises_SkipsTimedAndDistanceExercises)
+{
+    std::vector<Workout> history = {
+        makeWorkoutWithTimedExercise("Plank", 45),
+        makeWorkoutWithTimedExercise("Plank", 45),
+        makeWorkoutWithTimedExercise("Plank", 45),
+        makeWorkoutWithDistanceExercise("Run", 5000, 1440),
+        makeWorkoutWithExercise("Bench", 5, 100),
+    };
+
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+
+    auto result = topExercises(2, 20);
+
+    ASSERT_EQ(result.size(), 1u);
+    EXPECT_EQ(result[0].name, "Bench");
+}
+
+TEST_F(WorkoutServiceTest, TopExercises_SkipsBodyweightExercises)
+{
+    std::vector<Workout> history = {
+        makeWorkoutWithBodyweightExercise("Pull-ups", 8),
+        makeWorkoutWithExercise("Bench", 5, 100),
+    };
+
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+
+    auto result = topExercises(2, 20);
+
+    ASSERT_EQ(result.size(), 1u);
+    EXPECT_EQ(result[0].name, "Bench");
+}
+
+// --- recentTotals ---
+
+TEST_F(WorkoutServiceTest, RecentTotals_SumsTimeDistanceAndVolume)
+{
+    std::vector<Workout> history = {
+        completedWorkout(makeWorkoutWithTimedExercise("Plank", 45)),
+        completedWorkout(makeWorkoutWithTimedExercise("Plank", 75)),
+        completedWorkout(makeWorkoutWithDistanceExercise("Run", 5000, 1440)),
+        completedWorkout(makeWorkoutWithExercise("Bench", 5, 100)),
+    };
+
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+
+    const auto totals = recentTotals(20);
+
+    EXPECT_EQ(totals.workouts, 4);
+    EXPECT_EQ(totals.totalDurationSeconds, 45 + 75 + 1440);
+    EXPECT_DOUBLE_EQ(totals.totalDistanceMeters, 5000.0);
+    EXPECT_DOUBLE_EQ(totals.totalWeight, 500.0);
+}
+
+TEST_F(WorkoutServiceTest, RecentTotals_IgnoresSetsTheUserNeverDid)
+{
+    std::vector<Workout> history = {
+        completedWorkout(makeWorkoutWithTimedExercise("Plank", 45)),
+        makeWorkoutWithTimedExercise("Plank", 45),
+        makeWorkoutWithDistanceExercise("Run", 5000, 1440),
+    };
+
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+
+    const auto totals = recentTotals(20);
+
+    EXPECT_EQ(totals.workouts, 3);
+    EXPECT_EQ(totals.totalDurationSeconds, 45);
+    EXPECT_DOUBLE_EQ(totals.totalDistanceMeters, 0.0);
+}
+
+TEST_F(WorkoutServiceTest, RecentTotals_LimitsHistoryQueryToRecentWorkouts)
+{
+    EXPECT_CALL(m_repo, findAll(::testing::_))
+        .WillOnce(
+            [](const WorkoutQuery& query)
+            {
+                EXPECT_TRUE(query.limit().has_value());
+                EXPECT_EQ(query.limit().value(), 5);
+                return std::vector<Workout> {};
+            });
+
+    recentTotals(5);
+}
+
+TEST_F(WorkoutServiceTest, RecentTotals_EmptyHistory_IsAllZero)
+{
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(std::vector<Workout> {}));
+
+    const auto totals = recentTotals(20);
+
+    EXPECT_EQ(totals.workouts, 0);
+    EXPECT_EQ(totals.totalDurationSeconds, 0);
+    EXPECT_DOUBLE_EQ(totals.totalDistanceMeters, 0.0);
+    EXPECT_DOUBLE_EQ(totals.totalWeight, 0.0);
 }
 
 // --- findWorkout ---

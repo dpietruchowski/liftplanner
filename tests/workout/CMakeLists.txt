@@ -9,10 +9,12 @@ set(TEST_SOURCES
     infrastructure/database/migrationtest.cpp
     application/workoutservicetest.cpp
     utils/workoutjsontest.cpp
+    utils/workouttexttest.cpp
 )
 
 set(APP_SOURCES
     ${PROJECT_SOURCE_DIR}/src/utils/workoutjson.cpp
+    ${PROJECT_SOURCE_DIR}/src/utils/workouttext.cpp
 )
 
 add_executable(workout_tests ${TEST_SOURCES} ${APP_SOURCES})

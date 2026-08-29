@@ -1,16 +1,29 @@
 #include "workouttext.h"
+#include <QRegularExpression>
 #include <QStringList>
 
 namespace WorkoutText
 {
 
-static QString formatDuration(qint64 seconds)
+QString formatDuration(qint64 seconds)
 {
     qint64 hours = seconds / 3600;
     qint64 minutes = (seconds % 3600) / 60;
     if (hours > 0)
         return QString("%1h %2m").arg(hours).arg(minutes, 2, 10, QChar('0'));
-    return QString("%1m").arg(minutes);
+    if (minutes > 0)
+        return QString("%1m").arg(minutes);
+    return QString("%1s").arg(seconds);
+}
+
+QString formatDistance(double meters)
+{
+    if (meters < 1000.0)
+        return QString("%1 m").arg(qRound(meters));
+
+    const double kilometers = meters / 1000.0;
+    return QString("%1 km").arg(
+        QString::number(kilometers, 'f', 1).remove(QRegularExpression("\\.0$")));
 }
 
 QString workoutToText(const Workout& workout)

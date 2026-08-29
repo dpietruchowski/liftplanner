@@ -327,3 +327,31 @@ TEST_F(ExerciseTest, IsCompleted_TimedSets_BehaveLikeRepSets)
     e.sets()[1].setCompleted(true);
     EXPECT_TRUE(e.isCompleted());
 }
+
+TEST_F(ExerciseTest, IsWeighted_TrueWhenAnySetCarriesExternalLoad)
+{
+    Exercise e("Bench Press", 120);
+    e.addSet(Set(10, 0.0));
+    e.addSet(Set(8, 80.0));
+
+    EXPECT_TRUE(e.isWeighted());
+}
+
+TEST_F(ExerciseTest, IsWeighted_FalseForTimedDistanceAndBodyweightWork)
+{
+    Exercise plank("Plank", 60);
+    plank.addSet(Set::createDuration(45));
+    EXPECT_FALSE(plank.isWeighted());
+
+    Exercise run("Run", 0);
+    run.addSet(Set::createDistance(5000.0, 1440));
+    EXPECT_FALSE(run.isWeighted());
+
+    Exercise pullups("Pull-ups", 90);
+    Set bodyweight(8, 0.0);
+    bodyweight.setLoadType(LoadType::Bodyweight);
+    pullups.addSet(bodyweight);
+    EXPECT_FALSE(pullups.isWeighted());
+
+    EXPECT_FALSE(Exercise("Empty", 60).isWeighted());
+}

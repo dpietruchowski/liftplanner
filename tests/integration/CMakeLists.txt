@@ -12,6 +12,7 @@ set(TEST_SOURCES
     mixed_workout_import_test.cpp
     set_editing_test.cpp
     interval_workout_test.cpp
+    home_stats_test.cpp
 )
 
 set(APP_SOURCES

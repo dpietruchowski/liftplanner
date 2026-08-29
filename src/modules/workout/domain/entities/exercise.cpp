@@ -139,6 +139,12 @@ double Exercise::averageWeight() const
     return count > 0 ? total / count : 0.0;
 }
 
+bool Exercise::isWeighted() const
+{
+    return std::any_of(m_sets.cbegin(), m_sets.cend(),
+                       [](const Set& set) { return set.isWeighted(); });
+}
+
 double Exercise::bestOneRepMax() const
 {
     double best = 0.0;

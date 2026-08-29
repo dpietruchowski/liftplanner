@@ -6,6 +6,20 @@
 #include "utils/workouttext.h"
 #include <QDate>
 
+namespace
+{
+constexpr int top_exercise_tiles = 2;
+constexpr int recent_stats_window = 20;
+
+QVariantMap statTile(const QString& label, const QString& value)
+{
+    QVariantMap tile;
+    tile["label"] = label;
+    tile["value"] = value;
+    return tile;
+}
+}  // namespace
+
 WorkoutHistoryViewModel::WorkoutHistoryViewModel(WorkoutService* service,
                                                  ActiveWorkoutViewModel* activeWorkoutViewModel,
                                                  QObject* parent)
@@ -44,6 +58,7 @@ void WorkoutHistoryViewModel::loadAllWorkouts()
 
                                       emit workoutsChanged();
                                       refreshTopExercises();
+                                      refreshRecentTotals();
                                   });
 }
 
@@ -52,21 +67,44 @@ void WorkoutHistoryViewModel::refreshTopExercises()
     if (!m_service)
         return;
 
-    m_service->topExercises(2, 20).then(
-        this,
-        [this](std::vector<WorkoutService::ExerciseFrequency> entries)
-        {
-            m_topExercises.clear();
-            for (const auto& entry : entries)
-            {
-                QVariantMap item;
-                item["name"] = entry.name;
-                item["count"] = entry.count;
-                item["oneRepMax"] = entry.bestOneRepMax;
-                m_topExercises.append(item);
-            }
-            emit topExercisesChanged();
-        });
+    m_service->topExercises(top_exercise_tiles, recent_stats_window)
+        .then(this,
+              [this](std::vector<WorkoutService::ExerciseFrequency> entries)
+              {
+                  m_topExercises.clear();
+                  for (const auto& entry : entries)
+                  {
+                      QVariantMap item;
+                      item["name"] = entry.name;
+                      item["count"] = entry.count;
+                      item["oneRepMax"] = entry.bestOneRepMax;
+                      m_topExercises.append(item);
+                  }
+                  emit topExercisesChanged();
+              });
+}
+
+void WorkoutHistoryViewModel::refreshRecentTotals()
+{
+    if (!m_service)
+        return;
+
+    m_service->recentTotals(recent_stats_window)
+        .then(this,
+              [this](WorkoutService::TrainingTotals totals)
+              {
+                  m_recentTotals.clear();
+
+                  if (totals.totalDurationSeconds > 0)
+                      m_recentTotals.append(statTile(
+                          "time", WorkoutText::formatDuration(totals.totalDurationSeconds)));
+
+                  if (totals.totalDistanceMeters > 0.0)
+                      m_recentTotals.append(statTile(
+                          "distance", WorkoutText::formatDistance(totals.totalDistanceMeters)));
+
+                  emit recentTotalsChanged();
+              });
 }
 
 void WorkoutHistoryViewModel::saveWorkout(WorkoutModel* workout)
@@ -139,6 +177,8 @@ QVariantList WorkoutHistoryViewModel::weekActivity() const
 }
 
 QVariantList WorkoutHistoryViewModel::topExercises() const { return m_topExercises; }
+
+QVariantList WorkoutHistoryViewModel::recentTotals() const { return m_recentTotals; }
 
 void WorkoutHistoryViewModel::importFromJson(const QString& jsonData)
 {

@@ -20,6 +20,14 @@ public:
         double bestOneRepMax { 0.0 };
     };
 
+    struct TrainingTotals
+    {
+        int workouts { 0 };
+        double totalWeight { 0.0 };
+        int totalDurationSeconds { 0 };
+        double totalDistanceMeters { 0.0 };
+    };
+
     WorkoutService(WorkoutRepository& repository, QObject* worker);
 
     Task<std::vector<Workout>> loadPlannedWorkouts();
@@ -30,6 +38,7 @@ public:
     Task<void> importHistory(const std::vector<Workout>& workouts);
 
     Task<std::vector<ExerciseFrequency>> topExercises(int topN, int recentWorkouts);
+    Task<TrainingTotals> recentTotals(int recentWorkouts);
 
     Task<std::optional<Workout>> findWorkout(int id);
     Task<int> saveWorkout(const Workout& workout);
@@ -44,6 +53,7 @@ private:
     Result<std::vector<Workout>> loadHistoryCore(int limit);
     Result<void> importHistoryCore(const std::vector<Workout>& workouts);
     Result<std::vector<ExerciseFrequency>> topExercisesCore(int topN, int recentWorkouts);
+    Result<TrainingTotals> recentTotalsCore(int recentWorkouts);
     Result<std::optional<Workout>> findWorkoutCore(int id);
     Result<int> saveWorkoutCore(const Workout& workout);
     Result<bool> deleteWorkoutCore(int id);

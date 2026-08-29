@@ -18,7 +18,7 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: 2
 
-        // Top exercises (most frequent in recent workouts) with best 1RM
+        // Top exercises (most frequent weighted lifts in recent workouts) with best 1RM
         Row {
             Layout.alignment: Qt.AlignHCenter
             spacing: Theme.spacing.medium
@@ -27,8 +27,26 @@ Rectangle {
                 model: WorkoutHistoryViewModel.topExercises
 
                 StatTile {
+                    objectName: "topExerciseTile_" + modelData.name
                     label: modelData.name
                     value: Math.round(modelData.oneRepMax) + " kg"
+                }
+            }
+        }
+
+        // Time held and ground covered in the same recent workouts
+        Row {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: Theme.spacing.small
+            spacing: Theme.spacing.medium
+
+            Repeater {
+                model: WorkoutHistoryViewModel.recentTotals
+
+                StatTile {
+                    objectName: "totalsTile_" + modelData.label
+                    label: modelData.label
+                    value: modelData.value
                 }
             }
         }
