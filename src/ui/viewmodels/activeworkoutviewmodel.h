@@ -34,6 +34,8 @@ public:
     Q_INVOKABLE void toggleSetCompleted(SetModel* set);
     Q_INVOKABLE void moveExercise(int from, int to);
 
+    Q_INVOKABLE void notifyRestFinished();
+
 signals:
     void workoutCompleted();
     void errorOccurred(const QString& errorMessage);

@@ -12,6 +12,7 @@ Rectangle {
 
     RestDialog {
         id: restDialog
+        objectName: "restDialog"
         dialogVisible: false
     }
 

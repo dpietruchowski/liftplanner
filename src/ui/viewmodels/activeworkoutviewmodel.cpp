@@ -1,5 +1,6 @@
 #include "activeworkoutviewmodel.h"
 #include "modules/workout/application/workoutservice.h"
+#include "utils/haptics.h"
 #include "utils/workoutjson.h"
 #include <QDebug>
 #include <QDir>
@@ -276,6 +277,11 @@ void ActiveWorkoutViewModel::moveExercise(int from, int to)
     m_currentWorkout->moveExercise(from, to);
     selectFirstIncomplete();
     saveCurrentWorkout();
+}
+
+void ActiveWorkoutViewModel::notifyRestFinished()
+{
+    Haptics::play(Haptics::Effect::Reward);
 }
 
 void ActiveWorkoutViewModel::saveCompletedSet()

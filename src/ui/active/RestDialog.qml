@@ -95,6 +95,7 @@ Item {
             if (diff <= 0) {
                 restDialog.remainingSeconds = 0
                 restDialog.hideDialog()
+                ActiveWorkoutViewModel.notifyRestFinished()
             } else {
                 restDialog.remainingSeconds = diff
             }
