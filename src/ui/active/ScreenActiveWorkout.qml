@@ -10,17 +10,16 @@ Rectangle {
     objectName: "screenActiveWorkout"
     color: Theme.colors.background
 
-    RestDialog {
-        id: restDialog
-        objectName: "restDialog"
-        dialogVisible: false
+    WorkoutTimerBar {
+        id: timerBar
+        objectName: "workoutTimerBar"
     }
 
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: Theme.padding.medium
-        anchors.topMargin: restDialog.isVisible
-                           ? restDialog.barHeight + Theme.padding.medium
+        anchors.topMargin: timerBar.isVisible
+                           ? timerBar.barHeight + Theme.padding.medium
                            : Theme.padding.medium
         spacing: Theme.spacing.medium
 
@@ -31,7 +30,7 @@ Rectangle {
             Layout.fillWidth: true
             titleFont.pixelSize: Theme.fontSize.large
             title: ActiveWorkoutViewModel.currentWorkout ? ActiveWorkoutViewModel.currentWorkout.name : "Workout"
-            visible: !restDialog.isVisible
+            visible: !timerBar.isVisible
         }
 
         ScrollView {
@@ -96,13 +95,7 @@ Rectangle {
                 enabled: ActiveWorkoutViewModel.isActive
                 buttonSize: Theme.button.mediumSquare
                 buttonStyle: Theme.button.primary
-                onClicked: {
-                    var rs = ActiveWorkoutViewModel.currentExercise
-                            && ActiveWorkoutViewModel.currentExercise.restSeconds > 0
-                            ? ActiveWorkoutViewModel.currentExercise.restSeconds
-                            : 60
-                    restDialog.show(rs)
-                }
+                onClicked: ActiveWorkoutViewModel.toggleTimer()
             }
 
             Item { Layout.fillWidth: true }
@@ -120,10 +113,6 @@ Rectangle {
                         endWorkoutPopup.open()
                     } else {
                         ActiveWorkoutViewModel.completeCurrentSet()
-                        var rs = ActiveWorkoutViewModel.currentExercise ? ActiveWorkoutViewModel.currentExercise.restSeconds : 0
-                        if (rs > 0) {
-                            restDialog.show(rs)
-                        }
                     }
                 }
             }

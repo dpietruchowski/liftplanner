@@ -30,8 +30,7 @@ int Exercise::restSecondsForSet(int index) const
     if (index < 0 || index >= static_cast<int>(m_sets.size()))
         return m_restSeconds;
 
-    const int override_ = m_sets[index].restSecondsOverride();
-    return override_ >= 0 ? override_ : m_restSeconds;
+    return m_sets[index].effectiveRestSeconds(m_restSeconds);
 }
 
 const std::vector<Set>& Exercise::sets() const { return m_sets; }

@@ -65,6 +65,11 @@ QString Set::formatSeconds(int seconds)
     return QString::number(seconds) + QStringLiteral("s");
 }
 
+int Set::effectiveRestSeconds(int exerciseDefault) const
+{
+    return m_restSecondsOverride >= 0 ? m_restSecondsOverride : exerciseDefault;
+}
+
 QString Set::toCompactString() const
 {
     const QString weightText = QString::number(m_weight, 'g', 6);

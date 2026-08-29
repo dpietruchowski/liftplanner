@@ -17,7 +17,9 @@ ActiveWorkoutViewModel::ActiveWorkoutViewModel(WorkoutService* service, QObject*
     , m_currentExercise(nullptr)
     , m_currentSet(nullptr)
     , m_isActive(false)
+    , m_timer(new WorkoutTimer(this))
 {
+    connect(m_timer, &WorkoutTimer::finished, this, &ActiveWorkoutViewModel::onTimerFinished);
     connect(this, &ActiveWorkoutViewModel::currentWorkoutChanged, this,
             &ActiveWorkoutViewModel::saveCurrentWorkout);
     connect(this, &ActiveWorkoutViewModel::currentExerciseChanged, this,
@@ -28,6 +30,8 @@ ActiveWorkoutViewModel::ActiveWorkoutViewModel(WorkoutService* service, QObject*
 }
 
 ActiveWorkoutViewModel::~ActiveWorkoutViewModel() { saveCurrentWorkout(); }
+
+WorkoutTimer* ActiveWorkoutViewModel::timer() const { return m_timer; }
 
 void ActiveWorkoutViewModel::saveCurrentWorkout()
 {
@@ -91,6 +95,8 @@ void ActiveWorkoutViewModel::startWorkout(WorkoutModel* workout)
 
     auto* previousWorkout = m_currentWorkout;
 
+    m_timer->stop();
+
     auto* clonedWorkout = workout->clone(nullptr);
     clonedWorkout->start();
 
@@ -118,9 +124,13 @@ void ActiveWorkoutViewModel::completeCurrentSet()
         return;
     }
 
+    const int rest = restSecondsFor(m_currentSet);
+
     saveCompletedSet();
     selectNextIncomplete();
     saveCurrentWorkout();
+
+    startRestAfterCompletedSet(rest);
 }
 
 void ActiveWorkoutViewModel::navigateToNext()
@@ -182,6 +192,7 @@ void ActiveWorkoutViewModel::endWorkout()
     if (!m_currentWorkout)
         return;
 
+    m_timer->stop();
     m_currentWorkout->end();
     saveToDb();
     emit workoutCompleted();
@@ -324,9 +335,92 @@ void ActiveWorkoutViewModel::moveExercise(int from, int to)
     saveCurrentWorkout();
 }
 
-void ActiveWorkoutViewModel::notifyRestFinished()
+void ActiveWorkoutViewModel::startWorkTimer()
 {
+    const int seconds = workSecondsFor(m_currentSet);
+    if (seconds > 0)
+        m_timer->start(WorkoutTimer::Work, seconds);
+}
+
+void ActiveWorkoutViewModel::startRestTimer()
+{
+    constexpr int fallback_rest_seconds = 60;
+
+    const int rest = restSecondsFor(m_currentSet);
+    m_timer->start(WorkoutTimer::Rest, rest > 0 ? rest : fallback_rest_seconds);
+}
+
+void ActiveWorkoutViewModel::toggleTimer()
+{
+    if (!m_isActive)
+        return;
+
+    if (m_timer->isRunning())
+    {
+        m_timer->stop();
+        return;
+    }
+
+    if (workSecondsFor(m_currentSet) > 0)
+        startWorkTimer();
+    else
+        startRestTimer();
+}
+
+void ActiveWorkoutViewModel::onTimerFinished(WorkoutTimer::Phase phase)
+{
+    if (phase == WorkoutTimer::Work)
+    {
+        Haptics::play(Haptics::Effect::LevelUp);
+        completeCurrentSet();
+        return;
+    }
+
     Haptics::play(Haptics::Effect::Reward);
+    startWorkForCurrentSet();
+}
+
+void ActiveWorkoutViewModel::startRestAfterCompletedSet(int restSeconds)
+{
+    if (m_currentWorkout && m_currentWorkout->isCompleted())
+    {
+        m_timer->stop();
+        return;
+    }
+
+    if (restSeconds > 0)
+        m_timer->start(WorkoutTimer::Rest, restSeconds);
+    else
+        startWorkForCurrentSet();
+}
+
+void ActiveWorkoutViewModel::startWorkForCurrentSet()
+{
+    const int seconds = workSecondsFor(m_currentSet);
+    if (seconds > 0)
+        m_timer->start(WorkoutTimer::Work, seconds);
+    else
+        m_timer->stop();
+}
+
+int ActiveWorkoutViewModel::restSecondsFor(SetModel* set) const
+{
+    if (!set)
+        return 0;
+
+    auto* exercise = qobject_cast<ExerciseModel*>(set->parent());
+    if (!exercise)
+        return 0;
+
+    return set->entity().effectiveRestSeconds(exercise->restSeconds());
+}
+
+int ActiveWorkoutViewModel::workSecondsFor(SetModel* set) const
+{
+    if (!set || set->entity().metric() != SetMetric::Duration)
+        return 0;
+
+    return set->entity().durationSeconds();
 }
 
 void ActiveWorkoutViewModel::saveCompletedSet()

@@ -31,6 +31,7 @@ public:
     MockTimeProvider& timeProvider();
     void setCurrentDate(const QDate& date);
     void setCurrentDateTime(const QDateTime& dateTime);
+    void advanceSeconds(int seconds);
     void advanceDay();
     void advanceDays(int days);
     void advanceDate(const QDate& targetDate);

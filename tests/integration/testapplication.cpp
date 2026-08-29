@@ -99,6 +99,8 @@ void TestApplication::setCurrentDateTime(const QDateTime& dateTime)
     timeProvider().setCurrentDateTime(dateTime);
 }
 
+void TestApplication::advanceSeconds(int seconds) { timeProvider().advanceSeconds(seconds); }
+
 void TestApplication::advanceDay() { timeProvider().advanceDays(1); }
 
 void TestApplication::advanceDays(int days) { timeProvider().advanceDays(days); }

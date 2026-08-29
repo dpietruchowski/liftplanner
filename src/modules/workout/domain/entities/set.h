@@ -25,6 +25,7 @@ public:
     int restSecondsOverride() const;
 
     bool isWeighted() const;
+    int effectiveRestSeconds(int exerciseDefault) const;
     QString toCompactString() const;
 
     static QString formatSeconds(int seconds);

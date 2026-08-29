@@ -160,4 +160,27 @@ inline const QString BROKEN_SETS_JSON = R"JSON({
     ]
 })JSON";
 
+inline const QString INTERVAL_WORKOUT_JSON = R"JSON({
+    "user_profile": null,
+    "workouts": [
+        {
+            "name": "Interval Day",
+            "exercises": [
+                {
+                    "name": "Burpee intervals",
+                    "kind": "interval",
+                    "rest_seconds": 60,
+                    "sets": "4x(20s/10s)"
+                },
+                {
+                    "name": "Plank",
+                    "kind": "mobility",
+                    "rest_seconds": 30,
+                    "sets": "45s,45s"
+                }
+            ]
+        }
+    ]
+})JSON";
+
 }  // namespace TestData

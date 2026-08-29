@@ -267,3 +267,20 @@ TEST_F(SetTest, LoadTypeToString_Roundtrips)
     EXPECT_EQ(loadTypeFromString(loadTypeToString(LoadType::None)), LoadType::None);
     EXPECT_EQ(loadTypeFromString("nonsense"), LoadType::External);
 }
+
+TEST_F(SetTest, EffectiveRestSeconds_FallsBackToTheExerciseDefault)
+{
+    Set set(10, 80.0);
+
+    EXPECT_EQ(set.effectiveRestSeconds(120), 120);
+}
+
+TEST_F(SetTest, EffectiveRestSeconds_PrefersTheOverrideIncludingZero)
+{
+    Set set = Set::createDuration(20);
+    set.setRestSecondsOverride(10);
+    EXPECT_EQ(set.effectiveRestSeconds(120), 10);
+
+    set.setRestSecondsOverride(0);
+    EXPECT_EQ(set.effectiveRestSeconds(120), 0);
+}
