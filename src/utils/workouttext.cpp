@@ -39,8 +39,8 @@ QString workoutToText(const Workout& workout)
     header.append(workout.name());
     header.append(date.toString("yyyy-MM-dd"));
     if (started.isValid())
-        header.append(QString("%1 - %2").arg(started.toString("HH:mm"),
-                                             ended.isValid() ? ended.toString("HH:mm") : QString()));
+        header.append(QString("%1 - %2").arg(
+            started.toString("HH:mm"), ended.isValid() ? ended.toString("HH:mm") : QString()));
     if (started.isValid() && ended.isValid())
         header.append(formatDuration(started.secsTo(ended)));
 

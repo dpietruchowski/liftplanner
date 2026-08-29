@@ -161,7 +161,7 @@ TEST_F(ExerciseTest, Aggregates_SumAcrossSets)
 {
     Exercise e("Bench Press", 90);
     e.addSet(Set(5, 100));  // tw 500, 1RM 112.5
-    e.addSet(Set(5, 80));   // tw 400, 1RM 90
+    e.addSet(Set(5, 80));  // tw 400, 1RM 90
     e.addSet(Set(10, 60));  // tw 600, 1RM 80
 
     EXPECT_DOUBLE_EQ(e.totalWeight(), 1500.0);

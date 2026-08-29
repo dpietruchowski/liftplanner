@@ -318,13 +318,16 @@ Order WorkoutRepositoryDb::buildOrderClause(const WorkoutQuery& query) const
     };
 
     if (query.orderByCreatedTimeDirection().has_value())
-        appendOrder(WorkoutSerializer::created_time_key, query.orderByCreatedTimeDirection().value());
+        appendOrder(WorkoutSerializer::created_time_key,
+                    query.orderByCreatedTimeDirection().value());
 
     if (query.orderByStartedTimeDirection().has_value())
-        appendOrder(WorkoutSerializer::started_time_key, query.orderByStartedTimeDirection().value());
+        appendOrder(WorkoutSerializer::started_time_key,
+                    query.orderByStartedTimeDirection().value());
 
     if (query.orderByPlannedTimeDirection().has_value())
-        appendOrder(WorkoutSerializer::planned_time_key, query.orderByPlannedTimeDirection().value());
+        appendOrder(WorkoutSerializer::planned_time_key,
+                    query.orderByPlannedTimeDirection().value());
 
     return order;
 }

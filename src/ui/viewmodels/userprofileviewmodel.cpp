@@ -11,10 +11,7 @@ namespace
 constexpr double kg_per_lb = 0.45359237;
 constexpr int default_user_id = 1;
 
-double roundToTenth(double value)
-{
-    return std::round(value * 10.0) / 10.0;
-}
+double roundToTenth(double value) { return std::round(value * 10.0) / 10.0; }
 }
 
 UserProfileViewModel::UserProfileViewModel(UserProfileService* service, QObject* parent)

@@ -10,10 +10,10 @@ class UserProfileViewModel : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString sex READ sex WRITE setSex NOTIFY profileChanged)
-    Q_PROPERTY(int sessionsPerWeek READ sessionsPerWeek WRITE setSessionsPerWeek NOTIFY
-                   profileChanged)
-    Q_PROPERTY(QString experienceLevel READ experienceLevel WRITE setExperienceLevel NOTIFY
-                   profileChanged)
+    Q_PROPERTY(
+        int sessionsPerWeek READ sessionsPerWeek WRITE setSessionsPerWeek NOTIFY profileChanged)
+    Q_PROPERTY(
+        QString experienceLevel READ experienceLevel WRITE setExperienceLevel NOTIFY profileChanged)
     Q_PROPERTY(QString primaryGoal READ primaryGoal WRITE setPrimaryGoal NOTIFY profileChanged)
     Q_PROPERTY(QString dateOfBirth READ dateOfBirth WRITE setDateOfBirth NOTIFY profileChanged)
     Q_PROPERTY(int age READ age NOTIFY profileChanged)

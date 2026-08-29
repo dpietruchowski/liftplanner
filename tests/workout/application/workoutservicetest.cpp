@@ -235,7 +235,7 @@ TEST_F(WorkoutServiceTest, TopExercises_RanksByFrequencyThenBestOneRepMax)
 {
     std::vector<Workout> history = {
         makeWorkoutWithExercise("Bench", 5, 100),  // 1RM 112.5
-        makeWorkoutWithExercise("Bench", 5, 80),   // 1RM 90
+        makeWorkoutWithExercise("Bench", 5, 80),  // 1RM 90
         makeWorkoutWithExercise("Squat", 5, 120),  // 1RM 135
         makeWorkoutWithExercise("Deadlift", 5, 140),  // 1RM 157.5
     };

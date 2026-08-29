@@ -159,7 +159,8 @@ QVariantList WorkoutHistoryViewModel::weekActivity() const
     const QDate today = TimeProvider::instance().currentDate();
     const QDate monday = today.addDays(1 - today.dayOfWeek());
 
-    const auto markDay = [&](const WorkoutModel* workout) {
+    const auto markDay = [&](const WorkoutModel* workout)
+    {
         if (!workout || !workout->startedTime().isValid())
             return;
         const int dayIndex = static_cast<int>(monday.daysTo(workout->startedTime().date()));

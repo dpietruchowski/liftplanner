@@ -172,8 +172,9 @@ void PlannedWorkoutViewModel::generatePrompt()
                                           QVariantMap vm
                                               = UserProfileSerializer::toVariant(*profileOpt);
                                           vm.remove(UserProfileSerializer::user_id_key);
-                                          profileJson = QJsonDocument(QJsonObject::fromVariantMap(vm))
-                                                            .toJson(QJsonDocument::Indented);
+                                          profileJson
+                                              = QJsonDocument(QJsonObject::fromVariantMap(vm))
+                                                    .toJson(QJsonDocument::Indented);
                                       }
                                       finish(prompt, profileJson);
                                   });

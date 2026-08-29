@@ -39,8 +39,8 @@ void LiftPlannerApplication::initialize()
             }
             m_workoutService
                 = std::make_unique<WorkoutService>(m_storage->workoutRepo(), m_worker.get());
-            m_userProfileService
-                = std::make_unique<UserProfileService>(m_storage->userProfileRepo(), m_worker.get());
+            m_userProfileService = std::make_unique<UserProfileService>(
+                m_storage->userProfileRepo(), m_worker.get());
         },
         Qt::BlockingQueuedConnection);
 
@@ -66,8 +66,10 @@ void LiftPlannerApplication::registerQmlTypes(QmlRegistrator& registrator)
     registrator.registerType<ColoredSvgProvider>("Themed.Components", "ColoredSvgProvider");
 
     registrator.registerSingletonInstance("ActiveWorkoutViewModel", m_activeWorkoutViewModel.get());
-    registrator.registerSingletonInstance("WorkoutHistoryViewModel", m_workoutHistoryViewModel.get());
-    registrator.registerSingletonInstance("PlannedWorkoutViewModel", m_plannedWorkoutViewModel.get());
+    registrator.registerSingletonInstance("WorkoutHistoryViewModel",
+                                          m_workoutHistoryViewModel.get());
+    registrator.registerSingletonInstance("PlannedWorkoutViewModel",
+                                          m_plannedWorkoutViewModel.get());
     registrator.registerSingletonInstance("UserProfileViewModel", m_userProfileViewModel.get());
     registrator.registerSingletonInstance("ClipboardHelper", m_clipboardHelper.get());
 

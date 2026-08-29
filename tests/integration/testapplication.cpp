@@ -89,10 +89,7 @@ MockTimeProvider& TestApplication::timeProvider()
     return dynamic_cast<MockTimeProvider&>(TimeProvider::instance());
 }
 
-void TestApplication::setCurrentDate(const QDate& date)
-{
-    timeProvider().setCurrentDate(date);
-}
+void TestApplication::setCurrentDate(const QDate& date) { timeProvider().setCurrentDate(date); }
 
 void TestApplication::setCurrentDateTime(const QDateTime& dateTime)
 {

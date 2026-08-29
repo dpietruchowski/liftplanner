@@ -179,7 +179,7 @@ TEST_F(WorkoutTest, Aggregates_SumAcrossExercises)
 
     Exercise e1("Bench", 90);
     e1.addSet(Set(5, 100));  // tw 500
-    e1.addSet(Set(5, 80));   // tw 400
+    e1.addSet(Set(5, 80));  // tw 400
     w.addExercise(e1);
 
     Exercise e2("OHP", 120);
