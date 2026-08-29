@@ -10,6 +10,7 @@ Qt6/QML workout planner (C++20, SQLite via QtSql, CMake + Ninja). Buduje się na
 - [data-model.md](data-model.md) — schemat SQLite (tabele, relacje, migracje).
 - [testing.md](testing.md) — budowanie i uruchamianie testów, `TestApplication`, time-travel, automatyzacja UI.
 - [test-cases/](test-cases/) — scenariusze smoke pod driver automatyzacji UI.
+- [garmin-integration.md](garmin-integration.md) — opcje integracji z Garmin Forerunner 970 bez aplikacji na zegarku.
 
 ## Szybki start
 
