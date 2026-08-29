@@ -1,4 +1,5 @@
 #include "set.h"
+#include <cmath>
 
 Set::Set() = default;
 
@@ -55,6 +56,59 @@ void Set::setRestSecondsOverride(int seconds) { m_restSecondsOverride = seconds;
 bool Set::isWeighted() const
 {
     return m_metric == SetMetric::Reps && m_loadType == LoadType::External;
+}
+
+QString Set::formatSeconds(int seconds)
+{
+    if (seconds >= 60 && seconds % 60 == 0)
+        return QString::number(seconds / 60) + QStringLiteral("min");
+    return QString::number(seconds) + QStringLiteral("s");
+}
+
+QString Set::toCompactString() const
+{
+    const QString weightText = QString::number(m_weight, 'g', 6);
+
+    switch (m_metric)
+    {
+        case SetMetric::Duration:
+            return formatSeconds(m_durationSeconds);
+
+        case SetMetric::Distance:
+        {
+            QString distanceText;
+            if (m_distanceMeters >= 1000.0 && std::fmod(m_distanceMeters, 1000.0) == 0.0)
+                distanceText
+                    = QString::number(m_distanceMeters / 1000.0, 'g', 6) + QStringLiteral("km");
+            else
+                distanceText = QString::number(m_distanceMeters, 'g', 6) + QStringLiteral("m");
+
+            if (m_durationSeconds > 0)
+                distanceText += QStringLiteral("@") + formatSeconds(m_durationSeconds);
+            return distanceText;
+        }
+
+        case SetMetric::Reps:
+            break;
+    }
+
+    const QString repsText = QString::number(m_repetitions) + QStringLiteral("x");
+
+    switch (m_loadType)
+    {
+        case LoadType::External:
+            return repsText + weightText + QStringLiteral("kg");
+        case LoadType::Added:
+            return repsText + QStringLiteral("BW+") + weightText + QStringLiteral("kg");
+        case LoadType::Assisted:
+            return repsText + QStringLiteral("BW-") + weightText + QStringLiteral("kg");
+        case LoadType::Band:
+            return repsText + QStringLiteral("BAND");
+        case LoadType::Bodyweight:
+        case LoadType::None:
+            break;
+    }
+    return repsText + QStringLiteral("BW");
 }
 
 double Set::totalWeight() const

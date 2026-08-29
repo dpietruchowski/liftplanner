@@ -1,6 +1,8 @@
 #include "workoutjson.h"
 #include "modules/workout/domain/entities/workoutstatus.h"
 #include <QJsonDocument>
+#include <QRegularExpression>
+#include <cmath>
 
 namespace WorkoutJson
 {
@@ -15,6 +17,11 @@ QJsonObject setToJson(const Set& set)
     obj["repetitions"] = set.repetitions();
     obj["weight"] = set.weight();
     obj["completed"] = set.completed();
+    obj["metric"] = setMetricToString(set.metric());
+    obj["load_type"] = loadTypeToString(set.loadType());
+    obj["duration_seconds"] = set.durationSeconds();
+    obj["distance_meters"] = set.distanceMeters();
+    obj["rest_seconds_override"] = set.restSecondsOverride();
     return obj;
 }
 
@@ -28,6 +35,7 @@ QJsonObject exerciseToJson(const Exercise& exercise)
     obj["name"] = exercise.name();
     obj["description"] = exercise.description();
     obj["rest_seconds"] = exercise.restSeconds();
+    obj["kind"] = exerciseKindToString(exercise.kind());
 
     QJsonArray setsArray;
     for (const auto& set : exercise.sets())
@@ -68,6 +76,7 @@ QJsonObject exerciseToJsonCompact(const Exercise& exercise)
     QJsonObject obj;
     obj["name"] = exercise.name();
     obj["rest_seconds"] = exercise.restSeconds();
+    obj["kind"] = exerciseKindToString(exercise.kind());
     obj["sets"] = exercise.setsToString();
     return obj;
 }
@@ -105,30 +114,178 @@ Set setFromJson(const QJsonObject& json)
         s.setWeight(json["weight"].toDouble());
     if (json.contains("completed"))
         s.setCompleted(json["completed"].toBool());
+    if (json.contains("metric"))
+        s.setMetric(setMetricFromString(json["metric"].toString()));
+    if (json.contains("load_type"))
+        s.setLoadType(loadTypeFromString(json["load_type"].toString()));
+    if (json.contains("duration_seconds"))
+        s.setDurationSeconds(json["duration_seconds"].toInt());
+    if (json.contains("distance_meters"))
+        s.setDistanceMeters(json["distance_meters"].toDouble());
+    if (json.contains("rest_seconds_override"))
+        s.setRestSecondsOverride(json["rest_seconds_override"].toInt());
     return s;
 }
 
-static std::vector<Set> parseSetsFromString(const QString& str)
+static bool parseTimeToken(const QString& token, int& seconds)
 {
-    std::vector<Set> sets;
-    QStringList parts = str.split(",", Qt::SkipEmptyParts);
-    for (const QString& part : parts)
+    static const QRegularExpression re(QStringLiteral("^([0-9]+(?:\\.[0-9]+)?)(s|sec|min)$"));
+    const auto match = re.match(token);
+    if (!match.hasMatch())
+        return false;
+
+    const double value = match.captured(1).toDouble();
+    const double scale = match.captured(2) == QStringLiteral("min") ? 60.0 : 1.0;
+    seconds = static_cast<int>(std::llround(value * scale));
+    return true;
+}
+
+static bool parseDistanceToken(const QString& token, double& meters)
+{
+    static const QRegularExpression re(QStringLiteral("^([0-9]+(?:\\.[0-9]+)?)(m|km)$"));
+    const auto match = re.match(token);
+    if (!match.hasMatch())
+        return false;
+
+    const double value = match.captured(1).toDouble();
+    meters = match.captured(2) == QStringLiteral("km") ? value * 1000.0 : value;
+    return true;
+}
+
+static bool parseRepsToken(const QString& token, Set& set)
+{
+    static const QRegularExpression re(
+        QStringLiteral("^([0-9]+)x(?:bw(\\+|-)([0-9]+(?:\\.[0-9]+)?)kg"
+                       "|(bw)|(band)|([0-9]+(?:\\.[0-9]+)?)kg)$"));
+    const auto match = re.match(token);
+    if (!match.hasMatch())
+        return false;
+
+    set.setRepetitions(match.captured(1).toInt());
+    set.setMetric(SetMetric::Reps);
+
+    if (!match.captured(2).isEmpty())
     {
-        QString s = part.trimmed().toLower().replace("kg", "");
-        QStringList tokens = s.split("x");
-        if (tokens.size() == 2)
-        {
-            bool ok1 = false, ok2 = false;
-            int reps = tokens[0].trimmed().toInt(&ok1);
-            double weight = tokens[1].trimmed().toDouble(&ok2);
-            if (ok1 && ok2)
-                sets.emplace_back(reps, weight);
-        }
+        set.setLoadType(match.captured(2) == QStringLiteral("+") ? LoadType::Added
+                                                                 : LoadType::Assisted);
+        set.setWeight(match.captured(3).toDouble());
     }
+    else if (!match.captured(4).isEmpty())
+    {
+        set.setLoadType(LoadType::Bodyweight);
+    }
+    else if (!match.captured(5).isEmpty())
+    {
+        set.setLoadType(LoadType::Band);
+    }
+    else
+    {
+        set.setLoadType(LoadType::External);
+        set.setWeight(match.captured(6).toDouble());
+    }
+    return true;
+}
+
+static bool parseWorkToken(const QString& token, Set& set)
+{
+    if (parseRepsToken(token, set))
+        return true;
+
+    const int at = token.indexOf(QLatin1Char('@'));
+    if (at > 0)
+    {
+        double meters = 0.0;
+        int seconds = 0;
+        if (!parseDistanceToken(token.left(at), meters)
+            || !parseTimeToken(token.mid(at + 1), seconds))
+            return false;
+
+        set = Set::createDistance(meters, seconds);
+        return true;
+    }
+
+    int seconds = 0;
+    if (parseTimeToken(token, seconds))
+    {
+        set = Set::createDuration(seconds);
+        return true;
+    }
+
+    double meters = 0.0;
+    if (parseDistanceToken(token, meters))
+    {
+        set = Set::createDistance(meters, 0);
+        return true;
+    }
+
+    return false;
+}
+
+std::vector<Set> parseSets(const QString& text, QStringList* errors)
+{
+    static const QRegularExpression repeatRe(QStringLiteral("^([0-9]+)x\\((.+)\\)$"));
+    static const QRegularExpression whitespaceRe(QStringLiteral("\\s"));
+
+    constexpr int max_repeat_count = 100;
+
+    std::vector<Set> sets;
+
+    const QStringList rawTokens = text.split(QLatin1Char(','), Qt::SkipEmptyParts);
+    for (const QString& rawToken : rawTokens)
+    {
+        const QString token = QString(rawToken).remove(whitespaceRe).toLower();
+        if (token.isEmpty())
+            continue;
+
+        const auto reportUnparsed = [&errors, &rawToken]()
+        {
+            if (errors)
+                errors->append(QStringLiteral("Unrecognized set: '%1'").arg(rawToken.trimmed()));
+        };
+
+        int count = 1;
+        int restOverride = -1;
+        QString work = token;
+
+        const auto repeat = repeatRe.match(token);
+        if (repeat.hasMatch())
+        {
+            count = repeat.captured(1).toInt();
+            if (count < 1 || count > max_repeat_count)
+            {
+                reportUnparsed();
+                continue;
+            }
+            work = repeat.captured(2);
+        }
+
+        const int separator = work.lastIndexOf(QLatin1Char('/'));
+        if (separator >= 0)
+        {
+            if (!parseTimeToken(work.mid(separator + 1), restOverride))
+            {
+                reportUnparsed();
+                continue;
+            }
+            work = work.left(separator);
+        }
+
+        Set set;
+        if (!parseWorkToken(work, set))
+        {
+            reportUnparsed();
+            continue;
+        }
+
+        set.setRestSecondsOverride(restOverride);
+        for (int i = 0; i < count; ++i)
+            sets.push_back(set);
+    }
+
     return sets;
 }
 
-Exercise exerciseFromJson(const QJsonObject& json)
+Exercise exerciseFromJson(const QJsonObject& json, QStringList* errors)
 {
     Exercise e;
     if (json.contains("id"))
@@ -141,13 +298,15 @@ Exercise exerciseFromJson(const QJsonObject& json)
         e.setDescription(json["description"].toString());
     if (json.contains("rest_seconds"))
         e.setRestSeconds(json["rest_seconds"].toInt());
+    if (json.contains("kind"))
+        e.setKind(exerciseKindFromString(json["kind"].toString()));
 
     if (json.contains("sets"))
     {
         QJsonValue setsVal = json["sets"];
         if (setsVal.isString())
         {
-            for (const auto& set : parseSetsFromString(setsVal.toString()))
+            for (const auto& set : parseSets(setsVal.toString(), errors))
                 e.addSet(set);
         }
         else if (setsVal.isArray())
@@ -160,7 +319,7 @@ Exercise exerciseFromJson(const QJsonObject& json)
     return e;
 }
 
-Workout workoutFromJson(const QJsonObject& json)
+Workout workoutFromJson(const QJsonObject& json, QStringList* errors)
 {
     Workout w;
     if (json.contains("id"))
@@ -181,17 +340,17 @@ Workout workoutFromJson(const QJsonObject& json)
     if (json.contains("exercises"))
     {
         for (const auto& val : json["exercises"].toArray())
-            w.addExercise(exerciseFromJson(val.toObject()));
+            w.addExercise(exerciseFromJson(val.toObject(), errors));
     }
 
     return w;
 }
 
-std::vector<Workout> workoutsFromJsonArray(const QJsonArray& array)
+std::vector<Workout> workoutsFromJsonArray(const QJsonArray& array, QStringList* errors)
 {
     std::vector<Workout> workouts;
     for (const auto& val : array)
-        workouts.push_back(workoutFromJson(val.toObject()));
+        workouts.push_back(workoutFromJson(val.toObject(), errors));
     return workouts;
 }
 

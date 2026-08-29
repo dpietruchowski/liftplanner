@@ -8,9 +8,14 @@ set(TEST_SOURCES
     infrastructure/database/workoutrepositorydbtest.cpp
     infrastructure/database/migrationtest.cpp
     application/workoutservicetest.cpp
+    utils/workoutjsontest.cpp
 )
 
-add_executable(workout_tests ${TEST_SOURCES})
+set(APP_SOURCES
+    ${PROJECT_SOURCE_DIR}/src/utils/workoutjson.cpp
+)
+
+add_executable(workout_tests ${TEST_SOURCES} ${APP_SOURCES})
 
 target_compile_definitions(workout_tests PRIVATE UNIT_TEST)
 

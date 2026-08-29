@@ -2,6 +2,7 @@
 
 #include "loadtype.h"
 #include "setmetric.h"
+#include <QString>
 
 class Set final
 {
@@ -24,6 +25,9 @@ public:
     int restSecondsOverride() const;
 
     bool isWeighted() const;
+    QString toCompactString() const;
+
+    static QString formatSeconds(int seconds);
 
     double totalWeight() const;
     double oneRepMax() const;

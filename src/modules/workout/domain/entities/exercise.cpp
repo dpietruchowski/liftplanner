@@ -60,9 +60,34 @@ bool Exercise::isCompleted() const
 QString Exercise::setsToString() const
 {
     QStringList parts;
-    for (const auto& s : m_sets)
-        parts.append(
-            QString("%1x%2kg").arg(s.repetitions()).arg(QString::number(s.weight(), 'g', 6)));
+
+    size_t i = 0;
+    while (i < m_sets.size())
+    {
+        const QString compact = m_sets[i].toCompactString();
+        const int restOverride = m_sets[i].restSecondsOverride();
+
+        size_t runEnd = i + 1;
+        while (runEnd < m_sets.size() && m_sets[runEnd].restSecondsOverride() == restOverride
+               && m_sets[runEnd].toCompactString() == compact)
+            ++runEnd;
+
+        const int count = static_cast<int>(runEnd - i);
+
+        if (restOverride >= 0)
+        {
+            parts.append(
+                QString("%1x(%2/%3)").arg(count).arg(compact, Set::formatSeconds(restOverride)));
+        }
+        else
+        {
+            for (int n = 0; n < count; ++n)
+                parts.append(compact);
+        }
+
+        i = runEnd;
+    }
+
     return parts.join(", ");
 }
 
