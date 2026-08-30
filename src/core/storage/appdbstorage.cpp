@@ -4,6 +4,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 
+#include "modules/exercisecatalog/infrastructure/backfill/exercisehistorybackfill.h"
 #include "modules/exercisecatalog/infrastructure/database/exercisedefinitionrepositorydb.h"
 #include "modules/exercisecatalog/infrastructure/seed/exercisecatalogseed.h"
 #include "modules/userprofile/infrastructure/database/userprofilerepositorydb.h"
@@ -54,8 +55,21 @@ bool AppDbStorage::open()
     runner.run();
 
     seedExerciseCatalog();
+    backfillExerciseHistory();
 
     return true;
+}
+
+void AppDbStorage::backfillExerciseHistory()
+{
+    const HistoryBackfillResult result
+        = ExerciseHistoryBackfill::apply(*m_database, *m_exerciseDefinitionRepo);
+
+    if (result.examined == 0)
+        return;
+
+    qInfo() << "Exercise history backfill: examined" << result.examined << "linked" << result.linked
+            << "unmatched" << result.unmatched;
 }
 
 void AppDbStorage::seedExerciseCatalog()

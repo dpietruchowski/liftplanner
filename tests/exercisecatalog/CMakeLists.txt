@@ -7,6 +7,7 @@ set(TEST_SOURCES
     infrastructure/database/exercisedefinitionrepositorydbtest.cpp
     infrastructure/seed/exercisecatalogseedtest.cpp
     application/exercisecatalogservicetest.cpp
+    infrastructure/backfill/exercisehistorybackfilltest.cpp
 )
 
 add_executable(exercisecatalog_tests ${TEST_SOURCES})

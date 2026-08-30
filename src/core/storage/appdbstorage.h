@@ -27,6 +27,7 @@ public:
 
 private:
     void seedExerciseCatalog();
+    void backfillExerciseHistory();
 
     std::unique_ptr<QSqlDatabase> m_database;
     std::unique_ptr<DbStorage> m_dbStorage;

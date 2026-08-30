@@ -289,3 +289,60 @@ TEST_F(WorkoutJsonTest, WorkoutsFromJsonArray_CollectsErrorsFromEveryExercise)
     ASSERT_EQ(errors.size(), 1);
     EXPECT_TRUE(errors.first().contains("nonsense"));
 }
+
+TEST(WorkoutJsonCatalogLinkTest, ADefinitionLinkSurvivesTheJsonRoundTrip)
+{
+    Exercise exercise
+        = Exercise::createFromDefinition(42, "Bench Press", ExerciseKind::Strength, 180);
+    exercise.setNotes("Paused reps.");
+    exercise.addSet(Set(5, 100.0));
+
+    const Exercise restored
+        = WorkoutJson::exerciseFromJson(WorkoutJson::exerciseToJson(exercise), nullptr);
+
+    ASSERT_TRUE(restored.hasDefinition());
+    EXPECT_EQ(restored.definitionId().value(), 42);
+    EXPECT_EQ(restored.notes(), "Paused reps.");
+}
+
+TEST(WorkoutJsonCatalogLinkTest, AnAdHocExerciseCarriesNoDefinitionKey)
+{
+    Exercise exercise = Exercise::createAdHoc("Zercher Squat", ExerciseKind::Strength, 120);
+
+    const QJsonObject json = WorkoutJson::exerciseToJson(exercise);
+
+    EXPECT_FALSE(json.contains("definition_id"));
+    EXPECT_FALSE(WorkoutJson::exerciseFromJson(json, nullptr).hasDefinition());
+}
+
+TEST(WorkoutJsonCatalogLinkTest, TheCompactFormStaysFreeOfCatalogIds)
+{
+    Exercise exercise
+        = Exercise::createFromDefinition(42, "Bench Press", ExerciseKind::Strength, 180);
+    exercise.addSet(Set(5, 100.0));
+
+    const QJsonObject json = WorkoutJson::exerciseToJsonCompact(exercise);
+
+    EXPECT_FALSE(json.contains("definition_id"));
+    EXPECT_FALSE(json.contains("id"));
+}
+
+TEST(WorkoutJsonCatalogLinkTest, AWholeWorkoutKeepsItsLinksThroughTheCache)
+{
+    Workout workout("Full Body", QDateTime::currentDateTime());
+
+    Exercise linked = Exercise::createFromDefinition(7, "Front Squat", ExerciseKind::Strength, 180);
+    linked.addSet(Set(5, 90.0));
+    workout.addExercise(linked);
+
+    Exercise adHoc = Exercise::createAdHoc("Cable Crunch", ExerciseKind::Strength, 60);
+    adHoc.addSet(Set(12, 30.0));
+    workout.addExercise(adHoc);
+
+    const Workout restored
+        = WorkoutJson::workoutFromJson(WorkoutJson::workoutToJson(workout), nullptr);
+
+    ASSERT_EQ(restored.exercises().size(), 2u);
+    EXPECT_EQ(restored.exercises()[0].definitionId().value(), 7);
+    EXPECT_FALSE(restored.exercises()[1].hasDefinition());
+}

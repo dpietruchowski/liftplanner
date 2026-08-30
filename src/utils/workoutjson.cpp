@@ -36,6 +36,10 @@ QJsonObject exerciseToJson(const Exercise& exercise)
     obj["description"] = exercise.description();
     obj["rest_seconds"] = exercise.restSeconds();
     obj["kind"] = exerciseKindToString(exercise.kind());
+    if (exercise.hasDefinition())
+        obj["definition_id"] = exercise.definitionId().value();
+    if (!exercise.notes().isEmpty())
+        obj["notes"] = exercise.notes();
 
     QJsonArray setsArray;
     for (const auto& set : exercise.sets())
@@ -300,6 +304,10 @@ Exercise exerciseFromJson(const QJsonObject& json, QStringList* errors)
         e.setRestSeconds(json["rest_seconds"].toInt());
     if (json.contains("kind"))
         e.setKind(exerciseKindFromString(json["kind"].toString()));
+    if (json.contains("definition_id"))
+        e.setDefinitionId(json["definition_id"].toInt());
+    if (json.contains("notes"))
+        e.setNotes(json["notes"].toString());
 
     if (json.contains("sets"))
     {
