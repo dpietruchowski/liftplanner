@@ -223,7 +223,7 @@ void ActiveWorkoutViewModel::duplicateSet(SetModel* set)
 
     auto* clone = new SetModel(duplicate, exercise);
     exercise->addSet(clone);
-    setCurrentSet(clone);
+    selectFirstIncomplete();
     saveCurrentWorkout();
 }
 
@@ -245,18 +245,7 @@ void ActiveWorkoutViewModel::removeSet(SetModel* set)
     exercise->removeSet(set);
     set->deleteLater();
 
-    if (m_currentSet == set)
-    {
-        if (!exercise->sets().isEmpty())
-        {
-            int newIndex = qMax(0, index - 1);
-            setCurrentSet(exercise->sets().at(newIndex));
-        }
-        else
-        {
-            setCurrentSet(nullptr);
-        }
-    }
+    selectFirstIncomplete();
     saveCurrentWorkout();
 }
 
@@ -265,19 +254,12 @@ void ActiveWorkoutViewModel::toggleSetCompleted(SetModel* set)
     if (!m_isActive || !set)
         return;
 
-    auto* exercise = qobject_cast<ExerciseModel*>(set->parent());
-    if (!exercise)
+    if (!qobject_cast<ExerciseModel*>(set->parent()))
         return;
 
-    bool nowCompleted = !set->completed();
-    set->setCompleted(nowCompleted);
+    set->setCompleted(!set->completed());
 
-    setCurrentExercise(exercise);
-    setCurrentSet(set);
-
-    if (nowCompleted)
-        selectNextIncomplete();
-
+    selectFirstIncomplete();
     saveCurrentWorkout();
 }
 

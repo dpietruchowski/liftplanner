@@ -191,10 +191,10 @@ TEST_F(ActiveWorkoutTest, DuplicateSet_CopiesValues)
 
     vm.duplicateSet(originalSet);
 
-    // Current set should now be the duplicated one
-    EXPECT_EQ(vm.currentSet()->repetitions(), expectedReps);
-    EXPECT_EQ(vm.currentSet()->weight(), expectedWeight);
-    EXPECT_FALSE(vm.currentSet()->completed());
+    auto* duplicate = vm.currentExercise()->sets().last();
+    EXPECT_EQ(duplicate->repetitions(), expectedReps);
+    EXPECT_EQ(duplicate->weight(), expectedWeight);
+    EXPECT_FALSE(duplicate->completed());
 }
 
 TEST_F(ActiveWorkoutTest, RemoveSet_RemovesFromExercise)
@@ -209,6 +209,61 @@ TEST_F(ActiveWorkoutTest, RemoveSet_RemovesFromExercise)
     vm.removeSet(setToRemove);
 
     EXPECT_EQ(exercise->sets().size(), originalSetCount - 1);
+}
+
+TEST_F(ActiveWorkoutTest, CompletingALaterSet_KeepsTheMarkerOnTheNextSet)
+{
+    auto& vm = app.activeWorkoutViewModel();
+    startFirstWorkout();
+
+    auto* firstSet = vm.currentSet();
+    auto* lastSet = vm.currentExercise()->sets().last();
+
+    vm.toggleSetCompleted(lastSet);
+
+    EXPECT_TRUE(lastSet->completed());
+    EXPECT_EQ(vm.currentSet(), firstSet);
+}
+
+TEST_F(ActiveWorkoutTest, UncompletingAnEarlierSet_MovesTheMarkerBackToIt)
+{
+    auto& vm = app.activeWorkoutViewModel();
+    startFirstWorkout();
+
+    auto* firstSet = vm.currentSet();
+    vm.completeCurrentSet();
+    ASSERT_NE(vm.currentSet(), firstSet);
+
+    vm.toggleSetCompleted(firstSet);
+
+    EXPECT_FALSE(firstSet->completed());
+    EXPECT_EQ(vm.currentSet(), firstSet);
+}
+
+TEST_F(ActiveWorkoutTest, RemoveSet_MovesTheMarkerForwardNotBack)
+{
+    auto& vm = app.activeWorkoutViewModel();
+    startFirstWorkout();
+
+    auto* exercise = vm.currentExercise();
+    vm.completeCurrentSet();
+
+    auto* thirdSet = exercise->sets()[2];
+    vm.removeSet(vm.currentSet());
+
+    EXPECT_EQ(vm.currentSet(), thirdSet);
+}
+
+TEST_F(ActiveWorkoutTest, DuplicateSet_LeavesTheMarkerOnTheNextSet)
+{
+    auto& vm = app.activeWorkoutViewModel();
+    startFirstWorkout();
+
+    auto* firstSet = vm.currentSet();
+
+    vm.duplicateSet(firstSet);
+
+    EXPECT_EQ(vm.currentSet(), firstSet);
 }
 
 TEST_F(ActiveWorkoutTest, CompleteAllSets_WorkoutStillActive)

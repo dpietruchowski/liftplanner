@@ -37,7 +37,6 @@ Rectangle {
     MouseArea {
         id: rowMouse
         anchors.fill: parent
-        onClicked: ActiveWorkoutViewModel.currentSet = setData
         onPressAndHold: setRect.actionsVisible = !setRect.actionsVisible
         onPressed: holdAnim.restart()
         onReleased: { holdAnim.stop(); holdProgress.width = 0 }
