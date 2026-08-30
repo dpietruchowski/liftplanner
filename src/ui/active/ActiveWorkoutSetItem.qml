@@ -6,6 +6,7 @@ import Themed.Components
 
 Rectangle {
     id: setRect
+    objectName: "activeWorkoutSetItem" + index
     property var setData
     property bool actionsVisible: false
 
@@ -17,8 +18,80 @@ Rectangle {
     readonly property int primaryColumnWidth: 66
     readonly property int columnPadding: Theme.padding.large
 
+    readonly property string primaryLabel: {
+        if (!setData)
+            return ""
+        if (setData.metric === "duration")
+            return qsTr("TIME")
+        if (setData.metric === "distance")
+            return qsTr("DIST")
+        return qsTr("REPS")
+    }
+
+    readonly property string secondaryLabel: {
+        if (!setData)
+            return ""
+        if (setData.metric === "distance")
+            return qsTr("TIME")
+        if (setData.loadType === "added")
+            return qsTr("+ KG")
+        if (setData.loadType === "assisted")
+            return qsTr("- KG")
+        return qsTr("KG")
+    }
+
+    component SetStepper: Rectangle {
+        id: stepper
+
+        property string label
+        property string decrementName
+        property string incrementName
+
+        signal decremented()
+        signal incremented()
+
+        radius: Theme.radius.medium
+        color: Theme.colors.surfaceMuted
+        border.width: Theme.border.thin
+        border.color: Theme.colors.border
+
+        RowLayout {
+            anchors.fill: parent
+            anchors.margins: Theme.padding.xSmall
+            spacing: Theme.spacing.xSmall
+
+            ThemedButton {
+                objectName: stepper.decrementName
+                iconSource: Theme.icons.minus
+                buttonSize: Theme.button.square
+                buttonStyle: Theme.button.subtle
+                onClicked: stepper.decremented()
+            }
+
+            Text {
+                Layout.fillWidth: true
+                text: stepper.label
+                color: Theme.colors.textMuted
+                font.pixelSize: Theme.setRow.labelSize
+                font.letterSpacing: Theme.setRow.labelSpacing
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                elide: Text.ElideRight
+            }
+
+            ThemedButton {
+                objectName: stepper.incrementName
+                iconSource: Theme.icons.plus
+                buttonSize: Theme.button.square
+                buttonStyle: Theme.button.subtle
+                onClicked: stepper.incremented()
+            }
+        }
+    }
+
     width: setsColumn.width
-    height: actionsVisible ? rowHeight + Theme.button.square.size + Theme.padding.small * 2 : rowHeight
+    height: actionsVisible ? rowHeight + actionsColumn.height + Theme.padding.small : rowHeight
     radius: Theme.radius.medium
     color: isCurrent ? Theme.colors.surfaceAccent
                      : isCompleted ? Theme.colors.surfaceSunken
@@ -155,80 +228,77 @@ Rectangle {
             }
         }
 
-        RowLayout {
-            visible: setRect.actionsVisible
+        Column {
+            id: actionsColumn
             width: parent.width
-            height: Theme.button.square.size + Theme.padding.small
-            spacing: 0
+            spacing: Theme.spacing.small
+            visible: setRect.actionsVisible
 
             Item {
-                Layout.preferredWidth: setRect.numberColumnWidth
-                Layout.leftMargin: setRect.columnPadding
-            }
+                width: parent.width
+                height: Theme.padding.small
 
-            RowLayout {
-                spacing: Theme.spacing.xSmall
-                Layout.preferredWidth: setRect.primaryColumnWidth
-                Layout.alignment: Qt.AlignVCenter
-
-                ThemedButton {
-                    objectName: "primaryDecrementButton"
-                    iconSource: Theme.icons.minus
-                    buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.subtle
-                    onClicked: ActiveWorkoutViewModel.adjustSetPrimary(setData, -1)
-                }
-
-                ThemedButton {
-                    objectName: "primaryIncrementButton"
-                    iconSource: Theme.icons.plus
-                    buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.subtle
-                    onClicked: ActiveWorkoutViewModel.adjustSetPrimary(setData, 1)
+                Rectangle {
+                    x: setRect.columnPadding
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width - setRect.columnPadding * 2
+                    height: Theme.border.thin
+                    color: Theme.colors.divider
                 }
             }
 
             RowLayout {
-                spacing: Theme.spacing.xSmall
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignVCenter
-                visible: setData.secondaryAdjustable
+                x: setRect.columnPadding
+                width: parent.width - setRect.columnPadding * 2
+                height: Theme.setRow.stepperHeight
+                spacing: Theme.spacing.small
 
-                ThemedButton {
-                    objectName: "secondaryDecrementButton"
-                    iconSource: Theme.icons.minus
-                    buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.subtle
-                    onClicked: ActiveWorkoutViewModel.adjustSetSecondary(setData, -1)
+                SetStepper {
+                    label: setRect.primaryLabel
+                    decrementName: "primaryDecrementButton"
+                    incrementName: "primaryIncrementButton"
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    onDecremented: ActiveWorkoutViewModel.adjustSetPrimary(setData, -1)
+                    onIncremented: ActiveWorkoutViewModel.adjustSetPrimary(setData, 1)
                 }
 
-                ThemedButton {
-                    objectName: "secondaryIncrementButton"
-                    iconSource: Theme.icons.plus
-                    buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.subtle
-                    onClicked: ActiveWorkoutViewModel.adjustSetSecondary(setData, 1)
+                SetStepper {
+                    label: setRect.secondaryLabel
+                    decrementName: "secondaryDecrementButton"
+                    incrementName: "secondaryIncrementButton"
+                    visible: setData.secondaryAdjustable
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    onDecremented: ActiveWorkoutViewModel.adjustSetSecondary(setData, -1)
+                    onIncremented: ActiveWorkoutViewModel.adjustSetSecondary(setData, 1)
                 }
-
-                Item { Layout.fillWidth: true }
             }
 
             RowLayout {
-                spacing: Theme.spacing.xSmall
-                Layout.alignment: Qt.AlignVCenter
-                Layout.rightMargin: setRect.columnPadding
+                x: setRect.columnPadding
+                width: parent.width - setRect.columnPadding * 2
+                height: Theme.setRow.actionHeight
+                spacing: Theme.spacing.small
 
                 ThemedButton {
+                    objectName: "duplicateSetButton"
+                    text: qsTr("Duplicate set")
                     iconSource: Theme.icons.addSet
-                    buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.subtle
+                    buttonSize: Theme.button.small
+                    buttonStyle: Theme.button.sunken
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
                     onClicked: ActiveWorkoutViewModel.duplicateSet(setData)
                 }
 
                 ThemedButton {
+                    objectName: "removeSetButton"
                     iconSource: Theme.icons.removeSet
-                    buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.subtle
+                    buttonSize: Theme.button.small
+                    buttonStyle: Theme.button.dangerSubtle
+                    Layout.preferredWidth: Theme.setRow.removeWidth
+                    Layout.fillHeight: true
                     onClicked: ActiveWorkoutViewModel.removeSet(setData)
                 }
             }

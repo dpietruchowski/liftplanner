@@ -376,6 +376,14 @@ QtObject {
             property color text: "#E5695C"
         }
 
+        property var sunken: QtObject {
+            property color background: "#101214"
+            property color hovered: "#16191D"
+            property color pressed: "#0B0D0F"
+            property color border: "#202225"
+            property color text: "#8A9099"
+        }
+
         property var subtle: QtObject {
             property color background: "#1E2126"
             property color hovered: "#262A30"
