@@ -9,14 +9,27 @@ Rectangle {
     property var setData
     property bool actionsVisible: false
 
+    readonly property bool isCurrent: ActiveWorkoutViewModel.currentSet === setData
+    readonly property bool isCompleted: setData.completed
+    readonly property int rowHeight: isCurrent ? Theme.layout.activeRowHeight : Theme.layout.listItemHeight
+
+    readonly property int numberColumnWidth: 24
+    readonly property int primaryColumnWidth: 66
+    readonly property int columnPadding: Theme.padding.large
+
     width: setsColumn.width
-    height: actionsVisible ? Theme.layout.listItemHeight + Theme.button.square.size + Theme.padding.small * 2 : Theme.layout.listItemHeight
+    height: actionsVisible ? rowHeight + Theme.button.square.size + Theme.padding.small * 2 : rowHeight
     radius: Theme.radius.medium
-    color: Theme.colors.surface
-    border.width: ActiveWorkoutViewModel.currentSet === setData ? Theme.border.thick : Theme.border.thin
-    border.color: ActiveWorkoutViewModel.currentSet === setData ? Theme.colors.primaryVariant : Theme.colors.border
+    color: isCurrent ? Theme.colors.surfaceAccent
+                     : isCompleted ? Theme.colors.surfaceSunken
+                                   : Theme.colors.surface
+    border.width: isCurrent ? Theme.border.medium : Theme.border.thin
+    border.color: isCurrent ? Theme.colors.primary
+                            : isCompleted ? Theme.colors.borderSubtle
+                                          : Theme.colors.border
 
     Behavior on color { ColorAnimation { duration: 200 } }
+    Behavior on border.color { ColorAnimation { duration: 200 } }
     Behavior on height { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
 
     clip: true
@@ -44,10 +57,10 @@ Rectangle {
         id: holdProgress
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        height: Theme.border.thick
+        height: Theme.border.medium
         width: 0
         radius: height / 2
-        color: Theme.colors.primaryVariant
+        color: Theme.colors.primary
         visible: width > 0
     }
 
@@ -55,70 +68,76 @@ Rectangle {
         anchors.fill: parent
         spacing: 0
 
-        // Row 1: N | primary | secondary | indicator
         RowLayout {
             width: parent.width
-            height: Theme.layout.listItemHeight
+            height: setRect.rowHeight
             spacing: 0
 
-            // Set number column
             Text {
                 text: index + 1
                 font.pixelSize: Theme.fontSize.small
-                font.bold: true
-                color: Theme.colors.textPrimary
-                horizontalAlignment: Text.AlignHCenter
-                Layout.preferredWidth: 40
+                font.bold: setRect.isCurrent
+                color: setRect.isCurrent ? Theme.colors.textPrimary : Theme.colors.textFaint
+                Layout.preferredWidth: setRect.numberColumnWidth
+                Layout.leftMargin: setRect.columnPadding
                 Layout.alignment: Qt.AlignVCenter
-                leftPadding: Theme.padding.medium
             }
 
-            // Primary column
-            Item {
-                Layout.preferredWidth: 80
-                Layout.fillHeight: true
-
-                Text {
-                    anchors.centerIn: parent
-                    text: setData.primaryText
-                    font.pixelSize: Theme.fontSize.small
-                    color: Theme.colors.textSecondary
-                }
+            Text {
+                text: setData.primaryText
+                font.pixelSize: setRect.isCurrent ? Theme.fontSize.medium : Theme.fontSize.normal
+                font.bold: setRect.isCurrent
+                color: setRect.isCurrent ? Theme.colors.textPrimary
+                                         : setRect.isCompleted ? Theme.colors.textDisabled
+                                                               : Theme.colors.textSecondary
+                elide: Text.ElideRight
+                Layout.preferredWidth: setRect.primaryColumnWidth
+                Layout.alignment: Qt.AlignVCenter
             }
 
-            // Secondary column
-            Item {
-                Layout.preferredWidth: 80
-                Layout.fillHeight: true
-
-                Text {
-                    anchors.centerIn: parent
-                    text: setData.secondaryText
-                    font.pixelSize: Theme.fontSize.small
-                    color: Theme.colors.textSecondary
-                }
+            Text {
+                text: setData.secondaryText
+                font.pixelSize: setRect.isCurrent ? Theme.fontSize.medium : Theme.fontSize.normal
+                font.bold: setRect.isCurrent
+                color: setRect.isCurrent ? Theme.colors.textPrimary
+                                         : setRect.isCompleted ? Theme.colors.textDisabled
+                                                               : Theme.colors.textSecondary
+                elide: Text.ElideRight
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter
             }
 
-            Item { Layout.fillWidth: true }
-
-            // Indicator column (tap = toggle done)
             Rectangle {
                 id: indicator
-                width: Theme.layout.indicatorSize
-                height: Theme.layout.indicatorSize
-                radius: Theme.layout.indicatorSize / 2
-                color: setData.completed ? Theme.colors.success : "transparent"
-                border.color: setData.completed ? Theme.colors.success : Theme.colors.border
-                border.width: Theme.border.medium
+                property int size: setRect.isCurrent ? Theme.layout.indicatorSizeLarge : Theme.layout.indicatorSize
+
+                Layout.preferredWidth: size
+                Layout.preferredHeight: size
                 Layout.alignment: Qt.AlignVCenter
-                Layout.rightMargin: Theme.padding.medium
+                Layout.rightMargin: setRect.columnPadding
+
+                radius: width / 2
+                color: setRect.isCompleted ? Theme.colors.successSurface : "transparent"
+                border.color: setRect.isCompleted ? Theme.colors.successSurface
+                                                  : setRect.isCurrent ? Theme.colors.primary
+                                                                      : Theme.colors.borderStrong
+                border.width: Theme.border.medium
 
                 Behavior on color { ColorAnimation { duration: 200 } }
                 Behavior on border.color { ColorAnimation { duration: 200 } }
 
+                ThemedIcon {
+                    anchors.centerIn: parent
+                    width: parent.width * 0.55
+                    height: width
+                    visible: setRect.isCompleted
+                    svgSource: Theme.icons.check
+                    color: Theme.colors.textPrimary
+                }
+
                 SequentialAnimation {
                     id: pulseAnim
-                    NumberAnimation { target: indicator; property: "scale"; to: 1.4; duration: 110; easing.type: Easing.OutQuad }
+                    NumberAnimation { target: indicator; property: "scale"; to: 1.3; duration: 110; easing.type: Easing.OutQuad }
                     NumberAnimation { target: indicator; property: "scale"; to: 1.0; duration: 160; easing.type: Easing.OutBack }
                 }
 
@@ -137,90 +156,80 @@ Rectangle {
             }
         }
 
-        // Row 2 (expanded): [-][+] under primary | under secondary | add/remove
         RowLayout {
-            visible: actionsVisible
+            visible: setRect.actionsVisible
             width: parent.width
             height: Theme.button.square.size + Theme.padding.small
             spacing: 0
 
-            // Empty space under number
-            Item { Layout.preferredWidth: 40 }
-
-            // Primary -/+
             Item {
-                Layout.preferredWidth: 80
-                Layout.fillHeight: true
+                Layout.preferredWidth: setRect.numberColumnWidth
+                Layout.leftMargin: setRect.columnPadding
+            }
 
-                RowLayout {
-                    anchors.centerIn: parent
-                    spacing: Theme.spacing.xSmall
+            RowLayout {
+                spacing: Theme.spacing.xSmall
+                Layout.preferredWidth: setRect.primaryColumnWidth
+                Layout.alignment: Qt.AlignVCenter
 
-                    ThemedButton {
-                        objectName: "primaryDecrementButton"
-                        iconSource: Theme.icons.minus
-                        buttonSize: Theme.button.square
-                        buttonStyle: Theme.button.ghost
-                        onClicked: ActiveWorkoutViewModel.adjustSetPrimary(setData, -1)
-                    }
+                ThemedButton {
+                    objectName: "primaryDecrementButton"
+                    iconSource: Theme.icons.minus
+                    buttonSize: Theme.button.square
+                    buttonStyle: Theme.button.subtle
+                    onClicked: ActiveWorkoutViewModel.adjustSetPrimary(setData, -1)
+                }
 
-                    ThemedButton {
-                        objectName: "primaryIncrementButton"
-                        iconSource: Theme.icons.plus
-                        buttonSize: Theme.button.square
-                        buttonStyle: Theme.button.ghost
-                        onClicked: ActiveWorkoutViewModel.adjustSetPrimary(setData, 1)
-                    }
+                ThemedButton {
+                    objectName: "primaryIncrementButton"
+                    iconSource: Theme.icons.plus
+                    buttonSize: Theme.button.square
+                    buttonStyle: Theme.button.subtle
+                    onClicked: ActiveWorkoutViewModel.adjustSetPrimary(setData, 1)
                 }
             }
 
-            // Secondary -/+
-            Item {
-                Layout.preferredWidth: 80
-                Layout.fillHeight: true
+            RowLayout {
+                spacing: Theme.spacing.xSmall
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter
+                visible: setData.secondaryAdjustable
 
-                RowLayout {
-                    anchors.centerIn: parent
-                    spacing: Theme.spacing.xSmall
-                    visible: setData.secondaryAdjustable
-
-                    ThemedButton {
-                        objectName: "secondaryDecrementButton"
-                        iconSource: Theme.icons.minus
-                        buttonSize: Theme.button.square
-                        buttonStyle: Theme.button.ghost
-                        onClicked: ActiveWorkoutViewModel.adjustSetSecondary(setData, -1)
-                    }
-
-                    ThemedButton {
-                        objectName: "secondaryIncrementButton"
-                        iconSource: Theme.icons.plus
-                        buttonSize: Theme.button.square
-                        buttonStyle: Theme.button.ghost
-                        onClicked: ActiveWorkoutViewModel.adjustSetSecondary(setData, 1)
-                    }
+                ThemedButton {
+                    objectName: "secondaryDecrementButton"
+                    iconSource: Theme.icons.minus
+                    buttonSize: Theme.button.square
+                    buttonStyle: Theme.button.subtle
+                    onClicked: ActiveWorkoutViewModel.adjustSetSecondary(setData, -1)
                 }
+
+                ThemedButton {
+                    objectName: "secondaryIncrementButton"
+                    iconSource: Theme.icons.plus
+                    buttonSize: Theme.button.square
+                    buttonStyle: Theme.button.subtle
+                    onClicked: ActiveWorkoutViewModel.adjustSetSecondary(setData, 1)
+                }
+
+                Item { Layout.fillWidth: true }
             }
 
-            Item { Layout.fillWidth: true }
-
-            // Add/remove set under indicator
             RowLayout {
                 spacing: Theme.spacing.xSmall
                 Layout.alignment: Qt.AlignVCenter
-                Layout.rightMargin: Theme.padding.medium
+                Layout.rightMargin: setRect.columnPadding
 
                 ThemedButton {
                     iconSource: Theme.icons.addSet
                     buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.ghost
+                    buttonStyle: Theme.button.subtle
                     onClicked: ActiveWorkoutViewModel.duplicateSet(setData)
                 }
 
                 ThemedButton {
                     iconSource: Theme.icons.removeSet
                     buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.ghost
+                    buttonStyle: Theme.button.subtle
                     onClicked: ActiveWorkoutViewModel.removeSet(setData)
                 }
             }

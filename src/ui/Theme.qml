@@ -11,67 +11,86 @@ QtObject {
     property bool isNightMode: true
 
     property var colors: QtObject {
-        property color background: "#121212"
-        property color surface: "#1E1E1E"
-        property color dialogSurface: "#2A2A2A"
-        property color primary: "#1F618D"
-        property color primaryVariant: "#2471A3"
-        property color secondary: "#6C5CE7"
-        property color info: "#3498db"
-        property color success: "#27ae60"
-        property color warning: "#f1c40f"
-        property color error: "#e74c3c"
-        property color border: "#333333"
-        property color cardBackground: "#1E1E1E"
-        property color cardBorder: "#333333"
-        property color divider: "#333333"
-        property color textPrimary: "#FFFFFF"
-        property color textSecondary: "#BBBBBB"
-        property color textDisabled: "#666666"
-        property color textInverse: "#121212"
-        property color textPlaceholder: "#666666"
-        property color buttonText: "#FFFFFF"
-        property color overlay: "#000000A0"
-        property color overlayLight: "#80000000"
+        property color background: "#0E0F11"
+        property color surface: "#141619"
+        property color surfaceMuted: "#101214"
+        property color surfaceSunken: "#121316"
+        property color surfaceRaised: "#131518"
+        property color surfaceAccent: "#1A2028"
+        property color dialogSurface: "#191C20"
+
+        property color primary: "#46A6EF"
+        property color primaryVariant: "#6FBBF3"
+        property color primarySurface: "#1B2D3A"
+        property color primaryBorder: "#2C5D82"
+
+        property color secondary: "#8B7BF0"
+        property color info: "#46A6EF"
+        property color success: "#53BE70"
+        property color successSurface: "#37784A"
+        property color warning: "#E7B84B"
+        property color error: "#E5695C"
+
+        property color border: "#202225"
+        property color borderStrong: "#3A3B3E"
+        property color borderSubtle: "#1C1E20"
+        property color divider: "#242628"
+        property color cardBackground: "#141619"
+        property color cardBorder: "#202225"
+        property color chipBackground: "#252729"
+        property color chipText: "#9AA0A8"
+
+        property color textPrimary: "#F2F3F5"
+        property color textSecondary: "#C9CDD3"
+        property color textMuted: "#8A9099"
+        property color textDisabled: "#585C63"
+        property color textFaint: "#4B4F55"
+        property color textInverse: "#0E0F11"
+        property color textPlaceholder: "#585C63"
+        property color buttonText: "#0E0F11"
+
+        property color overlay: "#000000B3"
+        property color overlayLight: "#A6000000"
     }
 
     property var fontSize: QtObject {
-        property int huge: 84
+        property int huge: 80
         property int xxLarge: 40
-        property int xlarge: 32
-        property int large: 22
-        property int medium: 18
-        property int normal: 16
-        property int small: 14
+        property int xlarge: 28
+        property int large: 21
+        property int medium: 16
+        property int normal: 14
+        property int small: 12
         property int xSmall: 11
     }
 
     property var radius: QtObject {
-        property int small: 4
-        property int medium: 8
-        property int large: 12
-        property int xLarge: 16
+        property int small: 6
+        property int medium: 12
+        property int large: 16
+        property int xLarge: 22
     }
 
     property var padding: QtObject {
         property int xSmall: 4
-        property int small: 6
+        property int small: 8
         property int medium: 12
-        property int large: 18
+        property int large: 15
+        property int screen: 12
     }
 
     property var spacing: QtObject {
         property int xSmall: 4
         property int small: 6
-        property int medium: 12
-        property int large: 18
+        property int medium: 10
+        property int large: 16
         property int xLarge: 24
     }
 
     property var border: QtObject {
         property int thin: 1
         property int medium: 2
-        property int thick: 3
+        property int thick: 2
     }
 
     property var elevation: QtObject {
@@ -86,26 +105,38 @@ QtObject {
         property int sizeSmall: 40
     }
 
+    property var chip: QtObject {
+        property int height: 20
+        property int padding: 6
+        property int spacing: 4
+        property int fontSize: 10
+        property int radius: theme.radius.small
+    }
+
     property real dialogOpacity: 0.98
 
     property var layout: QtObject {
-        property int listItemHeight: 50
+        property int listItemHeight: 46
         property int listItemHeightLarge: 56
-        property int cardHeight: 100
+        property int rowHeight: 42
+        property int activeRowHeight: 58
+        property int cardHeight: 96
         property int dialogBarHeight: 200
-        property int indicatorSize: 20
-        property int iconSizeLarge: 48
+        property int indicatorSize: 22
+        property int indicatorSizeLarge: 28
+        property int iconSizeLarge: 44
         property int exerciseItemHeight: 25
+        property int actionBarHeight: 62
     }
 
     property var navigation: QtObject {
-        property int barHeight: 60
+        property int barHeight: 58
     }
 
     property var icon: QtObject {
         property int small: 16
-        property int medium: 24
-        property int large: 32
+        property int medium: 22
+        property int large: 30
     }
 
     property var icons: QtObject {
@@ -151,105 +182,136 @@ QtObject {
         property int radius: theme.radius.medium
 
         property var icon: QtObject {
-            property int size: theme.applicationHeight * 0.06
+            property int size: 46
             property int width: size
             property int height: size
             property int fontSize: theme.fontSize.small
             property int iconSize: theme.icon.medium
         }
 
+        property var circle: QtObject {
+            property int size: 42
+            property int width: size
+            property int height: size
+            property int fontSize: theme.fontSize.normal
+            property int iconSize: 26
+        }
+
+        property var badge: QtObject {
+            property int size: 20
+            property int width: size
+            property int height: size
+            property int fontSize: theme.fontSize.xSmall
+            property int iconSize: 12
+        }
+
         property var square: QtObject {
-            property int size: 28
+            property int size: 30
             property int width: size
             property int height: size
             property int fontSize: theme.fontSize.small
-            property int iconSize: 14
+            property int iconSize: 16
         }
 
         property var small: QtObject {
-            property int width: theme.applicationWidth * 0.18
-            property int height: theme.applicationHeight * 0.05
+            property int width: theme.applicationWidth * 0.2
+            property int height: 34
             property int fontSize: theme.fontSize.small
             property int iconSize: 16
         }
 
         property var smallSquare: QtObject {
-            property int size: theme.applicationHeight * 0.05
+            property int size: 36
             property int width: size
             property int height: size
             property int fontSize: theme.fontSize.small
-            property int iconSize: size - 4
+            property int iconSize: 18
         }
 
         property var medium: QtObject {
-            property int width: theme.applicationWidth * 0.28
-            property int height: theme.applicationHeight * 0.06
-            property int fontSize: theme.fontSize.medium
-            property int iconSize: 20
+            property int width: theme.applicationWidth * 0.3
+            property int height: 44
+            property int fontSize: theme.fontSize.normal
+            property int iconSize: 18
         }
 
         property var mediumSquare: QtObject {
-            property int size: theme.applicationHeight * 0.06
+            property int size: 46
             property int width: size
             property int height: size
-            property int fontSize: theme.fontSize.medium
-            property int iconSize: size - 4
+            property int fontSize: theme.fontSize.normal
+            property int iconSize: 20
         }
 
         property var large: QtObject {
-            property int width: theme.applicationWidth * 0.45
-            property int height: theme.applicationHeight * 0.09
-            property int fontSize: theme.fontSize.large
-            property int iconSize: 24
+            property int width: theme.applicationWidth * 0.5
+            property int height: 52
+            property int fontSize: theme.fontSize.medium
+            property int iconSize: 22
         }
 
         property var primary: QtObject {
-            property color background: "#1F618D"
-            property color hovered: "#2874A6"
-            property color pressed: "#1A4F73"
-            property color border: "#2471A3"
-            property color text: "#FFFFFF"
+            property color background: "#46A6EF"
+            property color hovered: "#6FBBF3"
+            property color pressed: "#3690D3"
+            property color border: "#46A6EF"
+            property color text: "#0E0F11"
+        }
+
+        property var tonal: QtObject {
+            property color background: "#1B2D3A"
+            property color hovered: "#22394A"
+            property color pressed: "#16242E"
+            property color border: "#2C5D82"
+            property color text: "#92CBFB"
         }
 
         property var secondary: QtObject {
-            property color background: "#6C5CE7"
-            property color hovered: "#7D6FF0"
-            property color pressed: "#5A4BD6"
-            property color border: "#6C5CE7"
-            property color text: "#FFFFFF"
+            property color background: "#8B7BF0"
+            property color hovered: "#9E90F5"
+            property color pressed: "#7768DA"
+            property color border: "#8B7BF0"
+            property color text: "#0E0F11"
         }
 
         property var success: QtObject {
-            property color background: "#27ae60"
-            property color hovered: "#2ECC71"
-            property color pressed: "#1E8449"
-            property color border: "#27ae60"
-            property color text: "#FFFFFF"
+            property color background: "#53BE70"
+            property color hovered: "#67CD82"
+            property color pressed: "#45A55F"
+            property color border: "#53BE70"
+            property color text: "#0E0F11"
         }
 
         property var danger: QtObject {
-            property color background: "#e74c3c"
-            property color hovered: "#EC7063"
-            property color pressed: "#C0392B"
-            property color border: "#e74c3c"
-            property color text: "#FFFFFF"
+            property color background: "#E5695C"
+            property color hovered: "#EE8175"
+            property color pressed: "#C9584C"
+            property color border: "#E5695C"
+            property color text: "#0E0F11"
+        }
+
+        property var subtle: QtObject {
+            property color background: "#1E2126"
+            property color hovered: "#262A30"
+            property color pressed: "#181B1F"
+            property color border: "#262A30"
+            property color text: "#8A9099"
         }
 
         property var ghost: QtObject {
-            property color background: "#40FFFFFF"
-            property color hovered: "#60FFFFFF"
-            property color pressed: "#25FFFFFF"
-            property color border: "#70FFFFFF"
-            property color text: "#FFFFFF"
+            property color background: "#00000000"
+            property color hovered: "#14FFFFFF"
+            property color pressed: "#0AFFFFFF"
+            property color border: "#2C2F34"
+            property color text: "#8A9099"
         }
 
         property var outline: QtObject {
             property color background: "transparent"
-            property color hovered: "#15FFFFFF"
-            property color pressed: "#08FFFFFF"
-
-            property color border: "#80FFFFFF"
-            property color text: "#BBBBBB"
+            property color hovered: "#14FFFFFF"
+            property color pressed: "#0AFFFFFF"
+            property color border: "#2C2F34"
+            property color text: "#8A9099"
         }
     }
 }

@@ -11,16 +11,49 @@ Column {
     property int exerciseCount: 0
     signal showExerciseInfo(var exercise)
     width: contentColumn.width
-    spacing: Theme.spacing.medium / 2
+    spacing: Theme.spacing.small
 
     readonly property bool isCurrent: ActiveWorkoutViewModel.currentExercise === exercise
     readonly property bool isExpanded: !screen.reorderMode && screen.expandedExercise === exercise
-    readonly property real moveStep: Theme.layout.listItemHeight + Theme.spacing.medium / 2
+    readonly property real moveStep: Theme.layout.rowHeight + Theme.spacing.small
     property real moveStartY: 0
 
     function playMove(dir) {
         moveStartY = -dir * moveStep
         moveAnim.restart()
+    }
+
+    function setsSummary() {
+        if (!exercise || !exercise.sets || exercise.sets.length === 0)
+            return ""
+
+        var values = []
+        for (var i = 0; i < exercise.sets.length; ++i) {
+            var set = exercise.sets[i]
+            var loaded = set.secondaryAdjustable && parseFloat(set.secondaryText) !== 0
+            var text = loaded ? set.secondaryText : set.primaryText
+            if (text.length > 0 && values.indexOf(text) === -1)
+                values.push(text)
+        }
+
+        var count = exercise.sets.length
+        var label = count + (count === 1 ? " set" : " sets")
+        if (values.length === 0)
+            return label
+        if (values.length === 1)
+            return label + " · " + values[0]
+
+        var unit = values[0].replace(/^[\d.,\s+-]+/, "")
+        var min = Number.POSITIVE_INFINITY
+        var max = Number.NEGATIVE_INFINITY
+        for (var j = 0; j < values.length; ++j) {
+            var value = parseFloat(values[j])
+            if (isNaN(value) || values[j].replace(/^[\d.,\s+-]+/, "") !== unit)
+                return label
+            min = Math.min(min, value)
+            max = Math.max(max, value)
+        }
+        return label + " · " + min + "-" + max + " " + unit
     }
 
     transform: Translate { id: moveTranslate; y: 0 }
@@ -45,31 +78,21 @@ Column {
         }
     }
 
-    function getBorderColor() {
-        if (isCurrent) {
-            return Theme.colors.primary
-        } else {
-            return Theme.colors.border
-        }
-    }
-
-    function getBorderWidth() {
-        if (isCurrent) {
-            return Theme.border.thick
-        } else {
-            return Theme.border.medium
-        }
-    }
-
     Rectangle {
+        id: header
         width: exerciseDelegate.width
-        height: Theme.layout.listItemHeight
+        height: exerciseDelegate.isExpanded ? Theme.layout.listItemHeight - Theme.spacing.small
+                                            : Theme.layout.rowHeight
 
         radius: Theme.radius.medium
-        color: Theme.colors.background
+        color: exerciseDelegate.isExpanded ? "transparent" : Theme.colors.surfaceMuted
 
-        border.color: getBorderColor()
-        border.width: getBorderWidth()
+        border.color: exerciseDelegate.isCurrent && !exerciseDelegate.isExpanded
+                      ? Theme.colors.primaryBorder
+                      : Theme.colors.borderSubtle
+        border.width: exerciseDelegate.isExpanded ? 0 : Theme.border.thin
+
+        Behavior on color { ColorAnimation { duration: 200 } }
 
         Rectangle {
             id: moveFlash
@@ -81,15 +104,15 @@ Column {
             SequentialAnimation {
                 id: flashAnim
                 running: moveAnim.running
-                NumberAnimation { target: moveFlash; property: "opacity"; to: 0.3; duration: 110 }
+                NumberAnimation { target: moveFlash; property: "opacity"; to: 0.25; duration: 110 }
                 NumberAnimation { target: moveFlash; property: "opacity"; to: 0; duration: 220 }
             }
         }
 
         RowLayout {
             anchors.fill: parent
-            anchors.leftMargin: Theme.spacing.medium
-            anchors.rightMargin: Theme.spacing.medium
+            anchors.leftMargin: exerciseDelegate.isExpanded ? 0 : Theme.padding.large
+            anchors.rightMargin: exerciseDelegate.isExpanded ? 0 : Theme.padding.large
             spacing: Theme.spacing.medium
 
             Text {
@@ -98,10 +121,9 @@ Column {
                 Layout.fillWidth: true
                 Layout.maximumWidth: implicitWidth + 1
 
-                color: Theme.colors.textPrimary
-                font.pixelSize: Theme.fontSize.medium
-                font.bold: true
-                font.letterSpacing: 1.5
+                color: exerciseDelegate.isExpanded ? Theme.colors.textPrimary : Theme.colors.textMuted
+                font.pixelSize: exerciseDelegate.isExpanded ? Theme.fontSize.medium : Theme.fontSize.normal
+                font.bold: exerciseDelegate.isExpanded
 
                 elide: Text.ElideRight
                 verticalAlignment: Text.AlignVCenter
@@ -111,25 +133,52 @@ Column {
                 objectName: "exerciseInfoButton"
                 iconSource: Theme.icons.info
                 circular: true
-                buttonSize: Theme.button.square
+                buttonSize: Theme.button.badge
                 buttonStyle: Theme.button.ghost
                 z: 1
-                visible: !screen.reorderMode
+                visible: exerciseDelegate.isExpanded
+                Layout.alignment: Qt.AlignVCenter
 
                 onClicked: exerciseDelegate.showExerciseInfo(exercise)
             }
 
             Item { Layout.fillWidth: true }
 
-            Rectangle {
-                width: Theme.layout.indicatorSize
-                height: Theme.layout.indicatorSize
-                radius: Theme.layout.indicatorSize / 2
-                color: exercise.completed ? Theme.colors.success : "transparent"
-                border.color: exercise.completed ? Theme.colors.success : Theme.colors.border
-                border.width: Theme.border.medium
+            Text {
+                text: exerciseDelegate.setsSummary()
+                color: Theme.colors.textDisabled
+                font.pixelSize: Theme.fontSize.small
+                elide: Text.ElideRight
+                verticalAlignment: Text.AlignVCenter
+                visible: !exerciseDelegate.isExpanded && !screen.reorderMode
                 Layout.alignment: Qt.AlignVCenter
-                visible: !screen.reorderMode
+                Layout.maximumWidth: implicitWidth + 1
+            }
+
+            ThemedIcon {
+                svgSource: Theme.icons.expand
+                color: Theme.colors.textFaint
+                width: Theme.icon.small
+                height: Theme.icon.small
+                visible: !exerciseDelegate.isExpanded && !screen.reorderMode && !exercise.completed
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            Rectangle {
+                width: Theme.button.badge.size
+                height: Theme.button.badge.size
+                radius: width / 2
+                color: Theme.colors.successSurface
+                visible: !exerciseDelegate.isExpanded && !screen.reorderMode && exercise.completed
+                Layout.alignment: Qt.AlignVCenter
+
+                ThemedIcon {
+                    anchors.centerIn: parent
+                    width: parent.width * 0.6
+                    height: width
+                    svgSource: Theme.icons.check
+                    color: Theme.colors.textPrimary
+                }
             }
 
             RowLayout {
@@ -141,7 +190,7 @@ Column {
                 ThemedButton {
                     iconSource: Theme.icons.moveUp
                     buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.ghost
+                    buttonStyle: Theme.button.subtle
                     enabled: index > 0
                     onClicked: exerciseDelegate.screen.requestMove(exercise, index, -1)
                 }
@@ -149,7 +198,7 @@ Column {
                 ThemedButton {
                     iconSource: Theme.icons.moveDown
                     buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.ghost
+                    buttonStyle: Theme.button.subtle
                     enabled: index < exerciseDelegate.exerciseCount - 1
                     onClicked: exerciseDelegate.screen.requestMove(exercise, index, 1)
                 }
@@ -167,7 +216,7 @@ Column {
     Column {
         id: setsColumn
         width: exerciseDelegate.width
-        spacing: Theme.spacing.medium / 2
+        spacing: Theme.spacing.small
         height: exerciseDelegate.isExpanded ? implicitHeight : 0
         visible: height > 0
         clip: true
@@ -181,5 +230,11 @@ Column {
                 setData: modelData
             }
         }
+    }
+
+    Item {
+        width: exerciseDelegate.width
+        height: Theme.spacing.small
+        visible: exerciseDelegate.isExpanded
     }
 }

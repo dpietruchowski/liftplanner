@@ -8,14 +8,15 @@ WorkoutCard {
 
     signal startWorkoutRequest(var workout)
 
-    borderColor: Theme.colors.primary
+    borderColor: Theme.colors.primaryBorder
+    dateColor: Theme.colors.primary
     dateText: workout ? Qt.formatDateTime(workout.plannedTime, "ddd, d MMM yyyy") : ""
 
     ThemedButton {
         iconSource: Theme.icons.startWorkout
         circular: true
-        buttonSize: Theme.button.square
-        buttonStyle: Theme.button.outline
+        buttonSize: Theme.button.circle
+        buttonStyle: Theme.button.primary
         onClicked: root.startWorkoutRequest(root.workout)
         ToolTip.visible: hovered
         ToolTip.text: "Start workout"

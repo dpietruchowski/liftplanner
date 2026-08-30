@@ -10,10 +10,10 @@ Rectangle {
     objectName: "screenHome"
     color: Theme.colors.background
 
-    anchors.margins: Theme.padding.medium
+    anchors.margins: Theme.padding.screen
 
     ColumnLayout {
-        width: parent.width - 2 * Theme.padding.medium
+        width: parent.width - 2 * Theme.padding.screen
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: 2

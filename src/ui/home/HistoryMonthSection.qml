@@ -20,23 +20,30 @@ ColumnLayout {
         id: header
         Layout.fillWidth: true
         title: root.monthLabel
+        titleFont.pixelSize: Theme.fontSize.normal
+        titleFont.letterSpacing: 0
+        titleColor: Theme.colors.textSecondary
         expandable: true
 
         Text {
             text: root.workouts.length
             font.pixelSize: Theme.fontSize.small
-            color: Theme.colors.textSecondary
+            color: Theme.colors.textDisabled
             anchors.verticalCenter: parent.verticalCenter
         }
     }
 
-    Repeater {
-        model: header.expanded ? root.workouts : []
-        delegate: WorkoutItem {
-            Layout.fillWidth: true
-            workout: modelData
-            onDeleteWorkout: function(workout) { root.deleteWorkoutRequest(workout) }
-            onExportWorkout: function(workout) { root.exportWorkoutRequest(workout) }
+    RevealColumn {
+        expanded: header.expanded
+
+        Repeater {
+            model: root.workouts
+            delegate: WorkoutItem {
+                Layout.fillWidth: true
+                workout: modelData
+                onDeleteWorkout: function(workout) { root.deleteWorkoutRequest(workout) }
+                onExportWorkout: function(workout) { root.exportWorkoutRequest(workout) }
+            }
         }
     }
 }

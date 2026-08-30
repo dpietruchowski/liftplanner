@@ -19,7 +19,7 @@ WorkoutCard {
                 iconSource: Theme.icons.copy
                 circular: true
                 buttonSize: Theme.button.square
-                buttonStyle: Theme.button.primary
+                buttonStyle: Theme.button.tonal
                 onClicked: root.exportWorkout(root.workout)
                 ToolTip.visible: hovered
                 ToolTip.text: "Copy to clipboard"

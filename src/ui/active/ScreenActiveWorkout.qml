@@ -13,23 +13,29 @@ Rectangle {
     WorkoutTimerBar {
         id: timerBar
         objectName: "workoutTimerBar"
+        anchors.margins: Theme.padding.screen
+        y: Theme.padding.screen
     }
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: Theme.padding.medium
         anchors.topMargin: timerBar.isVisible
-                           ? timerBar.barHeight + Theme.padding.medium
-                           : Theme.padding.medium
+                           ? timerBar.barHeight + Theme.padding.screen * 2
+                           : Theme.padding.screen
         spacing: Theme.spacing.medium
 
         Behavior on anchors.topMargin { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
 
-        SectionHeader {
-            id: plannedSection
+        Text {
+            objectName: "activeWorkoutTitle"
             Layout.fillWidth: true
-            titleFont.pixelSize: Theme.fontSize.large
-            title: ActiveWorkoutViewModel.currentWorkout ? ActiveWorkoutViewModel.currentWorkout.name : "Workout"
+            Layout.leftMargin: Theme.padding.screen
+            Layout.rightMargin: Theme.padding.screen
+            text: ActiveWorkoutViewModel.currentWorkout ? ActiveWorkoutViewModel.currentWorkout.name : "Workout"
+            color: Theme.colors.textPrimary
+            font.pixelSize: Theme.fontSize.large
+            font.bold: true
+            elide: Text.ElideRight
             visible: !timerBar.isVisible
         }
 
@@ -38,12 +44,14 @@ Rectangle {
             objectName: "workoutExerciseList"
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.leftMargin: Theme.padding.screen
+            Layout.rightMargin: Theme.padding.screen
             clip: true
 
             Column {
                 id: contentColumn
                 width: sv.availableWidth
-                spacing: Theme.spacing.medium / 2
+                spacing: Theme.spacing.small
 
                 property var expandedExercise: ActiveWorkoutViewModel.currentExercise
                 property bool reorderMode: false
@@ -85,47 +93,59 @@ Rectangle {
             }
         }
 
-        RowLayout {
+        Rectangle {
             Layout.fillWidth: true
-            spacing: Theme.spacing.medium
+            Layout.preferredHeight: Theme.layout.actionBarHeight
+            color: Theme.colors.surfaceRaised
 
-            ThemedButton {
-                objectName: "startTimerButton"
-                iconSource: Theme.icons.timer
-                enabled: ActiveWorkoutViewModel.isActive
-                buttonSize: Theme.button.mediumSquare
-                buttonStyle: Theme.button.primary
-                onClicked: ActiveWorkoutViewModel.toggleTimer()
+            Rectangle {
+                width: parent.width
+                height: Theme.border.thin
+                color: Theme.colors.divider
             }
 
-            Item { Layout.fillWidth: true }
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: Theme.padding.screen
+                anchors.rightMargin: Theme.padding.screen
+                spacing: Theme.spacing.medium
 
-            ThemedButton {
-                objectName: "completeSetButton"
-                text: ActiveWorkoutViewModel.currentWorkout && ActiveWorkoutViewModel.currentWorkout.completed ? "End" : "Done"
-                enabled: ActiveWorkoutViewModel.isActive && ActiveWorkoutViewModel.currentSet
-                buttonSize: Theme.button.medium
-                buttonStyle: ActiveWorkoutViewModel.currentWorkout && ActiveWorkoutViewModel.currentWorkout.completed
-                             ? Theme.button.primary
-                             : Theme.button.success
-                onClicked: {
-                    if (ActiveWorkoutViewModel.currentWorkout.completed) {
-                        endWorkoutPopup.open()
-                    } else {
-                        ActiveWorkoutViewModel.completeCurrentSet()
+                ThemedButton {
+                    objectName: "startTimerButton"
+                    iconSource: Theme.icons.timer
+                    enabled: ActiveWorkoutViewModel.isActive
+                    buttonSize: Theme.button.mediumSquare
+                    buttonStyle: Theme.button.tonal
+                    onClicked: ActiveWorkoutViewModel.toggleTimer()
+                }
+
+                ThemedButton {
+                    objectName: "completeSetButton"
+                    text: ActiveWorkoutViewModel.currentWorkout && ActiveWorkoutViewModel.currentWorkout.completed ? "End" : "Done"
+                    enabled: ActiveWorkoutViewModel.isActive && ActiveWorkoutViewModel.currentSet
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Theme.button.medium.height
+                    buttonSize: Theme.button.medium
+                    buttonStyle: ActiveWorkoutViewModel.currentWorkout && ActiveWorkoutViewModel.currentWorkout.completed
+                                 ? Theme.button.primary
+                                 : Theme.button.success
+                    onClicked: {
+                        if (ActiveWorkoutViewModel.currentWorkout.completed) {
+                            endWorkoutPopup.open()
+                        } else {
+                            ActiveWorkoutViewModel.completeCurrentSet()
+                        }
                     }
                 }
-            }
 
-            Item { Layout.fillWidth: true }
-
-            ThemedButton {
-                objectName: "reorderButton"
-                iconSource: Theme.icons.reorder
-                enabled: ActiveWorkoutViewModel.isActive
-                buttonSize: Theme.button.mediumSquare
-                buttonStyle: contentColumn.reorderMode ? Theme.button.primary : Theme.button.outline
-                onClicked: contentColumn.reorderMode = !contentColumn.reorderMode
+                ThemedButton {
+                    objectName: "reorderButton"
+                    iconSource: Theme.icons.reorder
+                    enabled: ActiveWorkoutViewModel.isActive
+                    buttonSize: Theme.button.mediumSquare
+                    buttonStyle: contentColumn.reorderMode ? Theme.button.tonal : Theme.button.subtle
+                    onClicked: contentColumn.reorderMode = !contentColumn.reorderMode
+                }
             }
         }
     }

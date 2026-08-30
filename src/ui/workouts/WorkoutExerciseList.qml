@@ -19,10 +19,4 @@ ColumnLayout {
             exercise: modelData
         }
     }
-
-    Rectangle {
-        Layout.fillWidth: true
-        height: Theme.border.thin
-        color: Theme.colors.border
-    }
 }

@@ -7,7 +7,7 @@ Rectangle {
 
     property string label: ""
     property int nameSize: Theme.fontSize.medium
-    property color nameColor: Theme.colors.textSecondary
+    property color nameColor: Theme.colors.textMuted
     property bool cardVisible: false
     property var workout: null
 
@@ -21,9 +21,9 @@ Rectangle {
     }
 
     radius: Theme.radius.large
-    color: cardVisible ? Theme.colors.surface : "transparent"
+    color: cardVisible ? Theme.colors.surfaceAccent : "transparent"
     border.width: cardVisible ? Theme.border.medium : 0
-    border.color: Theme.colors.primaryVariant
+    border.color: Theme.colors.primary
 
     implicitHeight: inner.implicitHeight
 
@@ -41,7 +41,7 @@ Rectangle {
         Text {
             Layout.alignment: Qt.AlignHCenter
             text: root.label
-            color: Theme.colors.textSecondary
+            color: Theme.colors.textMuted
             font.pixelSize: Theme.fontSize.small
             visible: root.label.length > 0
         }
@@ -56,7 +56,7 @@ Rectangle {
 
             Text {
                 text: root.dateText
-                color: Theme.colors.textSecondary
+                color: Theme.colors.textMuted
                 font.pixelSize: Theme.fontSize.small
                 visible: root.dateText.length > 0
                 Layout.alignment: Qt.AlignVCenter
@@ -87,8 +87,8 @@ Rectangle {
                         }
                         return exerciseNames.join(", ")
                     }
-                    color: Theme.colors.textSecondary
-                    font.pixelSize: Theme.fontSize.small - 2
+                    color: Theme.colors.textDisabled
+                    font.pixelSize: Theme.fontSize.xSmall
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignHCenter
                     visible: root.workout && root.workout.exercises && root.workout.exercises.length > 0

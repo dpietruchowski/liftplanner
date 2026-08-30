@@ -32,14 +32,14 @@ Item {
 
     component PlusButton: ThemedButton {
         buttonSize: Theme.button.medium
-        buttonStyle: Theme.button.primary
+        buttonStyle: Theme.button.tonal
         iconSource: Theme.icons.plus
         onClicked: timerBar.timer.addSeconds(10)
     }
 
     component MinusButton: ThemedButton {
         buttonSize: Theme.button.medium
-        buttonStyle: Theme.button.primary
+        buttonStyle: Theme.button.tonal
         iconSource: Theme.icons.minus
         onClicked: timerBar.timer.addSeconds(-10)
     }
@@ -47,7 +47,7 @@ Item {
     component PauseButton: ThemedButton {
         objectName: "timerPauseButton"
         buttonSize: Theme.button.medium
-        buttonStyle: Theme.button.outline
+        buttonStyle: Theme.button.subtle
         text: timerBar.timer.paused ? "Resume" : "Pause"
         onClicked: timerBar.timer.paused ? timerBar.timer.resume() : timerBar.timer.pause()
     }
@@ -55,23 +55,23 @@ Item {
     component ExpandButton: ThemedButton {
         iconSource: Theme.icons.expand
         buttonSize: Theme.button.smallSquare
-        buttonStyle: Theme.button.primary
+        buttonStyle: Theme.button.subtle
         onClicked: timerBar.expanded = true
     }
 
     component CollapseButton: ThemedButton {
         iconSource: Theme.icons.collapse
         buttonSize: Theme.button.mediumSquare
-        buttonStyle: Theme.button.primary
+        buttonStyle: Theme.button.subtle
         onClicked: timerBar.expanded = false
     }
 
     Rectangle {
         anchors.fill: parent
-        color: Theme.colors.dialogSurface
+        color: timerBar.timer.resting ? Theme.colors.surface : Theme.colors.surfaceAccent
         radius: Theme.radius.medium
-        border.width: Theme.border.thin
-        border.color: timerBar.timer.resting ? Theme.colors.border : Theme.colors.primaryVariant
+        border.width: timerBar.timer.resting ? Theme.border.thin : Theme.border.medium
+        border.color: timerBar.timer.resting ? Theme.colors.border : Theme.colors.primary
 
         Item {
             anchors.fill: parent
@@ -112,7 +112,7 @@ Item {
                 objectName: "timerPhaseLabel"
                 Layout.fillWidth: true
                 text: timerBar.timer.phaseLabel
-                color: Theme.colors.textSecondary
+                color: Theme.colors.textMuted
                 font.pixelSize: Theme.fontSize.small
                 font.bold: true
                 horizontalAlignment: Text.AlignHCenter

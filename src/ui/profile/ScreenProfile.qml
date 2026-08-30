@@ -14,8 +14,8 @@ Rectangle {
     property int controlWidth: 180
 
     component FormLabel: Text {
-        font.pixelSize: Theme.fontSize.small
-        color: Theme.colors.textSecondary
+        font.pixelSize: Theme.fontSize.normal
+        color: Theme.colors.textMuted
         Layout.fillWidth: true
     }
 
@@ -47,8 +47,8 @@ Rectangle {
         rightPadding: Theme.padding.medium
 
         background: Rectangle {
-            color: Theme.colors.surface
-            radius: Theme.radius.small
+            color: Theme.colors.surfaceMuted
+            radius: Theme.radius.medium
             border.width: parent.activeFocus ? Theme.border.medium : Theme.border.thin
             border.color: parent.activeFocus ? Theme.colors.primary : Theme.colors.cardBorder
 
@@ -98,7 +98,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: saveBar.top
-        anchors.margins: Theme.padding.medium
+        anchors.margins: Theme.padding.screen
         anchors.bottomMargin: 0
         contentWidth: availableWidth
 
@@ -113,8 +113,8 @@ Rectangle {
                 width: 72
                 height: 72
                 radius: width / 2
-                color: Theme.colors.surface
-                border.color: Theme.colors.primary
+                color: Theme.colors.surfaceMuted
+                border.color: Theme.colors.primaryBorder
                 border.width: Theme.border.medium
 
                 ThemedIcon {
@@ -122,7 +122,7 @@ Rectangle {
                     width: Theme.icon.large
                     height: Theme.icon.large
                     svgSource: Theme.icons.user
-                    color: Theme.colors.textSecondary
+                    color: Theme.colors.textMuted
                 }
             }
 
@@ -138,7 +138,7 @@ Rectangle {
                 Layout.alignment: Qt.AlignHCenter
                 text: "Used to personalize AI-generated workout plans"
                 font.pixelSize: Theme.fontSize.small
-                color: Theme.colors.textSecondary
+                color: Theme.colors.textMuted
             }
 
             Row {
@@ -334,7 +334,7 @@ Rectangle {
                       + "should consider when planning your workouts."
                 wrapMode: Text.WordWrap
                 font.pixelSize: Theme.fontSize.small
-                color: Theme.colors.textSecondary
+                color: Theme.colors.textMuted
             }
         }
     }
@@ -345,13 +345,13 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        height: saveButton.height + 2 * Theme.padding.medium
-        color: Theme.colors.surface
+        height: Theme.layout.actionBarHeight
+        color: Theme.colors.surfaceRaised
 
         Rectangle {
             width: parent.width
             height: Theme.border.thin
-            color: Theme.colors.border
+            color: Theme.colors.divider
             anchors.top: parent.top
         }
 
@@ -359,10 +359,11 @@ Rectangle {
             id: saveButton
             objectName: "saveProfileButton"
             anchors.centerIn: parent
-            width: parent.width - 2 * Theme.padding.medium
+            width: parent.width - 2 * Theme.padding.screen
+            height: Theme.button.medium.height
             text: UserProfileViewModel.dirty ? "Save profile" : "Saved"
             enabled: UserProfileViewModel.dirty
-            buttonStyle: Theme.button.primary
+            buttonStyle: UserProfileViewModel.dirty ? Theme.button.primary : Theme.button.subtle
             buttonSize: Theme.button.large
             onClicked: UserProfileViewModel.save()
         }

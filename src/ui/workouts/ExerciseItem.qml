@@ -4,39 +4,32 @@ import QtQuick.Layouts
 import LiftPlanner 1.0
 import Themed.Components
 
-Rectangle {
+ColumnLayout {
     id: root
     Layout.fillWidth: true
-    Layout.preferredHeight: column.implicitHeight
-    radius: Theme.radius.medium / 2
-    color: Theme.colors.background
-    anchors.leftMargin: Theme.padding.medium
-    anchors.rightMargin: Theme.padding.medium
+    spacing: Theme.spacing.xSmall
 
     property var exercise
 
-    ColumnLayout {
-        id: column
-        anchors.fill: parent
-        spacing: Theme.spacing.xSmall
+    Text {
+        text: exercise.name
+        font.pixelSize: Theme.fontSize.normal
+        font.bold: true
+        color: Theme.colors.textPrimary
+        Layout.fillWidth: true
+        elide: Text.ElideRight
+    }
 
-        Text {
-            text: exercise.name
-            font.pixelSize: Theme.fontSize.small
-            font.bold: true
-            color: Theme.colors.textPrimary
-            Layout.fillWidth: true
-            horizontalAlignment: Text.AlignLeft
-            elide: Text.ElideRight
-        }
+    Flow {
+        Layout.fillWidth: true
+        spacing: Theme.chip.spacing
 
-        Text {
-            text: exercise.setsToString()
-            font.pixelSize: Theme.fontSize.small
-            color: Theme.colors.textSecondary
-            Layout.fillWidth: true
-            horizontalAlignment: Text.AlignLeft
-            elide: Text.ElideRight
+        Repeater {
+            model: exercise.sets
+
+            delegate: SetChip {
+                setData: modelData
+            }
         }
     }
 }

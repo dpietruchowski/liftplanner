@@ -32,7 +32,9 @@ Popup {
 
     background: Rectangle {
         color: Theme.colors.dialogSurface
-        radius: Theme.radius.medium
+        radius: Theme.radius.large
+        border.width: Theme.border.thin
+        border.color: Theme.colors.border
         opacity: Theme.dialogOpacity
     }
 
@@ -84,7 +86,7 @@ Popup {
             Layout.fillWidth: true
             text: notificationPopup.text
             color: Theme.colors.textSecondary
-            font.pixelSize: Theme.fontSize.medium
+            font.pixelSize: Theme.fontSize.normal
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
             textFormat: notificationPopup.textFormat
@@ -97,7 +99,7 @@ Popup {
             visible: notificationPopup.copyEnabled
             text: qsTr("Copy")
             buttonSize: Theme.button.medium
-            buttonStyle: Theme.button.secondary
+            buttonStyle: Theme.button.tonal
             onClicked: ClipboardHelper.setText(notificationPopup.text)
         }
 
@@ -109,7 +111,7 @@ Popup {
                 visible: (notificationPopup.buttons & NotificationPopup.Cancel) !== 0
                 text: qsTr("Cancel")
                 buttonSize: Theme.button.medium
-                buttonStyle: Theme.button.danger
+                buttonStyle: Theme.button.subtle
                 onClicked: {
                     notificationPopup.rejected()
                     notificationPopup.close()

@@ -39,7 +39,7 @@ Rectangle {
         id: scrollView
         objectName: "workoutsScrollView"
         anchors.fill: parent
-        anchors.margins: Theme.padding.medium
+        anchors.margins: Theme.padding.screen
 
         ColumnLayout {
             width: scrollView.contentItem.width
@@ -49,14 +49,14 @@ Rectangle {
                 id: plannedSection
                 Layout.fillWidth: true
                 title: "PLANNED"
+                titleColor: Theme.colors.textMuted
                 expandable: true
 
                 ThemedButton {
                     objectName: "generatePromptButton"
                     iconSource: Theme.icons.ai
-                    circular: true
-                    buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.primary
+                    buttonSize: Theme.button.smallSquare
+                    buttonStyle: Theme.button.tonal
                     onClicked: PlannedWorkoutViewModel.generatePrompt()
                     ToolTip.visible: hovered
                     ToolTip.text: "Generate prompt for AI"
@@ -66,9 +66,8 @@ Rectangle {
                 ThemedButton {
                     objectName: "importPlannedButton"
                     iconSource: Theme.icons.importData
-                    circular: true
-                    buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.primary
+                    buttonSize: Theme.button.smallSquare
+                    buttonStyle: Theme.button.subtle
                     onClicked: importPlannedPopup.open()
                     ToolTip.visible: hovered
                     ToolTip.text: "Import planned workouts"
@@ -76,17 +75,21 @@ Rectangle {
                 }
             }
 
-            Repeater {
-                id: plannedRepeater
-                model: plannedSection.expanded ? PlannedWorkoutViewModel.workouts : []
-                delegate: PlannedWorkoutItem {
-                    workout: modelData
-                    onStartWorkoutRequest: function(workout) {
-                        root.currentWorkout = workout
-                        if (ActiveWorkoutViewModel.currentWorkout) {
-                            startWorkoutPopup.open()
-                        } else {
-                            startWorkout()
+            RevealColumn {
+                expanded: plannedSection.expanded
+
+                Repeater {
+                    id: plannedRepeater
+                    model: PlannedWorkoutViewModel.workouts
+                    delegate: PlannedWorkoutItem {
+                        workout: modelData
+                        onStartWorkoutRequest: function(workout) {
+                            root.currentWorkout = workout
+                            if (ActiveWorkoutViewModel.currentWorkout) {
+                                startWorkoutPopup.open()
+                            } else {
+                                startWorkout()
+                            }
                         }
                     }
                 }
@@ -98,7 +101,7 @@ Rectangle {
                 horizontalAlignment: Text.AlignHCenter
                 text: "No planned workouts.\nTap the AI button to generate a plan prompt."
                 font.pixelSize: Theme.fontSize.small
-                color: Theme.colors.textSecondary
+                color: Theme.colors.textMuted
             }
 
             SectionHeader {
@@ -106,14 +109,14 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.topMargin: Theme.spacing.large
                 title: "HISTORY"
+                titleColor: Theme.colors.textMuted
                 expandable: true
 
                 ThemedButton {
                     objectName: "exportHistoryButton"
                     iconSource: Theme.icons.exportData
-                    circular: true
-                    buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.primary
+                    buttonSize: Theme.button.smallSquare
+                    buttonStyle: Theme.button.subtle
                     onClicked: WorkoutHistoryViewModel.exportToClipboard(50)
                     ToolTip.visible: hovered
                     ToolTip.text: "Export recent workouts"
@@ -123,9 +126,8 @@ Rectangle {
                 ThemedButton {
                     objectName: "importHistoryButton"
                     iconSource: Theme.icons.importData
-                    circular: true
-                    buttonSize: Theme.button.square
-                    buttonStyle: Theme.button.primary
+                    buttonSize: Theme.button.smallSquare
+                    buttonStyle: Theme.button.subtle
                     onClicked: importHistoryPopup.open()
                     ToolTip.visible: hovered
                     ToolTip.text: "Import workout history"
@@ -133,20 +135,25 @@ Rectangle {
                 }
             }
 
-            Repeater {
-                model: historySection.expanded ? root.historyMonths : []
-                delegate: HistoryMonthSection {
-                    Layout.fillWidth: true
-                    monthLabel: modelData.label
-                    workouts: modelData.workouts
-                    expanded: index === 0
+            RevealColumn {
+                expanded: historySection.expanded
+                spacing: Theme.spacing.large
 
-                    onDeleteWorkoutRequest: function(workout) {
-                        root.workoutToDelete = workout
-                        deletePopup.open()
-                    }
-                    onExportWorkoutRequest: function(workout) {
-                        WorkoutHistoryViewModel.exportWorkoutToClipboard(workout)
+                Repeater {
+                    model: root.historyMonths
+                    delegate: HistoryMonthSection {
+                        Layout.fillWidth: true
+                        monthLabel: modelData.label
+                        workouts: modelData.workouts
+                        expanded: index === 0
+
+                        onDeleteWorkoutRequest: function(workout) {
+                            root.workoutToDelete = workout
+                            deletePopup.open()
+                        }
+                        onExportWorkoutRequest: function(workout) {
+                            WorkoutHistoryViewModel.exportWorkoutToClipboard(workout)
+                        }
                     }
                 }
             }
@@ -157,7 +164,7 @@ Rectangle {
                 horizontalAlignment: Text.AlignHCenter
                 text: "No completed workouts yet."
                 font.pixelSize: Theme.fontSize.small
-                color: Theme.colors.textSecondary
+                color: Theme.colors.textMuted
             }
         }
     }

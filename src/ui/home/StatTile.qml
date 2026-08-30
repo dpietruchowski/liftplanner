@@ -8,9 +8,11 @@ Rectangle {
     property string value: ""
 
     width: 120
-    height: 64
+    height: 68
     radius: Theme.radius.medium
-    color: Theme.colors.surface
+    color: Theme.colors.surfaceMuted
+    border.width: Theme.border.thin
+    border.color: Theme.colors.borderSubtle
 
     Column {
         anchors.centerIn: parent
@@ -22,7 +24,7 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter
             elide: Text.ElideRight
             text: root.label
-            color: Theme.colors.textSecondary
+            color: Theme.colors.textMuted
             font.pixelSize: Theme.fontSize.small
         }
 
