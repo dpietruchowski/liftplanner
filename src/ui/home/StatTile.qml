@@ -10,6 +10,7 @@ Rectangle {
     property string value: ""
     property string unit: ""
     property string badge: ""
+    property bool centered: false
 
     implicitHeight: Theme.stat.height
     radius: Theme.radius.medium
@@ -26,6 +27,7 @@ Rectangle {
             Layout.fillWidth: true
             text: root.label
             elide: Text.ElideRight
+            horizontalAlignment: root.centered ? Text.AlignHCenter : Text.AlignLeft
             color: Theme.colors.textMuted
             font.pixelSize: Theme.stat.labelSize
         }
@@ -35,6 +37,11 @@ Rectangle {
         RowLayout {
             Layout.fillWidth: true
             spacing: Theme.spacing.xSmall
+
+            Item {
+                visible: root.centered
+                Layout.fillWidth: true
+            }
 
             Text {
                 text: root.value

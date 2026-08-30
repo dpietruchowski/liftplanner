@@ -107,6 +107,7 @@ Rectangle {
             Layout.topMargin: Theme.spacing.xLarge
             text: "Start workout"
             iconSource: Theme.icons.startWorkout
+            iconSize: Theme.icon.large
             pill: true
             buttonStyle: Theme.button.primary
             buttonSize: Theme.button.wide

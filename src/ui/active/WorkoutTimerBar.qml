@@ -73,6 +73,8 @@ Item {
 
             PhaseLabel {}
 
+            Item { Layout.fillWidth: true }
+
             Text {
                 objectName: "timerRemainingCompact"
                 text: timerBar.timer.remainingText

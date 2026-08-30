@@ -107,65 +107,79 @@ Rectangle {
             spacing: Theme.spacing.medium
 
             // Identity header
-            Rectangle {
-                Layout.alignment: Qt.AlignHCenter
+            RowLayout {
+                Layout.fillWidth: true
                 Layout.topMargin: Theme.spacing.medium
-                width: 72
-                height: 72
-                radius: width / 2
-                color: Theme.colors.surfaceMuted
-                border.color: Theme.colors.primaryBorder
-                border.width: Theme.border.medium
-
-                ThemedIcon {
-                    anchors.centerIn: parent
-                    width: Theme.icon.large
-                    height: Theme.icon.large
-                    svgSource: Theme.icons.user
-                    color: Theme.colors.textMuted
-                }
-            }
-
-            Text {
-                Layout.alignment: Qt.AlignHCenter
-                text: "Your training profile"
-                font.pixelSize: Theme.fontSize.large
-                font.bold: true
-                color: Theme.colors.textPrimary
-            }
-
-            Text {
-                Layout.alignment: Qt.AlignHCenter
-                text: "Used to personalize AI-generated workout plans"
-                font.pixelSize: Theme.fontSize.small
-                color: Theme.colors.textMuted
-            }
-
-            Row {
-                Layout.alignment: Qt.AlignHCenter
-                Layout.topMargin: Theme.spacing.small
-                Layout.bottomMargin: Theme.spacing.small
                 spacing: Theme.spacing.medium
 
+                Rectangle {
+                    width: 44
+                    height: 44
+                    radius: width / 2
+                    color: Theme.colors.surfaceMuted
+                    border.color: Theme.colors.primaryBorder
+                    border.width: Theme.border.medium
+
+                    ThemedIcon {
+                        anchors.centerIn: parent
+                        width: Theme.icon.medium
+                        height: Theme.icon.medium
+                        svgSource: Theme.icons.user
+                        color: Theme.colors.primary
+                    }
+                }
+
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: Theme.spacing.xSmall
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: "Your training profile"
+                        font.pixelSize: Theme.fontSize.large
+                        font.bold: true
+                        color: Theme.colors.textPrimary
+                        elide: Text.ElideRight
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: "Used to personalize AI-generated plans"
+                        font.pixelSize: Theme.fontSize.small
+                        color: Theme.colors.textMuted
+                        elide: Text.ElideRight
+                    }
+                }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: Theme.spacing.small
+                Layout.bottomMargin: Theme.spacing.small
+                spacing: Theme.stat.spacing
+
                 StatTile {
-                    width: 100
-                    label: "Age"
-                    value: UserProfileViewModel.age >= 0 ? UserProfileViewModel.age : "—"
+                    Layout.fillWidth: true
+                    centered: true
+                    label: "AGE"
+                    value: UserProfileViewModel.age >= 0 ? UserProfileViewModel.age : "\u2014"
                 }
 
                 StatTile {
-                    width: 100
-                    label: "Bodyweight"
+                    Layout.fillWidth: true
+                    centered: true
+                    label: "BODYWEIGHT"
                     value: UserProfileViewModel.bodyweight > 0
-                           ? UserProfileViewModel.bodyweight.toFixed(1) + " "
-                             + UserProfileViewModel.bodyweightUnit
-                           : "—"
+                           ? UserProfileViewModel.bodyweight.toFixed(1) : "\u2014"
+                    unit: UserProfileViewModel.bodyweight > 0
+                          ? UserProfileViewModel.bodyweightUnit : ""
                 }
 
                 StatTile {
-                    width: 100
-                    label: "Per week"
-                    value: UserProfileViewModel.sessionsPerWeek + "×"
+                    Layout.fillWidth: true
+                    centered: true
+                    label: "PER WEEK"
+                    value: UserProfileViewModel.sessionsPerWeek + "\u00d7"
                 }
             }
 
@@ -360,11 +374,12 @@ Rectangle {
             objectName: "saveProfileButton"
             anchors.centerIn: parent
             width: parent.width - 2 * Theme.padding.screen
-            height: Theme.button.medium.height
+            height: Theme.button.wide.height
             text: UserProfileViewModel.dirty ? "Save profile" : "Saved"
             enabled: UserProfileViewModel.dirty
             buttonStyle: UserProfileViewModel.dirty ? Theme.button.primary : Theme.button.subtle
-            buttonSize: Theme.button.large
+            buttonSize: Theme.button.wide
+            pill: true
             onClicked: UserProfileViewModel.save()
         }
     }
