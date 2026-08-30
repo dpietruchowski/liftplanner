@@ -1,6 +1,8 @@
 #include "liftplannerapplication.h"
 
 #include "core/storage/appdbstorage.h"
+#include "modules/exercisecatalog/application/exercisecatalogservice.h"
+#include "modules/exercisecatalog/infrastructure/database/exercisedefinitionrepositorydb.h"
 #include "modules/userprofile/application/userprofileservice.h"
 #include "modules/userprofile/infrastructure/database/userprofilerepositorydb.h"
 #include "modules/workout/application/workoutservice.h"
@@ -41,6 +43,8 @@ void LiftPlannerApplication::initialize()
                 = std::make_unique<WorkoutService>(m_storage->workoutRepo(), m_worker.get());
             m_userProfileService = std::make_unique<UserProfileService>(
                 m_storage->userProfileRepo(), m_worker.get());
+            m_exerciseCatalogService = std::make_unique<ExerciseCatalogService>(
+                m_storage->exerciseDefinitionRepo(), m_worker.get());
         },
         Qt::BlockingQueuedConnection);
 

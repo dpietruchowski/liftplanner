@@ -6,6 +6,7 @@ set(TEST_SOURCES
     infrastructure/serializers/exercisedefinitionserializertest.cpp
     infrastructure/database/exercisedefinitionrepositorydbtest.cpp
     infrastructure/seed/exercisecatalogseedtest.cpp
+    application/exercisecatalogservicetest.cpp
 )
 
 add_executable(exercisecatalog_tests ${TEST_SOURCES})
@@ -19,6 +20,7 @@ target_link_libraries(exercisecatalog_tests
     PRIVATE
         core
         exercisecatalog_module
+        app_utils
         workout_module
         dbtoolkit
         gtest

@@ -9,6 +9,7 @@ class BackendWorker;
 class AppDbStorage;
 class WorkoutService;
 class UserProfileService;
+class ExerciseCatalogService;
 class ActiveWorkoutViewModel;
 class WorkoutHistoryViewModel;
 class PlannedWorkoutViewModel;
@@ -29,6 +30,7 @@ private:
     std::unique_ptr<AppDbStorage> m_storage;
     std::unique_ptr<WorkoutService> m_workoutService;
     std::unique_ptr<UserProfileService> m_userProfileService;
+    std::unique_ptr<ExerciseCatalogService> m_exerciseCatalogService;
 
     std::unique_ptr<ActiveWorkoutViewModel> m_activeWorkoutViewModel;
     std::unique_ptr<WorkoutHistoryViewModel> m_workoutHistoryViewModel;
