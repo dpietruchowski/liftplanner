@@ -2,6 +2,10 @@ set(TEST_SOURCES
     domain/entities/workouttest.cpp
     domain/entities/exercisetest.cpp
     domain/entities/settest.cpp
+    domain/entities/positiontest.cpp
+    domain/entities/exercisedefinitionlinktest.cpp
+    domain/entities/aggregatemutationtest.cpp
+    domain/entities/workouttemplatetest.cpp
     infrastructure/serializers/workoutserializertest.cpp
     infrastructure/serializers/exerciseserializertest.cpp
     infrastructure/serializers/setserializertest.cpp

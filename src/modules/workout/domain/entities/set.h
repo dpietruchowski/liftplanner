@@ -23,6 +23,7 @@ public:
     int durationSeconds() const;
     double distanceMeters() const;
     int restSecondsOverride() const;
+    int position() const;
 
     bool isWeighted() const;
     int effectiveRestSeconds(int exerciseDefault) const;
@@ -43,6 +44,7 @@ public:
     void setDurationSeconds(int seconds);
     void setDistanceMeters(double meters);
     void setRestSecondsOverride(int seconds);
+    void setPosition(int position);
 
 private:
     void validate() const;
@@ -57,4 +59,5 @@ private:
     int m_durationSeconds { 0 };
     double m_distanceMeters { 0.0 };
     int m_restSecondsOverride { -1 };
+    int m_position { 0 };
 };

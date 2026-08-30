@@ -41,6 +41,7 @@ LoadType Set::loadType() const { return m_loadType; }
 int Set::durationSeconds() const { return m_durationSeconds; }
 double Set::distanceMeters() const { return m_distanceMeters; }
 int Set::restSecondsOverride() const { return m_restSecondsOverride; }
+int Set::position() const { return m_position; }
 
 void Set::setId(int id) { m_id = id; }
 void Set::setExerciseId(int exerciseId) { m_exerciseId = exerciseId; }
@@ -52,6 +53,7 @@ void Set::setLoadType(LoadType loadType) { m_loadType = loadType; }
 void Set::setDurationSeconds(int seconds) { m_durationSeconds = seconds; }
 void Set::setDistanceMeters(double meters) { m_distanceMeters = meters; }
 void Set::setRestSecondsOverride(int seconds) { m_restSecondsOverride = seconds; }
+void Set::setPosition(int position) { m_position = position; }
 
 bool Set::isWeighted() const
 {

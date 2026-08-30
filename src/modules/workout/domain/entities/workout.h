@@ -4,6 +4,7 @@
 #include "workoutstatus.h"
 #include <QDateTime>
 #include <QString>
+#include <QStringList>
 #include <vector>
 
 class Workout final
@@ -33,9 +34,14 @@ public:
 
     const std::vector<Exercise>& exercises() const;
     std::vector<Exercise>& exercises();
-    void addExercise(const Exercise& exercise);
+    void addExercise(const Exercise& exercise, int atPosition = -1);
     void removeExercise(int index);
+    void moveExercise(int from, int to);
+    void normalizePositions();
     bool isCompleted() const;
+    bool isEmpty() const;
+    QStringList validationErrors() const;
+    bool isValid() const;
 
     int totalRepetitions() const;
     int totalSets() const;
@@ -47,6 +53,7 @@ public:
 
 private:
     void validate() const;
+    void renumberExercises();
 
     int m_id { -1 };
     QString m_name;

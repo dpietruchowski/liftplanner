@@ -42,12 +42,47 @@ void Workout::end()
 const std::vector<Exercise>& Workout::exercises() const { return m_exercises; }
 std::vector<Exercise>& Workout::exercises() { return m_exercises; }
 
-void Workout::addExercise(const Exercise& exercise) { m_exercises.push_back(exercise); }
+void Workout::addExercise(const Exercise& exercise, int atPosition)
+{
+    const int size = static_cast<int>(m_exercises.size());
+    const int index = (atPosition < 0 || atPosition > size) ? size : atPosition;
+
+    m_exercises.insert(m_exercises.begin() + index, exercise);
+    renumberExercises();
+}
 
 void Workout::removeExercise(int index)
 {
-    if (index >= 0 && index < static_cast<int>(m_exercises.size()))
-        m_exercises.erase(m_exercises.begin() + index);
+    if (index < 0 || index >= static_cast<int>(m_exercises.size()))
+        return;
+
+    m_exercises.erase(m_exercises.begin() + index);
+    renumberExercises();
+}
+
+void Workout::moveExercise(int from, int to)
+{
+    const int size = static_cast<int>(m_exercises.size());
+    if (from < 0 || from >= size || to < 0 || to >= size || from == to)
+        return;
+
+    Exercise moved = m_exercises[from];
+    m_exercises.erase(m_exercises.begin() + from);
+    m_exercises.insert(m_exercises.begin() + to, moved);
+    renumberExercises();
+}
+
+void Workout::normalizePositions()
+{
+    renumberExercises();
+    for (auto& exercise : m_exercises)
+        exercise.normalizePositions();
+}
+
+void Workout::renumberExercises()
+{
+    for (size_t i = 0; i < m_exercises.size(); ++i)
+        m_exercises[i].setPosition(static_cast<int>(i));
 }
 
 bool Workout::isCompleted() const
@@ -61,6 +96,26 @@ bool Workout::isCompleted() const
     }
     return true;
 }
+
+bool Workout::isEmpty() const { return m_exercises.empty(); }
+
+QStringList Workout::validationErrors() const
+{
+    QStringList errors;
+
+    if (m_name.trimmed().isEmpty())
+        errors.append(QStringLiteral("workout name must not be empty"));
+
+    for (size_t i = 0; i < m_exercises.size(); ++i)
+    {
+        for (const QString& error : m_exercises[i].validationErrors())
+            errors.append(QStringLiteral("exercise %1: %2").arg(QString::number(i), error));
+    }
+
+    return errors;
+}
+
+bool Workout::isValid() const { return validationErrors().isEmpty(); }
 
 int Workout::totalRepetitions() const
 {

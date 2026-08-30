@@ -1,4 +1,5 @@
 #include "exercise.h"
+#include "setcompatibility.h"
 #include <QStringList>
 #include <algorithm>
 
@@ -11,12 +12,32 @@ Exercise::Exercise(const QString& name, int restSeconds)
     validate();
 }
 
+Exercise Exercise::createFromDefinition(int definitionId, const QString& name, ExerciseKind kind,
+                                        int restSeconds)
+{
+    Exercise exercise(name, restSeconds);
+    exercise.m_definitionId = definitionId;
+    exercise.m_kind = kind;
+    return exercise;
+}
+
+Exercise Exercise::createAdHoc(const QString& name, ExerciseKind kind, int restSeconds)
+{
+    Exercise exercise(name, restSeconds);
+    exercise.m_kind = kind;
+    return exercise;
+}
+
 int Exercise::id() const { return m_id; }
 int Exercise::workoutId() const { return m_workoutId; }
 const QString& Exercise::name() const { return m_name; }
 const QString& Exercise::description() const { return m_description; }
 int Exercise::restSeconds() const { return m_restSeconds; }
 ExerciseKind Exercise::kind() const { return m_kind; }
+int Exercise::position() const { return m_position; }
+const std::optional<int>& Exercise::definitionId() const { return m_definitionId; }
+bool Exercise::hasDefinition() const { return m_definitionId.has_value(); }
+const QString& Exercise::notes() const { return m_notes; }
 
 void Exercise::setId(int id) { m_id = id; }
 void Exercise::setWorkoutId(int workoutId) { m_workoutId = workoutId; }
@@ -24,6 +45,10 @@ void Exercise::setName(const QString& name) { m_name = name; }
 void Exercise::setDescription(const QString& description) { m_description = description; }
 void Exercise::setRestSeconds(int restSeconds) { m_restSeconds = restSeconds; }
 void Exercise::setKind(ExerciseKind kind) { m_kind = kind; }
+void Exercise::setPosition(int position) { m_position = position; }
+void Exercise::setDefinitionId(int definitionId) { m_definitionId = definitionId; }
+void Exercise::clearDefinitionId() { m_definitionId.reset(); }
+void Exercise::setNotes(const QString& notes) { m_notes = notes; }
 
 int Exercise::restSecondsForSet(int index) const
 {
@@ -36,12 +61,55 @@ int Exercise::restSecondsForSet(int index) const
 const std::vector<Set>& Exercise::sets() const { return m_sets; }
 std::vector<Set>& Exercise::sets() { return m_sets; }
 
-void Exercise::addSet(const Set& set) { m_sets.push_back(set); }
+void Exercise::addSet(const Set& set, int atPosition)
+{
+    const int size = static_cast<int>(m_sets.size());
+    const int index = (atPosition < 0 || atPosition > size) ? size : atPosition;
+
+    m_sets.insert(m_sets.begin() + index, set);
+    renumberSets();
+}
 
 void Exercise::removeSet(int index)
 {
-    if (index >= 0 && index < static_cast<int>(m_sets.size()))
-        m_sets.erase(m_sets.begin() + index);
+    if (index < 0 || index >= static_cast<int>(m_sets.size()))
+        return;
+
+    m_sets.erase(m_sets.begin() + index);
+    renumberSets();
+}
+
+void Exercise::moveSet(int from, int to)
+{
+    const int size = static_cast<int>(m_sets.size());
+    if (from < 0 || from >= size || to < 0 || to >= size || from == to)
+        return;
+
+    Set moved = m_sets[from];
+    m_sets.erase(m_sets.begin() + from);
+    m_sets.insert(m_sets.begin() + to, moved);
+    renumberSets();
+}
+
+void Exercise::duplicateSet(int index)
+{
+    if (index < 0 || index >= static_cast<int>(m_sets.size()))
+        return;
+
+    Set copy = m_sets[index];
+    copy.setId(-1);
+    copy.setCompleted(false);
+
+    m_sets.insert(m_sets.begin() + index + 1, copy);
+    renumberSets();
+}
+
+void Exercise::normalizePositions() { renumberSets(); }
+
+void Exercise::renumberSets()
+{
+    for (size_t i = 0; i < m_sets.size(); ++i)
+        m_sets[i].setPosition(static_cast<int>(i));
 }
 
 bool Exercise::isCompleted() const
@@ -152,5 +220,32 @@ double Exercise::bestOneRepMax() const
         best = std::max(best, s.oneRepMax());
     return best;
 }
+
+bool Exercise::acceptsSet(const Set& set) const { return metricSuitsKind(m_kind, set.metric()); }
+
+QStringList Exercise::validationErrors() const
+{
+    QStringList errors;
+
+    if (m_name.trimmed().isEmpty())
+        errors.append(QStringLiteral("exercise name must not be empty"));
+
+    if (m_restSeconds < 0)
+        errors.append(QStringLiteral("rest seconds must not be negative"));
+
+    for (size_t i = 0; i < m_sets.size(); ++i)
+    {
+        if (acceptsSet(m_sets[i]))
+            continue;
+
+        errors.append(QStringLiteral("set %1 uses metric %2 which does not suit kind %3")
+                          .arg(QString::number(i), setMetricToString(m_sets[i].metric()),
+                               exerciseKindToString(m_kind)));
+    }
+
+    return errors;
+}
+
+bool Exercise::isValid() const { return validationErrors().isEmpty(); }
 
 void Exercise::validate() const { }
