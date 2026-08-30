@@ -4,6 +4,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 
+#include "modules/exercisecatalog/infrastructure/database/exercisedefinitionrepositorydb.h"
 #include "modules/userprofile/infrastructure/database/userprofilerepositorydb.h"
 #include "modules/workout/infrastructure/database/workoutrepositorydb.h"
 #include <dbtoolkit/dbstorage.h>
@@ -38,10 +39,13 @@ bool AppDbStorage::open()
     m_workoutRepo->createTables();
     m_userProfileRepo = std::make_unique<UserProfileRepositoryDb>(*m_dbStorage);
     m_userProfileRepo->createTable();
+    m_exerciseDefinitionRepo = std::make_unique<ExerciseDefinitionRepositoryDb>(*m_dbStorage);
+    m_exerciseDefinitionRepo->createTables();
 
     MigrationRunner runner(*m_dbStorage);
     m_workoutRepo->registerMigrations(runner);
     m_userProfileRepo->registerMigrations(runner);
+    m_exerciseDefinitionRepo->registerMigrations(runner);
     runner.run();
 
     return true;
@@ -50,3 +54,8 @@ bool AppDbStorage::open()
 WorkoutRepositoryDb& AppDbStorage::workoutRepo() { return *m_workoutRepo; }
 
 UserProfileRepositoryDb& AppDbStorage::userProfileRepo() { return *m_userProfileRepo; }
+
+ExerciseDefinitionRepositoryDb& AppDbStorage::exerciseDefinitionRepo()
+{
+    return *m_exerciseDefinitionRepo;
+}

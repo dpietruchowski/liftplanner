@@ -3,6 +3,8 @@ set(TEST_SOURCES
     domain/entities/exercisedefinitiontest.cpp
     domain/repositories/exercisedefinitionquerytest.cpp
     domain/services/exercisematchertest.cpp
+    infrastructure/serializers/exercisedefinitionserializertest.cpp
+    infrastructure/database/exercisedefinitionrepositorydbtest.cpp
 )
 
 add_executable(exercisecatalog_tests ${TEST_SOURCES})
@@ -11,12 +13,15 @@ target_compile_definitions(exercisecatalog_tests PRIVATE UNIT_TEST)
 
 target_link_libraries(exercisecatalog_tests
     PRIVATE
+        core
         exercisecatalog_module
         workout_module
+        dbtoolkit
         gtest
         gtest_main
         gmock
         Qt6::Core
+        Qt6::Sql
 )
 
 target_include_directories(exercisecatalog_tests
