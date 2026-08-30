@@ -5,6 +5,7 @@ qt_standard_project_setup()
 add_subdirectory(ui/models)
 add_subdirectory(core)
 add_subdirectory(modules/workout)
+add_subdirectory(modules/exercisecatalog)
 add_subdirectory(modules/userprofile)
 
 if(NOT QML_LIVE_ENABLED)
@@ -43,6 +44,7 @@ target_link_libraries(liftplanner
     PRIVATE
     core
     workout_module
+    exercisecatalog_module
     userprofile_module
     qmllive
     dbtoolkit
