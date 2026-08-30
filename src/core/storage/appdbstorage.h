@@ -24,6 +24,8 @@ public:
     ExerciseDefinitionRepositoryDb& exerciseDefinitionRepo();
 
 private:
+    void seedExerciseCatalog();
+
     std::unique_ptr<QSqlDatabase> m_database;
     std::unique_ptr<DbStorage> m_dbStorage;
     std::unique_ptr<WorkoutRepositoryDb> m_workoutRepo;

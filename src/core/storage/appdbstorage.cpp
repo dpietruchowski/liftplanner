@@ -5,6 +5,7 @@
 #include <QSqlQuery>
 
 #include "modules/exercisecatalog/infrastructure/database/exercisedefinitionrepositorydb.h"
+#include "modules/exercisecatalog/infrastructure/seed/exercisecatalogseed.h"
 #include "modules/userprofile/infrastructure/database/userprofilerepositorydb.h"
 #include "modules/workout/infrastructure/database/workoutrepositorydb.h"
 #include <dbtoolkit/dbstorage.h>
@@ -48,7 +49,20 @@ bool AppDbStorage::open()
     m_exerciseDefinitionRepo->registerMigrations(runner);
     runner.run();
 
+    seedExerciseCatalog();
+
     return true;
+}
+
+void AppDbStorage::seedExerciseCatalog()
+{
+    const CatalogSeedResult result = ExerciseCatalogSeed::apply(*m_exerciseDefinitionRepo);
+
+    for (const QString& error : result.errors)
+        qWarning() << "Exercise catalog seed:" << error;
+
+    qInfo() << "Exercise catalog seed: inserted" << result.inserted << "updated" << result.updated
+            << "archived" << result.archived;
 }
 
 WorkoutRepositoryDb& AppDbStorage::workoutRepo() { return *m_workoutRepo; }

@@ -5,11 +5,15 @@ set(TEST_SOURCES
     domain/services/exercisematchertest.cpp
     infrastructure/serializers/exercisedefinitionserializertest.cpp
     infrastructure/database/exercisedefinitionrepositorydbtest.cpp
+    infrastructure/seed/exercisecatalogseedtest.cpp
 )
 
 add_executable(exercisecatalog_tests ${TEST_SOURCES})
 
-target_compile_definitions(exercisecatalog_tests PRIVATE UNIT_TEST)
+target_compile_definitions(exercisecatalog_tests PRIVATE
+    UNIT_TEST
+    EXERCISE_SEED_FILE="${PROJECT_SOURCE_DIR}/src/data/exercises.json"
+)
 
 target_link_libraries(exercisecatalog_tests
     PRIVATE

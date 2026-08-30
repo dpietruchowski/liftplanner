@@ -1,0 +1,2348 @@
+{
+  "version": 1,
+  "exercises": [
+    {
+      "slug": "ab-wheel-rollout",
+      "name": "Ab Wheel Rollout",
+      "aliases": [],
+      "kind": "bodyweight",
+      "equipment": "other",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "bodyweight",
+      "defaultRestSeconds": 90,
+      "muscles": [
+        {
+          "muscle": "abs",
+          "role": "primary"
+        },
+        {
+          "muscle": "lats",
+          "role": "secondary"
+        },
+        {
+          "muscle": "lower_back",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Roll out only as far as the ribs can stay down, then pull back."
+    },
+    {
+      "slug": "arnold-press",
+      "name": "Arnold Press",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 120,
+      "muscles": [
+        {
+          "muscle": "front_delts",
+          "role": "primary"
+        },
+        {
+          "muscle": "side_delts",
+          "role": "secondary"
+        },
+        {
+          "muscle": "triceps",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Rotate the palms outward as the dumbbells travel overhead."
+    },
+    {
+      "slug": "back-extension",
+      "name": "Back Extension",
+      "aliases": [
+        "Hyperextension"
+      ],
+      "kind": "bodyweight",
+      "equipment": "bodyweight",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "bodyweight",
+      "defaultRestSeconds": 90,
+      "muscles": [
+        {
+          "muscle": "lower_back",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "secondary"
+        },
+        {
+          "muscle": "hamstrings",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Hinge at the hips and rise until the torso lines up with the legs."
+    },
+    {
+      "slug": "back-squat",
+      "name": "Back Squat",
+      "aliases": [
+        "Squat"
+      ],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 210,
+      "muscles": [
+        {
+          "muscle": "quads",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "primary"
+        },
+        {
+          "muscle": "hamstrings",
+          "role": "secondary"
+        },
+        {
+          "muscle": "lower_back",
+          "role": "stabilizer"
+        },
+        {
+          "muscle": "abs",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Sit down between the hips and stand back up, keeping the whole foot loaded."
+    },
+    {
+      "slug": "barbell-curl",
+      "name": "Barbell Curl",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 90,
+      "muscles": [
+        {
+          "muscle": "biceps",
+          "role": "primary"
+        },
+        {
+          "muscle": "forearms",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Curl the bar with the elbows pinned at the sides."
+    },
+    {
+      "slug": "barbell-row",
+      "name": "Barbell Row",
+      "aliases": [
+        "Bent-Over Row"
+      ],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 150,
+      "muscles": [
+        {
+          "muscle": "upper_back",
+          "role": "primary"
+        },
+        {
+          "muscle": "lats",
+          "role": "primary"
+        },
+        {
+          "muscle": "biceps",
+          "role": "secondary"
+        },
+        {
+          "muscle": "lower_back",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Hinge forward and row the bar to the lower ribs."
+    },
+    {
+      "slug": "barbell-shrug",
+      "name": "Barbell Shrug",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 90,
+      "muscles": [
+        {
+          "muscle": "traps",
+          "role": "primary"
+        },
+        {
+          "muscle": "forearms",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Lift the shoulders straight up and pause briefly at the top."
+    },
+    {
+      "slug": "bench-press",
+      "name": "Bench Press",
+      "aliases": [
+        "Flat Bench Press"
+      ],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 180,
+      "muscles": [
+        {
+          "muscle": "chest",
+          "role": "primary"
+        },
+        {
+          "muscle": "triceps",
+          "role": "secondary"
+        },
+        {
+          "muscle": "front_delts",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Lower the bar to mid-chest with the shoulder blades retracted, then press back up."
+    },
+    {
+      "slug": "bulgarian-split-squat",
+      "name": "Bulgarian Split Squat",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "compound",
+      "laterality": "unilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 120,
+      "muscles": [
+        {
+          "muscle": "quads",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "primary"
+        },
+        {
+          "muscle": "hamstrings",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Rest the rear foot on a bench and lower straight down over the front leg."
+    },
+    {
+      "slug": "burpee",
+      "name": "Burpee",
+      "aliases": [],
+      "kind": "interval",
+      "equipment": "bodyweight",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "quads",
+          "role": "primary"
+        },
+        {
+          "muscle": "chest",
+          "role": "secondary"
+        },
+        {
+          "muscle": "abs",
+          "role": "secondary"
+        },
+        {
+          "muscle": "front_delts",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Drop to a push-up, jump the feet back in and finish standing."
+    },
+    {
+      "slug": "cable-crossover",
+      "name": "Cable Crossover",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "cable",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 90,
+      "muscles": [
+        {
+          "muscle": "chest",
+          "role": "primary"
+        },
+        {
+          "muscle": "front_delts",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Draw both handles together in front of the chest and control the return."
+    },
+    {
+      "slug": "cable-curl",
+      "name": "Cable Curl",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "cable",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 75,
+      "muscles": [
+        {
+          "muscle": "biceps",
+          "role": "primary"
+        },
+        {
+          "muscle": "forearms",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Curl the handle with constant cable tension through the full range."
+    },
+    {
+      "slug": "cable-woodchop",
+      "name": "Cable Woodchop",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "cable",
+      "mechanics": "compound",
+      "laterality": "unilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 75,
+      "muscles": [
+        {
+          "muscle": "obliques",
+          "role": "primary"
+        },
+        {
+          "muscle": "abs",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Pull the handle diagonally across the body, turning through the torso."
+    },
+    {
+      "slug": "cat-cow",
+      "name": "Cat-Cow",
+      "aliases": [],
+      "kind": "mobility",
+      "equipment": "bodyweight",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "duration",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 30,
+      "muscles": [
+        {
+          "muscle": "lower_back",
+          "role": "primary"
+        },
+        {
+          "muscle": "abs",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Alternate between rounding and extending the spine on all fours."
+    },
+    {
+      "slug": "chest-dip",
+      "name": "Chest Dip",
+      "aliases": [],
+      "kind": "bodyweight",
+      "equipment": "bodyweight",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "bodyweight",
+      "defaultRestSeconds": 120,
+      "muscles": [
+        {
+          "muscle": "chest",
+          "role": "primary"
+        },
+        {
+          "muscle": "triceps",
+          "role": "secondary"
+        },
+        {
+          "muscle": "front_delts",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Lean the torso forward on parallel bars and lower until the shoulders drop below the elbows."
+    },
+    {
+      "slug": "chin-up",
+      "name": "Chin-Up",
+      "aliases": [],
+      "kind": "bodyweight",
+      "equipment": "bodyweight",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "bodyweight",
+      "defaultRestSeconds": 150,
+      "muscles": [
+        {
+          "muscle": "lats",
+          "role": "primary"
+        },
+        {
+          "muscle": "biceps",
+          "role": "primary"
+        },
+        {
+          "muscle": "upper_back",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Use an underhand grip and pull the chest toward the bar."
+    },
+    {
+      "slug": "close-grip-bench-press",
+      "name": "Close-Grip Bench Press",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 150,
+      "muscles": [
+        {
+          "muscle": "triceps",
+          "role": "primary"
+        },
+        {
+          "muscle": "chest",
+          "role": "secondary"
+        },
+        {
+          "muscle": "front_delts",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Grip inside shoulder width and keep the elbows tucked."
+    },
+    {
+      "slug": "couch-stretch",
+      "name": "Couch Stretch",
+      "aliases": [],
+      "kind": "mobility",
+      "equipment": "bodyweight",
+      "mechanics": "isolation",
+      "laterality": "unilateral",
+      "defaultMetric": "duration",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 30,
+      "muscles": [
+        {
+          "muscle": "quads",
+          "role": "primary"
+        },
+        {
+          "muscle": "hip_flexors",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Place the rear foot against a wall in a half-kneel and stay tall."
+    },
+    {
+      "slug": "crunch",
+      "name": "Crunch",
+      "aliases": [],
+      "kind": "bodyweight",
+      "equipment": "bodyweight",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "bodyweight",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "abs",
+          "role": "primary"
+        }
+      ],
+      "instructions": "Curl the ribs toward the hips and lower without relaxing fully."
+    },
+    {
+      "slug": "cycling",
+      "name": "Cycling",
+      "aliases": [],
+      "kind": "cardio",
+      "equipment": "bike",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "distance",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "quads",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "secondary"
+        },
+        {
+          "muscle": "calves",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Ride at a steady cadence for the planned distance."
+    },
+    {
+      "slug": "dead-bug",
+      "name": "Dead Bug",
+      "aliases": [],
+      "kind": "bodyweight",
+      "equipment": "bodyweight",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "bodyweight",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "abs",
+          "role": "primary"
+        },
+        {
+          "muscle": "hip_flexors",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Extend the opposite arm and leg while keeping the lower back flat."
+    },
+    {
+      "slug": "dead-hang",
+      "name": "Dead Hang",
+      "aliases": [],
+      "kind": "interval",
+      "equipment": "bodyweight",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "duration",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "forearms",
+          "role": "primary"
+        },
+        {
+          "muscle": "lats",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Hang from the bar with a relaxed shoulder position for time."
+    },
+    {
+      "slug": "deadlift",
+      "name": "Deadlift",
+      "aliases": [
+        "Conventional Deadlift"
+      ],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 240,
+      "muscles": [
+        {
+          "muscle": "hamstrings",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "primary"
+        },
+        {
+          "muscle": "lower_back",
+          "role": "primary"
+        },
+        {
+          "muscle": "traps",
+          "role": "secondary"
+        },
+        {
+          "muscle": "forearms",
+          "role": "secondary"
+        },
+        {
+          "muscle": "quads",
+          "role": "secondary"
+        },
+        {
+          "muscle": "lats",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Drive the floor away with a neutral spine, keeping the bar close to the legs."
+    },
+    {
+      "slug": "decline-bench-press",
+      "name": "Decline Bench Press",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 150,
+      "muscles": [
+        {
+          "muscle": "chest",
+          "role": "primary"
+        },
+        {
+          "muscle": "triceps",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Press from a declined bench, keeping the bar path over the lower chest."
+    },
+    {
+      "slug": "dumbbell-bench-press",
+      "name": "Dumbbell Bench Press",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 150,
+      "muscles": [
+        {
+          "muscle": "chest",
+          "role": "primary"
+        },
+        {
+          "muscle": "triceps",
+          "role": "secondary"
+        },
+        {
+          "muscle": "front_delts",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Press both dumbbells from chest level, letting them travel slightly inward."
+    },
+    {
+      "slug": "dumbbell-curl",
+      "name": "Dumbbell Curl",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 75,
+      "muscles": [
+        {
+          "muscle": "biceps",
+          "role": "primary"
+        },
+        {
+          "muscle": "forearms",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Curl the dumbbells while keeping the upper arms still."
+    },
+    {
+      "slug": "dumbbell-fly",
+      "name": "Dumbbell Fly",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 90,
+      "muscles": [
+        {
+          "muscle": "chest",
+          "role": "primary"
+        },
+        {
+          "muscle": "front_delts",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Open the arms in a wide arc with a soft elbow bend, then bring them back together."
+    },
+    {
+      "slug": "dumbbell-row",
+      "name": "Dumbbell Row",
+      "aliases": [
+        "Single-Arm Row"
+      ],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "compound",
+      "laterality": "unilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 120,
+      "muscles": [
+        {
+          "muscle": "lats",
+          "role": "primary"
+        },
+        {
+          "muscle": "upper_back",
+          "role": "secondary"
+        },
+        {
+          "muscle": "biceps",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Support the free hand on a bench and row the dumbbell to the hip."
+    },
+    {
+      "slug": "dumbbell-shoulder-press",
+      "name": "Dumbbell Shoulder Press",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 150,
+      "muscles": [
+        {
+          "muscle": "front_delts",
+          "role": "primary"
+        },
+        {
+          "muscle": "side_delts",
+          "role": "secondary"
+        },
+        {
+          "muscle": "triceps",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Press both dumbbells from ear height until the arms are extended."
+    },
+    {
+      "slug": "elliptical",
+      "name": "Elliptical",
+      "aliases": [],
+      "kind": "cardio",
+      "equipment": "machine",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "duration",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "quads",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "secondary"
+        },
+        {
+          "muscle": "calves",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Keep a steady stride for the planned time."
+    },
+    {
+      "slug": "face-pull",
+      "name": "Face Pull",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "cable",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 90,
+      "muscles": [
+        {
+          "muscle": "rear_delts",
+          "role": "primary"
+        },
+        {
+          "muscle": "upper_back",
+          "role": "secondary"
+        },
+        {
+          "muscle": "traps",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Pull the rope toward the face with the elbows high."
+    },
+    {
+      "slug": "farmers-walk",
+      "name": "Farmer's Walk",
+      "aliases": [],
+      "kind": "cardio",
+      "equipment": "dumbbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "distance",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 120,
+      "muscles": [
+        {
+          "muscle": "forearms",
+          "role": "primary"
+        },
+        {
+          "muscle": "traps",
+          "role": "primary"
+        },
+        {
+          "muscle": "abs",
+          "role": "stabilizer"
+        },
+        {
+          "muscle": "quads",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Carry a heavy weight in each hand and walk tall for the planned distance."
+    },
+    {
+      "slug": "front-raise",
+      "name": "Front Raise",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 75,
+      "muscles": [
+        {
+          "muscle": "front_delts",
+          "role": "primary"
+        }
+      ],
+      "instructions": "Lift the dumbbells forward to shoulder height with straight arms."
+    },
+    {
+      "slug": "front-squat",
+      "name": "Front Squat",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 210,
+      "muscles": [
+        {
+          "muscle": "quads",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "secondary"
+        },
+        {
+          "muscle": "abs",
+          "role": "stabilizer"
+        },
+        {
+          "muscle": "upper_back",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Hold the bar on the front delts with the elbows high and squat upright."
+    },
+    {
+      "slug": "goblet-squat",
+      "name": "Goblet Squat",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 120,
+      "muscles": [
+        {
+          "muscle": "quads",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "secondary"
+        },
+        {
+          "muscle": "abs",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Hold a single weight at the chest and squat between the knees."
+    },
+    {
+      "slug": "good-morning",
+      "name": "Good Morning",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 150,
+      "muscles": [
+        {
+          "muscle": "hamstrings",
+          "role": "primary"
+        },
+        {
+          "muscle": "lower_back",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Hinge forward with the bar on the upper back and a flat spine."
+    },
+    {
+      "slug": "hammer-curl",
+      "name": "Hammer Curl",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 75,
+      "muscles": [
+        {
+          "muscle": "biceps",
+          "role": "primary"
+        },
+        {
+          "muscle": "forearms",
+          "role": "primary"
+        }
+      ],
+      "instructions": "Curl with a neutral grip, thumbs pointing up throughout."
+    },
+    {
+      "slug": "hamstring-stretch",
+      "name": "Hamstring Stretch",
+      "aliases": [],
+      "kind": "mobility",
+      "equipment": "bodyweight",
+      "mechanics": "isolation",
+      "laterality": "unilateral",
+      "defaultMetric": "duration",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 30,
+      "muscles": [
+        {
+          "muscle": "hamstrings",
+          "role": "primary"
+        },
+        {
+          "muscle": "calves",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Hinge over a straight leg until the back of the thigh lengthens."
+    },
+    {
+      "slug": "hanging-leg-raise",
+      "name": "Hanging Leg Raise",
+      "aliases": [],
+      "kind": "bodyweight",
+      "equipment": "bodyweight",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "bodyweight",
+      "defaultRestSeconds": 90,
+      "muscles": [
+        {
+          "muscle": "abs",
+          "role": "primary"
+        },
+        {
+          "muscle": "hip_flexors",
+          "role": "secondary"
+        },
+        {
+          "muscle": "forearms",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Hang from the bar and raise the legs without swinging."
+    },
+    {
+      "slug": "hip-abduction",
+      "name": "Hip Abduction",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "machine",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "abductors",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Push the knees apart against the pads and return slowly."
+    },
+    {
+      "slug": "hip-adduction",
+      "name": "Hip Adduction",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "machine",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "adductors",
+          "role": "primary"
+        }
+      ],
+      "instructions": "Squeeze the knees together against the pads and control the return."
+    },
+    {
+      "slug": "hip-flexor-stretch",
+      "name": "Hip Flexor Stretch",
+      "aliases": [],
+      "kind": "mobility",
+      "equipment": "bodyweight",
+      "mechanics": "isolation",
+      "laterality": "unilateral",
+      "defaultMetric": "duration",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 30,
+      "muscles": [
+        {
+          "muscle": "hip_flexors",
+          "role": "primary"
+        },
+        {
+          "muscle": "quads",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Kneel in a half-lunge and tuck the pelvis until the front of the hip lengthens."
+    },
+    {
+      "slug": "hip-thrust",
+      "name": "Hip Thrust",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 150,
+      "muscles": [
+        {
+          "muscle": "glutes",
+          "role": "primary"
+        },
+        {
+          "muscle": "hamstrings",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Rest the upper back on a bench and drive the hips to full extension."
+    },
+    {
+      "slug": "hollow-hold",
+      "name": "Hollow Hold",
+      "aliases": [],
+      "kind": "interval",
+      "equipment": "bodyweight",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "duration",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "abs",
+          "role": "primary"
+        },
+        {
+          "muscle": "hip_flexors",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Press the lower back into the floor and hold the arms and legs off the ground."
+    },
+    {
+      "slug": "incline-bench-press",
+      "name": "Incline Bench Press",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 180,
+      "muscles": [
+        {
+          "muscle": "chest",
+          "role": "primary"
+        },
+        {
+          "muscle": "front_delts",
+          "role": "secondary"
+        },
+        {
+          "muscle": "triceps",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Set the bench to about 30 degrees and press from the upper chest."
+    },
+    {
+      "slug": "incline-dumbbell-press",
+      "name": "Incline Dumbbell Press",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 150,
+      "muscles": [
+        {
+          "muscle": "chest",
+          "role": "primary"
+        },
+        {
+          "muscle": "front_delts",
+          "role": "secondary"
+        },
+        {
+          "muscle": "triceps",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Press from an inclined bench with the dumbbells starting at upper-chest level."
+    },
+    {
+      "slug": "jump-rope",
+      "name": "Jump Rope",
+      "aliases": [],
+      "kind": "cardio",
+      "equipment": "other",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "duration",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "calves",
+          "role": "primary"
+        },
+        {
+          "muscle": "quads",
+          "role": "secondary"
+        },
+        {
+          "muscle": "forearms",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Skip with small hops, turning the rope from the wrists."
+    },
+    {
+      "slug": "kettlebell-swing",
+      "name": "Kettlebell Swing",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "kettlebell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 90,
+      "muscles": [
+        {
+          "muscle": "glutes",
+          "role": "primary"
+        },
+        {
+          "muscle": "hamstrings",
+          "role": "primary"
+        },
+        {
+          "muscle": "lower_back",
+          "role": "secondary"
+        },
+        {
+          "muscle": "abs",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Hinge and snap the hips to float the bell up to chest height."
+    },
+    {
+      "slug": "lat-pulldown",
+      "name": "Lat Pulldown",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "cable",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 120,
+      "muscles": [
+        {
+          "muscle": "lats",
+          "role": "primary"
+        },
+        {
+          "muscle": "upper_back",
+          "role": "secondary"
+        },
+        {
+          "muscle": "biceps",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Pull the bar to the upper chest while keeping the torso nearly upright."
+    },
+    {
+      "slug": "lateral-raise",
+      "name": "Lateral Raise",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 75,
+      "muscles": [
+        {
+          "muscle": "side_delts",
+          "role": "primary"
+        },
+        {
+          "muscle": "traps",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Raise the dumbbells out to the sides up to shoulder height."
+    },
+    {
+      "slug": "leg-curl",
+      "name": "Leg Curl",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "machine",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 75,
+      "muscles": [
+        {
+          "muscle": "hamstrings",
+          "role": "primary"
+        },
+        {
+          "muscle": "calves",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Curl the pad toward the hips and resist on the way back."
+    },
+    {
+      "slug": "leg-extension",
+      "name": "Leg Extension",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "machine",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 75,
+      "muscles": [
+        {
+          "muscle": "quads",
+          "role": "primary"
+        }
+      ],
+      "instructions": "Extend the knees to full lockout and lower under control."
+    },
+    {
+      "slug": "leg-press",
+      "name": "Leg Press",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "machine",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 150,
+      "muscles": [
+        {
+          "muscle": "quads",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "secondary"
+        },
+        {
+          "muscle": "hamstrings",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Lower the platform under control and press without locking the knees hard."
+    },
+    {
+      "slug": "machine-chest-press",
+      "name": "Machine Chest Press",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "machine",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 120,
+      "muscles": [
+        {
+          "muscle": "chest",
+          "role": "primary"
+        },
+        {
+          "muscle": "triceps",
+          "role": "secondary"
+        },
+        {
+          "muscle": "front_delts",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Press the handles forward until the arms are extended without locking hard."
+    },
+    {
+      "slug": "mountain-climber",
+      "name": "Mountain Climbers",
+      "aliases": [],
+      "kind": "interval",
+      "equipment": "bodyweight",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "duration",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "abs",
+          "role": "primary"
+        },
+        {
+          "muscle": "hip_flexors",
+          "role": "secondary"
+        },
+        {
+          "muscle": "front_delts",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Drive the knees toward the chest from a push-up position."
+    },
+    {
+      "slug": "neck-curl",
+      "name": "Neck Curl",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "other",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "neck",
+          "role": "primary"
+        }
+      ],
+      "instructions": "Nod the chin toward the chest against light resistance."
+    },
+    {
+      "slug": "neck-extension",
+      "name": "Neck Extension",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "other",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "neck",
+          "role": "primary"
+        }
+      ],
+      "instructions": "Extend the head backward against light resistance through a comfortable range."
+    },
+    {
+      "slug": "overhead-press",
+      "name": "Overhead Press",
+      "aliases": [
+        "Military Press",
+        "Shoulder Press"
+      ],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 180,
+      "muscles": [
+        {
+          "muscle": "front_delts",
+          "role": "primary"
+        },
+        {
+          "muscle": "side_delts",
+          "role": "secondary"
+        },
+        {
+          "muscle": "triceps",
+          "role": "secondary"
+        },
+        {
+          "muscle": "abs",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Press the bar overhead and finish with the head through the arms."
+    },
+    {
+      "slug": "overhead-triceps-extension",
+      "name": "Overhead Triceps Extension",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 90,
+      "muscles": [
+        {
+          "muscle": "triceps",
+          "role": "primary"
+        }
+      ],
+      "instructions": "Lower the weight behind the head and extend the elbows."
+    },
+    {
+      "slug": "plank",
+      "name": "Plank",
+      "aliases": [],
+      "kind": "interval",
+      "equipment": "bodyweight",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "duration",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "abs",
+          "role": "primary"
+        },
+        {
+          "muscle": "obliques",
+          "role": "secondary"
+        },
+        {
+          "muscle": "lower_back",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Hold a straight line on the forearms with the ribs pulled down."
+    },
+    {
+      "slug": "preacher-curl",
+      "name": "Preacher Curl",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 90,
+      "muscles": [
+        {
+          "muscle": "biceps",
+          "role": "primary"
+        }
+      ],
+      "instructions": "Rest the upper arms on the pad and curl without letting the elbows lift."
+    },
+    {
+      "slug": "pull-up",
+      "name": "Pull-Up",
+      "aliases": [],
+      "kind": "bodyweight",
+      "equipment": "bodyweight",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "bodyweight",
+      "defaultRestSeconds": 150,
+      "muscles": [
+        {
+          "muscle": "lats",
+          "role": "primary"
+        },
+        {
+          "muscle": "upper_back",
+          "role": "secondary"
+        },
+        {
+          "muscle": "biceps",
+          "role": "secondary"
+        },
+        {
+          "muscle": "forearms",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Hang with an overhand grip and pull until the chin clears the bar."
+    },
+    {
+      "slug": "push-press",
+      "name": "Push Press",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 180,
+      "muscles": [
+        {
+          "muscle": "front_delts",
+          "role": "primary"
+        },
+        {
+          "muscle": "triceps",
+          "role": "secondary"
+        },
+        {
+          "muscle": "quads",
+          "role": "secondary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Use a short dip and leg drive to start the bar, then press it to lockout."
+    },
+    {
+      "slug": "push-up",
+      "name": "Push-Up",
+      "aliases": [
+        "Press-Up"
+      ],
+      "kind": "bodyweight",
+      "equipment": "bodyweight",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "bodyweight",
+      "defaultRestSeconds": 90,
+      "muscles": [
+        {
+          "muscle": "chest",
+          "role": "primary"
+        },
+        {
+          "muscle": "triceps",
+          "role": "secondary"
+        },
+        {
+          "muscle": "front_delts",
+          "role": "secondary"
+        },
+        {
+          "muscle": "abs",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Keep a straight line from head to heels and lower until the chest is near the floor."
+    },
+    {
+      "slug": "rack-pull",
+      "name": "Rack Pull",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 180,
+      "muscles": [
+        {
+          "muscle": "traps",
+          "role": "primary"
+        },
+        {
+          "muscle": "lower_back",
+          "role": "secondary"
+        },
+        {
+          "muscle": "lats",
+          "role": "secondary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Pull from pins set near knee height and finish standing tall."
+    },
+    {
+      "slug": "rear-delt-fly",
+      "name": "Rear Delt Fly",
+      "aliases": [
+        "Reverse Fly"
+      ],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 75,
+      "muscles": [
+        {
+          "muscle": "rear_delts",
+          "role": "primary"
+        },
+        {
+          "muscle": "upper_back",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Hinge forward and open the arms out to the sides."
+    },
+    {
+      "slug": "romanian-deadlift",
+      "name": "Romanian Deadlift",
+      "aliases": [
+        "RDL"
+      ],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 180,
+      "muscles": [
+        {
+          "muscle": "hamstrings",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "primary"
+        },
+        {
+          "muscle": "lower_back",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Push the hips back with soft knees and stop when the hamstrings stretch."
+    },
+    {
+      "slug": "rowing-machine",
+      "name": "Rowing Machine",
+      "aliases": [
+        "Erg"
+      ],
+      "kind": "cardio",
+      "equipment": "rower",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "distance",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "lats",
+          "role": "primary"
+        },
+        {
+          "muscle": "quads",
+          "role": "secondary"
+        },
+        {
+          "muscle": "upper_back",
+          "role": "secondary"
+        },
+        {
+          "muscle": "biceps",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Drive with the legs, then swing the torso and finish with the arms."
+    },
+    {
+      "slug": "running",
+      "name": "Running",
+      "aliases": [],
+      "kind": "cardio",
+      "equipment": "treadmill",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "distance",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "quads",
+          "role": "primary"
+        },
+        {
+          "muscle": "hamstrings",
+          "role": "secondary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "secondary"
+        },
+        {
+          "muscle": "calves",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Run at a steady effort for the planned distance."
+    },
+    {
+      "slug": "russian-twist",
+      "name": "Russian Twist",
+      "aliases": [],
+      "kind": "bodyweight",
+      "equipment": "bodyweight",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "bodyweight",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "obliques",
+          "role": "primary"
+        },
+        {
+          "muscle": "abs",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Sit back at an angle and rotate the torso from side to side."
+    },
+    {
+      "slug": "seated-cable-row",
+      "name": "Seated Cable Row",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "cable",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 120,
+      "muscles": [
+        {
+          "muscle": "upper_back",
+          "role": "primary"
+        },
+        {
+          "muscle": "lats",
+          "role": "secondary"
+        },
+        {
+          "muscle": "biceps",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Pull the handle to the abdomen and let the shoulder blades separate on the return."
+    },
+    {
+      "slug": "seated-calf-raise",
+      "name": "Seated Calf Raise",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "machine",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "calves",
+          "role": "primary"
+        }
+      ],
+      "instructions": "Drive the knees up with the balls of the feet on the platform."
+    },
+    {
+      "slug": "shoulder-dislocate",
+      "name": "Shoulder Dislocate",
+      "aliases": [],
+      "kind": "mobility",
+      "equipment": "band",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "duration",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 30,
+      "muscles": [
+        {
+          "muscle": "front_delts",
+          "role": "primary"
+        },
+        {
+          "muscle": "rear_delts",
+          "role": "secondary"
+        },
+        {
+          "muscle": "traps",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Pass a band overhead and behind the back with straight arms."
+    },
+    {
+      "slug": "side-plank",
+      "name": "Side Plank",
+      "aliases": [],
+      "kind": "interval",
+      "equipment": "bodyweight",
+      "mechanics": "isolation",
+      "laterality": "unilateral",
+      "defaultMetric": "duration",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 45,
+      "muscles": [
+        {
+          "muscle": "obliques",
+          "role": "primary"
+        },
+        {
+          "muscle": "abs",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Stack the hips and hold the body in a straight line on one forearm."
+    },
+    {
+      "slug": "skull-crusher",
+      "name": "Skull Crusher",
+      "aliases": [
+        "Lying Triceps Extension"
+      ],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 90,
+      "muscles": [
+        {
+          "muscle": "triceps",
+          "role": "primary"
+        }
+      ],
+      "instructions": "Lower the bar toward the forehead and press back to lockout."
+    },
+    {
+      "slug": "sled-push",
+      "name": "Sled Push",
+      "aliases": [],
+      "kind": "cardio",
+      "equipment": "sled",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "distance",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 120,
+      "muscles": [
+        {
+          "muscle": "quads",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "primary"
+        },
+        {
+          "muscle": "calves",
+          "role": "secondary"
+        },
+        {
+          "muscle": "abs",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Drive the sled forward with short, powerful steps and a braced torso."
+    },
+    {
+      "slug": "stair-climber",
+      "name": "Stair Climber",
+      "aliases": [],
+      "kind": "cardio",
+      "equipment": "machine",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "duration",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "quads",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "primary"
+        },
+        {
+          "muscle": "calves",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Climb at a steady pace without leaning on the handles."
+    },
+    {
+      "slug": "standing-calf-raise",
+      "name": "Standing Calf Raise",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "machine",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "calves",
+          "role": "primary"
+        }
+      ],
+      "instructions": "Rise onto the toes with straight knees and pause at the top."
+    },
+    {
+      "slug": "step-up",
+      "name": "Step-Up",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "compound",
+      "laterality": "unilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 120,
+      "muscles": [
+        {
+          "muscle": "quads",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "secondary"
+        },
+        {
+          "muscle": "calves",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Drive through the top foot without pushing off the trailing leg."
+    },
+    {
+      "slug": "straight-arm-pulldown",
+      "name": "Straight-Arm Pulldown",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "cable",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 90,
+      "muscles": [
+        {
+          "muscle": "lats",
+          "role": "primary"
+        },
+        {
+          "muscle": "triceps",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Sweep the bar down to the thighs with the elbows almost locked."
+    },
+    {
+      "slug": "sumo-deadlift",
+      "name": "Sumo Deadlift",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 240,
+      "muscles": [
+        {
+          "muscle": "glutes",
+          "role": "primary"
+        },
+        {
+          "muscle": "quads",
+          "role": "secondary"
+        },
+        {
+          "muscle": "adductors",
+          "role": "secondary"
+        },
+        {
+          "muscle": "hamstrings",
+          "role": "secondary"
+        },
+        {
+          "muscle": "lower_back",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Take a wide stance with the hands inside the knees and push the floor apart."
+    },
+    {
+      "slug": "swimming",
+      "name": "Swimming",
+      "aliases": [],
+      "kind": "cardio",
+      "equipment": "other",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "distance",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "lats",
+          "role": "primary"
+        },
+        {
+          "muscle": "front_delts",
+          "role": "secondary"
+        },
+        {
+          "muscle": "quads",
+          "role": "secondary"
+        },
+        {
+          "muscle": "abs",
+          "role": "stabilizer"
+        }
+      ],
+      "instructions": "Swim the planned distance at a steady effort."
+    },
+    {
+      "slug": "t-bar-row",
+      "name": "T-Bar Row",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 150,
+      "muscles": [
+        {
+          "muscle": "upper_back",
+          "role": "primary"
+        },
+        {
+          "muscle": "lats",
+          "role": "secondary"
+        },
+        {
+          "muscle": "biceps",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Row the handles to the chest while keeping the hips hinged."
+    },
+    {
+      "slug": "thoracic-rotation",
+      "name": "Thoracic Rotation",
+      "aliases": [],
+      "kind": "mobility",
+      "equipment": "bodyweight",
+      "mechanics": "isolation",
+      "laterality": "unilateral",
+      "defaultMetric": "duration",
+      "defaultLoadType": "none",
+      "defaultRestSeconds": 30,
+      "muscles": [
+        {
+          "muscle": "upper_back",
+          "role": "primary"
+        },
+        {
+          "muscle": "obliques",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Rotate the upper back while keeping the hips still."
+    },
+    {
+      "slug": "trap-bar-deadlift",
+      "name": "Trap Bar Deadlift",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "trap_bar",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 210,
+      "muscles": [
+        {
+          "muscle": "quads",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "primary"
+        },
+        {
+          "muscle": "traps",
+          "role": "secondary"
+        },
+        {
+          "muscle": "lower_back",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Stand inside the frame and stand up tall with the handles at the sides."
+    },
+    {
+      "slug": "triceps-dip",
+      "name": "Triceps Dip",
+      "aliases": [],
+      "kind": "bodyweight",
+      "equipment": "bodyweight",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "bodyweight",
+      "defaultRestSeconds": 120,
+      "muscles": [
+        {
+          "muscle": "triceps",
+          "role": "primary"
+        },
+        {
+          "muscle": "chest",
+          "role": "secondary"
+        },
+        {
+          "muscle": "front_delts",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Stay upright on the bars and lower until the elbows reach about 90 degrees."
+    },
+    {
+      "slug": "triceps-pushdown",
+      "name": "Triceps Pushdown",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "cable",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 75,
+      "muscles": [
+        {
+          "muscle": "triceps",
+          "role": "primary"
+        }
+      ],
+      "instructions": "Extend the elbows down to full lockout with the upper arms fixed."
+    },
+    {
+      "slug": "upright-row",
+      "name": "Upright Row",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "barbell",
+      "mechanics": "compound",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 90,
+      "muscles": [
+        {
+          "muscle": "side_delts",
+          "role": "primary"
+        },
+        {
+          "muscle": "traps",
+          "role": "secondary"
+        },
+        {
+          "muscle": "biceps",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Pull the bar up along the body with the elbows leading."
+    },
+    {
+      "slug": "walking-lunge",
+      "name": "Walking Lunge",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "compound",
+      "laterality": "unilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 120,
+      "muscles": [
+        {
+          "muscle": "quads",
+          "role": "primary"
+        },
+        {
+          "muscle": "glutes",
+          "role": "primary"
+        },
+        {
+          "muscle": "hamstrings",
+          "role": "secondary"
+        }
+      ],
+      "instructions": "Step forward into a lunge and drive through to the next step."
+    },
+    {
+      "slug": "wrist-curl",
+      "name": "Wrist Curl",
+      "aliases": [],
+      "kind": "strength",
+      "equipment": "dumbbell",
+      "mechanics": "isolation",
+      "laterality": "bilateral",
+      "defaultMetric": "reps",
+      "defaultLoadType": "external",
+      "defaultRestSeconds": 60,
+      "muscles": [
+        {
+          "muscle": "forearms",
+          "role": "primary"
+        }
+      ],
+      "instructions": "Rest the forearms on a bench and curl only at the wrists."
+    }
+  ]
+}
