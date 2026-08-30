@@ -23,6 +23,7 @@ QtObject {
         property color primaryVariant: "#6FBBF3"
         property color primarySurface: "#1B2D3A"
         property color primaryBorder: "#2C5D82"
+        property color primaryLight: "#86C5FA"
 
         property color secondary: "#8B7BF0"
         property color info: "#46A6EF"
@@ -45,6 +46,7 @@ QtObject {
         property color textMuted: "#8A9099"
         property color textDisabled: "#585C63"
         property color textFaint: "#4B4F55"
+        property color textSoft: "#9B9D9F"
         property color textInverse: "#0E0F11"
         property color textPlaceholder: "#585C63"
         property color buttonText: "#0E0F11"
@@ -111,6 +113,49 @@ QtObject {
         property int spacing: 4
         property int fontSize: 10
         property int radius: theme.radius.small
+    }
+
+    property var drum: QtObject {
+        property int cardInset: 8
+        property int padding: 12
+        property int paddingLarge: 20
+        property int gap: 12
+        property int gapLarge: 16
+        property int rowSpacing: 20
+        property int rowHeight: 78
+        property int rowHeightLarge: 112
+        property int textSpacing: 5
+        property int textSpacingLarge: 7
+        property int dateWidth: 24
+        property int dateSize: 18
+        property int dateSizeLarge: 22
+        property int monthSize: 9
+        property int labelSize: 9
+        property int labelSizeLarge: 11
+        property real labelSpacing: 1.2
+        property int nameSize: 18
+        property int nameSizeLarge: 26
+        property int exerciseSize: theme.fontSize.xSmall
+        property int dotSize: 6
+    }
+
+    property var week: QtObject {
+        property int cellSize: 28
+        property int cellRadius: 8
+        property int spacing: 14
+        property int labelGap: 6
+        property int labelSize: theme.fontSize.xSmall
+        property int iconSize: 14
+    }
+
+    property var stat: QtObject {
+        property int height: 56
+        property int padding: 10
+        property int spacing: 12
+        property int labelSize: theme.fontSize.xSmall
+        property int valueSize: 22
+        property int unitSize: theme.fontSize.xSmall
+        property int badgeSize: 9
     }
 
     property real dialogOpacity: 0.98
@@ -248,6 +293,13 @@ QtObject {
             property int height: 52
             property int fontSize: theme.fontSize.medium
             property int iconSize: 22
+        }
+
+        property var wide: QtObject {
+            property int width: theme.applicationWidth * 0.9
+            property int height: 48
+            property int fontSize: theme.fontSize.medium
+            property int iconSize: 24
         }
 
         property var primary: QtObject {
