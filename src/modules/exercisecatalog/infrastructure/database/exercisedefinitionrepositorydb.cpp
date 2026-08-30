@@ -3,6 +3,8 @@
 #include "modules/exercisecatalog/infrastructure/serializers/exercisedefinitionserializer.h"
 #include "modules/exercisecatalog/infrastructure/serializers/muscleinvolvementserializer.h"
 
+#include "core/query/whereclause.h"
+
 #include <dbtoolkit/dbrepository.h>
 #include <dbtoolkit/dbstorage.h>
 #include <dbtoolkit/migrationrunner.h>
@@ -17,13 +19,6 @@
 
 namespace
 {
-
-Where grouped(const Where& condition) { return Where().and_(condition); }
-
-void addClause(Where& where, const Where& clause)
-{
-    where = where.isEmpty() ? grouped(clause) : where.and_(clause);
-}
 
 QStringList muscleKeysOfRegion(BodyRegion region)
 {

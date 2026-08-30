@@ -8,6 +8,7 @@
 #include "modules/exercisecatalog/infrastructure/seed/exercisecatalogseed.h"
 #include "modules/userprofile/infrastructure/database/userprofilerepositorydb.h"
 #include "modules/workout/infrastructure/database/workoutrepositorydb.h"
+#include "modules/workout/infrastructure/database/workouttemplaterepositorydb.h"
 #include <dbtoolkit/dbstorage.h>
 #include <dbtoolkit/migrationrunner.h>
 
@@ -38,6 +39,8 @@ bool AppDbStorage::open()
     m_dbStorage = std::make_unique<DbStorage>(*m_database);
     m_workoutRepo = std::make_unique<WorkoutRepositoryDb>(*m_dbStorage);
     m_workoutRepo->createTables();
+    m_workoutTemplateRepo = std::make_unique<WorkoutTemplateRepositoryDb>(*m_dbStorage);
+    m_workoutTemplateRepo->createTables();
     m_userProfileRepo = std::make_unique<UserProfileRepositoryDb>(*m_dbStorage);
     m_userProfileRepo->createTable();
     m_exerciseDefinitionRepo = std::make_unique<ExerciseDefinitionRepositoryDb>(*m_dbStorage);
@@ -45,6 +48,7 @@ bool AppDbStorage::open()
 
     MigrationRunner runner(*m_dbStorage);
     m_workoutRepo->registerMigrations(runner);
+    m_workoutTemplateRepo->registerMigrations(runner);
     m_userProfileRepo->registerMigrations(runner);
     m_exerciseDefinitionRepo->registerMigrations(runner);
     runner.run();
@@ -66,6 +70,8 @@ void AppDbStorage::seedExerciseCatalog()
 }
 
 WorkoutRepositoryDb& AppDbStorage::workoutRepo() { return *m_workoutRepo; }
+
+WorkoutTemplateRepositoryDb& AppDbStorage::workoutTemplateRepo() { return *m_workoutTemplateRepo; }
 
 UserProfileRepositoryDb& AppDbStorage::userProfileRepo() { return *m_userProfileRepo; }
 
