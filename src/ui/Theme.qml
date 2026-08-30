@@ -158,6 +158,15 @@ QtObject {
         property int badgeSize: 9
     }
 
+    property var panel: QtObject {
+        property int handleWidth: 40
+        property int handleHeight: 4
+        property int titleSize: 26
+        property int rowHeight: 44
+        property int rowIconSize: theme.icon.small
+        property real maxHeightRatio: 0.9
+    }
+
     property real dialogOpacity: 0.98
 
     property var layout: QtObject {
@@ -219,6 +228,7 @@ QtObject {
         property string moveDown: "qrc:/Themed/Icons/chevron-down.svg"
         property string reorder: "qrc:/Themed/Icons/reorder.svg"
         property string timer: "qrc:/Themed/Icons/timer.svg"
+        property string video: "qrc:/Themed/Icons/video.svg"
         property string back: "qrc:/Themed/Icons/previous.svg"
         property string send: "qrc:/Themed/Icons/send.svg"
     }

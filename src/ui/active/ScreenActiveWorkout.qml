@@ -79,14 +79,7 @@ Rectangle {
                         screen: contentColumn
                         exerciseCount: exerciseRepeater.count
                         onShowExerciseInfo: function(exercise) {
-                            exerciseInfoPopup.title = exercise.name
-                            var searchUrl = "https://www.youtube.com/results?search_query="
-                                    + encodeURIComponent(exercise.name)
-                            exerciseInfoPopup.text = exercise.description
-                                    + "<br><br><a href=\""
-                                    + searchUrl
-                                    + "\">YouTube</a>"
-                            exerciseInfoPopup.open()
+                            exerciseInfoPanel.showExercise(exercise)
                         }
                     }
                 }
@@ -150,11 +143,8 @@ Rectangle {
         }
     }
 
-    NotificationPopup {
-        id: exerciseInfoPopup
-        iconVisible: false
-        buttons: Notification.Button.Ok
-        textFormat: Text.RichText
+    ExerciseInfoPanel {
+        id: exerciseInfoPanel
     }
 
     NotificationPopup {
