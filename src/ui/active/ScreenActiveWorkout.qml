@@ -13,14 +13,13 @@ Rectangle {
     WorkoutTimerBar {
         id: timerBar
         objectName: "workoutTimerBar"
-        anchors.margins: Theme.padding.screen
-        y: Theme.padding.screen
+        y: 0
     }
 
     ColumnLayout {
         anchors.fill: parent
         anchors.topMargin: timerBar.isVisible
-                           ? timerBar.barHeight + Theme.padding.screen * 2
+                           ? timerBar.barHeight + Theme.padding.screen
                            : Theme.padding.screen
         spacing: Theme.spacing.medium
 

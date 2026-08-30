@@ -158,6 +158,23 @@ QtObject {
         property int badgeSize: 9
     }
 
+    property var timer: QtObject {
+        property int barHeight: 178
+        property int compactHeight: theme.layout.listItemHeight
+        property int timeSize: 72
+        property int compactTimeSize: theme.fontSize.large
+        property int labelSize: theme.fontSize.xSmall
+        property real labelSpacing: 1.4
+    }
+
+    property var setRow: QtObject {
+        property int stepperHeight: 38
+        property int actionHeight: 36
+        property int removeWidth: 72
+        property int labelSize: theme.fontSize.xSmall
+        property real labelSpacing: 1.2
+    }
+
     property var panel: QtObject {
         property int handleWidth: 40
         property int handleHeight: 4
@@ -175,7 +192,6 @@ QtObject {
         property int rowHeight: 42
         property int activeRowHeight: 58
         property int cardHeight: 96
-        property int dialogBarHeight: 200
         property int indicatorSize: 22
         property int indicatorSizeLarge: 28
         property int iconSizeLarge: 44
@@ -350,6 +366,14 @@ QtObject {
             property color pressed: "#C9584C"
             property color border: "#E5695C"
             property color text: "#0E0F11"
+        }
+
+        property var dangerSubtle: QtObject {
+            property color background: "#2C1B1A"
+            property color hovered: "#3A2321"
+            property color pressed: "#231413"
+            property color border: "#5A2F2A"
+            property color text: "#E5695C"
         }
 
         property var subtle: QtObject {

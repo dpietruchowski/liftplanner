@@ -9,8 +9,9 @@ Item {
     property bool expanded: true
 
     readonly property var timer: ActiveWorkoutViewModel.timer
-    readonly property int collapsedHeight: Theme.layout.listItemHeight
-    readonly property int expandedHeight: Theme.layout.dialogBarHeight
+    readonly property int adjustSeconds: 15
+    readonly property int collapsedHeight: Theme.timer.compactHeight
+    readonly property int expandedHeight: Theme.timer.barHeight
     readonly property bool isVisible: timer.running
     readonly property int barHeight: isVisible ? (expanded ? expandedHeight : collapsedHeight) : 0
 
@@ -30,118 +31,154 @@ Item {
         }
     }
 
-    component PlusButton: ThemedButton {
-        buttonSize: Theme.button.medium
-        buttonStyle: Theme.button.tonal
-        iconSource: Theme.icons.plus
-        onClicked: timerBar.timer.addSeconds(10)
+    component PhaseLabel: Text {
+        text: timerBar.timer.phaseLabel.toUpperCase()
+        color: Theme.colors.primary
+        font.pixelSize: Theme.timer.labelSize
+        font.bold: true
+        font.letterSpacing: Theme.timer.labelSpacing
     }
 
-    component MinusButton: ThemedButton {
-        buttonSize: Theme.button.medium
-        buttonStyle: Theme.button.tonal
-        iconSource: Theme.icons.minus
-        onClicked: timerBar.timer.addSeconds(-10)
-    }
+    component AdjustButton: ThemedButton {
+        property int step: 0
 
-    component PauseButton: ThemedButton {
-        objectName: "timerPauseButton"
         buttonSize: Theme.button.medium
         buttonStyle: Theme.button.subtle
-        text: timerBar.timer.paused ? "Resume" : "Pause"
-        onClicked: timerBar.timer.paused ? timerBar.timer.resume() : timerBar.timer.pause()
-    }
-
-    component ExpandButton: ThemedButton {
-        iconSource: Theme.icons.expand
-        buttonSize: Theme.button.smallSquare
-        buttonStyle: Theme.button.subtle
-        onClicked: timerBar.expanded = true
-    }
-
-    component CollapseButton: ThemedButton {
-        iconSource: Theme.icons.collapse
-        buttonSize: Theme.button.mediumSquare
-        buttonStyle: Theme.button.subtle
-        onClicked: timerBar.expanded = false
+        onClicked: timerBar.timer.addSeconds(step)
     }
 
     Rectangle {
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.right: parent.right
+        y: -Theme.radius.large
+        height: parent.height + Theme.radius.large
         color: timerBar.timer.resting ? Theme.colors.surface : Theme.colors.surfaceAccent
-        radius: Theme.radius.medium
+        radius: Theme.radius.large
         border.width: timerBar.timer.resting ? Theme.border.thin : Theme.border.medium
         border.color: timerBar.timer.resting ? Theme.colors.border : Theme.colors.primary
+    }
 
-        Item {
+    Item {
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        height: timerBar.collapsedHeight
+        visible: !timerBar.expanded
+
+        RowLayout {
             anchors.fill: parent
-            visible: !timerBar.expanded
+            anchors.leftMargin: Theme.padding.screen
+            anchors.rightMargin: Theme.padding.small
+            spacing: Theme.spacing.small
 
-            RowLayout {
-                anchors.fill: parent
-                anchors.margins: Theme.padding.medium
-                spacing: Theme.spacing.medium
+            PhaseLabel {}
 
-                Item { Layout.fillWidth: true }
+            Text {
+                objectName: "timerRemainingCompact"
+                text: timerBar.timer.remainingText
+                color: Theme.colors.textPrimary
+                font.pixelSize: Theme.timer.compactTimeSize
+                font.bold: true
+            }
 
-                MinusButton { buttonSize: Theme.button.small }
+            Item { Layout.fillWidth: true }
 
-                Text {
-                    objectName: "timerRemainingCompact"
-                    text: timerBar.timer.remainingText
-                    color: Theme.colors.textPrimary
-                    font.pixelSize: Theme.fontSize.large
-                    font.bold: true
-                }
+            AdjustButton {
+                step: -timerBar.adjustSeconds
+                iconSource: Theme.icons.minus
+                buttonSize: Theme.button.square
+            }
 
-                PlusButton { buttonSize: Theme.button.small }
+            AdjustButton {
+                step: timerBar.adjustSeconds
+                iconSource: Theme.icons.plus
+                buttonSize: Theme.button.square
+            }
 
-                Item { Layout.fillWidth: true }
-
-                ExpandButton {}
+            ThemedButton {
+                objectName: "timerExpandButton"
+                iconSource: Theme.icons.moveDown
+                buttonSize: Theme.button.square
+                buttonStyle: Theme.button.subtle
+                circular: true
+                onClicked: timerBar.expanded = true
             }
         }
+    }
+
+    Item {
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        height: timerBar.expandedHeight
+        visible: timerBar.expanded
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: Theme.padding.medium
-            spacing: 0
-            visible: timerBar.expanded
+            anchors.margins: Theme.padding.screen
+            spacing: Theme.spacing.small
 
-            Text {
-                objectName: "timerPhaseLabel"
+            Item {
                 Layout.fillWidth: true
-                text: timerBar.timer.phaseLabel
-                color: Theme.colors.textMuted
-                font.pixelSize: Theme.fontSize.small
-                font.bold: true
-                horizontalAlignment: Text.AlignHCenter
-            }
+                Layout.fillHeight: true
 
-            Text {
-                objectName: "timerRemainingText"
-                Layout.fillWidth: true
-                text: timerBar.timer.remainingText
-                color: Theme.colors.textPrimary
-                font.pixelSize: Theme.fontSize.huge
-                font.bold: true
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
+                PhaseLabel {
+                    objectName: "timerPhaseLabel"
+                    anchors.left: parent.left
+                    anchors.top: parent.top
+                }
+
+                Text {
+                    objectName: "timerRemainingText"
+                    anchors.centerIn: parent
+                    text: timerBar.timer.remainingText
+                    color: Theme.colors.textPrimary
+                    font.pixelSize: Theme.timer.timeSize
+                    font.bold: true
+                }
+
+                ThemedButton {
+                    objectName: "timerCollapseButton"
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.topMargin: -Theme.padding.xSmall
+                    iconSource: Theme.icons.close
+                    buttonSize: Theme.button.square
+                    buttonStyle: Theme.button.subtle
+                    circular: true
+                    onClicked: timerBar.expanded = false
+                }
             }
 
             RowLayout {
-                Layout.alignment: Qt.AlignHCenter
-                spacing: Theme.spacing.large
+                Layout.fillWidth: true
+                spacing: Theme.spacing.small
 
-                Item { Layout.fillWidth: true }
+                AdjustButton {
+                    objectName: "timerMinusButton"
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Theme.button.medium.height
+                    step: -timerBar.adjustSeconds
+                    text: "−" + timerBar.adjustSeconds + " s"
+                }
 
-                MinusButton {}
-                PauseButton {}
-                PlusButton {}
+                ThemedButton {
+                    objectName: "timerPauseButton"
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Theme.button.medium.height
+                    buttonSize: Theme.button.medium
+                    buttonStyle: Theme.button.tonal
+                    text: timerBar.timer.paused ? "Resume" : "Pause"
+                    onClicked: timerBar.timer.paused ? timerBar.timer.resume() : timerBar.timer.pause()
+                }
 
-                Item { Layout.fillWidth: true }
-
-                CollapseButton {}
+                AdjustButton {
+                    objectName: "timerPlusButton"
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Theme.button.medium.height
+                    step: timerBar.adjustSeconds
+                    text: "+" + timerBar.adjustSeconds + " s"
+                }
             }
         }
     }
