@@ -9,14 +9,20 @@
 #include <dbtoolkit/query/column.h>
 #include <dbtoolkit/query/createtable.h>
 #include <dbtoolkit/query/order.h>
+#include <dbtoolkit/query/select.h>
+#include <dbtoolkit/query/update.h>
 #include <dbtoolkit/query/where.h>
+
+#include "positionbackfill.h"
 
 ExerciseRepositoryDb::ExerciseRepositoryDb(DbStorage& storage)
     : m_repository(std::make_unique<DbRepository>(
           ExerciseSerializer::table, ExerciseSerializer::id_key,
           QStringList { ExerciseSerializer::id_key, ExerciseSerializer::workout_id_key,
                         ExerciseSerializer::name_key, ExerciseSerializer::description_key,
-                        ExerciseSerializer::rest_seconds_key, ExerciseSerializer::kind_key },
+                        ExerciseSerializer::rest_seconds_key, ExerciseSerializer::kind_key,
+                        ExerciseSerializer::position_key, ExerciseSerializer::definition_id_key,
+                        ExerciseSerializer::notes_key },
           storage, nullptr))
 {
 }
@@ -34,6 +40,9 @@ bool ExerciseRepositoryDb::createTable()
         .column(Column(ExerciseSerializer::rest_seconds_key).integer())
         .column(
             Column(ExerciseSerializer::kind_key).text().defaultValue(QStringLiteral("strength")))
+        .column(Column(ExerciseSerializer::position_key).integer().defaultValue(0))
+        .column(Column(ExerciseSerializer::definition_id_key).integer())
+        .column(Column(ExerciseSerializer::notes_key).text())
         .foreignKey(ExerciseSerializer::workout_id_key, WorkoutSerializer::table,
                     WorkoutSerializer::id_key, OnDeleteAction::Cascade);
     return m_repository->createTable(table);
@@ -63,12 +72,32 @@ void ExerciseRepositoryDb::registerMigrations(MigrationRunner& runner)
                               .toInt()
                        != 0;
                });
+
+    runner.add(
+        4,
+        [](QSqlDatabase& db)
+        {
+            const bool columnsAdded
+                = AlterTable(ExerciseSerializer::table)
+                      .addColumn(Column(ExerciseSerializer::position_key).integer().defaultValue(0))
+                      .addColumn(Column(ExerciseSerializer::definition_id_key).integer())
+                      .addColumn(Column(ExerciseSerializer::notes_key).text())
+                      .execute(db)
+                      .toInt()
+                != 0;
+
+            return columnsAdded
+                && backfillPositions(db, ExerciseSerializer::table,
+                                     ExerciseSerializer::workout_id_key, ExerciseSerializer::id_key,
+                                     ExerciseSerializer::position_key);
+        });
 }
 
 std::vector<Exercise> ExerciseRepositoryDb::findByWorkoutId(int workoutId) const
 {
     auto where = Where(ExerciseSerializer::workout_id_key).equals(workoutId);
-    auto rows = m_repository->select(where);
+    auto rows = m_repository->select(
+        where, positionOrder(ExerciseSerializer::workout_id_key, ExerciseSerializer::position_key));
 
     std::vector<Exercise> results;
     results.reserve(rows.size());
@@ -83,7 +112,8 @@ std::vector<Exercise> ExerciseRepositoryDb::findByWorkoutIds(const QList<int>& w
         return {};
 
     auto where = Where(ExerciseSerializer::workout_id_key).in(workoutIds);
-    auto rows = m_repository->select(where);
+    auto rows = m_repository->select(
+        where, positionOrder(ExerciseSerializer::workout_id_key, ExerciseSerializer::position_key));
 
     std::vector<Exercise> results;
     results.reserve(rows.size());

@@ -18,6 +18,7 @@ public:
     static constexpr const char* duration_seconds_key = "duration_seconds";
     static constexpr const char* distance_meters_key = "distance_meters";
     static constexpr const char* rest_seconds_override_key = "rest_seconds_override";
+    static constexpr const char* position_key = "position";
 
     static Set fromVariant(const QVariantMap& data);
     static QVariantMap toVariant(const Set& set);

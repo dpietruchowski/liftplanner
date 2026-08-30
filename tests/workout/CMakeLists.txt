@@ -11,6 +11,7 @@ set(TEST_SOURCES
     infrastructure/serializers/setserializertest.cpp
     infrastructure/database/workoutrepositorydbtest.cpp
     infrastructure/database/migrationtest.cpp
+    infrastructure/database/orderpersistencetest.cpp
     application/workoutservicetest.cpp
     utils/workoutjsontest.cpp
     utils/workouttexttest.cpp

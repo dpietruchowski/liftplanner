@@ -70,6 +70,23 @@ protected:
                                "VALUES (2, 1, 8, 85.5, 0)"));
     }
 
+    void insertLegacyOrderingData()
+    {
+        QSqlQuery query(m_database);
+        ASSERT_TRUE(query.exec("INSERT INTO workouts (id, name, status) "
+                               "VALUES (2, 'Pull Day', 'Ended')"));
+        ASSERT_TRUE(query.exec("INSERT INTO exercises (id, workout_id, name, rest_seconds) "
+                               "VALUES (5, 2, 'Deadlift', 180)"));
+        ASSERT_TRUE(query.exec("INSERT INTO exercises (id, workout_id, name, rest_seconds) "
+                               "VALUES (9, 2, 'Barbell Row', 90)"));
+        ASSERT_TRUE(query.exec("INSERT INTO exercises (id, workout_id, name, rest_seconds) "
+                               "VALUES (14, 2, 'Curl', 60)"));
+        ASSERT_TRUE(query.exec("INSERT INTO sets (id, exercise_id, repetitions, weight, completed) "
+                               "VALUES (11, 9, 8, 60.0, 1)"));
+        ASSERT_TRUE(query.exec("INSERT INTO sets (id, exercise_id, repetitions, weight, completed) "
+                               "VALUES (17, 9, 8, 65.0, 1)"));
+    }
+
     void migrate()
     {
         m_dbStorage = std::make_unique<DbStorage>(m_database);
@@ -192,7 +209,7 @@ TEST_F(MigrationTest, LegacyDatabase_ReachesLatestSchemaVersion)
 
     migrate();
 
-    EXPECT_EQ(m_schemaVersion, 3);
+    EXPECT_EQ(m_schemaVersion, 5);
 }
 
 TEST_F(MigrationTest, Migration_IsIdempotent)
@@ -205,7 +222,7 @@ TEST_F(MigrationTest, Migration_IsIdempotent)
     m_repo->registerMigrations(second);
 
     EXPECT_TRUE(second.run());
-    EXPECT_EQ(second.currentVersion(), 3);
+    EXPECT_EQ(second.currentVersion(), 5);
     EXPECT_EQ(scalar("SELECT COUNT(*) FROM sets").toInt(), 2);
     EXPECT_EQ(scalar("SELECT metric FROM sets WHERE id = 1").toString(), "reps");
 }
@@ -218,7 +235,7 @@ TEST_F(MigrationTest, FreshDatabase_HasAllColumnsAndLatestVersion)
     EXPECT_TRUE(setColumns.contains(SetSerializer::metric_key));
     EXPECT_TRUE(setColumns.contains(SetSerializer::rest_seconds_override_key));
     EXPECT_TRUE(columnsOf(ExerciseSerializer::table).contains(ExerciseSerializer::kind_key));
-    EXPECT_EQ(m_schemaVersion, 3);
+    EXPECT_EQ(m_schemaVersion, 5);
 }
 
 TEST_F(MigrationTest, FreshDatabase_RoundtripsTimedAndDistanceSets)
@@ -260,4 +277,71 @@ TEST_F(MigrationTest, FreshDatabase_RoundtripsTimedAndDistanceSets)
     EXPECT_DOUBLE_EQ(loadedRun.sets()[0].distanceMeters(), 5000.0);
     EXPECT_EQ(loadedRun.sets()[0].durationSeconds(), 1500);
     EXPECT_DOUBLE_EQ(loaded->totalWeight(), 0.0);
+}
+
+TEST_F(MigrationTest, LegacyDatabase_GainsOrderingAndCatalogColumns)
+{
+    createLegacySchema();
+    insertLegacyData();
+
+    migrate();
+
+    const QStringList exerciseColumns = columnsOf(ExerciseSerializer::table);
+    EXPECT_TRUE(exerciseColumns.contains(ExerciseSerializer::position_key));
+    EXPECT_TRUE(exerciseColumns.contains(ExerciseSerializer::definition_id_key));
+    EXPECT_TRUE(exerciseColumns.contains(ExerciseSerializer::notes_key));
+    EXPECT_TRUE(columnsOf(SetSerializer::table).contains(SetSerializer::position_key));
+}
+
+TEST_F(MigrationTest, LegacyRowsGetDensePositionsRestartingPerParent)
+{
+    createLegacySchema();
+    insertLegacyData();
+    insertLegacyOrderingData();
+
+    migrate();
+
+    EXPECT_EQ(scalar("SELECT position FROM exercises WHERE id = 1").toInt(), 0);
+    EXPECT_EQ(scalar("SELECT position FROM exercises WHERE id = 5").toInt(), 0);
+    EXPECT_EQ(scalar("SELECT position FROM exercises WHERE id = 9").toInt(), 1);
+    EXPECT_EQ(scalar("SELECT position FROM exercises WHERE id = 14").toInt(), 2);
+
+    EXPECT_EQ(scalar("SELECT position FROM sets WHERE id = 1").toInt(), 0);
+    EXPECT_EQ(scalar("SELECT position FROM sets WHERE id = 2").toInt(), 1);
+    EXPECT_EQ(scalar("SELECT position FROM sets WHERE id = 11").toInt(), 0);
+    EXPECT_EQ(scalar("SELECT position FROM sets WHERE id = 17").toInt(), 1);
+}
+
+TEST_F(MigrationTest, LegacyRowsCarryNoCatalogLink)
+{
+    createLegacySchema();
+    insertLegacyData();
+
+    migrate();
+
+    EXPECT_TRUE(scalar("SELECT definition_id FROM exercises WHERE id = 1").isNull());
+
+    auto workout = m_repo->findOne(WorkoutQuery().whereId(1));
+    ASSERT_TRUE(workout.has_value());
+    ASSERT_EQ(workout->exercises().size(), 1u);
+    EXPECT_FALSE(workout->exercises()[0].hasDefinition());
+}
+
+TEST_F(MigrationTest, MigratedOrderSurvivesReadBack)
+{
+    createLegacySchema();
+    insertLegacyData();
+    insertLegacyOrderingData();
+
+    migrate();
+
+    auto workout = m_repo->findOne(WorkoutQuery().whereId(2));
+
+    ASSERT_TRUE(workout.has_value());
+    ASSERT_EQ(workout->exercises().size(), 3u);
+    EXPECT_EQ(workout->exercises()[0].name(), "Deadlift");
+    EXPECT_EQ(workout->exercises()[1].name(), "Barbell Row");
+    EXPECT_EQ(workout->exercises()[2].name(), "Curl");
+    for (size_t i = 0; i < workout->exercises().size(); ++i)
+        EXPECT_EQ(workout->exercises()[i].position(), static_cast<int>(i));
 }

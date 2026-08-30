@@ -25,6 +25,8 @@ Set SetSerializer::fromVariant(const QVariantMap& data)
         set.setDistanceMeters(data.value(distance_meters_key).toDouble());
     if (data.contains(rest_seconds_override_key))
         set.setRestSecondsOverride(data.value(rest_seconds_override_key).toInt());
+    if (data.contains(position_key))
+        set.setPosition(data.value(position_key).toInt());
 
     return set;
 }
@@ -46,6 +48,7 @@ QVariantMap SetSerializer::toVariant(const Set& set)
     data.insert(duration_seconds_key, set.durationSeconds());
     data.insert(distance_meters_key, set.distanceMeters());
     data.insert(rest_seconds_override_key, set.restSecondsOverride());
+    data.insert(position_key, set.position());
 
     return data;
 }
