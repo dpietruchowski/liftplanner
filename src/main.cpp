@@ -24,7 +24,8 @@ int main(int argc, char* argv[])
     QQuickStyle::setStyle("Basic");
 
     LiftPlannerApplication liftApp("liftplanner.db");
-    liftApp.initialize();
+    if (!liftApp.initialize())
+        return -1;
 
     QQmlApplicationEngine engine;
 

@@ -27,10 +27,12 @@ public:
     explicit LiftPlannerApplication(const QString& dbPath);
     ~LiftPlannerApplication();
 
-    void initialize();
+    bool initialize();
     void registerQmlTypes(QmlRegistrator& registrator);
 
 private:
+    void drainWorker();
+
     std::unique_ptr<BackendWorker> m_worker;
     std::unique_ptr<AppDbStorage> m_storage;
     std::unique_ptr<WorkoutService> m_workoutService;

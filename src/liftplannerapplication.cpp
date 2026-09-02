@@ -23,6 +23,7 @@
 #include "utils/notificationtypes.h"
 #include "utils/qmlregistrator.h"
 #include <QDebug>
+#include <QEventLoop>
 #include <QMetaObject>
 
 LiftPlannerApplication::LiftPlannerApplication(const QString& dbPath)
@@ -31,9 +32,45 @@ LiftPlannerApplication::LiftPlannerApplication(const QString& dbPath)
     m_storage = std::make_unique<AppDbStorage>(dbPath);
 }
 
-LiftPlannerApplication::~LiftPlannerApplication() = default;
+LiftPlannerApplication::~LiftPlannerApplication()
+{
+    drainWorker();
 
-void LiftPlannerApplication::initialize()
+    m_clipboardHelper.reset();
+    m_workoutTemplateViewModel.reset();
+    m_workoutEditorViewModel.reset();
+    m_exerciseCatalogViewModel.reset();
+    m_userProfileViewModel.reset();
+    m_plannedWorkoutViewModel.reset();
+    m_workoutHistoryViewModel.reset();
+    m_activeWorkoutViewModel.reset();
+
+    QMetaObject::invokeMethod(
+        m_worker.get(),
+        [this]()
+        {
+            m_workoutTemplateService.reset();
+            m_definitionLookup.reset();
+            m_exerciseCatalogService.reset();
+            m_userProfileService.reset();
+            m_workoutService.reset();
+            m_storage.reset();
+        },
+        Qt::BlockingQueuedConnection);
+}
+
+void LiftPlannerApplication::drainWorker()
+{
+    QEventLoop loop;
+    for (int i = 0; i < 64; ++i)
+    {
+        QMetaObject::invokeMethod(m_worker.get(), [] {}, Qt::BlockingQueuedConnection);
+        if (!loop.processEvents(QEventLoop::AllEvents))
+            break;
+    }
+}
+
+bool LiftPlannerApplication::initialize()
 {
     bool opened = true;
     QMetaObject::invokeMethod(
@@ -61,7 +98,7 @@ void LiftPlannerApplication::initialize()
     if (!opened)
     {
         qCritical() << "Failed to open database";
-        return;
+        return false;
     }
 
     m_activeWorkoutViewModel = std::make_unique<ActiveWorkoutViewModel>(m_workoutService.get());
@@ -77,6 +114,8 @@ void LiftPlannerApplication::initialize()
     m_workoutTemplateViewModel
         = std::make_unique<WorkoutTemplateViewModel>(m_workoutTemplateService.get());
     m_clipboardHelper = std::make_unique<ClipboardHelper>();
+
+    return true;
 }
 
 void LiftPlannerApplication::registerQmlTypes(QmlRegistrator& registrator)
