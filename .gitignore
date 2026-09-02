@@ -54,3 +54,6 @@ prompt.json
 # Python
 __pycache__/
 *.pyc
+
+# Scratch space for throwaway scripts, logs and DB copies
+tmp/
