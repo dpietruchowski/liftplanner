@@ -4,7 +4,7 @@
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 
-#ifdef QT_DEBUG
+#ifdef LIFTPLANNER_AUTOMATION
 #include "automation/uiautomationserver.h"
 #endif
 
@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
 
     engine.load(registrator.getMainQmlUrl());
 
-#ifdef QT_DEBUG
+#ifdef LIFTPLANNER_AUTOMATION
     const QByteArray automationPort = qgetenv("LIFTPLANNER_AUTOMATION_PORT");
     if (!automationPort.isEmpty() && !engine.rootObjects().isEmpty())
         new UiAutomationServer(&engine, automationPort.toUShort(), &app);

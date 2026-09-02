@@ -234,7 +234,7 @@ QtObject {
         property string exportData: "qrc:/Themed/Icons/export.svg"
 
         property string addSet: "qrc:/Themed/Icons/add-set.svg"
-        property string removeSet: "qrc:/Themed/Icons/remove-set.svg"
+        property string removeSet: "qrc:/Themed/Icons/remove.svg"
         property string plus: "qrc:/Themed/Icons/plus.svg"
         property string minus: "qrc:/Themed/Icons/minus.svg"
         property string next: "qrc:/Themed/Icons/next.svg"

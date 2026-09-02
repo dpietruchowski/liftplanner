@@ -59,8 +59,9 @@ target_link_libraries(liftplanner
     Qt6::Qml
 )
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+if(FILLIN_AUTOMATION)
     target_link_libraries(liftplanner PRIVATE app_automation)
+    target_compile_definitions(liftplanner PRIVATE LIFTPLANNER_AUTOMATION)
 endif()
 
 target_compile_definitions(liftplanner

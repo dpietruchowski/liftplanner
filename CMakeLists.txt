@@ -17,6 +17,14 @@ set(QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/android")
 
 set(QML_LIVE_ENABLED OFF)
 
+if(NOT DEFINED FILLIN_AUTOMATION)
+    if(NOT ANDROID AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(FILLIN_AUTOMATION ON)
+    else()
+        set(FILLIN_AUTOMATION OFF)
+    endif()
+endif()
+
 if(NOT ANDROID)
     add_compile_definitions(LIBS_TESTING)
 endif()
