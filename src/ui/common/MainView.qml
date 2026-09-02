@@ -9,8 +9,31 @@ Item {
 
     property var activeWorkoutScreen: ScreenActiveWorkout {}
     property var homeScreen: ScreenHome {}
-    property var workoutsScreen: ScreenWorkouts {}
+    property var workoutsScreen: ScreenWorkouts {
+        onCreateWorkoutRequest: root.openWorkoutEditor()
+    }
     property var profileScreen: ScreenProfile {}
+
+    property var workoutEditorScreen: ScreenWorkoutEditor {
+        onClosed: stackView.pop()
+        onAddExerciseRequested: {
+            exercisePickerScreen.reset()
+            stackView.push(exercisePickerScreen)
+        }
+    }
+
+    property var exercisePickerScreen: ScreenExercisePicker {
+        onCancelled: stackView.pop()
+        onExerciseSelected: function(definition) {
+            WorkoutEditorViewModel.addExercise(definition)
+            stackView.pop()
+        }
+    }
+
+    function openWorkoutEditor() {
+        WorkoutEditorViewModel.createNew("", new Date())
+        stackView.push(workoutEditorScreen)
+    }
 
     function goBack() {
         if (stackView.depth > 1) {
@@ -54,6 +77,28 @@ Item {
                 "Prompt copied to clipboard.\n\n" +
                 "Paste it into any AI (ChatGPT, Gemini, etc.) and discuss your training plan. " +
                 "Then copy the generated JSON and tap the import button next to 'Planned' to add planned workouts."
+            notificationPopup.open()
+        }
+    }
+
+    Connections {
+        target: WorkoutEditorViewModel
+
+        function onErrorOccurred(error) {
+            notificationPopup.type = Notification.Type.Error
+            notificationPopup.text = error
+            notificationPopup.open()
+        }
+
+        function onSaved(workoutId) {
+            PlannedWorkoutViewModel.loadAll()
+            while (stackView.currentItem !== workoutsScreen && stackView.depth > 1)
+                stackView.pop()
+        }
+
+        function onSavedAsTemplate(templateId) {
+            notificationPopup.type = Notification.Type.Info
+            notificationPopup.text = "Saved as a template."
             notificationPopup.open()
         }
     }

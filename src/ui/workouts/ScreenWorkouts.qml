@@ -14,6 +14,8 @@ Rectangle {
     property var currentWorkout
     property var workoutToDelete
 
+    signal createWorkoutRequest()
+
     property var historyMonths: {
         var groups = []
         var workouts = WorkoutHistoryViewModel.workouts
@@ -51,6 +53,17 @@ Rectangle {
                 title: "PLANNED"
                 titleColor: Theme.colors.textMuted
                 expandable: true
+
+                ThemedButton {
+                    objectName: "createWorkoutButton"
+                    iconSource: Theme.icons.plus
+                    buttonSize: Theme.button.smallSquare
+                    buttonStyle: Theme.button.tonal
+                    onClicked: root.createWorkoutRequest()
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Create a workout"
+                    ToolTip.delay: 500
+                }
 
                 ThemedButton {
                     objectName: "generatePromptButton"

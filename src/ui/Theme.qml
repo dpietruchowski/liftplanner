@@ -183,6 +183,7 @@ QtObject {
         property int titleSize: 26
         property int rowHeight: 44
         property int rowIconSize: theme.icon.small
+        property int filterLabelWidth: 84
         property real maxHeightRatio: 0.9
     }
 
