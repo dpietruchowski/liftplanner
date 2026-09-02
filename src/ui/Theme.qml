@@ -168,6 +168,8 @@ QtObject {
     }
 
     property var setRow: QtObject {
+        property int numberWidth: 24
+        property int primaryWidth: 66
         property int stepperHeight: 38
         property int actionHeight: 36
         property int removeWidth: 72

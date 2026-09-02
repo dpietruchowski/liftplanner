@@ -227,6 +227,9 @@ Column {
             model: exercise.sets
 
             delegate: ActiveWorkoutSetItem {
+                objectName: "activeWorkoutSetItem" + index
+                width: setsColumn.width
+                number: index + 1
                 setData: modelData
             }
         }

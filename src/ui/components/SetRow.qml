@@ -1,0 +1,197 @@
+import QtQuick
+import QtQuick.Layouts
+import LiftPlanner
+import Themed.Components
+
+Rectangle {
+    id: root
+
+    property int number: 0
+    property string primaryText: ""
+    property string secondaryText: ""
+    property string metric: "reps"
+    property string loadType: "external"
+
+    property bool current: false
+    property bool completed: false
+    property bool expanded: false
+
+    property bool completable: true
+    property bool editable: true
+    property bool secondaryAdjustable: true
+
+    property string primaryLabel: root.metric === "duration" ? qsTr("TIME")
+                                : root.metric === "distance" ? qsTr("DIST")
+                                                             : qsTr("REPS")
+
+    property string secondaryLabel: root.metric === "distance" ? qsTr("TIME")
+                                  : root.loadType === "added" ? qsTr("+ KG")
+                                  : root.loadType === "assisted" ? qsTr("- KG")
+                                                                 : qsTr("KG")
+
+    signal completionToggled()
+    signal primaryAdjusted(int direction)
+    signal secondaryAdjusted(int direction)
+    signal duplicateRequested()
+    signal removeRequested()
+
+    readonly property int rowHeight: root.current ? Theme.layout.activeRowHeight
+                                                  : Theme.layout.listItemHeight
+    readonly property color valueColor: root.current ? Theme.colors.textPrimary
+                                      : root.completed ? Theme.colors.textDisabled
+                                                       : Theme.colors.textSecondary
+
+    height: root.expanded ? root.rowHeight + editor.height + Theme.padding.small
+                          : root.rowHeight
+    radius: Theme.radius.medium
+    clip: true
+
+    color: root.current ? Theme.colors.surfaceAccent
+         : root.completed ? Theme.colors.surfaceSunken
+                          : Theme.colors.surface
+    border.width: root.current ? Theme.border.medium : Theme.border.thin
+    border.color: root.current ? Theme.colors.primary
+                : root.completed ? Theme.colors.borderSubtle
+                                 : Theme.colors.border
+
+    Behavior on color { ColorAnimation { duration: 200 } }
+    Behavior on border.color { ColorAnimation { duration: 200 } }
+    Behavior on height { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+
+    HoldToRevealArea {
+        anchors.fill: parent
+        enabled: root.editable
+        onHeld: root.expanded = !root.expanded
+    }
+
+    Column {
+        anchors.fill: parent
+        spacing: 0
+
+        RowLayout {
+            width: parent.width
+            height: root.rowHeight
+            spacing: 0
+
+            Text {
+                text: root.number
+                font.pixelSize: Theme.fontSize.small
+                font.bold: root.current
+                color: root.current ? Theme.colors.textPrimary : Theme.colors.textFaint
+                Layout.preferredWidth: Theme.setRow.numberWidth
+                Layout.leftMargin: Theme.padding.large
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            Text {
+                text: root.primaryText
+                font.pixelSize: root.current ? Theme.fontSize.medium : Theme.fontSize.normal
+                font.bold: root.current
+                color: root.valueColor
+                elide: Text.ElideRight
+                Layout.preferredWidth: Theme.setRow.primaryWidth
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            Text {
+                text: root.secondaryText
+                font.pixelSize: root.current ? Theme.fontSize.medium : Theme.fontSize.normal
+                font.bold: root.current
+                color: root.valueColor
+                elide: Text.ElideRight
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            CompletionDot {
+                id: dot
+                size: root.current ? Theme.layout.indicatorSizeLarge : Theme.layout.indicatorSize
+                completed: root.completed
+                highlighted: root.current
+                interactive: root.completable
+                visible: root.completable
+                Layout.preferredWidth: dot.size
+                Layout.preferredHeight: dot.size
+                Layout.alignment: Qt.AlignVCenter
+                Layout.rightMargin: Theme.padding.large
+                onToggled: root.completionToggled()
+            }
+        }
+
+        Column {
+            id: editor
+            width: parent.width
+            spacing: Theme.spacing.small
+            visible: root.expanded
+
+            Item {
+                width: parent.width
+                height: Theme.padding.small
+
+                Rectangle {
+                    x: Theme.padding.large
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width - Theme.padding.large * 2
+                    height: Theme.border.thin
+                    color: Theme.colors.divider
+                }
+            }
+
+            RowLayout {
+                x: Theme.padding.large
+                width: parent.width - Theme.padding.large * 2
+                height: Theme.setRow.stepperHeight
+                spacing: Theme.spacing.small
+
+                StepperField {
+                    label: root.primaryLabel
+                    decrementName: "primaryDecrementButton"
+                    incrementName: "primaryIncrementButton"
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    onDecremented: root.primaryAdjusted(-1)
+                    onIncremented: root.primaryAdjusted(1)
+                }
+
+                StepperField {
+                    label: root.secondaryLabel
+                    decrementName: "secondaryDecrementButton"
+                    incrementName: "secondaryIncrementButton"
+                    visible: root.secondaryAdjustable
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    onDecremented: root.secondaryAdjusted(-1)
+                    onIncremented: root.secondaryAdjusted(1)
+                }
+            }
+
+            RowLayout {
+                x: Theme.padding.large
+                width: parent.width - Theme.padding.large * 2
+                height: Theme.setRow.actionHeight
+                spacing: Theme.spacing.small
+
+                ThemedButton {
+                    objectName: "duplicateSetButton"
+                    text: qsTr("Duplicate set")
+                    iconSource: Theme.icons.addSet
+                    buttonSize: Theme.button.small
+                    buttonStyle: Theme.button.sunken
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    onClicked: root.duplicateRequested()
+                }
+
+                ThemedButton {
+                    objectName: "removeSetButton"
+                    iconSource: Theme.icons.removeSet
+                    buttonSize: Theme.button.small
+                    buttonStyle: Theme.button.dangerSubtle
+                    Layout.preferredWidth: Theme.setRow.removeWidth
+                    Layout.fillHeight: true
+                    onClicked: root.removeRequested()
+                }
+            }
+        }
+    }
+}
