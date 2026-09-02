@@ -14,6 +14,7 @@ set(TEST_SOURCES
     infrastructure/database/orderpersistencetest.cpp
     infrastructure/database/workouttemplaterepositorydbtest.cpp
     application/workoutservicetest.cpp
+    application/workouttemplateservicetest.cpp
     utils/workoutjsontest.cpp
     utils/workouttexttest.cpp
 )

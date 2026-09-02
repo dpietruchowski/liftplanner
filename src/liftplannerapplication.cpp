@@ -3,10 +3,13 @@
 #include "core/storage/appdbstorage.h"
 #include "modules/exercisecatalog/application/exercisecatalogservice.h"
 #include "modules/exercisecatalog/infrastructure/database/exercisedefinitionrepositorydb.h"
+#include "modules/exercisecatalog/infrastructure/lookup/catalogdefinitionlookup.h"
 #include "modules/userprofile/application/userprofileservice.h"
 #include "modules/userprofile/infrastructure/database/userprofilerepositorydb.h"
 #include "modules/workout/application/workoutservice.h"
+#include "modules/workout/application/workouttemplateservice.h"
 #include "modules/workout/infrastructure/database/workoutrepositorydb.h"
+#include "modules/workout/infrastructure/database/workouttemplaterepositorydb.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
 #include "ui/viewmodels/plannedworkoutviewmodel.h"
 #include "ui/viewmodels/userprofileviewmodel.h"
@@ -45,6 +48,10 @@ void LiftPlannerApplication::initialize()
                 m_storage->userProfileRepo(), m_worker.get());
             m_exerciseCatalogService = std::make_unique<ExerciseCatalogService>(
                 m_storage->exerciseDefinitionRepo(), m_worker.get());
+            m_definitionLookup
+                = std::make_unique<CatalogDefinitionLookup>(m_storage->exerciseDefinitionRepo());
+            m_workoutTemplateService = std::make_unique<WorkoutTemplateService>(
+                m_storage->workoutTemplateRepo(), *m_definitionLookup, m_worker.get());
         },
         Qt::BlockingQueuedConnection);
 

@@ -8,8 +8,10 @@ class QmlRegistrator;
 class BackendWorker;
 class AppDbStorage;
 class WorkoutService;
+class WorkoutTemplateService;
 class UserProfileService;
 class ExerciseCatalogService;
+class CatalogDefinitionLookup;
 class ActiveWorkoutViewModel;
 class WorkoutHistoryViewModel;
 class PlannedWorkoutViewModel;
@@ -31,6 +33,8 @@ private:
     std::unique_ptr<WorkoutService> m_workoutService;
     std::unique_ptr<UserProfileService> m_userProfileService;
     std::unique_ptr<ExerciseCatalogService> m_exerciseCatalogService;
+    std::unique_ptr<CatalogDefinitionLookup> m_definitionLookup;
+    std::unique_ptr<WorkoutTemplateService> m_workoutTemplateService;
 
     std::unique_ptr<ActiveWorkoutViewModel> m_activeWorkoutViewModel;
     std::unique_ptr<WorkoutHistoryViewModel> m_workoutHistoryViewModel;
