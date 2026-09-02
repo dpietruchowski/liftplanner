@@ -11,6 +11,10 @@ Item {
     property var homeScreen: ScreenHome {}
     property var workoutsScreen: ScreenWorkouts {
         onCreateWorkoutRequest: root.openWorkoutEditor()
+        onOpenTemplatesRequest: {
+            workoutTemplatesScreen.reset()
+            stackView.push(workoutTemplatesScreen)
+        }
     }
     property var profileScreen: ScreenProfile {}
 
@@ -27,6 +31,15 @@ Item {
         onExerciseSelected: function(definition) {
             WorkoutEditorViewModel.addExercise(definition)
             stackView.pop()
+        }
+    }
+
+    property var workoutTemplatesScreen: ScreenWorkoutTemplates {
+        onClosed: stackView.pop()
+        onTemplateChosen: function(templateId) {
+            WorkoutEditorViewModel.startFromTemplate(templateId, new Date())
+            stackView.pop()
+            stackView.push(workoutEditorScreen)
         }
     }
 
@@ -98,7 +111,17 @@ Item {
 
         function onSavedAsTemplate(templateId) {
             notificationPopup.type = Notification.Type.Info
-            notificationPopup.text = "Saved as a template."
+            notificationPopup.text = "Saved as a template. You can start from it via the templates button on the Workouts screen."
+            notificationPopup.open()
+        }
+    }
+
+    Connections {
+        target: WorkoutTemplateViewModel
+
+        function onErrorOccurred(error) {
+            notificationPopup.type = Notification.Type.Error
+            notificationPopup.text = error
             notificationPopup.open()
         }
     }

@@ -14,6 +14,7 @@
 #include "ui/viewmodels/plannedworkoutviewmodel.h"
 #include "ui/viewmodels/workouteditorviewmodel.h"
 #include "ui/viewmodels/workouthistoryviewmodel.h"
+#include "ui/viewmodels/workouttemplateviewmodel.h"
 #include "utils/backendworker.h"
 #include "utils/mocktimeprovider.h"
 #include "utils/timeprovider.h"
@@ -75,6 +76,8 @@ TestApplication::TestApplication()
         = std::make_unique<ExerciseCatalogViewModel>(m_exerciseCatalogService.get());
     m_workoutEditorViewModel = std::make_unique<WorkoutEditorViewModel>(
         m_workoutService.get(), m_workoutTemplateService.get());
+    m_workoutTemplateViewModel
+        = std::make_unique<WorkoutTemplateViewModel>(m_workoutTemplateService.get());
 
     drain();
 }
@@ -83,6 +86,7 @@ TestApplication::~TestApplication()
 {
     drain();
 
+    m_workoutTemplateViewModel.reset();
     m_workoutEditorViewModel.reset();
     m_exerciseCatalogViewModel.reset();
     m_plannedWorkoutViewModel.reset();
@@ -152,6 +156,11 @@ ExerciseCatalogViewModel& TestApplication::exerciseCatalogViewModel()
 {
     return *m_exerciseCatalogViewModel;
 }
+WorkoutTemplateViewModel& TestApplication::workoutTemplateViewModel()
+{
+    return *m_workoutTemplateViewModel;
+}
+
 WorkoutEditorViewModel& TestApplication::workoutEditorViewModel()
 {
     return *m_workoutEditorViewModel;
@@ -172,6 +181,15 @@ int TestApplication::seedDefinition(const ExerciseDefinition& definition)
     QMetaObject::invokeMethod(
         m_worker.get(), [this, &definition, &id]()
         { id = m_exerciseDefinitionRepo->save(definition); }, Qt::BlockingQueuedConnection);
+    return id;
+}
+
+int TestApplication::seedTemplate(const WorkoutTemplate& workoutTemplate)
+{
+    int id = -1;
+    QMetaObject::invokeMethod(
+        m_worker.get(), [this, &workoutTemplate, &id]()
+        { id = m_workoutTemplateRepo->save(workoutTemplate); }, Qt::BlockingQueuedConnection);
     return id;
 }
 

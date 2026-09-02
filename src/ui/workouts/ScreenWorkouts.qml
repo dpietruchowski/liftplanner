@@ -15,6 +15,7 @@ Rectangle {
     property var workoutToDelete
 
     signal createWorkoutRequest()
+    signal openTemplatesRequest()
 
     property var historyMonths: {
         var groups = []
@@ -62,6 +63,17 @@ Rectangle {
                     onClicked: root.createWorkoutRequest()
                     ToolTip.visible: hovered
                     ToolTip.text: "Create a workout"
+                    ToolTip.delay: 500
+                }
+
+                ThemedButton {
+                    objectName: "openTemplatesButton"
+                    iconSource: Theme.icons.planned
+                    buttonSize: Theme.button.smallSquare
+                    buttonStyle: Theme.button.tonal
+                    onClicked: root.openTemplatesRequest()
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Start from a template"
                     ToolTip.delay: 500
                 }
 

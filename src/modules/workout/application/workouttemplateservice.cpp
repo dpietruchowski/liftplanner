@@ -25,6 +25,17 @@ Task<std::vector<WorkoutTemplate>> WorkoutTemplateService::searchTemplates(const
     return invoke([this, text] { return searchTemplatesCore(text); });
 }
 
+Task<std::vector<WorkoutTemplateSummary>> WorkoutTemplateService::loadSummaries()
+{
+    return invoke([this] { return loadSummariesCore(); });
+}
+
+Task<std::vector<WorkoutTemplateSummary>>
+WorkoutTemplateService::searchSummaries(const QString& text)
+{
+    return invoke([this, text] { return searchSummariesCore(text); });
+}
+
 Task<std::optional<WorkoutTemplate>> WorkoutTemplateService::findById(int id)
 {
     return invoke([this, id] { return findByIdCore(id); });
@@ -74,6 +85,53 @@ WorkoutTemplateService::searchTemplatesCore(const QString& text)
     query.whereNameContains(trimmed).orderByName(SortDirection::Ascending);
 
     return Result<std::vector<WorkoutTemplate>>::success(m_repository.findAll(query));
+}
+
+Result<std::vector<WorkoutTemplateSummary>> WorkoutTemplateService::loadSummariesCore()
+{
+    const auto templates = loadTemplatesCore();
+    if (templates.isFailure())
+        return Result<std::vector<WorkoutTemplateSummary>>::failure(templates.error());
+
+    return Result<std::vector<WorkoutTemplateSummary>>::success(summarize(templates.value()));
+}
+
+Result<std::vector<WorkoutTemplateSummary>>
+WorkoutTemplateService::searchSummariesCore(const QString& text)
+{
+    const auto templates = searchTemplatesCore(text);
+    if (templates.isFailure())
+        return Result<std::vector<WorkoutTemplateSummary>>::failure(templates.error());
+
+    return Result<std::vector<WorkoutTemplateSummary>>::success(summarize(templates.value()));
+}
+
+std::vector<WorkoutTemplateSummary>
+WorkoutTemplateService::summarize(const std::vector<WorkoutTemplate>& templates)
+{
+    std::vector<WorkoutTemplateSummary> summaries;
+    summaries.reserve(templates.size());
+
+    for (const auto& workoutTemplate : templates)
+    {
+        WorkoutTemplateSummary summary;
+        summary.workoutTemplate = workoutTemplate;
+
+        for (const auto& templateExercise : workoutTemplate.exercises())
+        {
+            summary.setCount += static_cast<int>(templateExercise.sets().size());
+
+            const auto definition = m_lookup.findDefinition(templateExercise.definitionId());
+            if (definition.has_value())
+                summary.exerciseNames.append(definition->name);
+            else
+                summary.complete = false;
+        }
+
+        summaries.push_back(summary);
+    }
+
+    return summaries;
 }
 
 Result<std::optional<WorkoutTemplate>> WorkoutTemplateService::findByIdCore(int id)

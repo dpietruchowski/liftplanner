@@ -15,6 +15,7 @@ class WorkoutTemplateService;
 class UserProfileRepositoryDb;
 class UserProfileService;
 class ExerciseDefinition;
+class WorkoutTemplate;
 class ExerciseDefinitionRepositoryDb;
 class ExerciseCatalogService;
 class CatalogDefinitionLookup;
@@ -23,6 +24,7 @@ class WorkoutHistoryViewModel;
 class PlannedWorkoutViewModel;
 class ExerciseCatalogViewModel;
 class WorkoutEditorViewModel;
+class WorkoutTemplateViewModel;
 
 class TestApplication final
 {
@@ -35,12 +37,14 @@ public:
     PlannedWorkoutViewModel& plannedWorkoutViewModel();
     ExerciseCatalogViewModel& exerciseCatalogViewModel();
     WorkoutEditorViewModel& workoutEditorViewModel();
+    WorkoutTemplateViewModel& workoutTemplateViewModel();
 
     WorkoutService& workoutService();
     WorkoutTemplateService& workoutTemplateService();
     ExerciseCatalogService& exerciseCatalogService();
 
     int seedDefinition(const ExerciseDefinition& definition);
+    int seedTemplate(const WorkoutTemplate& workoutTemplate);
 
     MockTimeProvider& timeProvider();
     void setCurrentDate(const QDate& date);
@@ -74,4 +78,5 @@ private:
     std::unique_ptr<PlannedWorkoutViewModel> m_plannedWorkoutViewModel;
     std::unique_ptr<ExerciseCatalogViewModel> m_exerciseCatalogViewModel;
     std::unique_ptr<WorkoutEditorViewModel> m_workoutEditorViewModel;
+    std::unique_ptr<WorkoutTemplateViewModel> m_workoutTemplateViewModel;
 };
