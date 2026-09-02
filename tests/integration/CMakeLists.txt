@@ -13,6 +13,7 @@ set(TEST_SOURCES
     set_editing_test.cpp
     interval_workout_test.cpp
     home_stats_test.cpp
+    exercise_catalog_test.cpp
 )
 
 set(APP_SOURCES
@@ -20,9 +21,11 @@ set(APP_SOURCES
     ${PROJECT_SOURCE_DIR}/src/ui/viewmodels/workouttimer.cpp
     ${PROJECT_SOURCE_DIR}/src/ui/viewmodels/plannedworkoutviewmodel.cpp
     ${PROJECT_SOURCE_DIR}/src/ui/viewmodels/workouthistoryviewmodel.cpp
+    ${PROJECT_SOURCE_DIR}/src/ui/viewmodels/exercisecatalogviewmodel.cpp
     ${PROJECT_SOURCE_DIR}/src/ui/models/workoutmodel.cpp
     ${PROJECT_SOURCE_DIR}/src/ui/models/exercisemodel.cpp
     ${PROJECT_SOURCE_DIR}/src/ui/models/setmodel.cpp
+    ${PROJECT_SOURCE_DIR}/src/ui/models/exercisedefinitionmodel.cpp
     ${PROJECT_SOURCE_DIR}/src/utils/workoutjson.cpp
     ${PROJECT_SOURCE_DIR}/src/utils/workouttext.cpp
 )
@@ -36,6 +39,7 @@ target_link_libraries(integration_tests
         core
         workout_module
         userprofile_module
+        exercisecatalog_module
         dbtoolkit
         gtest
         gmock

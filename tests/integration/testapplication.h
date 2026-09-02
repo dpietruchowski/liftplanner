@@ -10,11 +10,18 @@ class BackendWorker;
 class DbStorage;
 class WorkoutRepositoryDb;
 class WorkoutService;
+class WorkoutTemplateRepositoryDb;
+class WorkoutTemplateService;
 class UserProfileRepositoryDb;
 class UserProfileService;
+class ExerciseDefinition;
+class ExerciseDefinitionRepositoryDb;
+class ExerciseCatalogService;
+class CatalogDefinitionLookup;
 class ActiveWorkoutViewModel;
 class WorkoutHistoryViewModel;
 class PlannedWorkoutViewModel;
+class ExerciseCatalogViewModel;
 
 class TestApplication final
 {
@@ -25,8 +32,13 @@ public:
     ActiveWorkoutViewModel& activeWorkoutViewModel();
     WorkoutHistoryViewModel& workoutHistoryViewModel();
     PlannedWorkoutViewModel& plannedWorkoutViewModel();
+    ExerciseCatalogViewModel& exerciseCatalogViewModel();
 
     WorkoutService& workoutService();
+    WorkoutTemplateService& workoutTemplateService();
+    ExerciseCatalogService& exerciseCatalogService();
+
+    int seedDefinition(const ExerciseDefinition& definition);
 
     MockTimeProvider& timeProvider();
     void setCurrentDate(const QDate& date);
@@ -49,8 +61,14 @@ private:
     std::unique_ptr<WorkoutService> m_workoutService;
     std::unique_ptr<UserProfileRepositoryDb> m_userProfileRepo;
     std::unique_ptr<UserProfileService> m_userProfileService;
+    std::unique_ptr<ExerciseDefinitionRepositoryDb> m_exerciseDefinitionRepo;
+    std::unique_ptr<ExerciseCatalogService> m_exerciseCatalogService;
+    std::unique_ptr<CatalogDefinitionLookup> m_definitionLookup;
+    std::unique_ptr<WorkoutTemplateRepositoryDb> m_workoutTemplateRepo;
+    std::unique_ptr<WorkoutTemplateService> m_workoutTemplateService;
 
     std::unique_ptr<ActiveWorkoutViewModel> m_activeWorkoutViewModel;
     std::unique_ptr<WorkoutHistoryViewModel> m_workoutHistoryViewModel;
     std::unique_ptr<PlannedWorkoutViewModel> m_plannedWorkoutViewModel;
+    std::unique_ptr<ExerciseCatalogViewModel> m_exerciseCatalogViewModel;
 };

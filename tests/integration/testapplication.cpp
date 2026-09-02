@@ -1,10 +1,16 @@
 #include "testapplication.h"
 
+#include "modules/exercisecatalog/application/exercisecatalogservice.h"
+#include "modules/exercisecatalog/infrastructure/database/exercisedefinitionrepositorydb.h"
+#include "modules/exercisecatalog/infrastructure/lookup/catalogdefinitionlookup.h"
 #include "modules/userprofile/application/userprofileservice.h"
 #include "modules/userprofile/infrastructure/database/userprofilerepositorydb.h"
 #include "modules/workout/application/workoutservice.h"
+#include "modules/workout/application/workouttemplateservice.h"
 #include "modules/workout/infrastructure/database/workoutrepositorydb.h"
+#include "modules/workout/infrastructure/database/workouttemplaterepositorydb.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
+#include "ui/viewmodels/exercisecatalogviewmodel.h"
 #include "ui/viewmodels/plannedworkoutviewmodel.h"
 #include "ui/viewmodels/workouthistoryviewmodel.h"
 #include "utils/backendworker.h"
@@ -41,10 +47,21 @@ TestApplication::TestApplication()
             m_workoutRepo->createTables();
             m_userProfileRepo = std::make_unique<UserProfileRepositoryDb>(*m_dbStorage);
             m_userProfileRepo->createTable();
+            m_exerciseDefinitionRepo
+                = std::make_unique<ExerciseDefinitionRepositoryDb>(*m_dbStorage);
+            m_exerciseDefinitionRepo->createTables();
+            m_workoutTemplateRepo = std::make_unique<WorkoutTemplateRepositoryDb>(*m_dbStorage);
+            m_workoutTemplateRepo->createTables();
 
             m_workoutService = std::make_unique<WorkoutService>(*m_workoutRepo, m_worker.get());
             m_userProfileService
                 = std::make_unique<UserProfileService>(*m_userProfileRepo, m_worker.get());
+            m_exerciseCatalogService = std::make_unique<ExerciseCatalogService>(
+                *m_exerciseDefinitionRepo, m_worker.get());
+            m_definitionLookup
+                = std::make_unique<CatalogDefinitionLookup>(*m_exerciseDefinitionRepo);
+            m_workoutTemplateService = std::make_unique<WorkoutTemplateService>(
+                *m_workoutTemplateRepo, *m_definitionLookup, m_worker.get());
         },
         Qt::BlockingQueuedConnection);
 
@@ -53,6 +70,8 @@ TestApplication::TestApplication()
         m_workoutService.get(), m_activeWorkoutViewModel.get());
     m_plannedWorkoutViewModel = std::make_unique<PlannedWorkoutViewModel>(
         m_workoutService.get(), m_userProfileService.get());
+    m_exerciseCatalogViewModel
+        = std::make_unique<ExerciseCatalogViewModel>(m_exerciseCatalogService.get());
 
     drain();
 }
@@ -61,6 +80,7 @@ TestApplication::~TestApplication()
 {
     drain();
 
+    m_exerciseCatalogViewModel.reset();
     m_plannedWorkoutViewModel.reset();
     m_workoutHistoryViewModel.reset();
     m_activeWorkoutViewModel.reset();
@@ -69,8 +89,13 @@ TestApplication::~TestApplication()
         m_worker.get(),
         [this]()
         {
+            m_workoutTemplateService.reset();
+            m_definitionLookup.reset();
+            m_exerciseCatalogService.reset();
             m_workoutService.reset();
             m_userProfileService.reset();
+            m_workoutTemplateRepo.reset();
+            m_exerciseDefinitionRepo.reset();
             m_userProfileRepo.reset();
             m_workoutRepo.reset();
             m_dbStorage.reset();
@@ -119,7 +144,28 @@ PlannedWorkoutViewModel& TestApplication::plannedWorkoutViewModel()
 {
     return *m_plannedWorkoutViewModel;
 }
+ExerciseCatalogViewModel& TestApplication::exerciseCatalogViewModel()
+{
+    return *m_exerciseCatalogViewModel;
+}
 WorkoutService& TestApplication::workoutService() { return *m_workoutService; }
+WorkoutTemplateService& TestApplication::workoutTemplateService()
+{
+    return *m_workoutTemplateService;
+}
+ExerciseCatalogService& TestApplication::exerciseCatalogService()
+{
+    return *m_exerciseCatalogService;
+}
+
+int TestApplication::seedDefinition(const ExerciseDefinition& definition)
+{
+    int id = -1;
+    QMetaObject::invokeMethod(
+        m_worker.get(), [this, &definition, &id]()
+        { id = m_exerciseDefinitionRepo->save(definition); }, Qt::BlockingQueuedConnection);
+    return id;
+}
 
 void TestApplication::drain()
 {
