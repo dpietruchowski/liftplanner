@@ -94,20 +94,22 @@ Popup {
             onLinkActivated: function(link) { Qt.openUrlExternally(link) }
         }
 
-        ThemedButton {
-            Layout.alignment: Qt.AlignHCenter
-            visible: notificationPopup.copyEnabled
-            text: qsTr("Copy")
-            buttonSize: Theme.button.medium
-            buttonStyle: Theme.button.tonal
-            onClicked: ClipboardHelper.setText(notificationPopup.text)
-        }
-
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: Theme.spacing.small
             spacing: Theme.spacing.medium
 
             ThemedButton {
+                objectName: "notificationCopyButton"
+                visible: notificationPopup.copyEnabled
+                text: qsTr("Copy")
+                buttonSize: Theme.button.medium
+                buttonStyle: Theme.button.tonal
+                onClicked: ClipboardHelper.setText(notificationPopup.text)
+            }
+
+            ThemedButton {
+                objectName: "notificationCancelButton"
                 visible: (notificationPopup.buttons & NotificationPopup.Cancel) !== 0
                 text: qsTr("Cancel")
                 buttonSize: Theme.button.medium
@@ -119,6 +121,7 @@ Popup {
             }
 
             ThemedButton {
+                objectName: "notificationOkButton"
                 visible: (notificationPopup.buttons & NotificationPopup.Ok) !== 0
                 text: qsTr("OK")
                 buttonSize: Theme.button.medium

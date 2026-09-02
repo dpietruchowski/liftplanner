@@ -5,6 +5,7 @@ import Themed.Components
 
 Item {
     id: root
+    objectName: "mainView"
     anchors.fill: parent
 
     property var activeWorkoutScreen: ScreenActiveWorkout {}
@@ -19,7 +20,7 @@ Item {
     property var profileScreen: ScreenProfile {}
 
     property var workoutEditorScreen: ScreenWorkoutEditor {
-        onClosed: stackView.pop()
+        onClosed: root.closeWorkoutEditor()
         onAddExerciseRequested: {
             exercisePickerScreen.reset()
             stackView.push(exercisePickerScreen)
@@ -48,7 +49,22 @@ Item {
         stackView.push(workoutEditorScreen)
     }
 
+    function closeWorkoutEditor() {
+        if (WorkoutEditorViewModel.dirty) {
+            discardChangesDialog.open()
+            return
+        }
+        WorkoutEditorViewModel.discard()
+        stackView.pop()
+    }
+
     function goBack() {
+        if (discardChangesDialog.opened)
+            return true
+        if (stackView.currentItem === workoutEditorScreen) {
+            closeWorkoutEditor()
+            return true
+        }
         if (stackView.depth > 1) {
             stackView.pop()
             return true
@@ -56,8 +72,24 @@ Item {
         return false
     }
 
+    ThemedDialog {
+        id: discardChangesDialog
+        objectName: "discardChangesDialog"
+        dialogTitle: qsTr("Discard changes?")
+        message: qsTr("This workout has unsaved changes. Leaving now will throw them away.")
+        dialogType: "error"
+        acceptText: qsTr("Discard")
+        rejectText: qsTr("Keep editing")
+        showRejectButton: true
+        onAccepted: {
+            WorkoutEditorViewModel.discard()
+            stackView.pop()
+        }
+    }
+
     StackView {
         id: stackView
+        objectName: "mainStack"
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
@@ -71,37 +103,42 @@ Item {
 
     NotificationPopup {
         id: notificationPopup
-        copyEnabled: true
+        objectName: "notificationPopup"
         type: Notification.Type.Error
         buttons: Notification.Button.Ok
     }
 
+    function showError(error) {
+        notificationPopup.type = Notification.Type.Error
+        notificationPopup.title = qsTr("Something went wrong")
+        notificationPopup.text = error
+        notificationPopup.copyEnabled = true
+        notificationPopup.open()
+    }
+
+    function showInfo(title, text) {
+        notificationPopup.type = Notification.Type.Info
+        notificationPopup.title = title
+        notificationPopup.text = text
+        notificationPopup.copyEnabled = false
+        notificationPopup.open()
+    }
+
     Connections {
         target: PlannedWorkoutViewModel
-        function onErrorOccurred(error) {
-            notificationPopup.type = Notification.Type.Error
-            notificationPopup.text = error
-            notificationPopup.open()
-        }
+        function onErrorOccurred(error) { root.showError(error) }
 
         function onPromptGenerated() {
-            notificationPopup.type = Notification.Type.Info
-            notificationPopup.text =
-                "Prompt copied to clipboard.\n\n" +
-                "Paste it into any AI (ChatGPT, Gemini, etc.) and discuss your training plan. " +
-                "Then copy the generated JSON and tap the import button next to 'Planned' to add planned workouts."
-            notificationPopup.open()
+            root.showInfo(qsTr("Prompt copied"),
+                          qsTr("Paste it into any AI (ChatGPT, Gemini, etc.) and discuss your training plan. " +
+                               "Then copy the generated JSON and tap the import button next to 'Planned' to add planned workouts."))
         }
     }
 
     Connections {
         target: WorkoutEditorViewModel
 
-        function onErrorOccurred(error) {
-            notificationPopup.type = Notification.Type.Error
-            notificationPopup.text = error
-            notificationPopup.open()
-        }
+        function onErrorOccurred(error) { root.showError(error) }
 
         function onSaved(workoutId) {
             PlannedWorkoutViewModel.loadAll()
@@ -110,20 +147,14 @@ Item {
         }
 
         function onSavedAsTemplate(templateId) {
-            notificationPopup.type = Notification.Type.Info
-            notificationPopup.text = "Saved as a template. You can start from it via the templates button on the Workouts screen."
-            notificationPopup.open()
+            root.showInfo(qsTr("Saved as a template"),
+                          qsTr("You can start from it via the templates button on the Workouts screen."))
         }
     }
 
     Connections {
         target: WorkoutTemplateViewModel
-
-        function onErrorOccurred(error) {
-            notificationPopup.type = Notification.Type.Error
-            notificationPopup.text = error
-            notificationPopup.open()
-        }
+        function onErrorOccurred(error) { root.showError(error) }
     }
 
     ThemedBottomNavigation {

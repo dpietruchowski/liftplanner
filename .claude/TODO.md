@@ -13,7 +13,7 @@
 - [ ] **Brak typu `Isometric`/`Hold` w `ExerciseKind`.** `metricSuitsKind` dopuszcza `Duration` tylko dla `Cardio`/`Interval`/`Mobility` ([setcompatibility.h](../src/modules/workout/domain/entities/setcompatibility.h)), więc plank, hollow hold i dead hang wylądowały w seedzie jako `interval` — w UI wyświetli się „interwał", co dla statycznego utrzymania jest mylące. To samo dotyczy `farmers-walk` zapisanego jako `cardio`/`distance`. Zmiana dotyka `setcompatibility.h`, walidacji `Exercise` i migawek typu w treningu.
 - [ ] **Brak podglądu wartości serii z poprzedniej sesji** podczas aktywnego treningu (potrzebne do progresji). Ekran pokazuje tylko bieżące serie ([ScreenActiveWorkout.qml](../src/ui/ScreenActiveWorkout.qml)).
 - [x] **Spłaszczone przyciski na Androidzie** — `WorkoutButtonsRow` już nie istnieje, przyciski przebudowane w `9c4ff53`/`2fb0e49`. Do ponownego zgłoszenia, jeśli wróci na urządzeniu.
-- [ ] **Układ dialogu „prompt skopiowany”** — komunikat/kolejność przycisków (copy nad OK) wygląda dziwnie ([NotificationPopup.qml](../src/ui/common/NotificationPopup.qml)).
+- [x] **Układ dialogu „prompt skopiowany”** → **Zrobione:** [NotificationPopup.qml](../src/ui/common/NotificationPopup.qml) trzyma Copy w jednym rzędzie z Cancel/OK, dialogi dostały tytuły („Prompt copied", „Saved as a template", „Something went wrong"), a Copy pokazuje się tylko przy błędach ([MainView.qml](../src/ui/common/MainView.qml) `showError`/`showInfo`).
 - [x] **Mieszany język UI** → całe UI jest po angielsku (nawigacja, profil, edytor, dialogi); polski zostaje tylko w dokumentacji i TODO. i18n poza zakresem 1.0.
 
 ## 🔵 Low priority
@@ -22,7 +22,7 @@
 - [ ] Widok kalendarza zaplanowanych treningów.
 
 ## ❓ Do ustalenia
-- [ ] **Brak potwierdzenia przy wyjściu z edytora z niezapisanymi zmianami.** `goBack()` po prostu zdejmuje ekran ze stosu ([MainView.qml](../src/ui/common/MainView.qml)), więc `WorkoutEditorViewModel.dirty` jest ignorowane i praca przepada bez ostrzeżenia.
+- [x] **Brak potwierdzenia przy wyjściu z edytora z niezapisanymi zmianami.** → **Zrobione:** `closeWorkoutEditor()` w [MainView.qml](../src/ui/common/MainView.qml) otwiera `discardChangesDialog` gdy `WorkoutEditorViewModel.dirty`; obsługuje przycisk wstecz w edytorze i klawisz wstecz (`goBack`), a przy otwartym dialogu klawisz wstecz jest połykany. Zweryfikowane automatyzacją (`mainView`/`mainStack` mają objectName do sterowania).
 - [x] **Segfault przy nieudanym starcie silnika QML.** → **Zrobione** (`ce99945`): `initialize()` zwraca `false` gdy baza się nie otwiera i `main` kończy się przed startem QML; destruktor [LiftPlannerApplication](../src/liftplannerapplication.cpp) najpierw dopompowuje kolejkę workera, potem kasuje viewmodele, a serwisy i storage zwalnia w wątku workera. Zweryfikowane: baza w katalogu tylko do odczytu → czyste `exit -1`.
 - [x] **Gdzie umieścić wejście do Profilu / Ustawień / About.** → Profil jest 4. slotem nawigacji ([MainView.qml](../src/ui/common/MainView.qml)); About/Licenses wchodzi jako sekcja na dole ekranu profilu.
 - [x] **Czy w 1.0 ma być ręczna edycja treningów** → tak, zrobione (patrz High priority).
