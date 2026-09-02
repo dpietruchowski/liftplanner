@@ -14,6 +14,7 @@ set(TEST_SOURCES
     interval_workout_test.cpp
     home_stats_test.cpp
     exercise_catalog_test.cpp
+    workout_editor_test.cpp
 )
 
 set(APP_SOURCES
@@ -22,6 +23,7 @@ set(APP_SOURCES
     ${PROJECT_SOURCE_DIR}/src/ui/viewmodels/plannedworkoutviewmodel.cpp
     ${PROJECT_SOURCE_DIR}/src/ui/viewmodels/workouthistoryviewmodel.cpp
     ${PROJECT_SOURCE_DIR}/src/ui/viewmodels/exercisecatalogviewmodel.cpp
+    ${PROJECT_SOURCE_DIR}/src/ui/viewmodels/workouteditorviewmodel.cpp
     ${PROJECT_SOURCE_DIR}/src/ui/models/workoutmodel.cpp
     ${PROJECT_SOURCE_DIR}/src/ui/models/exercisemodel.cpp
     ${PROJECT_SOURCE_DIR}/src/ui/models/setmodel.cpp
