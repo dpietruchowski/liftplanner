@@ -59,6 +59,8 @@ public:
     Q_INVOKABLE void setSetWeight(int exerciseIndex, int setIndex, double weight);
     Q_INVOKABLE void setSetDuration(int exerciseIndex, int setIndex, int seconds);
     Q_INVOKABLE void setSetDistance(int exerciseIndex, int setIndex, double meters);
+    Q_INVOKABLE void adjustSetPrimary(int exerciseIndex, int setIndex, int steps);
+    Q_INVOKABLE void adjustSetSecondary(int exerciseIndex, int setIndex, int steps);
 
     Q_INVOKABLE void save();
     Q_INVOKABLE void saveAsTemplate(const QString& name);

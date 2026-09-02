@@ -2,8 +2,10 @@
 
 #include "modules/workout/application/workoutservice.h"
 #include "modules/workout/application/workouttemplateservice.h"
+#include "modules/workout/domain/entities/setadjustment.h"
 #include "modules/workout/domain/entities/setcompatibility.h"
 #include "utils/timeprovider.h"
+#include <algorithm>
 
 WorkoutEditorViewModel::WorkoutEditorViewModel(WorkoutService* service,
                                                WorkoutTemplateService* templateService,
@@ -252,6 +254,48 @@ void WorkoutEditorViewModel::setSetDistance(int exerciseIndex, int setIndex, dou
         return;
 
     set->setDistanceMeters(meters);
+    markDirty();
+    publish();
+}
+
+void WorkoutEditorViewModel::adjustSetPrimary(int exerciseIndex, int setIndex, int steps)
+{
+    Set* set = setAt(exerciseIndex, setIndex);
+    if (set == nullptr || steps == 0)
+        return;
+
+    switch (set->metric())
+    {
+        case SetMetric::Duration:
+            set->setDurationSeconds(
+                std::max(0, set->durationSeconds() + steps * SetAdjustment::durationSeconds));
+            break;
+        case SetMetric::Distance:
+            set->setDistanceMeters(
+                std::max(0.0, set->distanceMeters() + steps * SetAdjustment::distanceMeters));
+            break;
+        case SetMetric::Reps:
+            set->setRepetitions(
+                std::max(0, set->repetitions() + steps * SetAdjustment::repetitions));
+            break;
+    }
+
+    markDirty();
+    publish();
+}
+
+void WorkoutEditorViewModel::adjustSetSecondary(int exerciseIndex, int setIndex, int steps)
+{
+    Set* set = setAt(exerciseIndex, setIndex);
+    if (set == nullptr || steps == 0)
+        return;
+
+    if (set->metric() == SetMetric::Distance)
+        set->setDurationSeconds(
+            std::max(0, set->durationSeconds() + steps * SetAdjustment::pacedDurationSeconds));
+    else
+        set->setWeight(std::max(0.0, set->weight() + steps * SetAdjustment::weightKilograms));
+
     markDirty();
     publish();
 }

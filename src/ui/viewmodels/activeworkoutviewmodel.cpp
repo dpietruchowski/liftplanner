@@ -1,5 +1,6 @@
 #include "activeworkoutviewmodel.h"
 #include "modules/workout/application/workoutservice.h"
+#include "modules/workout/domain/entities/setadjustment.h"
 #include "utils/haptics.h"
 #include "utils/workoutjson.h"
 #include <QDebug>
@@ -268,21 +269,20 @@ void ActiveWorkoutViewModel::adjustSetPrimary(SetModel* set, int steps)
     if (!set || steps == 0)
         return;
 
-    constexpr int reps_step = 1;
-    constexpr int duration_step = 5;
-    constexpr double distance_step = 100.0;
-
     const Set& entity = set->entity();
     switch (entity.metric())
     {
         case SetMetric::Duration:
-            set->setDurationSeconds(std::max(0, entity.durationSeconds() + steps * duration_step));
+            set->setDurationSeconds(
+                std::max(0, entity.durationSeconds() + steps * SetAdjustment::durationSeconds));
             break;
         case SetMetric::Distance:
-            set->setDistanceMeters(std::max(0.0, entity.distanceMeters() + steps * distance_step));
+            set->setDistanceMeters(
+                std::max(0.0, entity.distanceMeters() + steps * SetAdjustment::distanceMeters));
             break;
         case SetMetric::Reps:
-            set->setRepetitions(std::max(0, entity.repetitions() + steps * reps_step));
+            set->setRepetitions(
+                std::max(0, entity.repetitions() + steps * SetAdjustment::repetitions));
             break;
     }
 
@@ -294,15 +294,12 @@ void ActiveWorkoutViewModel::adjustSetSecondary(SetModel* set, int steps)
     if (!set || steps == 0 || !set->secondaryAdjustable())
         return;
 
-    constexpr double weight_step = 2.5;
-    constexpr int distance_duration_step = 30;
-
     const Set& entity = set->entity();
     if (entity.metric() == SetMetric::Distance)
         set->setDurationSeconds(
-            std::max(0, entity.durationSeconds() + steps * distance_duration_step));
+            std::max(0, entity.durationSeconds() + steps * SetAdjustment::pacedDurationSeconds));
     else
-        set->setWeight(std::max(0.0, entity.weight() + steps * weight_step));
+        set->setWeight(std::max(0.0, entity.weight() + steps * SetAdjustment::weightKilograms));
 
     saveCurrentWorkout();
 }
