@@ -168,13 +168,20 @@ void WorkoutEditorViewModel::setExerciseNotes(int exerciseIndex, const QString& 
 void WorkoutEditorViewModel::addSet(int exerciseIndex)
 {
     Exercise* exercise = exerciseAt(exerciseIndex);
-    if (exercise == nullptr || exercise->sets().empty())
+    if (exercise == nullptr)
         return;
 
-    Set copy = exercise->sets().back();
-    copy.setId(-1);
-    copy.setCompleted(false);
-    exercise->addSet(copy);
+    if (exercise->sets().empty())
+    {
+        exercise->addSet(seedSetFor(*exercise));
+    }
+    else
+    {
+        Set copy = exercise->sets().back();
+        copy.setId(-1);
+        copy.setCompleted(false);
+        exercise->addSet(copy);
+    }
 
     markDirty();
     publish();
@@ -360,9 +367,19 @@ Set WorkoutEditorViewModel::seedSetFor(const ExerciseDefinitionModel& definition
         ? entity.defaultMetric()
         : defaultMetricFor(entity.kind());
 
+    return seedSet(metric, entity.defaultLoadType());
+}
+
+Set WorkoutEditorViewModel::seedSetFor(const Exercise& exercise) const
+{
+    return seedSet(defaultMetricFor(exercise.kind()), defaultLoadTypeFor(exercise.kind()));
+}
+
+Set WorkoutEditorViewModel::seedSet(SetMetric metric, LoadType loadType) const
+{
     Set set;
     set.setMetric(metric);
-    set.setLoadType(entity.defaultLoadType());
+    set.setLoadType(loadType);
 
     switch (metric)
     {

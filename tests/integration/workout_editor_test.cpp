@@ -201,6 +201,35 @@ TEST_F(WorkoutEditorTest, AddSetCopiesTheLastSetOfTheExercise)
     EXPECT_FALSE(sets[1]->completed());
 }
 
+TEST_F(WorkoutEditorTest, AddSetSeedsAFreshSetWhenTheExerciseHasNoneLeft)
+{
+    startWorkout();
+    addExercise(QStringLiteral("Back Squat"));
+    editor().removeSet(0, 0);
+    ASSERT_TRUE(editor().workout()->exercises().first()->sets().isEmpty());
+
+    editor().addSet(0);
+
+    const auto sets = editor().workout()->exercises().first()->sets();
+    ASSERT_EQ(sets.size(), 1);
+    EXPECT_EQ(sets[0]->entity().metric(), SetMetric::Reps);
+    EXPECT_EQ(sets[0]->repetitions(), 8);
+}
+
+TEST_F(WorkoutEditorTest, ASeededSetFollowsTheMetricOfTheExerciseKind)
+{
+    startWorkout();
+    addExercise(QStringLiteral("Plank"));
+    editor().removeSet(0, 0);
+
+    editor().addSet(0);
+
+    const auto sets = editor().workout()->exercises().first()->sets();
+    ASSERT_EQ(sets.size(), 1);
+    EXPECT_EQ(sets[0]->entity().metric(), SetMetric::Duration);
+    EXPECT_EQ(sets[0]->durationSeconds(), 30);
+}
+
 TEST_F(WorkoutEditorTest, SetsCanBeEditedDuplicatedReorderedAndRemoved)
 {
     startWorkout();

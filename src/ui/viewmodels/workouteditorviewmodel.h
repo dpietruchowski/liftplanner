@@ -76,6 +76,8 @@ private:
     Exercise* exerciseAt(int exerciseIndex);
     Set* setAt(int exerciseIndex, int setIndex);
     Set seedSetFor(const ExerciseDefinitionModel& definition) const;
+    Set seedSetFor(const Exercise& exercise) const;
+    Set seedSet(SetMetric metric, LoadType loadType) const;
 
     void adopt(const Workout& workout, bool dirty);
     void publish();
