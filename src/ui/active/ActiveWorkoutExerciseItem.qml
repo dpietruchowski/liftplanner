@@ -213,6 +213,17 @@ Column {
         }
     }
 
+    Text {
+        objectName: "previousPerformanceText"
+        width: exerciseDelegate.width
+        visible: exerciseDelegate.isExpanded && exercise.previousSummary.length > 0
+        text: qsTr("Last time") + " · " + Qt.formatDate(exercise.previousDate, "d MMM")
+              + ": " + exercise.previousSummary
+        color: Theme.colors.textMuted
+        font.pixelSize: Theme.fontSize.small
+        elide: Text.ElideRight
+    }
+
     Column {
         id: setsColumn
         width: exerciseDelegate.width

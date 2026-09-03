@@ -10,6 +10,7 @@
 #include <QHash>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QPointer>
 #include <QStandardPaths>
 #include <algorithm>
 
@@ -60,6 +61,18 @@ Workout withExecutionStateFrom(Workout stored, const Workout& cached)
     stored.setStatus(cached.status());
     stored.setStartedTime(cached.startedTime());
     return stored;
+}
+
+QString completedSetsSummary(const Exercise& exercise)
+{
+    Exercise done = exercise;
+    done.sets().clear();
+    for (const Set& set : exercise.sets())
+    {
+        if (set.completed())
+            done.addSet(set);
+    }
+    return done.setsToString();
 }
 
 }
@@ -133,6 +146,31 @@ void ActiveWorkoutViewModel::restoreWorkout(const Workout& entity)
     setCurrentWorkout(new WorkoutModel(entity, this));
     selectFirstIncomplete();
     setIsActive(true);
+    refreshPreviousPerformances();
+}
+
+void ActiveWorkoutViewModel::refreshPreviousPerformances()
+{
+    if (!m_service || !m_currentWorkout)
+        return;
+
+    QPointer<WorkoutModel> target(m_currentWorkout);
+    m_service->previousPerformances(m_currentWorkout->toEntity())
+        .then(this,
+              [target](std::vector<WorkoutService::PreviousPerformance> entries)
+              {
+                  if (!target)
+                      return;
+
+                  const QList<ExerciseModel*> exercises = target->exercises();
+                  for (const auto& entry : entries)
+                  {
+                      if (entry.exerciseIndex < 0 || entry.exerciseIndex >= exercises.size())
+                          continue;
+                      exercises[entry.exerciseIndex]->setPreviousPerformance(
+                          completedSetsSummary(entry.exercise), entry.performedAt);
+                  }
+              });
 }
 
 void ActiveWorkoutViewModel::startWorkout(WorkoutModel* workout)
@@ -155,6 +193,7 @@ void ActiveWorkoutViewModel::startWorkout(WorkoutModel* workout)
 
     updateCurrentExercise();
     updateCurrentSet();
+    refreshPreviousPerformances();
 
     if (previousWorkout)
     {

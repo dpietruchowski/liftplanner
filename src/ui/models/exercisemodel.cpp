@@ -24,6 +24,19 @@ QString ExerciseModel::kindString() const { return exerciseKindToString(m_exerci
 
 bool ExerciseModel::isCompleted() const { return toEntity().isCompleted(); }
 
+QString ExerciseModel::previousSummary() const { return m_previousSummary; }
+QDateTime ExerciseModel::previousDate() const { return m_previousDate; }
+
+void ExerciseModel::setPreviousPerformance(const QString& summary, const QDateTime& date)
+{
+    if (m_previousSummary == summary && m_previousDate == date)
+        return;
+
+    m_previousSummary = summary;
+    m_previousDate = date;
+    emit previousPerformanceChanged();
+}
+
 QQmlListProperty<SetModel> ExerciseModel::setsProperty()
 {
     return QQmlListProperty<SetModel>(this, &m_sets);

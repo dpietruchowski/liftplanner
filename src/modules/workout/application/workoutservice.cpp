@@ -6,6 +6,26 @@
 #include <QHash>
 #include <algorithm>
 
+namespace
+{
+
+constexpr int previous_performance_window = 50;
+
+bool sameExercise(const Exercise& a, const Exercise& b)
+{
+    if (a.hasDefinition() && b.hasDefinition())
+        return a.definitionId() == b.definitionId();
+    return a.name().compare(b.name(), Qt::CaseInsensitive) == 0;
+}
+
+bool hasCompletedSet(const Exercise& exercise)
+{
+    return std::any_of(exercise.sets().begin(), exercise.sets().end(),
+                       [](const Set& set) { return set.completed(); });
+}
+
+}
+
 WorkoutService::WorkoutService(WorkoutRepository& repository, QObject* worker)
     : Service(worker)
     , m_repository(repository)
@@ -46,6 +66,12 @@ WorkoutService::topExercises(int topN, int recentWorkouts)
 Task<WorkoutService::TrainingTotals> WorkoutService::recentTotals(int recentWorkouts)
 {
     return invoke([this, recentWorkouts] { return recentTotalsCore(recentWorkouts); });
+}
+
+Task<std::vector<WorkoutService::PreviousPerformance>>
+WorkoutService::previousPerformances(const Workout& workout)
+{
+    return invoke([this, workout] { return previousPerformancesCore(workout); });
 }
 
 Task<std::optional<Workout>> WorkoutService::findWorkout(int id)
@@ -173,6 +199,35 @@ Result<WorkoutService::TrainingTotals> WorkoutService::recentTotalsCore(int rece
     }
 
     return Result<TrainingTotals>::success(totals);
+}
+
+Result<std::vector<WorkoutService::PreviousPerformance>>
+WorkoutService::previousPerformancesCore(const Workout& workout)
+{
+    const std::vector<Workout> history = loadHistoryCore(previous_performance_window).value();
+
+    std::vector<PreviousPerformance> result;
+    const auto& exercises = workout.exercises();
+    for (size_t i = 0; i < exercises.size(); ++i)
+    {
+        for (const Workout& past : history)
+        {
+            if (past.id() == workout.id())
+                continue;
+
+            const auto& candidates = past.exercises();
+            const auto match = std::find_if(
+                candidates.begin(), candidates.end(), [&](const Exercise& candidate)
+                { return sameExercise(candidate, exercises[i]) && hasCompletedSet(candidate); });
+            if (match == candidates.end())
+                continue;
+
+            result.push_back({ static_cast<int>(i), past.startedTime(), *match });
+            break;
+        }
+    }
+
+    return Result<std::vector<PreviousPerformance>>::success(result);
 }
 
 Result<std::optional<Workout>> WorkoutService::findWorkoutCore(int id)

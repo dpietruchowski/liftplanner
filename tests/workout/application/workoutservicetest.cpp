@@ -44,6 +44,10 @@ protected:
         return m_service->recentTotalsCore(recentWorkouts).value();
     }
     std::optional<Workout> findWorkout(int id) { return m_service->findWorkoutCore(id).value(); }
+    std::vector<WorkoutService::PreviousPerformance> previousPerformances(const Workout& workout)
+    {
+        return m_service->previousPerformancesCore(workout).value();
+    }
     int saveWorkout(const Workout& workout) { return m_service->saveWorkoutCore(workout).value(); }
     bool deleteWorkout(int id) { return m_service->deleteWorkoutCore(id).value(); }
 
@@ -484,4 +488,79 @@ TEST_F(WorkoutServiceTest, DeleteWorkout_ReturnsFalseWhenNotFound)
 
     bool result = deleteWorkout(999);
     EXPECT_FALSE(result);
+}
+
+// --- previousPerformances ---
+
+namespace
+{
+
+Exercise exerciseWithSets(const QString& name, double weight, bool completed,
+                          std::optional<int> definitionId = std::nullopt)
+{
+    Exercise exercise(name, 120);
+    if (definitionId)
+        exercise.setDefinitionId(*definitionId);
+    for (int i = 0; i < 2; ++i)
+    {
+        Set set(10, weight);
+        set.setCompleted(completed);
+        exercise.addSet(set);
+    }
+    return exercise;
+}
+
+Workout endedWorkout(int id, int daysAgo, const std::vector<Exercise>& exercises)
+{
+    Workout workout(QStringLiteral("Session %1").arg(id), QDateTime::currentDateTime());
+    workout.setId(id);
+    workout.setStatus(WorkoutStatus::Ended);
+    workout.setStartedTime(QDateTime::currentDateTime().addDays(-daysAgo));
+    for (const Exercise& exercise : exercises)
+        workout.addExercise(exercise);
+    return workout;
+}
+
+}
+
+TEST_F(WorkoutServiceTest, PreviousPerformances_PicksTheMostRecentCompletedMatch)
+{
+    const std::vector<Workout> history = {
+        endedWorkout(4, 1, { exerciseWithSets("Bench Press", 100.0, false, 7) }),
+        endedWorkout(2, 2, { exerciseWithSets("Bench Press", 62.5, true, 7) }),
+        endedWorkout(1, 3,
+                     { exerciseWithSets("Bench Press", 60.0, true, 7),
+                       exerciseWithSets("Squat", 90.0, true) }),
+    };
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+
+    Workout active("Today", QDateTime::currentDateTime());
+    active.setId(9);
+    active.addExercise(exerciseWithSets("Bench Press", 0.0, false, 7));
+    active.addExercise(exerciseWithSets("squat", 0.0, false));
+    active.addExercise(exerciseWithSets("Deadlift", 0.0, false));
+
+    const auto result = previousPerformances(active);
+
+    ASSERT_EQ(result.size(), 2u);
+    EXPECT_EQ(result[0].exerciseIndex, 0);
+    EXPECT_EQ(result[0].performedAt, history[1].startedTime());
+    EXPECT_DOUBLE_EQ(result[0].exercise.sets()[0].weight(), 62.5);
+    EXPECT_EQ(result[1].exerciseIndex, 1);
+    EXPECT_EQ(result[1].exercise.name(), "Squat");
+}
+
+TEST_F(WorkoutServiceTest, PreviousPerformances_SkipsTheWorkoutItselfAndNameMismatches)
+{
+    const std::vector<Workout> history = {
+        endedWorkout(9, 0, { exerciseWithSets("Bench Press", 100.0, true, 7) }),
+        endedWorkout(1, 3, { exerciseWithSets("Incline Bench Press", 60.0, true, 8) }),
+    };
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+
+    Workout active("Today", QDateTime::currentDateTime());
+    active.setId(9);
+    active.addExercise(exerciseWithSets("Bench Press", 0.0, false, 7));
+
+    EXPECT_TRUE(previousPerformances(active).empty());
 }

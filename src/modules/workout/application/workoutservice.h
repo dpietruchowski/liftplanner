@@ -1,9 +1,11 @@
 #pragma once
 
+#include <QDateTime>
 #include <QString>
 #include <optional>
 #include <vector>
 
+#include "modules/workout/domain/entities/exercise.h"
 #include "modules/workout/domain/entities/workout.h"
 #include "utils/service.h"
 #include "utils/testing.h"
@@ -28,6 +30,13 @@ public:
         double totalDistanceMeters { 0.0 };
     };
 
+    struct PreviousPerformance
+    {
+        int exerciseIndex { -1 };
+        QDateTime performedAt;
+        Exercise exercise;
+    };
+
     WorkoutService(WorkoutRepository& repository, QObject* worker);
 
     Task<std::vector<Workout>> loadPlannedWorkouts();
@@ -39,6 +48,7 @@ public:
 
     Task<std::vector<ExerciseFrequency>> topExercises(int topN, int recentWorkouts);
     Task<TrainingTotals> recentTotals(int recentWorkouts);
+    Task<std::vector<PreviousPerformance>> previousPerformances(const Workout& workout);
 
     Task<std::optional<Workout>> findWorkout(int id);
     Task<int> saveWorkout(const Workout& workout);
@@ -54,6 +64,7 @@ private:
     Result<void> importHistoryCore(const std::vector<Workout>& workouts);
     Result<std::vector<ExerciseFrequency>> topExercisesCore(int topN, int recentWorkouts);
     Result<TrainingTotals> recentTotalsCore(int recentWorkouts);
+    Result<std::vector<PreviousPerformance>> previousPerformancesCore(const Workout& workout);
     Result<std::optional<Workout>> findWorkoutCore(int id);
     Result<int> saveWorkoutCore(const Workout& workout);
     Result<bool> deleteWorkoutCore(int id);
