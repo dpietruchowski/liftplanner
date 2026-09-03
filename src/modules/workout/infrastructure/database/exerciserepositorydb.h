@@ -2,6 +2,7 @@
 
 #include "modules/workout/domain/entities/exercise.h"
 #include <QList>
+#include <QStringList>
 #include <memory>
 #include <vector>
 
@@ -24,5 +25,7 @@ public:
     void removeByWorkoutId(int workoutId);
 
 private:
+    static QStringList staticHoldNames();
+
     std::unique_ptr<DbRepository> m_repository;
 };

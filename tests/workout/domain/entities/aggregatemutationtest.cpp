@@ -1,5 +1,6 @@
 #include "modules/workout/domain/entities/exercise.h"
 #include "modules/workout/domain/entities/set.h"
+#include "modules/workout/domain/entities/setcompatibility.h"
 #include "modules/workout/domain/entities/workout.h"
 #include <gtest/gtest.h>
 
@@ -93,6 +94,17 @@ TEST_F(SetMetricCompatibilityTest, IntervalAcceptsDurationAndReps)
     EXPECT_TRUE(exercise.acceptsSet(Set::createDuration(45)));
     EXPECT_TRUE(exercise.acceptsSet(Set(15, 0.0)));
     EXPECT_FALSE(exercise.acceptsSet(Set::createDistance(200.0, 60)));
+}
+
+TEST_F(SetMetricCompatibilityTest, IsometricAcceptsDurationOnly)
+{
+    const Exercise exercise = Exercise::createAdHoc("Plank", ExerciseKind::Isometric, 60);
+
+    EXPECT_TRUE(exercise.acceptsSet(Set::createDuration(60)));
+    EXPECT_FALSE(exercise.acceptsSet(Set(15, 0.0)));
+    EXPECT_FALSE(exercise.acceptsSet(Set::createDistance(200.0, 60)));
+    EXPECT_EQ(defaultMetricFor(ExerciseKind::Isometric), SetMetric::Duration);
+    EXPECT_EQ(defaultLoadTypeFor(ExerciseKind::Isometric), LoadType::None);
 }
 
 TEST_F(SetMetricCompatibilityTest, AnIncompatibleSetIsReportedButNeverDropped)

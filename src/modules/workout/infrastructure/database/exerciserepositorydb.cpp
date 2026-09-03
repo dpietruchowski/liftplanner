@@ -91,6 +91,30 @@ void ExerciseRepositoryDb::registerMigrations(MigrationRunner& runner)
                                      ExerciseSerializer::workout_id_key, ExerciseSerializer::id_key,
                                      ExerciseSerializer::position_key);
         });
+
+    runner.add(6,
+               [](QSqlDatabase& db)
+               {
+                   Where isStaticHold;
+                   for (const QString& name : staticHoldNames())
+                       isStaticHold.or_(Where(ExerciseSerializer::name_key).like(name));
+
+                   return Update(ExerciseSerializer::table)
+                              .set(ExerciseSerializer::kind_key,
+                                   exerciseKindToString(ExerciseKind::Isometric))
+                              .where(Where(ExerciseSerializer::kind_key)
+                                         .equals(exerciseKindToString(ExerciseKind::Interval))
+                                         .and_(isStaticHold))
+                              .execute(db)
+                              .toInt()
+                       >= 0;
+               });
+}
+
+QStringList ExerciseRepositoryDb::staticHoldNames()
+{
+    return { QStringLiteral("Plank"), QStringLiteral("Side Plank"), QStringLiteral("Hollow Hold"),
+             QStringLiteral("Dead Hang"), QStringLiteral("Wall Sit") };
 }
 
 std::vector<Exercise> ExerciseRepositoryDb::findByWorkoutId(int workoutId) const

@@ -8,7 +8,8 @@ enum class ExerciseKind
     Bodyweight,
     Cardio,
     Interval,
-    Mobility
+    Mobility,
+    Isometric
 };
 
 inline QString exerciseKindToString(ExerciseKind kind)
@@ -25,6 +26,8 @@ inline QString exerciseKindToString(ExerciseKind kind)
             return QStringLiteral("interval");
         case ExerciseKind::Mobility:
             return QStringLiteral("mobility");
+        case ExerciseKind::Isometric:
+            return QStringLiteral("isometric");
     }
     return QStringLiteral("strength");
 }
@@ -39,5 +42,7 @@ inline ExerciseKind exerciseKindFromString(const QString& str)
         return ExerciseKind::Interval;
     if (str == QStringLiteral("mobility"))
         return ExerciseKind::Mobility;
+    if (str == QStringLiteral("isometric"))
+        return ExerciseKind::Isometric;
     return ExerciseKind::Strength;
 }

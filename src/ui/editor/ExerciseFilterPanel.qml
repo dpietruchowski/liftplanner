@@ -11,7 +11,7 @@ ThemedPanel {
     readonly property var equipmentOptions: ["", "barbell", "dumbbell", "kettlebell", "machine",
         "cable", "smith_machine", "trap_bar", "bodyweight", "band", "sled", "treadmill", "bike",
         "rower", "other"]
-    readonly property var kindOptions: ["", "strength", "bodyweight", "cardio", "interval", "mobility"]
+    readonly property var kindOptions: ["", "strength", "bodyweight", "cardio", "interval", "mobility", "isometric"]
 
     panelTitle: qsTr("Filters")
 

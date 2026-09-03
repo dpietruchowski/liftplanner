@@ -214,6 +214,8 @@ TEST_F(ExerciseTest, KindToString_Roundtrips)
               ExerciseKind::Interval);
     EXPECT_EQ(exerciseKindFromString(exerciseKindToString(ExerciseKind::Mobility)),
               ExerciseKind::Mobility);
+    EXPECT_EQ(exerciseKindFromString(exerciseKindToString(ExerciseKind::Isometric)),
+              ExerciseKind::Isometric);
     EXPECT_EQ(exerciseKindFromString("nonsense"), ExerciseKind::Strength);
 }
 

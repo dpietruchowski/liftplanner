@@ -209,7 +209,7 @@ TEST_F(MigrationTest, LegacyDatabase_ReachesLatestSchemaVersion)
 
     migrate();
 
-    EXPECT_EQ(m_schemaVersion, 5);
+    EXPECT_EQ(m_schemaVersion, 6);
 }
 
 TEST_F(MigrationTest, Migration_IsIdempotent)
@@ -222,9 +222,36 @@ TEST_F(MigrationTest, Migration_IsIdempotent)
     m_repo->registerMigrations(second);
 
     EXPECT_TRUE(second.run());
-    EXPECT_EQ(second.currentVersion(), 5);
+    EXPECT_EQ(second.currentVersion(), 6);
     EXPECT_EQ(scalar("SELECT COUNT(*) FROM sets").toInt(), 2);
     EXPECT_EQ(scalar("SELECT metric FROM sets WHERE id = 1").toString(), "reps");
+}
+
+TEST_F(MigrationTest, StaticHoldsStoredAsIntervals_BecomeIsometric)
+{
+    createLegacySchema();
+    insertLegacyData();
+    migrate();
+
+    QSqlQuery query(m_database);
+    ASSERT_TRUE(query.exec("INSERT INTO exercises (id, workout_id, name, kind) "
+                           "VALUES (20, 1, 'plank', 'interval')"));
+    ASSERT_TRUE(query.exec("INSERT INTO exercises (id, workout_id, name, kind) "
+                           "VALUES (21, 1, 'Dead Hang', 'interval')"));
+    ASSERT_TRUE(query.exec("INSERT INTO exercises (id, workout_id, name, kind) "
+                           "VALUES (22, 1, 'Burpee', 'interval')"));
+    ASSERT_TRUE(query.exec("INSERT INTO exercises (id, workout_id, name, kind) "
+                           "VALUES (23, 1, 'Plank', 'mobility')"));
+    ASSERT_TRUE(query.exec("PRAGMA user_version = 5"));
+
+    MigrationRunner again(*m_dbStorage);
+    m_repo->registerMigrations(again);
+    ASSERT_TRUE(again.run());
+
+    EXPECT_EQ(scalar("SELECT kind FROM exercises WHERE id = 20").toString(), "isometric");
+    EXPECT_EQ(scalar("SELECT kind FROM exercises WHERE id = 21").toString(), "isometric");
+    EXPECT_EQ(scalar("SELECT kind FROM exercises WHERE id = 22").toString(), "interval");
+    EXPECT_EQ(scalar("SELECT kind FROM exercises WHERE id = 23").toString(), "mobility");
 }
 
 TEST_F(MigrationTest, FreshDatabase_HasAllColumnsAndLatestVersion)
@@ -235,7 +262,7 @@ TEST_F(MigrationTest, FreshDatabase_HasAllColumnsAndLatestVersion)
     EXPECT_TRUE(setColumns.contains(SetSerializer::metric_key));
     EXPECT_TRUE(setColumns.contains(SetSerializer::rest_seconds_override_key));
     EXPECT_TRUE(columnsOf(ExerciseSerializer::table).contains(ExerciseSerializer::kind_key));
-    EXPECT_EQ(m_schemaVersion, 5);
+    EXPECT_EQ(m_schemaVersion, 6);
 }
 
 TEST_F(MigrationTest, FreshDatabase_RoundtripsTimedAndDistanceSets)

@@ -16,6 +16,8 @@ inline bool metricSuitsKind(ExerciseKind kind, SetMetric metric)
         case ExerciseKind::Interval:
         case ExerciseKind::Mobility:
             return metric == SetMetric::Duration || metric == SetMetric::Reps;
+        case ExerciseKind::Isometric:
+            return metric == SetMetric::Duration;
     }
     return false;
 }
@@ -31,6 +33,7 @@ inline SetMetric defaultMetricFor(ExerciseKind kind)
             return SetMetric::Distance;
         case ExerciseKind::Interval:
         case ExerciseKind::Mobility:
+        case ExerciseKind::Isometric:
             return SetMetric::Duration;
     }
     return SetMetric::Reps;
@@ -47,6 +50,7 @@ inline LoadType defaultLoadTypeFor(ExerciseKind kind)
         case ExerciseKind::Cardio:
         case ExerciseKind::Interval:
         case ExerciseKind::Mobility:
+        case ExerciseKind::Isometric:
             return LoadType::None;
     }
     return LoadType::External;

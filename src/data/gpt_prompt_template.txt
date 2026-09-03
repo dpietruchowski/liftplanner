@@ -150,7 +150,9 @@ Separators:
 - `x` before a parenthesis counts rounds; elsewhere it counts reps.
 
 `kind` labels the exercise so the app picks the right editor:
-strength | bodyweight | cardio | interval | mobility. Defaults to strength.
+strength | bodyweight | cardio | interval | mobility | isometric. Defaults to strength.
+Use `isometric` for static holds (plank, hollow hold, dead hang, wall sit);
+their sets are always durations.
 
 ================================================================
 === FINAL OUTPUT SCHEMA (STATE C only) ===

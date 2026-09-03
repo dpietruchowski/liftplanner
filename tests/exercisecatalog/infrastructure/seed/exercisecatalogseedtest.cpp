@@ -345,7 +345,7 @@ TEST_F(ShippedExerciseCatalogTest, TheShippedSeedCoversEveryEquipmentFilterItCla
     for (const ExerciseDefinition& definition : definitions)
         kinds.insert(static_cast<int>(definition.kind()));
 
-    EXPECT_EQ(kinds.size(), 5);
+    EXPECT_EQ(kinds.size(), 6);
 }
 
 TEST_F(ShippedExerciseCatalogTest, TheShippedSeedLandsInTheDatabaseAndIsIdempotent)
