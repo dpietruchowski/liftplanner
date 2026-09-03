@@ -55,6 +55,7 @@ private:
     int restSecondsFor(SetModel* set) const;
     int workSecondsFor(SetModel* set) const;
 
+    void restoreWorkout(const Workout& entity);
     void saveCompletedSet();
     void updateCurrentExercise();
     void updateCurrentSet();

@@ -6,10 +6,63 @@
 #include <QDebug>
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
+#include <QHash>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QStandardPaths>
 #include <algorithm>
+
+namespace
+{
+
+QString cacheFilePath()
+{
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+        + QStringLiteral("/current_workout.json");
+}
+
+std::optional<Workout> readCachedWorkout()
+{
+    QFile file(cacheFilePath());
+    if (!file.exists() || !file.open(QIODevice::ReadOnly))
+        return std::nullopt;
+
+    const QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+    if (!doc.isObject())
+        return std::nullopt;
+
+    return WorkoutJson::workoutFromJson(doc.object());
+}
+
+Workout withExecutionStateFrom(Workout stored, const Workout& cached)
+{
+    QHash<int, bool> completedBySetId;
+    for (const Exercise& exercise : cached.exercises())
+    {
+        for (const Set& set : exercise.sets())
+        {
+            if (set.id() != -1)
+                completedBySetId.insert(set.id(), set.completed());
+        }
+    }
+
+    for (Exercise& exercise : stored.exercises())
+    {
+        for (Set& set : exercise.sets())
+        {
+            const auto it = completedBySetId.constFind(set.id());
+            if (it != completedBySetId.constEnd())
+                set.setCompleted(it.value());
+        }
+    }
+
+    stored.setStatus(cached.status());
+    stored.setStartedTime(cached.startedTime());
+    return stored;
+}
+
+}
 
 ActiveWorkoutViewModel::ActiveWorkoutViewModel(WorkoutService* service, QObject* parent)
     : QObject(parent)
@@ -36,12 +89,7 @@ WorkoutTimer* ActiveWorkoutViewModel::timer() const { return m_timer; }
 
 void ActiveWorkoutViewModel::saveCurrentWorkout()
 {
-    QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QDir dir(dirPath);
-    if (!dir.exists())
-        dir.mkpath(".");
-
-    QString filePath = dir.filePath("current_workout.json");
+    const QString filePath = cacheFilePath();
 
     if (!m_currentWorkout)
     {
@@ -49,39 +97,40 @@ void ActiveWorkoutViewModel::saveCurrentWorkout()
         return;
     }
 
-    QJsonObject json = WorkoutJson::workoutToJson(m_currentWorkout->toEntity());
-    QJsonDocument doc(json);
+    QDir().mkpath(QFileInfo(filePath).absolutePath());
 
     QFile file(filePath);
     if (file.open(QIODevice::WriteOnly))
-    {
-        file.write(doc.toJson());
-        file.close();
-    }
+        file.write(
+            QJsonDocument(WorkoutJson::workoutToJson(m_currentWorkout->toEntity())).toJson());
 
     saveToDb();
 }
 
 void ActiveWorkoutViewModel::loadCurrentWorkout()
 {
-    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
-        + "/current_workout.json";
-
-    QFile file(path);
-    if (!file.exists() || !file.open(QIODevice::ReadOnly))
+    const std::optional<Workout> cached = readCachedWorkout();
+    if (!cached)
         return;
 
-    QByteArray data = file.readAll();
-    file.close();
+    if (cached->id() == -1 || !m_service)
+    {
+        restoreWorkout(*cached);
+        return;
+    }
 
-    QJsonDocument doc = QJsonDocument::fromJson(data);
-    if (!doc.isObject())
+    m_service->findWorkout(cached->id())
+        .onError(this, [this, cached = *cached](const QString&) { restoreWorkout(cached); })
+        .then(this, [this, cached = *cached](std::optional<Workout> stored)
+              { restoreWorkout(stored ? withExecutionStateFrom(*stored, cached) : cached); });
+}
+
+void ActiveWorkoutViewModel::restoreWorkout(const Workout& entity)
+{
+    if (m_currentWorkout)
         return;
 
-    Workout entity = WorkoutJson::workoutFromJson(doc.object());
-    auto* loadedWorkout = new WorkoutModel(entity, this);
-
-    setCurrentWorkout(loadedWorkout);
+    setCurrentWorkout(new WorkoutModel(entity, this));
     selectFirstIncomplete();
     setIsActive(true);
 }

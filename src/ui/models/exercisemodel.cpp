@@ -58,13 +58,8 @@ void ExerciseModel::removeSet(SetModel* set)
 
 Exercise ExerciseModel::toEntity() const
 {
-    Exercise e;
-    e.setId(m_exercise.id());
-    e.setWorkoutId(m_exercise.workoutId());
-    e.setName(m_exercise.name());
-    e.setDescription(m_exercise.description());
-    e.setRestSeconds(m_exercise.restSeconds());
-    e.setKind(m_exercise.kind());
+    Exercise e = m_exercise;
+    e.sets().clear();
     for (auto* s : m_sets)
         e.addSet(s->entity());
     return e;
