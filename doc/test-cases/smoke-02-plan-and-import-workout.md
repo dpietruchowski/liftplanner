@@ -20,7 +20,7 @@ JSON.
 
 ## Wymagania wstępne
 
-- Aplikacja postawiona (`liftplanner_session.py start`).
+- Aplikacja postawiona (`ui_session.py start`).
 - Profil użytkownika istnieje (jeśli nie — ustaw pola na `screenProfile`).
 - Przykładowy JSON planu zgodny z formatem `workoutjson` (tablica treningów).
 

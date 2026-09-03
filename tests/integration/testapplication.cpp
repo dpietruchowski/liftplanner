@@ -1,5 +1,8 @@
 #include "testapplication.h"
 
+#include "async/backendworker.h"
+#include "async/mocktimeprovider.h"
+#include "async/timeprovider.h"
 #include "modules/exercisecatalog/application/exercisecatalogservice.h"
 #include "modules/exercisecatalog/infrastructure/database/exercisedefinitionrepositorydb.h"
 #include "modules/exercisecatalog/infrastructure/lookup/catalogdefinitionlookup.h"
@@ -15,9 +18,6 @@
 #include "ui/viewmodels/workouteditorviewmodel.h"
 #include "ui/viewmodels/workouthistoryviewmodel.h"
 #include "ui/viewmodels/workouttemplateviewmodel.h"
-#include "utils/backendworker.h"
-#include "utils/mocktimeprovider.h"
-#include "utils/timeprovider.h"
 #include <QEventLoop>
 #include <QMetaObject>
 #include <QSqlQuery>

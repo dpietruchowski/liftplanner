@@ -1,5 +1,6 @@
 #include "liftplannerapplication.h"
 
+#include "async/backendworker.h"
 #include "core/storage/appdbstorage.h"
 #include "modules/exercisecatalog/application/exercisecatalogservice.h"
 #include "modules/exercisecatalog/infrastructure/database/exercisedefinitionrepositorydb.h"
@@ -10,6 +11,8 @@
 #include "modules/workout/application/workouttemplateservice.h"
 #include "modules/workout/infrastructure/database/workoutrepositorydb.h"
 #include "modules/workout/infrastructure/database/workouttemplaterepositorydb.h"
+#include "qmlutils/coloredsvgprovider.h"
+#include "qmlutils/qmlregistrator.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
 #include "ui/viewmodels/exercisecatalogviewmodel.h"
 #include "ui/viewmodels/plannedworkoutviewmodel.h"
@@ -18,11 +21,8 @@
 #include "ui/viewmodels/workouthistoryviewmodel.h"
 #include "ui/viewmodels/workouttemplateviewmodel.h"
 #include "utils/appinfo.h"
-#include "utils/backendworker.h"
 #include "utils/clipboardhelper.h"
-#include "utils/coloredsvgprovider.h"
 #include "utils/notificationtypes.h"
-#include "utils/qmlregistrator.h"
 #include <QDebug>
 #include <QEventLoop>
 #include <QMetaObject>
@@ -140,6 +140,5 @@ void LiftPlannerApplication::registerQmlTypes(QmlRegistrator& registrator)
     registrator.registerSingletonInstance("ClipboardHelper", m_clipboardHelper.get());
     registrator.registerSingletonInstance("AppInfo", m_appInfo.get());
 
-    registrator.registerSingletonType("Theme.qml", "Theme");
     registrator.registerSingletonType("Themed.Components", "Theme.qml", "Theme");
 }

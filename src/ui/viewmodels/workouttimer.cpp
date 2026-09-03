@@ -1,5 +1,5 @@
 #include "workouttimer.h"
-#include "utils/timeprovider.h"
+#include "async/timeprovider.h"
 #include <algorithm>
 
 namespace

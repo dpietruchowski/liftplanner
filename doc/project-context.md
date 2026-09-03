@@ -98,9 +98,12 @@ FINAL OUTPUT SCHEMA (`user_profile` + `workouts[].exercises[].sets` as `"5x60kg,
   cmake --build build/Debug --parallel
   ctest --output-on-failure --test-dir build/Debug
   ```
-- **Android:** [build.sh](../build.sh) `[clear] [debug|release]` — builds in Docker
-  (`stateoftheartio/qt6:6.8-android-aqt`) into `build-android/`. Signing config + keystore in root
-  CMake / `sign.sh` / `generate_key.sh`.
+- **Android:** [libs/scripts/build-android.sh](../libs/scripts/build-android.sh)
+  `[clear] [debug|release] [apk|aab] [official]` — builds in Docker
+  (`libs/docker/Dockerfile.android`) into `build-android/`. Package name, version, keystore
+  and key alias come from [app.env](../app.env); signing runs through
+  `libs/scripts/sign-apk.sh` / `sign-aab.sh`, keys via `generate-keystore.sh`.
+- **AppImage:** [libs/scripts/build-appimage.sh](../libs/scripts/build-appimage.sh) into `dist/`.
 - Tests = GoogleTest/GMock submodule (`tests/third_party/googletest`). Layout mirrors modules:
   `tests/workout/{domain,application,infrastructure}`, `tests/userprofile/...`, plus
   `tests/integration/` (full-app lifecycle tests via `TestApplication`). Tests excluded on Android.

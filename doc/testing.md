@@ -36,7 +36,7 @@ The [tests/](../tests/) tree mirrors `src/` layout — one suite per layer.
 | `tests/third_party/googletest/` | vendored GoogleTest (skipped by `format`) |
 
 Services expose their internals to their unit test via `LIBS_TEST_FRIEND(...)` (see
-[utils/testing.h](../src/utils/testing.h)), so a test can drive the private `…Core()`
+[async/testing.h](../libs/cpp/async/testing.h)), so a test can drive the private `…Core()`
 methods directly.
 
 ## Integration tests — `TestApplication`
@@ -65,7 +65,7 @@ Existing integration suites:
 
 Runtime "now" is read through `TimeProvider` (never `QDateTime::currentDateTime()`
 directly), so tests can control the clock deterministically. `TestApplication` installs
-a [MockTimeProvider](../src/utils/mocktimeprovider.h); call `setCurrentDate(...)` to pin
+a [MockTimeProvider](../libs/cpp/async/mocktimeprovider.h); call `setCurrentDate(...)` to pin
 the date or `advanceDays(n)` to move forward. This is what makes assertions on weekly
 activity, planned-vs-history boundaries, and date-stamped records reproducible. See
 [time_travel_test.cpp](../tests/integration/time_travel_test.cpp).
@@ -78,13 +78,13 @@ directly:
 
 ```bash
 # Ensure the app is up (adopts an existing instance on port 49210, else launches it)
-python3 tools/ui_automation/liftplanner_session.py start
+python3 libs/tools/ui_session.py start
 
 # Drive it (one command per call; the instance persists between calls)
-python3 tools/ui_automation/liftplanner_driver.py find ""        # list objectNames
-python3 tools/ui_automation/liftplanner_driver.py dump           # tree + properties
-python3 tools/ui_automation/liftplanner_driver.py click startWorkoutButton
-python3 tools/ui_automation/liftplanner_driver.py set_time 2026-01-05
+python3 libs/tools/ui_driver.py find ""        # list objectNames
+python3 libs/tools/ui_driver.py dump           # tree + properties
+python3 libs/tools/ui_driver.py click startWorkoutButton
+python3 libs/tools/ui_driver.py set_time 2026-01-05
 ```
 
 The driver mirrors the test clock control (`set_time`, `advance_time`, `reset_time`),

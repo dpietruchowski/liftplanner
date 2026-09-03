@@ -5,10 +5,10 @@
 #include <optional>
 #include <vector>
 
+#include "async/service.h"
+#include "async/testing.h"
 #include "modules/workout/domain/entities/workout.h"
 #include "modules/workout/domain/entities/workouttemplate.h"
-#include "utils/service.h"
-#include "utils/testing.h"
 
 class ExerciseDefinitionLookup;
 class WorkoutTemplateRepository;

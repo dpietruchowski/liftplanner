@@ -35,7 +35,7 @@ Popup {
         radius: Theme.radius.large
         border.width: Theme.border.thin
         border.color: Theme.colors.border
-        opacity: Theme.dialogOpacity
+        opacity: Theme.opacity.dialog
     }
 
     Overlay.modal: Rectangle {

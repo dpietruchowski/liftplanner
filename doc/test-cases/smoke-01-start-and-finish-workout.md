@@ -12,7 +12,7 @@ treningu.
 
 ## Wymagania wstępne
 
-- Aplikacja postawiona (`liftplanner_session.py start`).
+- Aplikacja postawiona (`ui_session.py start`).
 - Na liście Planned istnieje co najmniej jeden zaplanowany trening. Jeśli nie — wykonaj
   najpierw [smoke-02](smoke-02-plan-and-import-workout.md).
 - Ustalony zegar dla powtarzalności: `set_time 2026-01-05` (poniedziałek).

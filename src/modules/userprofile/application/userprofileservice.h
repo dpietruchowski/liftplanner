@@ -1,8 +1,8 @@
 #pragma once
 
+#include "async/service.h"
+#include "async/testing.h"
 #include "modules/userprofile/domain/entities/userprofile.h"
-#include "utils/service.h"
-#include "utils/testing.h"
 #include <optional>
 
 class UserProfileRepository;

@@ -1,3 +1,7 @@
-file(GLOB_RECURSE SOURCES_IN_DIR "*.cpp" "*.h")
-list(APPEND PROJECT_SOURCES ${SOURCES_IN_DIR})
-set(PROJECT_SOURCES ${PROJECT_SOURCES} PARENT_SCOPE)
+app_add_module(liftplanner_models
+    DEPS
+        workout_module
+        exercisecatalog_module
+        Qt6::Core
+        Qt6::Qml
+)

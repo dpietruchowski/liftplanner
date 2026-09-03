@@ -1,8 +1,8 @@
 #include "plannedworkoutviewmodel.h"
+#include "async/timeprovider.h"
 #include "modules/userprofile/application/userprofileservice.h"
 #include "modules/userprofile/infrastructure/serializers/userprofileserializer.h"
 #include "modules/workout/application/workoutservice.h"
-#include "utils/timeprovider.h"
 #include "utils/workoutjson.h"
 #include <QClipboard>
 #include <QDate>

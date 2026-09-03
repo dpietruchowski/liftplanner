@@ -1,22 +1,18 @@
 #include "liftplannerapplication.h"
-#include "utils/qmlregistrator.h"
+#include "qmlutils/qmlregistrator.h"
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 
-#ifdef LIFTPLANNER_AUTOMATION
+#ifdef LIBS_AUTOMATION
 #include "automation/uiautomationserver.h"
-#endif
-
-#ifndef APP_VERSION
-#define APP_VERSION "dev"
 #endif
 
 int main(int argc, char* argv[])
 {
     QGuiApplication app(argc, argv);
 
-    app.setApplicationName("LiftPlanner");
+    app.setApplicationName(QStringLiteral(APP_NAME));
     app.setApplicationVersion(QStringLiteral(APP_VERSION));
 
     // Use the same controls style on every platform (Android defaults to
@@ -34,12 +30,12 @@ int main(int argc, char* argv[])
         []() { QCoreApplication::exit(-1); }, Qt::QueuedConnection);
 
 #ifdef QML_LIVE_ENABLED
-    const QString uiRootDir = "/home/damian/dev/lift-planner/src/ui";
+    const QString uiRootDir = QStringLiteral(APP_QML_SOURCE_DIR);
 #else
-    const QString uiRootDir = "qrc:/LiftPlanner/ui";
+    const QString uiRootDir = QStringLiteral("qrc:/" APP_QML_URI);
 #endif
 
-    QmlRegistrator registrator(engine, uiRootDir, "LiftPlanner");
+    QmlRegistrator registrator(engine, uiRootDir, APP_QML_URI);
     liftApp.registerQmlTypes(registrator);
 
 #ifdef QML_LIVE_ENABLED
@@ -48,10 +44,13 @@ int main(int argc, char* argv[])
 
     engine.load(registrator.getMainQmlUrl());
 
-#ifdef LIFTPLANNER_AUTOMATION
-    const QByteArray automationPort = qgetenv("LIFTPLANNER_AUTOMATION_PORT");
-    if (!automationPort.isEmpty() && !engine.rootObjects().isEmpty())
-        new UiAutomationServer(&engine, automationPort.toUShort(), &app);
+#ifdef LIBS_AUTOMATION
+    if (!engine.rootObjects().isEmpty())
+    {
+        const QByteArray automationPort = qgetenv("APP_AUTOMATION_PORT");
+        const quint16 port = automationPort.isEmpty() ? 49200 : automationPort.toUShort();
+        new UiAutomationServer(&engine, port, &app);
+    }
 #endif
 
     return app.exec();

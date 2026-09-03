@@ -1,5 +1,5 @@
 #include "workout.h"
-#include "utils/timeprovider.h"
+#include "async/timeprovider.h"
 
 Workout::Workout() = default;
 

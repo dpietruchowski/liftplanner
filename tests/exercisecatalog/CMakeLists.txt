@@ -1,40 +1,11 @@
-set(TEST_SOURCES
-    domain/entities/valueobjectstest.cpp
-    domain/entities/exercisedefinitiontest.cpp
-    domain/repositories/exercisedefinitionquerytest.cpp
-    domain/services/exercisematchertest.cpp
-    infrastructure/serializers/exercisedefinitionserializertest.cpp
-    infrastructure/database/exercisedefinitionrepositorydbtest.cpp
-    infrastructure/seed/exercisecatalogseedtest.cpp
-    application/exercisecatalogservicetest.cpp
-    infrastructure/backfill/exercisehistorybackfilltest.cpp
-)
-
-add_executable(exercisecatalog_tests ${TEST_SOURCES})
-
-target_compile_definitions(exercisecatalog_tests PRIVATE
-    UNIT_TEST
-    EXERCISE_SEED_FILE="${PROJECT_SOURCE_DIR}/src/data/exercises.json"
-)
-
-target_link_libraries(exercisecatalog_tests
-    PRIVATE
+app_add_test(exercisecatalog_tests
+    DEPS
         core
         exercisecatalog_module
-        app_utils
         workout_module
-        dbtoolkit
-        gtest
-        gtest_main
-        gmock
-        Qt6::Core
+        app_utils
+        app_dbtoolkit
         Qt6::Sql
+    DEFINITIONS
+        EXERCISE_SEED_FILE="${PROJECT_SOURCE_DIR}/src/data/exercises.json"
 )
-
-target_include_directories(exercisecatalog_tests
-    PRIVATE
-        ${PROJECT_SOURCE_DIR}/src
-)
-
-include(GoogleTest)
-gtest_discover_tests(exercisecatalog_tests)

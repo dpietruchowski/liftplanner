@@ -1,7 +1,7 @@
 # Architecture
 
 lift-planner is a Qt6/QML workout planner (C++20, SQLite via QtSql, CMake + Ninja).
-It builds for Linux desktop (`build-desktop/src/liftplanner`) and Android (APK). The
+It builds for Linux desktop (`build-desktop/src/appliftplanner`) and Android (APK). The
 code follows a layered Clean-Architecture / DDD split, with a UI-automation server on
 desktop and shared infrastructure pulled from the `libs` submodule.
 
@@ -12,7 +12,7 @@ reverse.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│ UI (QML)            src/ui/*.qml                              │
+│ UI (QML)            src/ui/qml                                │
 │   screens, components, Theme                                  │
 ├──────────────────────────────────────────────────────────────┤
 │ ViewModels + Models src/ui/viewmodels, src/ui/models         │
@@ -37,7 +37,7 @@ reverse.
 [src/liftplannerapplication.cpp](../src/liftplannerapplication.cpp) is the single
 place where the object graph is built and wired:
 
-1. Constructs the [BackendWorker](../src/utils/backendworker.h) (a `QObject` owning its
+1. Constructs the [BackendWorker](../libs/cpp/async/backendworker.h) (a `QObject` owning its
    own `QThread`) and the [AppDbStorage](../src/core/storage/appdbstorage.cpp).
 2. In `initialize()`, opens the database **on the worker thread** (via
    `QMetaObject::invokeMethod(..., Qt::BlockingQueuedConnection)`) and creates the
@@ -50,7 +50,7 @@ place where the object graph is built and wired:
 
 [src/main.cpp](../src/main.cpp) sets up `QGuiApplication`, the
 `QQmlApplicationEngine`, the automation server (desktop), and loads
-[src/ui/Main.qml](../src/ui/Main.qml).
+[src/ui/qml/Main.qml](../src/ui/qml/Main.qml).
 
 ## Data flow
 
@@ -69,7 +69,7 @@ QML control  →  ViewModel (Q_INVOKABLE)  →  Service.method() : Task<T>
 - **Services are asynchronous.** Each public method (e.g.
   [WorkoutService::loadHistory](../src/modules/workout/application/workoutservice.cpp))
   wraps a private `…Core()` that returns `Result<T>` and calls `invoke(...)` from the
-  [Service](../src/utils/service.h) base. `invoke` runs the work on the
+  [Service](../libs/cpp/async/service.h) base. `invoke` runs the work on the
   `BackendWorker` thread and returns a `Task<T>`; the caller attaches a continuation
   with `.then(this, [](T result){ … })` which runs back on the UI thread. See
   [WorkoutHistoryViewModel::loadAllWorkouts](../src/ui/viewmodels/workouthistoryviewmodel.cpp).
@@ -83,7 +83,7 @@ QML control  →  ViewModel (Q_INVOKABLE)  →  Service.method() : Task<T>
 
 ## Time
 
-All runtime "now" goes through [TimeProvider](../src/utils/timeprovider.h)
+All runtime "now" goes through [TimeProvider](../libs/cpp/async/timeprovider.h)
 (`TimeProvider::instance().currentDate()/currentDateTime()`) rather than
 `QDateTime::currentDateTime()` directly. This makes time deterministic: tests and the
 UI-automation driver can install a `MockTimeProvider` to pin or advance the clock. See
@@ -92,8 +92,8 @@ UI-automation driver can install a `MockTimeProvider` to pin or advance the cloc
 ## UI automation (desktop only)
 
 On desktop the app starts a TCP automation server keyed off
-`LIFTPLANNER_AUTOMATION_PORT`. An external Python driver
-([tools/ui_automation/](../tools/ui_automation/)) finds controls by `objectName` and
+`APP_AUTOMATION_PORT`. An external Python driver
+([libs/tools/](../libs/tools/)) finds controls by `objectName` and
 issues `dump` / `find` / `click` / `set` / `invoke` / `set_time` commands against the
 live instance. This is the basis for the smoke scenarios in
 [doc/test-cases/](test-cases/) and the `ui-session` skill.
@@ -101,13 +101,21 @@ live instance. This is the basis for the smoke scenarios in
 ## Role of `libs`
 
 [libs/](../libs/) is a shared git submodule (`app-libs`) used by both lift-planner and
-its sibling app. lift-planner consumes:
+its sibling app. `libs/cpp` is the include root, so a header is reached through its
+library directory (`#include "async/task.h"`), and the CMake targets are named
+`app_<directory>`. lift-planner consumes:
 
-- `dbtoolkit` — `DbStorage`, `DbRepository`, the query builder (`CreateTable`,
-  `Column`, `Where`, `Order`) and `MigrationRunner` used by the infrastructure layer.
-- `utils` — `Task` / `Result`, the `Service` base, `BackendWorker`, `TimeProvider` /
-  `MockTimeProvider`, the QML registrator, and SVG provider helpers.
-- `icons`, plus QML component libraries used by the UI.
+- `dbtoolkit` (`app_dbtoolkit`) — `DbStorage`, `DbRepository`, the query builder
+  (`CreateTable`, `Column`, `Where`, `Order`) and `MigrationRunner` used by the
+  infrastructure layer.
+- `async` (`app_async`) — `Task` / `Result`, the `Service` base, `BackendWorker`,
+  `TimeProvider` / `MockTimeProvider`.
+- `qmlutils` (`app_qmlutils`) — the QML registrator and the SVG provider.
+- `platform` (`app_platform`) — `Haptics`.
+- `utils` (`app_utils`) — `TextMatcher`.
+- `automation` (`app_automation`) — the UI-automation server, Debug builds only.
+- `qml/theme`, `qml/themed`, `qml/app`, `qml/icons` (`app_theme_qml`, `app_themed_qml`,
+  `app_components_qml`, `app_icons`) — `DefaultTheme` and the shared QML components.
 - `eventbus` is present in `libs` but intentionally **not used** here — viewmodels
   coordinate through Qt signals/slots, which already provide the needed decoupling at
   this app's scale.

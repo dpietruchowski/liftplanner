@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Controls
-import LiftPlanner
+import Themed.Components
 
 MouseArea {
     id: root

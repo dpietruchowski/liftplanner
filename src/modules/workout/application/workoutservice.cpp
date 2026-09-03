@@ -1,8 +1,8 @@
 #include "workoutservice.h"
+#include "async/timeprovider.h"
 #include "modules/workout/domain/entities/workoutstatus.h"
 #include "modules/workout/domain/repositories/workoutquery.h"
 #include "modules/workout/domain/repositories/workoutrepository.h"
-#include "utils/timeprovider.h"
 #include <QHash>
 #include <algorithm>
 

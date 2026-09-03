@@ -1,9 +1,9 @@
 #pragma once
 
+#include "async/service.h"
+#include "async/testing.h"
 #include "modules/exercisecatalog/domain/entities/exercisedefinition.h"
 #include "modules/exercisecatalog/domain/repositories/exercisedefinitionquery.h"
-#include "utils/service.h"
-#include "utils/testing.h"
 
 #include <QString>
 #include <optional>

@@ -1,7 +1,7 @@
 #include "activeworkoutviewmodel.h"
 #include "modules/workout/application/workoutservice.h"
 #include "modules/workout/domain/entities/setadjustment.h"
-#include "utils/haptics.h"
+#include "platform/haptics.h"
 #include "utils/workoutjson.h"
 #include <QDebug>
 #include <QDir>
@@ -79,11 +79,11 @@ QString completedSetsSummary(const Exercise& exercise)
 
 ActiveWorkoutViewModel::ActiveWorkoutViewModel(WorkoutService* service, QObject* parent)
     : QObject(parent)
-    , m_service(service)
     , m_currentWorkout(nullptr)
     , m_currentExercise(nullptr)
     , m_currentSet(nullptr)
     , m_isActive(false)
+    , m_service(service)
     , m_timer(new WorkoutTimer(this))
 {
     connect(m_timer, &WorkoutTimer::finished, this, &ActiveWorkoutViewModel::onTimerFinished);

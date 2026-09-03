@@ -1,7 +1,7 @@
 #include "workouthistoryviewmodel.h"
+#include "async/timeprovider.h"
 #include "modules/workout/application/workoutservice.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
-#include "utils/timeprovider.h"
 #include "utils/workoutjson.h"
 #include "utils/workouttext.h"
 #include <QDate>

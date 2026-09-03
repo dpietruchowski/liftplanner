@@ -1,6 +1,12 @@
-file(GLOB VIEWMODEL_SOURCES
-    "*.cpp"
-    "*.h"
+app_add_module(liftplanner_viewmodels
+    DEPS
+        liftplanner_models
+        liftplanner_utils
+        workout_module
+        exercisecatalog_module
+        userprofile_module
+        app_async
+        app_platform
+        Qt6::Core
+        Qt6::Qml
 )
-
-set(PROJECT_SOURCES ${PROJECT_SOURCES} ${VIEWMODEL_SOURCES} PARENT_SCOPE)

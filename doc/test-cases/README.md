@@ -1,8 +1,8 @@
 # Test-cases — scenariusze smoke (UI driver)
 
 Scenariusze prowadzone **wyłącznie przez UI** za pomocą drivera automatyzacji
-([tools/ui_automation/](../../tools/ui_automation/)). Każdy krok to komenda
-`liftplanner_driver.py`, a po niej oczekiwany stan. Zasady ogólne i pełna lista komend:
+([libs/tools/](../../libs/tools/)). Każdy krok to komenda
+`ui_driver.py`, a po niej oczekiwany stan. Zasady ogólne i pełna lista komend:
 skill `ui-session` oraz [doc/testing.md](../testing.md).
 
 ## Jak uruchamiać
@@ -12,10 +12,10 @@ skill `ui-session` oraz [doc/testing.md](../testing.md).
 cmake -S . -B build-desktop -G Ninja -DCMAKE_BUILD_TYPE=Debug && cmake --build build-desktop
 
 # 2. Postaw instancję (idempotentne — adoptuje działającą na porcie 49210)
-python3 tools/ui_automation/liftplanner_session.py start
+python3 libs/tools/ui_session.py start
 
 # 3. Wykonuj kroki scenariusza, każdy to jedno wywołanie:
-python3 tools/ui_automation/liftplanner_driver.py <komenda> <args…>
+python3 libs/tools/ui_driver.py <komenda> <args…>
 ```
 
 ## Odkrywanie kontrolek
@@ -23,9 +23,9 @@ python3 tools/ui_automation/liftplanner_driver.py <komenda> <args…>
 **Nie zgaduj `objectName` z kodu** — odkrywaj je z działającej aplikacji:
 
 ```bash
-python3 tools/ui_automation/liftplanner_driver.py find ""          # wszystkie nazwy
-python3 tools/ui_automation/liftplanner_driver.py find "workout"    # filtr po podłańcuchu
-python3 tools/ui_automation/liftplanner_driver.py dump              # drzewo widocznych + właściwości
+python3 libs/tools/ui_driver.py find ""          # wszystkie nazwy
+python3 libs/tools/ui_driver.py find "workout"    # filtr po podłańcuchu
+python3 libs/tools/ui_driver.py dump              # drzewo widocznych + właściwości
 ```
 
 Główne ekrany wystawiają nazwy w stylu `screenHome`, `screenWorkouts`,

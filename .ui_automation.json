@@ -1,0 +1,10 @@
+{
+  "binary": ["build-desktop/src/appliftplanner", "build-release/src/appliftplanner"],
+  "port": 49210,
+  "port_env": "APP_AUTOMATION_PORT",
+  "sandbox": {
+    "dir": "tmp/run",
+    "copy": ["liftplanner.db"],
+    "env": {"XDG_DATA_HOME": "data"}
+  }
+}

@@ -1,35 +1,29 @@
 find_package(Qt6 6.4 REQUIRED COMPONENTS Quick Sql Qml QuickControls2)
 
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
 qt_standard_project_setup()
 
-add_subdirectory(ui/models)
 add_subdirectory(core)
 add_subdirectory(modules/workout)
 add_subdirectory(modules/exercisecatalog)
 add_subdirectory(modules/userprofile)
+add_subdirectory(utils)
+add_subdirectory(ui/models)
+add_subdirectory(ui/viewmodels)
 
 if(NOT QML_LIVE_ENABLED)
-    add_subdirectory(ui)
+    add_subdirectory(ui/qml)
 endif()
 
-add_subdirectory(ui/viewmodels)
-add_subdirectory(utils)
-
-qt_add_executable(liftplanner
+qt_add_executable(${APP_TARGET}
     main.cpp
     liftplannerapplication.h
     liftplannerapplication.cpp
-    ${PROJECT_SOURCES}
 )
 
-qt_add_qml_module(liftplanner
-    URI LiftPlanner
-    VERSION 1.0
-    QML_FILES
-        ${PROJECT_QML_SOURCES}
-)
-
-qt_add_resources(liftplanner "resources"
+qt_add_resources(${APP_TARGET} "resources"
     PREFIX "/LiftPlanner"
     FILES
         data/gpt_prompt_template.txt
@@ -38,35 +32,49 @@ qt_add_resources(liftplanner "resources"
         data/GPL-3.txt
 )
 
-target_include_directories(liftplanner
-    PRIVATE
-    ${CMAKE_SOURCE_DIR}/libs/qmllive
+target_compile_definitions(${APP_TARGET} PRIVATE
+    APP_NAME="${APP_NAME}"
+    APP_QML_URI="${APP_QML_URI}"
+    APP_QML_SOURCE_DIR="${CMAKE_SOURCE_DIR}/${APP_QML_SOURCE_DIR}"
+    APP_VERSION="${VERSION_NAME}"
 )
 
-target_link_libraries(liftplanner
+target_link_libraries(${APP_TARGET}
     PRIVATE
-    core
-    workout_module
-    exercisecatalog_module
-    userprofile_module
-    qmllive
-    dbtoolkit
-    app_utils
-    themed_components_qml
-    app_components_qml
-    themed_icons
-    Qt6::Quick
-    Qt6::QuickControls2
-    Qt6::Sql
-    Qt6::Qml
+        core
+        workout_module
+        exercisecatalog_module
+        userprofile_module
+        liftplanner_utils
+        liftplanner_models
+        liftplanner_viewmodels
+        app_qmllive
+        app_platform
+        app_qmlutils
+        -Wl,--no-as-needed
+        app_theme_qml
+        app_themed_qml
+        app_components_qml
+        app_icons
+        -Wl,--as-needed
+        Qt6::Quick
+        Qt6::QuickControls2
+        Qt6::Sql
+        Qt6::Qml
+        $<$<PLATFORM_ID:Android>:log>
 )
 
-if(FILLIN_AUTOMATION)
-    target_link_libraries(liftplanner PRIVATE app_automation)
-    target_compile_definitions(liftplanner PRIVATE LIFTPLANNER_AUTOMATION)
+if(NOT QML_LIVE_ENABLED)
+    target_link_libraries(${APP_TARGET}
+        PRIVATE -Wl,--no-as-needed ${APP_QML_TARGET} -Wl,--as-needed)
 endif()
 
-target_compile_definitions(liftplanner
-    PRIVATE
-    APP_VERSION="${QT_ANDROID_VERSION_NAME}"
+if(LIBS_AUTOMATION)
+    target_link_libraries(${APP_TARGET} PRIVATE app_automation)
+endif()
+
+install(TARGETS ${APP_TARGET}
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
 )

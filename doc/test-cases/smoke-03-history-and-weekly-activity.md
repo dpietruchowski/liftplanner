@@ -20,7 +20,7 @@ Kafelek odświeża się reaktywnie przez sygnały (`workoutsChanged`,
 
 ## Wymagania wstępne
 
-- Aplikacja postawiona (`liftplanner_session.py start`).
+- Aplikacja postawiona (`ui_session.py start`).
 - W historii jest co najmniej jeden trening w bieżącym (zmockowanym) tygodniu — np. po
   wykonaniu [smoke-01](smoke-01-start-and-finish-workout.md) z `set_time 2026-01-05`.
 
