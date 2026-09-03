@@ -17,6 +17,7 @@
 #include "ui/viewmodels/workouteditorviewmodel.h"
 #include "ui/viewmodels/workouthistoryviewmodel.h"
 #include "ui/viewmodels/workouttemplateviewmodel.h"
+#include "utils/appinfo.h"
 #include "utils/backendworker.h"
 #include "utils/clipboardhelper.h"
 #include "utils/coloredsvgprovider.h"
@@ -114,6 +115,7 @@ bool LiftPlannerApplication::initialize()
     m_workoutTemplateViewModel
         = std::make_unique<WorkoutTemplateViewModel>(m_workoutTemplateService.get());
     m_clipboardHelper = std::make_unique<ClipboardHelper>();
+    m_appInfo = std::make_unique<AppInfo>();
 
     return true;
 }
@@ -136,6 +138,7 @@ void LiftPlannerApplication::registerQmlTypes(QmlRegistrator& registrator)
     registrator.registerSingletonInstance("WorkoutTemplateViewModel",
                                           m_workoutTemplateViewModel.get());
     registrator.registerSingletonInstance("ClipboardHelper", m_clipboardHelper.get());
+    registrator.registerSingletonInstance("AppInfo", m_appInfo.get());
 
     registrator.registerSingletonType("Theme.qml", "Theme");
     registrator.registerSingletonType("Themed.Components", "Theme.qml", "Theme");

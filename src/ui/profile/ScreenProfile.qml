@@ -13,6 +13,8 @@ Rectangle {
     property bool dobInvalid: false
     property int controlWidth: 180
 
+    signal openLicensesRequest()
+
     component FormLabel: Text {
         font.pixelSize: Theme.fontSize.normal
         color: Theme.colors.textMuted
@@ -343,12 +345,44 @@ Rectangle {
 
             Text {
                 Layout.fillWidth: true
-                Layout.bottomMargin: Theme.spacing.medium
                 text: "Injuries, equipment, schedule constraints — anything the AI "
                       + "should consider when planning your workouts."
                 wrapMode: Text.WordWrap
                 font.pixelSize: Theme.fontSize.small
                 color: Theme.colors.textMuted
+            }
+
+            SectionHeader {
+                Layout.fillWidth: true
+                Layout.topMargin: Theme.spacing.medium
+                title: "ABOUT"
+            }
+
+            Text {
+                objectName: "aboutVersionText"
+                Layout.fillWidth: true
+                text: AppInfo.name + " " + AppInfo.version
+                font.pixelSize: Theme.fontSize.normal
+                color: Theme.colors.textPrimary
+                elide: Text.ElideRight
+            }
+
+            Text {
+                Layout.fillWidth: true
+                text: "Built with Qt " + AppInfo.qtVersion + ", used under the GNU LGPL v3."
+                wrapMode: Text.WordWrap
+                font.pixelSize: Theme.fontSize.small
+                color: Theme.colors.textMuted
+            }
+
+            ThemedButton {
+                objectName: "openLicensesButton"
+                Layout.fillWidth: true
+                Layout.bottomMargin: Theme.spacing.medium
+                text: "Open source licenses"
+                iconSource: Theme.icons.info
+                buttonStyle: Theme.button.tonal
+                onClicked: root.openLicensesRequest()
             }
         }
     }

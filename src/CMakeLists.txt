@@ -34,6 +34,8 @@ qt_add_resources(liftplanner "resources"
     FILES
         data/gpt_prompt_template.txt
         data/exercises.json
+        data/LGPL-3.txt
+        data/GPL-3.txt
 )
 
 target_include_directories(liftplanner

@@ -17,7 +17,13 @@ Item {
             stackView.push(workoutTemplatesScreen)
         }
     }
-    property var profileScreen: ScreenProfile {}
+    property var profileScreen: ScreenProfile {
+        onOpenLicensesRequest: stackView.push(licensesScreen)
+    }
+
+    property var licensesScreen: ScreenLicenses {
+        onClosed: stackView.pop()
+    }
 
     property var workoutEditorScreen: ScreenWorkoutEditor {
         onClosed: root.closeWorkoutEditor()

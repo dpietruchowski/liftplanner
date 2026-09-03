@@ -20,6 +20,7 @@ class ExerciseCatalogViewModel;
 class WorkoutEditorViewModel;
 class WorkoutTemplateViewModel;
 class ClipboardHelper;
+class AppInfo;
 
 class LiftPlannerApplication final
 {
@@ -49,4 +50,5 @@ private:
     std::unique_ptr<WorkoutEditorViewModel> m_workoutEditorViewModel;
     std::unique_ptr<WorkoutTemplateViewModel> m_workoutTemplateViewModel;
     std::unique_ptr<ClipboardHelper> m_clipboardHelper;
+    std::unique_ptr<AppInfo> m_appInfo;
 };
