@@ -4,9 +4,13 @@ set -e
 KEYSTORE_DIR="android"
 KEYSTORE_FILE="${KEYSTORE_DIR}/lift-planner.keystore"
 KEY_ALIAS="lift_planner_key"
-KEYSTORE_PASS="${KEYSTORE_PASS:-liftplanner123}"
 KEY_VALIDITY_DAYS=10000
 IMAGE_TAG=liftplanner-qt6-android:6.10-api36
+
+if [ -z "$KEYSTORE_PASS" ]; then
+    echo "❌ KEYSTORE_PASS is not set. Export a strong keystore password before generating the key."
+    exit 1
+fi
 
 echo "🔐 Generating new keystore for Android signing..."
 
@@ -25,9 +29,8 @@ mkdir -p "$KEYSTORE_DIR"
 echo "📝 Generating keystore..."
 echo ""
 
-docker build -t "$IMAGE_TAG" - < Dockerfile.android
-
 docker run --rm -i \
+    -e KEYSTORE_PASS \
     -v "${PWD}/${KEYSTORE_DIR}:/home/user/keystore" \
     "${IMAGE_TAG}" \
     sh -c "keytool -genkeypair \
@@ -37,14 +40,14 @@ docker run --rm -i \
         -keyalg RSA \
         -keysize 2048 \
         -validity ${KEY_VALIDITY_DAYS} \
-        -storepass ${KEYSTORE_PASS} \
-        -keypass ${KEYSTORE_PASS} \
+        -storepass:env KEYSTORE_PASS \
+        -keypass:env KEYSTORE_PASS \
         -dname 'CN=LiftPlanner App, OU=Development, O=LiftPlanner, L=Warsaw, ST=Masovian, C=PL'"
 
 echo ""
 echo "✅ Keystore generated successfully!"
 echo "📁 Location: $KEYSTORE_FILE"
 echo "🔑 Alias: $KEY_ALIAS"
-echo "🔒 Password: $KEYSTORE_PASS"
 echo ""
-echo "⚠️  Keep this keystore file secure and never commit it to version control!"
+echo "⚠️  Keep this keystore file and its password secure and never commit them to version control."
+echo "   Upload the certificate to Play App Signing so Google holds the release key."
