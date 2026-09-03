@@ -74,8 +74,9 @@ Every app parameter lives in `app.env`; CMake reads it through `app_load_env()`
 and the scripts source the same file, so there is no second copy to keep in
 sync. Never bump the version by hand — `build-android.sh … official` does it.
 
-`ctest -j` is flaky: the integration tests share one
-`current_workout.json` cache under `XDG_DATA_HOME`, so run them serially.
+`ctest -j` is safe: `tests/integration/main.cpp` points `XDG_DATA_HOME` at a
+per-process `QTemporaryDir`, so each test gets its own `current_workout.json`
+cache.
 
 ## Database access
 
