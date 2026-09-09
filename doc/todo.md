@@ -76,6 +76,19 @@ Wykonane w partiach Fazy 4 — szczegóły w
       Przy okazji: `qrc:/LiftPlannerMain.qml` — brakujący ukośnik w korzeniu QML
       nie pozwalał aplikacji wystartować.
 
+## Po refaktorze
+
+- [x] Testy integracyjne konsumują `Task` — build bez ani jednego ostrzeżenia,
+      aplikacja i testy razem.
+- [x] Baza pod `AppDataLocation` zamiast katalogu roboczego procesu
+      (`AppStoragePaths`), z jednorazowym przejęciem bazy leżącej obok
+      aplikacji. Kopia, nie przeniesienie — oryginał zostaje.
+- [ ] Rozdział ról `WorkoutModel`: projekcja tylko-do-odczytu dla list i edytora
+      vs mutowalny model aktywnego treningu. Zamyka mutowalne
+      `Workout::exercises()` / `Exercise::sets()` i podwójny stan w edytorze.
+- [ ] Do decyzji: edytor serii w aktywnym treningu otwiera się wyłącznie długim
+      przytrzymaniem i nic tego nie sygnalizuje.
+
 ## Pułapki
 
 - Klasy rejestrowane w QML nie mogą być `final`.
