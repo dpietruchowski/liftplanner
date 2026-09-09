@@ -1,9 +1,13 @@
 #include "workoutservice.h"
 #include "async/timeprovider.h"
+#include "domain/workout/historysetrow.h"
+#include "domain/workout/strengthmath.h"
 #include "domain/workout/workoutquery.h"
 #include "domain/workout/workoutrepository.h"
+#include "domain/workout/workoutrowrepository.h"
 #include "domain/workout/workoutstatus.h"
 #include <QHash>
+#include <QSet>
 #include <algorithm>
 
 namespace
@@ -26,9 +30,11 @@ bool hasCompletedSet(const Exercise& exercise)
 
 }
 
-WorkoutService::WorkoutService(WorkoutRepository& repository, QObject* worker)
+WorkoutService::WorkoutService(WorkoutRepository& repository, WorkoutRowRepository& rowRepository,
+                               QObject* worker)
     : Service(worker)
     , m_repository(repository)
+    , m_rowRepository(rowRepository)
 {
 }
 
@@ -140,23 +146,44 @@ Result<void> WorkoutService::importHistoryCore(const std::vector<Workout>& worko
 Result<std::vector<WorkoutService::ExerciseFrequency>>
 WorkoutService::topExercisesCore(int topN, int recentWorkouts)
 {
-    const std::vector<Workout> history = loadHistoryCore(recentWorkouts).value();
-
     QHash<QString, ExerciseFrequency> byName;
 
-    for (const auto& workout : history)
+    const auto foldExercise = [&byName](const QString& name, bool weighted, double bestOneRepMax)
     {
-        for (const auto& exercise : workout.exercises())
-        {
-            if (!exercise.isWeighted())
-                continue;
+        if (!weighted)
+            return;
 
-            ExerciseFrequency& entry = byName[exercise.name()];
-            entry.name = exercise.name();
-            entry.count += 1;
-            entry.bestOneRepMax = std::max(entry.bestOneRepMax, exercise.bestOneRepMax());
+        ExerciseFrequency& entry = byName[name];
+        entry.name = name;
+        entry.count += 1;
+        entry.bestOneRepMax = std::max(entry.bestOneRepMax, bestOneRepMax);
+    };
+
+    int currentWorkoutId = -1;
+    int currentExerciseId = -1;
+    QString currentName;
+    bool currentWeighted = false;
+    double currentBest = 0.0;
+
+    for (const HistorySetRow& row : m_rowRepository.findSetsOfRecentWorkouts(recentWorkouts))
+    {
+        if (row.exerciseId != currentExerciseId || row.workoutId != currentWorkoutId)
+        {
+            foldExercise(currentName, currentWeighted, currentBest);
+            currentWorkoutId = row.workoutId;
+            currentExerciseId = row.exerciseId;
+            currentName = row.exerciseName;
+            currentWeighted = false;
+            currentBest = 0.0;
         }
+
+        if (!row.hasSet || !StrengthMath::isWeighted(row.metric, row.loadType))
+            continue;
+
+        currentWeighted = true;
+        currentBest = std::max(currentBest, StrengthMath::oneRepMax(row.repetitions, row.weight));
     }
+    foldExercise(currentName, currentWeighted, currentBest);
 
     std::vector<ExerciseFrequency> result(byName.cbegin(), byName.cend());
     std::sort(result.begin(), result.end(),
@@ -177,26 +204,24 @@ WorkoutService::topExercisesCore(int topN, int recentWorkouts)
 
 Result<WorkoutService::TrainingTotals> WorkoutService::recentTotalsCore(int recentWorkouts)
 {
-    const std::vector<Workout> history = loadHistoryCore(recentWorkouts).value();
-
     TrainingTotals totals;
-    totals.workouts = static_cast<int>(history.size());
+    QSet<int> workoutIds;
 
-    for (const auto& workout : history)
+    for (const HistorySetRow& row : m_rowRepository.findSetsOfRecentWorkouts(recentWorkouts))
     {
-        for (const auto& exercise : workout.exercises())
-        {
-            for (const auto& set : exercise.sets())
-            {
-                if (!set.completed())
-                    continue;
+        workoutIds.insert(row.workoutId);
 
-                totals.totalWeight += set.totalWeight();
-                totals.totalDurationSeconds += set.durationSeconds();
-                totals.totalDistanceMeters += set.distanceMeters();
-            }
-        }
+        if (!row.hasSet || !row.completed)
+            continue;
+
+        if (StrengthMath::isWeighted(row.metric, row.loadType))
+            totals.totalWeight += StrengthMath::volume(row.repetitions, row.weight);
+
+        totals.totalDurationSeconds += row.durationSeconds;
+        totals.totalDistanceMeters += row.distanceMeters;
     }
+
+    totals.workouts = workoutIds.size();
 
     return Result<TrainingTotals>::success(totals);
 }

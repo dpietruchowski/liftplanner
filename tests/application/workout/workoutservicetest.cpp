@@ -1,7 +1,9 @@
 #include "application/workout/workoutservice.h"
+#include "domain/workout/historysetrow.h"
 #include "domain/workout/workout.h"
 #include "domain/workout/workoutquery.h"
 #include "domain/workout/workoutrepository.h"
+#include "domain/workout/workoutrowrepository.h"
 #include "domain/workout/workoutstatus.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -17,10 +19,68 @@ public:
     MOCK_METHOD(bool, exists, (const WorkoutQuery& query), (const, override));
 };
 
+class MockWorkoutRowRepository : public WorkoutRowRepository
+{
+public:
+    MOCK_METHOD(std::vector<HistorySetRow>, findSetsOfRecentWorkouts, (int workoutLimit),
+                (const, override));
+};
+
+std::vector<HistorySetRow> rowsOf(const std::vector<Workout>& workouts)
+{
+    std::vector<HistorySetRow> rows;
+    int workoutId = 0;
+    int exerciseId = 0;
+
+    for (const Workout& workout : workouts)
+    {
+        ++workoutId;
+        if (workout.exercises().empty())
+        {
+            HistorySetRow row;
+            row.workoutId = workoutId;
+            rows.push_back(row);
+            continue;
+        }
+
+        for (const Exercise& exercise : workout.exercises())
+        {
+            ++exerciseId;
+            for (const Set& set : exercise.sets())
+            {
+                HistorySetRow row;
+                row.workoutId = workoutId;
+                row.exerciseId = exerciseId;
+                row.exerciseName = exercise.name();
+                row.hasSet = true;
+                row.completed = set.completed();
+                row.metric = set.metric();
+                row.loadType = set.loadType();
+                row.repetitions = set.repetitions();
+                row.weight = set.weight();
+                row.durationSeconds = set.durationSeconds();
+                row.distanceMeters = set.distanceMeters();
+                rows.push_back(row);
+            }
+        }
+    }
+
+    return rows;
+}
+
 class WorkoutServiceTest : public ::testing::Test
 {
 protected:
-    void SetUp() override { m_service = std::make_unique<WorkoutService>(m_repo, nullptr); }
+    void SetUp() override
+    {
+        m_service = std::make_unique<WorkoutService>(m_repo, m_rowRepo, nullptr);
+    }
+
+    void givenHistoryRows(const std::vector<Workout>& workouts)
+    {
+        EXPECT_CALL(m_rowRepo, findSetsOfRecentWorkouts(::testing::_))
+            .WillOnce(::testing::Return(rowsOf(workouts)));
+    }
 
     std::vector<Workout> loadPlannedWorkouts()
     {
@@ -74,6 +134,7 @@ protected:
     }
 
     MockWorkoutRepository m_repo;
+    MockWorkoutRowRepository m_rowRepo;
     std::unique_ptr<WorkoutService> m_service;
 };
 
@@ -244,7 +305,7 @@ TEST_F(WorkoutServiceTest, TopExercises_RanksByFrequencyThenBestOneRepMax)
         makeWorkoutWithExercise("Deadlift", 5, 140),  // 1RM 157.5
     };
 
-    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+    givenHistoryRows(history);
 
     auto result = topExercises(2, 20);
 
@@ -260,21 +321,15 @@ TEST_F(WorkoutServiceTest, TopExercises_RanksByFrequencyThenBestOneRepMax)
 
 TEST_F(WorkoutServiceTest, TopExercises_LimitsHistoryQueryToRecentWorkouts)
 {
-    EXPECT_CALL(m_repo, findAll(::testing::_))
-        .WillOnce(
-            [](const WorkoutQuery& query)
-            {
-                EXPECT_TRUE(query.limit().has_value());
-                EXPECT_EQ(query.limit().value(), 5);
-                return std::vector<Workout> {};
-            });
+    EXPECT_CALL(m_rowRepo, findSetsOfRecentWorkouts(5))
+        .WillOnce(::testing::Return(std::vector<HistorySetRow> {}));
 
     topExercises(2, 5);
 }
 
 TEST_F(WorkoutServiceTest, TopExercises_EmptyHistory_ReturnsEmpty)
 {
-    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(std::vector<Workout> {}));
+    givenHistoryRows({});
 
     auto result = topExercises(2, 20);
     EXPECT_TRUE(result.empty());
@@ -335,7 +390,7 @@ TEST_F(WorkoutServiceTest, TopExercises_SkipsTimedAndDistanceExercises)
         makeWorkoutWithExercise("Bench", 5, 100),
     };
 
-    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+    givenHistoryRows(history);
 
     auto result = topExercises(2, 20);
 
@@ -350,7 +405,7 @@ TEST_F(WorkoutServiceTest, TopExercises_SkipsBodyweightExercises)
         makeWorkoutWithExercise("Bench", 5, 100),
     };
 
-    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+    givenHistoryRows(history);
 
     auto result = topExercises(2, 20);
 
@@ -369,7 +424,7 @@ TEST_F(WorkoutServiceTest, RecentTotals_SumsTimeDistanceAndVolume)
         completedWorkout(makeWorkoutWithExercise("Bench", 5, 100)),
     };
 
-    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+    givenHistoryRows(history);
 
     const auto totals = recentTotals(20);
 
@@ -387,7 +442,7 @@ TEST_F(WorkoutServiceTest, RecentTotals_IgnoresSetsTheUserNeverDid)
         makeWorkoutWithDistanceExercise("Run", 5000, 1440),
     };
 
-    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+    givenHistoryRows(history);
 
     const auto totals = recentTotals(20);
 
@@ -398,21 +453,15 @@ TEST_F(WorkoutServiceTest, RecentTotals_IgnoresSetsTheUserNeverDid)
 
 TEST_F(WorkoutServiceTest, RecentTotals_LimitsHistoryQueryToRecentWorkouts)
 {
-    EXPECT_CALL(m_repo, findAll(::testing::_))
-        .WillOnce(
-            [](const WorkoutQuery& query)
-            {
-                EXPECT_TRUE(query.limit().has_value());
-                EXPECT_EQ(query.limit().value(), 5);
-                return std::vector<Workout> {};
-            });
+    EXPECT_CALL(m_rowRepo, findSetsOfRecentWorkouts(5))
+        .WillOnce(::testing::Return(std::vector<HistorySetRow> {}));
 
     recentTotals(5);
 }
 
 TEST_F(WorkoutServiceTest, RecentTotals_EmptyHistory_IsAllZero)
 {
-    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(std::vector<Workout> {}));
+    givenHistoryRows({});
 
     const auto totals = recentTotals(20);
 

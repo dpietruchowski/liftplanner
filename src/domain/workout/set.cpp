@@ -1,4 +1,5 @@
 #include "set.h"
+#include "domain/workout/strengthmath.h"
 #include <cmath>
 
 Set::Set() = default;
@@ -55,10 +56,7 @@ void Set::setDistanceMeters(double meters) { m_distanceMeters = meters; }
 void Set::setRestSecondsOverride(int seconds) { m_restSecondsOverride = seconds; }
 void Set::setPosition(int position) { m_position = position; }
 
-bool Set::isWeighted() const
-{
-    return m_metric == SetMetric::Reps && m_loadType == LoadType::External;
-}
+bool Set::isWeighted() const { return StrengthMath::isWeighted(m_metric, m_loadType); }
 
 QString Set::formatSeconds(int seconds)
 {
@@ -120,23 +118,12 @@ QString Set::toCompactString() const
 
 double Set::totalWeight() const
 {
-    if (!isWeighted())
-        return 0.0;
-    return m_repetitions * m_weight;
+    return isWeighted() ? StrengthMath::volume(m_repetitions, m_weight) : 0.0;
 }
 
 double Set::oneRepMax() const
 {
-    if (!isWeighted())
-        return 0.0;
-    if (m_repetitions <= 0)
-        return 0.0;
-    if (m_repetitions == 1)
-        return m_weight;
-    // Brzycki for 2-10 reps, Epley above 10 (Brzycki loses accuracy at high reps).
-    if (m_repetitions <= 10)
-        return m_weight * 36.0 / (37 - m_repetitions);
-    return m_weight * (1.0 + m_repetitions / 30.0);
+    return isWeighted() ? StrengthMath::oneRepMax(m_repetitions, m_weight) : 0.0;
 }
 
 void Set::validate() const { }

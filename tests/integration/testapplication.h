@@ -9,6 +9,7 @@ class MockTimeProvider;
 class BackendWorker;
 class DbStorage;
 class WorkoutRepositoryDb;
+class WorkoutRowRepositoryDb;
 class WorkoutService;
 class WorkoutTemplateRepositoryDb;
 class WorkoutTemplateRowRepositoryDb;
@@ -65,6 +66,7 @@ private:
     QSqlDatabase m_database;
     std::unique_ptr<DbStorage> m_dbStorage;
     std::unique_ptr<WorkoutRepositoryDb> m_workoutRepo;
+    std::unique_ptr<WorkoutRowRepositoryDb> m_workoutRowRepo;
     std::unique_ptr<WorkoutService> m_workoutService;
     std::unique_ptr<UserProfileRepositoryDb> m_userProfileRepo;
     std::unique_ptr<UserProfileService> m_userProfileService;

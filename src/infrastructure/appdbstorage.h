@@ -6,6 +6,7 @@
 class QSqlDatabase;
 class DbStorage;
 class WorkoutRepositoryDb;
+class WorkoutRowRepositoryDb;
 class WorkoutTemplateRepositoryDb;
 class WorkoutTemplateRowRepositoryDb;
 class UserProfileRepositoryDb;
@@ -22,6 +23,7 @@ public:
     bool open();
 
     WorkoutRepositoryDb& workoutRepo();
+    WorkoutRowRepositoryDb& workoutRowRepo();
     WorkoutTemplateRepositoryDb& workoutTemplateRepo();
     WorkoutTemplateRowRepositoryDb& workoutTemplateRowRepo();
     UserProfileRepositoryDb& userProfileRepo();
@@ -34,6 +36,7 @@ private:
     std::unique_ptr<QSqlDatabase> m_database;
     std::unique_ptr<DbStorage> m_dbStorage;
     std::unique_ptr<WorkoutRepositoryDb> m_workoutRepo;
+    std::unique_ptr<WorkoutRowRepositoryDb> m_workoutRowRepo;
     std::unique_ptr<WorkoutTemplateRepositoryDb> m_workoutTemplateRepo;
     std::unique_ptr<WorkoutTemplateRowRepositoryDb> m_workoutTemplateRowRepo;
     std::unique_ptr<UserProfileRepositoryDb> m_userProfileRepo;

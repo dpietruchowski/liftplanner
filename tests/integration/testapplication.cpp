@@ -11,6 +11,7 @@
 #include "infrastructure/exercisecatalog/exercisedefinitionrepositorydb.h"
 #include "infrastructure/userprofile/userprofilerepositorydb.h"
 #include "infrastructure/workout/workoutrepositorydb.h"
+#include "infrastructure/workout/workoutrowrepositorydb.h"
 #include "infrastructure/workout/workouttemplaterepositorydb.h"
 #include "infrastructure/workout/workouttemplaterowrepositorydb.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
@@ -48,6 +49,7 @@ TestApplication::TestApplication()
             m_dbStorage = std::make_unique<DbStorage>(m_database);
             m_workoutRepo = std::make_unique<WorkoutRepositoryDb>(*m_dbStorage);
             m_workoutRepo->createTables();
+            m_workoutRowRepo = std::make_unique<WorkoutRowRepositoryDb>(*m_dbStorage);
             m_userProfileRepo = std::make_unique<UserProfileRepositoryDb>(*m_dbStorage);
             m_userProfileRepo->createTable();
             m_exerciseDefinitionRepo
@@ -58,7 +60,8 @@ TestApplication::TestApplication()
             m_workoutTemplateRowRepo
                 = std::make_unique<WorkoutTemplateRowRepositoryDb>(*m_dbStorage);
 
-            m_workoutService = std::make_unique<WorkoutService>(*m_workoutRepo, m_worker.get());
+            m_workoutService = std::make_unique<WorkoutService>(*m_workoutRepo, *m_workoutRowRepo,
+                                                                m_worker.get());
             m_userProfileService
                 = std::make_unique<UserProfileService>(*m_userProfileRepo, m_worker.get());
             m_exerciseCatalogService = std::make_unique<ExerciseCatalogService>(
@@ -110,6 +113,7 @@ TestApplication::~TestApplication()
             m_workoutTemplateRepo.reset();
             m_exerciseDefinitionRepo.reset();
             m_userProfileRepo.reset();
+            m_workoutRowRepo.reset();
             m_workoutRepo.reset();
             m_dbStorage.reset();
             m_database.close();

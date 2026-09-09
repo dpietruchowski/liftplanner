@@ -9,6 +9,7 @@
 #include "infrastructure/exercisecatalog/exercisehistorybackfill.h"
 #include "infrastructure/userprofile/userprofilerepositorydb.h"
 #include "infrastructure/workout/workoutrepositorydb.h"
+#include "infrastructure/workout/workoutrowrepositorydb.h"
 #include "infrastructure/workout/workouttemplaterepositorydb.h"
 #include "infrastructure/workout/workouttemplaterowrepositorydb.h"
 #include <dbtoolkit/dbstorage.h>
@@ -41,6 +42,7 @@ bool AppDbStorage::open()
     m_dbStorage = std::make_unique<DbStorage>(*m_database);
     m_workoutRepo = std::make_unique<WorkoutRepositoryDb>(*m_dbStorage);
     m_workoutRepo->createTables();
+    m_workoutRowRepo = std::make_unique<WorkoutRowRepositoryDb>(*m_dbStorage);
     m_workoutTemplateRepo = std::make_unique<WorkoutTemplateRepositoryDb>(*m_dbStorage);
     m_workoutTemplateRepo->createTables();
     m_workoutTemplateRowRepo = std::make_unique<WorkoutTemplateRowRepositoryDb>(*m_dbStorage);
@@ -86,6 +88,8 @@ void AppDbStorage::seedExerciseCatalog()
 }
 
 WorkoutRepositoryDb& AppDbStorage::workoutRepo() { return *m_workoutRepo; }
+
+WorkoutRowRepositoryDb& AppDbStorage::workoutRowRepo() { return *m_workoutRowRepo; }
 
 WorkoutTemplateRepositoryDb& AppDbStorage::workoutTemplateRepo() { return *m_workoutTemplateRepo; }
 

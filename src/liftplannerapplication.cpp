@@ -10,6 +10,7 @@
 #include "infrastructure/exercisecatalog/exercisedefinitionrepositorydb.h"
 #include "infrastructure/userprofile/userprofilerepositorydb.h"
 #include "infrastructure/workout/workoutrepositorydb.h"
+#include "infrastructure/workout/workoutrowrepositorydb.h"
 #include "infrastructure/workout/workouttemplaterepositorydb.h"
 #include "infrastructure/workout/workouttemplaterowrepositorydb.h"
 #include "qmlutils/coloredsvgprovider.h"
@@ -84,8 +85,8 @@ bool LiftPlannerApplication::initialize()
                 opened = false;
                 return;
             }
-            m_workoutService
-                = std::make_unique<WorkoutService>(m_storage->workoutRepo(), m_worker.get());
+            m_workoutService = std::make_unique<WorkoutService>(
+                m_storage->workoutRepo(), m_storage->workoutRowRepo(), m_worker.get());
             m_userProfileService = std::make_unique<UserProfileService>(
                 m_storage->userProfileRepo(), m_worker.get());
             m_exerciseCatalogService = std::make_unique<ExerciseCatalogService>(

@@ -11,6 +11,7 @@
 #include "domain/workout/workout.h"
 
 class WorkoutRepository;
+class WorkoutRowRepository;
 
 class WorkoutService final : public Service
 {
@@ -37,7 +38,8 @@ public:
         Exercise exercise;
     };
 
-    WorkoutService(WorkoutRepository& repository, QObject* worker);
+    WorkoutService(WorkoutRepository& repository, WorkoutRowRepository& rowRepository,
+                   QObject* worker);
 
     Task<std::vector<Workout>> loadPlannedWorkouts();
     Task<void> importPlannedWorkouts(const std::vector<Workout>& workouts);
@@ -70,4 +72,5 @@ private:
     Result<bool> deleteWorkoutCore(int id);
 
     WorkoutRepository& m_repository;
+    WorkoutRowRepository& m_rowRepository;
 };
