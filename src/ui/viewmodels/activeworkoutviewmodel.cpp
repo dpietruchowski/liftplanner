@@ -96,7 +96,11 @@ ActiveWorkoutViewModel::ActiveWorkoutViewModel(WorkoutService* service, QObject*
     loadCurrentWorkout();
 }
 
-ActiveWorkoutViewModel::~ActiveWorkoutViewModel() { saveCurrentWorkout(); }
+ActiveWorkoutViewModel::~ActiveWorkoutViewModel()
+{
+    m_shuttingDown = true;
+    saveCurrentWorkout();
+}
 
 WorkoutTimer* ActiveWorkoutViewModel::timer() const { return m_timer; }
 
@@ -587,7 +591,21 @@ void ActiveWorkoutViewModel::saveToDb()
     if (!m_service || !m_currentWorkout)
         return;
 
-    m_service->saveWorkout(m_currentWorkout->toEntity()).warnOnError("save the active workout");
+    if (m_shuttingDown)
+    {
+        m_service->saveWorkout(m_currentWorkout->toEntity()).warnOnError("save the active workout");
+        return;
+    }
+
+    QPointer<WorkoutModel> target(m_currentWorkout);
+    m_service->saveWorkout(m_currentWorkout->toEntity())
+        .then(this,
+              [target](int savedId)
+              {
+                  if (target)
+                      target->setId(savedId);
+              })
+        .warnOnError("save the active workout");
 }
 
 void ActiveWorkoutViewModel::saveSetToDb(SetModel* set)

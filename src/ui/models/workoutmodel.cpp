@@ -37,6 +37,15 @@ QQmlListProperty<ExerciseModel> WorkoutModel::exercisesProperty()
 
 QList<ExerciseModel*> WorkoutModel::exercises() const { return m_exercises; }
 
+void WorkoutModel::setId(int id)
+{
+    if (m_workout.id() == id)
+        return;
+
+    m_workout.setId(id);
+    emit dataChanged();
+}
+
 void WorkoutModel::setStartedTime(const QDateTime& time)
 {
     m_workout.setStartedTime(time);

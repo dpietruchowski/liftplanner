@@ -196,3 +196,51 @@ domain upwards, tests and a commit after each:
 
 Filled in as each batch lands, so that a month from now the reason for the chosen
 variant is written down rather than guessed.
+
+**Validation is a query, not a hook (batch 1, A2/A3).** An entity answers
+`validationErrors()` and `isValid()`; it never rejects a value in its
+constructor. The caller decides what an invalid entity means — the editor shows
+the errors, the importer collects them. All four entities now have that one
+shape.
+
+**Ordered children go through `Ordered` (batch 2, A1).** `domain/ordered.h`
+owns insert clamping, the out-of-range guard, the `from == to` guard and the
+renumbering loop for every `std::vector` of positioned children. An entity's
+`addX / removeX / moveX` is a one-line call; anything the entity does *on top*
+of the move — resetting the id of a duplicated set, renumbering grandchildren in
+`normalizePositions` — stays in the entity.
+
+**One sentinel for an inherited rest (batch 3, A4).**
+`RestSeconds::inherited` is the `-1`, `RestSeconds::effective(override,
+fallback)` is the rule. `Set` and `TemplateExercise` both spell their question
+`effectiveRestSeconds(default)`. `Exercise::restSecondsForSet(index)` keeps its
+own name because it answers a different question — it owns the default and takes
+an index rather than receiving a fallback.
+
+**Schema changes are migrations (batch 4, A10).** Nothing outside
+`registerMigrations` may alter a table. A migration is idempotent because
+`AlterTable` skips columns that already exist; a backfill guards on the value the
+`ADD COLUMN` default just wrote, so it is safe to re-run. `AlterTable::execute`
+is checked with `!= 0`, `Update::execute` with `>= 0` — it returns the row count,
+and matching nothing is a success.
+
+**Repositories read through `findBy(Where)` and write through `upsert` (batch 5,
+A11/A12/A13).** The one-id and many-ids finders differ only in their `Where`, so
+they share a private `findBy`; rows become entities through
+`DbRows::toEntities`. `save` is one `upsert` call — the toolkit already knows how
+to insert or update on the primary key. The catalog keeps its `findIdBySlug`
+step: the slug is a natural key, so resolving it is a different question from
+choosing between insert and update.
+
+**Model ids notify (batch 6, A19/A21).** `WorkoutModel::id` and
+`WorkoutTemplateModel::templateId` both notify; no model id is `CONSTANT`. A save
+writes the assigned id back into the model, so a binding on `workout.id` cannot
+hold a stale `-1`. The write-back is skipped while the view model is being
+destroyed, because a `then(this, …)` continuation asserts that its context object
+is still alive when it runs.
+
+**A18 left as it is.** `WorkoutModel` has `addExercise` and `moveExercise`,
+`ExerciseModel` has `addSet` and `removeSet`. Those are exactly the operations
+the active workout screen performs — the editor works on the entity, not on the
+models. Adding the missing two would be API nothing calls, which is a worse
+divergence than the one it removes.

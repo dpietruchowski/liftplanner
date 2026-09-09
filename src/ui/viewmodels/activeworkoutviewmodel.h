@@ -68,4 +68,5 @@ private:
 
     WorkoutService* m_service;
     WorkoutTimer* m_timer;
+    bool m_shuttingDown { false };
 };

@@ -11,7 +11,7 @@
 class WorkoutModel : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(int id READ id CONSTANT)
+    Q_PROPERTY(int id READ id NOTIFY dataChanged)
     Q_PROPERTY(QString name READ name NOTIFY dataChanged)
     Q_PROPERTY(
         QQmlListProperty<ExerciseModel> exercises READ exercisesProperty NOTIFY exercisesChanged)
@@ -39,6 +39,7 @@ public:
     QQmlListProperty<ExerciseModel> exercisesProperty();
     QList<ExerciseModel*> exercises() const;
 
+    void setId(int id);
     void setStartedTime(const QDateTime& time);
     void setEndedTime(const QDateTime& time);
     void start();
