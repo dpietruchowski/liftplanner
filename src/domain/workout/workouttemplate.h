@@ -34,8 +34,6 @@ public:
     bool isValid() const;
 
 private:
-    void renumberExercises();
-
     int m_id { -1 };
     QString m_name;
     QString m_notes;

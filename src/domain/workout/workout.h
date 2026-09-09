@@ -52,8 +52,6 @@ public:
     static Workout createDefault(const QString& name);
 
 private:
-    void renumberExercises();
-
     int m_id { -1 };
     QString m_name;
     QDateTime m_createdTime;

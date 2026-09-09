@@ -62,8 +62,6 @@ public:
     double bestOneRepMax() const;
 
 private:
-    void renumberSets();
-
     int m_id { -1 };
     int m_workoutId { -1 };
     QString m_name;

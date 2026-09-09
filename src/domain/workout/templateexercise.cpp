@@ -1,4 +1,5 @@
 #include "templateexercise.h"
+#include "domain/ordered.h"
 
 TemplateExercise::TemplateExercise() = default;
 
@@ -21,41 +22,14 @@ void TemplateExercise::setNotes(const QString& notes) { m_notes = notes; }
 
 void TemplateExercise::addSet(const SetPrescription& prescription, int atPosition)
 {
-    const int size = static_cast<int>(m_sets.size());
-    const int index = (atPosition < 0 || atPosition > size) ? size : atPosition;
-
-    m_sets.insert(m_sets.begin() + index, prescription);
-    renumberSets();
+    Ordered::insert(m_sets, prescription, atPosition);
 }
 
-void TemplateExercise::removeSet(int index)
-{
-    if (index < 0 || index >= static_cast<int>(m_sets.size()))
-        return;
+void TemplateExercise::removeSet(int index) { Ordered::remove(m_sets, index); }
 
-    m_sets.erase(m_sets.begin() + index);
-    renumberSets();
-}
+void TemplateExercise::moveSet(int from, int to) { Ordered::move(m_sets, from, to); }
 
-void TemplateExercise::moveSet(int from, int to)
-{
-    const int size = static_cast<int>(m_sets.size());
-    if (from < 0 || from >= size || to < 0 || to >= size || from == to)
-        return;
-
-    SetPrescription moved = m_sets[from];
-    m_sets.erase(m_sets.begin() + from);
-    m_sets.insert(m_sets.begin() + to, moved);
-    renumberSets();
-}
-
-void TemplateExercise::normalizePositions() { renumberSets(); }
-
-void TemplateExercise::renumberSets()
-{
-    for (size_t i = 0; i < m_sets.size(); ++i)
-        m_sets[i].setPosition(static_cast<int>(i));
-}
+void TemplateExercise::normalizePositions() { Ordered::renumber(m_sets); }
 
 int TemplateExercise::effectiveRestSeconds(int definitionDefault) const
 {

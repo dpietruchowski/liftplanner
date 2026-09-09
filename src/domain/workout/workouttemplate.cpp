@@ -1,4 +1,5 @@
 #include "workouttemplate.h"
+#include "domain/ordered.h"
 #include <algorithm>
 
 WorkoutTemplate::WorkoutTemplate() = default;
@@ -20,45 +21,18 @@ void WorkoutTemplate::setNotes(const QString& notes) { m_notes = notes; }
 
 void WorkoutTemplate::addExercise(const TemplateExercise& exercise, int atPosition)
 {
-    const int size = static_cast<int>(m_exercises.size());
-    const int index = (atPosition < 0 || atPosition > size) ? size : atPosition;
-
-    m_exercises.insert(m_exercises.begin() + index, exercise);
-    renumberExercises();
+    Ordered::insert(m_exercises, exercise, atPosition);
 }
 
-void WorkoutTemplate::removeExercise(int index)
-{
-    if (index < 0 || index >= static_cast<int>(m_exercises.size()))
-        return;
+void WorkoutTemplate::removeExercise(int index) { Ordered::remove(m_exercises, index); }
 
-    m_exercises.erase(m_exercises.begin() + index);
-    renumberExercises();
-}
-
-void WorkoutTemplate::moveExercise(int from, int to)
-{
-    const int size = static_cast<int>(m_exercises.size());
-    if (from < 0 || from >= size || to < 0 || to >= size || from == to)
-        return;
-
-    TemplateExercise moved = m_exercises[from];
-    m_exercises.erase(m_exercises.begin() + from);
-    m_exercises.insert(m_exercises.begin() + to, moved);
-    renumberExercises();
-}
+void WorkoutTemplate::moveExercise(int from, int to) { Ordered::move(m_exercises, from, to); }
 
 void WorkoutTemplate::normalizePositions()
 {
-    renumberExercises();
+    Ordered::renumber(m_exercises);
     for (auto& exercise : m_exercises)
         exercise.normalizePositions();
-}
-
-void WorkoutTemplate::renumberExercises()
-{
-    for (size_t i = 0; i < m_exercises.size(); ++i)
-        m_exercises[i].setPosition(static_cast<int>(i));
 }
 
 bool WorkoutTemplate::isEmpty() const { return m_exercises.empty(); }

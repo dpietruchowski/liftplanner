@@ -1,4 +1,5 @@
 #include "exercise.h"
+#include "domain/ordered.h"
 #include "setcompatibility.h"
 #include <QStringList>
 #include <algorithm>
@@ -60,35 +61,11 @@ int Exercise::restSecondsForSet(int index) const
 const std::vector<Set>& Exercise::sets() const { return m_sets; }
 std::vector<Set>& Exercise::sets() { return m_sets; }
 
-void Exercise::addSet(const Set& set, int atPosition)
-{
-    const int size = static_cast<int>(m_sets.size());
-    const int index = (atPosition < 0 || atPosition > size) ? size : atPosition;
+void Exercise::addSet(const Set& set, int atPosition) { Ordered::insert(m_sets, set, atPosition); }
 
-    m_sets.insert(m_sets.begin() + index, set);
-    renumberSets();
-}
+void Exercise::removeSet(int index) { Ordered::remove(m_sets, index); }
 
-void Exercise::removeSet(int index)
-{
-    if (index < 0 || index >= static_cast<int>(m_sets.size()))
-        return;
-
-    m_sets.erase(m_sets.begin() + index);
-    renumberSets();
-}
-
-void Exercise::moveSet(int from, int to)
-{
-    const int size = static_cast<int>(m_sets.size());
-    if (from < 0 || from >= size || to < 0 || to >= size || from == to)
-        return;
-
-    Set moved = m_sets[from];
-    m_sets.erase(m_sets.begin() + from);
-    m_sets.insert(m_sets.begin() + to, moved);
-    renumberSets();
-}
+void Exercise::moveSet(int from, int to) { Ordered::move(m_sets, from, to); }
 
 void Exercise::duplicateSet(int index)
 {
@@ -99,17 +76,10 @@ void Exercise::duplicateSet(int index)
     copy.setId(-1);
     copy.setCompleted(false);
 
-    m_sets.insert(m_sets.begin() + index + 1, copy);
-    renumberSets();
+    Ordered::insert(m_sets, copy, index + 1);
 }
 
-void Exercise::normalizePositions() { renumberSets(); }
-
-void Exercise::renumberSets()
-{
-    for (size_t i = 0; i < m_sets.size(); ++i)
-        m_sets[i].setPosition(static_cast<int>(i));
-}
+void Exercise::normalizePositions() { Ordered::renumber(m_sets); }
 
 bool Exercise::isCompleted() const
 {

@@ -37,8 +37,6 @@ public:
     bool isValid() const;
 
 private:
-    void renumberSets();
-
     int m_definitionId { -1 };
     int m_position { 0 };
     int m_restSecondsOverride { -1 };

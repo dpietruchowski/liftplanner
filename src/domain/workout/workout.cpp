@@ -1,5 +1,6 @@
 #include "workout.h"
 #include "async/timeprovider.h"
+#include "domain/ordered.h"
 
 Workout::Workout() = default;
 
@@ -43,45 +44,18 @@ std::vector<Exercise>& Workout::exercises() { return m_exercises; }
 
 void Workout::addExercise(const Exercise& exercise, int atPosition)
 {
-    const int size = static_cast<int>(m_exercises.size());
-    const int index = (atPosition < 0 || atPosition > size) ? size : atPosition;
-
-    m_exercises.insert(m_exercises.begin() + index, exercise);
-    renumberExercises();
+    Ordered::insert(m_exercises, exercise, atPosition);
 }
 
-void Workout::removeExercise(int index)
-{
-    if (index < 0 || index >= static_cast<int>(m_exercises.size()))
-        return;
+void Workout::removeExercise(int index) { Ordered::remove(m_exercises, index); }
 
-    m_exercises.erase(m_exercises.begin() + index);
-    renumberExercises();
-}
-
-void Workout::moveExercise(int from, int to)
-{
-    const int size = static_cast<int>(m_exercises.size());
-    if (from < 0 || from >= size || to < 0 || to >= size || from == to)
-        return;
-
-    Exercise moved = m_exercises[from];
-    m_exercises.erase(m_exercises.begin() + from);
-    m_exercises.insert(m_exercises.begin() + to, moved);
-    renumberExercises();
-}
+void Workout::moveExercise(int from, int to) { Ordered::move(m_exercises, from, to); }
 
 void Workout::normalizePositions()
 {
-    renumberExercises();
+    Ordered::renumber(m_exercises);
     for (auto& exercise : m_exercises)
         exercise.normalizePositions();
-}
-
-void Workout::renumberExercises()
-{
-    for (size_t i = 0; i < m_exercises.size(); ++i)
-        m_exercises[i].setPosition(static_cast<int>(i));
 }
 
 bool Workout::isCompleted() const
