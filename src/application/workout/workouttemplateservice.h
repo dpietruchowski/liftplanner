@@ -9,28 +9,22 @@
 #include "async/testing.h"
 #include "domain/workout/workout.h"
 #include "domain/workout/workouttemplate.h"
+#include "domain/workout/workouttemplaterow.h"
 
 class ExerciseDefinitionLookup;
 class WorkoutTemplateRepository;
-
-struct WorkoutTemplateSummary final
-{
-    WorkoutTemplate workoutTemplate;
-    QStringList exerciseNames;
-    int setCount { 0 };
-    bool complete { true };
-};
+class WorkoutTemplateRowRepository;
 
 class WorkoutTemplateService final : public Service
 {
 public:
     WorkoutTemplateService(WorkoutTemplateRepository& repository,
+                           WorkoutTemplateRowRepository& rowRepository,
                            const ExerciseDefinitionLookup& lookup, QObject* worker);
 
     Task<std::vector<WorkoutTemplate>> loadTemplates();
     Task<std::vector<WorkoutTemplate>> searchTemplates(const QString& text);
-    Task<std::vector<WorkoutTemplateSummary>> loadSummaries();
-    Task<std::vector<WorkoutTemplateSummary>> searchSummaries(const QString& text);
+    Task<std::vector<WorkoutTemplateRow>> searchRows(const QString& text);
     Task<std::optional<WorkoutTemplate>> findById(int id);
 
     Task<int> save(const WorkoutTemplate& workoutTemplate);
@@ -45,9 +39,7 @@ private:
 
     Result<std::vector<WorkoutTemplate>> loadTemplatesCore();
     Result<std::vector<WorkoutTemplate>> searchTemplatesCore(const QString& text);
-    Result<std::vector<WorkoutTemplateSummary>> loadSummariesCore();
-    Result<std::vector<WorkoutTemplateSummary>> searchSummariesCore(const QString& text);
-    std::vector<WorkoutTemplateSummary> summarize(const std::vector<WorkoutTemplate>& templates);
+    Result<std::vector<WorkoutTemplateRow>> searchRowsCore(const QString& text);
     Result<std::optional<WorkoutTemplate>> findByIdCore(int id);
     Result<int> saveCore(WorkoutTemplate workoutTemplate);
     Result<int> saveFromWorkoutCore(const Workout& workout, const QString& name);
@@ -56,5 +48,6 @@ private:
     Result<Workout> instantiateCore(int id, const QDateTime& plannedTime);
 
     WorkoutTemplateRepository& m_repository;
+    WorkoutTemplateRowRepository& m_rowRepository;
     const ExerciseDefinitionLookup& m_lookup;
 };

@@ -4,7 +4,7 @@
 #include "domain/workout/workouttemplatequery.h"
 #include "infrastructure/workout/workouttemplateserializer.h"
 
-#include "infrastructure/whereclause.h"
+#include "infrastructure/workout/workouttemplateconditions.h"
 
 #include <dbtoolkit/dbrepository.h>
 #include <dbtoolkit/dbstorage.h>
@@ -286,40 +286,10 @@ void WorkoutTemplateRepositoryDb::saveChildren(int templateId,
 
 Where WorkoutTemplateRepositoryDb::buildWhereClause(const WorkoutTemplateQuery& query) const
 {
-    Where where;
-
-    if (query.id().has_value())
-        addClause(where, Where(WorkoutTemplateSerializer::id_key).equals(query.id().value()));
-
-    if (query.name().has_value())
-        addClause(where, Where(WorkoutTemplateSerializer::name_key).equals(query.name().value()));
-
-    if (query.nameContains().has_value())
-    {
-        addClause(where,
-                  Where(WorkoutTemplateSerializer::name_key)
-                      .like(QStringLiteral("%%1%").arg(query.nameContains().value())));
-    }
-
-    if (query.referencesDefinition().has_value())
-    {
-        const Select subquery = Select(QStringList { TemplateExerciseSerializer::template_id_key })
-                                    .from(TemplateExerciseSerializer::table)
-                                    .where(Where(TemplateExerciseSerializer::definition_id_key)
-                                               .equals(query.referencesDefinition().value()));
-
-        addClause(where, Where(WorkoutTemplateSerializer::id_key).in(subquery));
-    }
-
-    return where;
+    return WorkoutTemplateConditions::where(query);
 }
 
 Order WorkoutTemplateRepositoryDb::buildOrderClause(const WorkoutTemplateQuery& query) const
 {
-    if (!query.orderByNameDirection().has_value())
-        return Order();
-
-    Order order(WorkoutTemplateSerializer::name_key);
-    return query.orderByNameDirection().value() == SortDirection::Ascending ? order.asc()
-                                                                            : order.desc();
+    return WorkoutTemplateConditions::order(query);
 }

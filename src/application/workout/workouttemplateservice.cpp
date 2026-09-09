@@ -5,12 +5,15 @@
 #include "domain/workout/templateexercise.h"
 #include "domain/workout/workouttemplatequery.h"
 #include "domain/workout/workouttemplaterepository.h"
+#include "domain/workout/workouttemplaterowrepository.h"
 
 WorkoutTemplateService::WorkoutTemplateService(WorkoutTemplateRepository& repository,
+                                               WorkoutTemplateRowRepository& rowRepository,
                                                const ExerciseDefinitionLookup& lookup,
                                                QObject* worker)
     : Service(worker)
     , m_repository(repository)
+    , m_rowRepository(rowRepository)
     , m_lookup(lookup)
 {
 }
@@ -25,15 +28,9 @@ Task<std::vector<WorkoutTemplate>> WorkoutTemplateService::searchTemplates(const
     return invoke([this, text] { return searchTemplatesCore(text); });
 }
 
-Task<std::vector<WorkoutTemplateSummary>> WorkoutTemplateService::loadSummaries()
+Task<std::vector<WorkoutTemplateRow>> WorkoutTemplateService::searchRows(const QString& text)
 {
-    return invoke([this] { return loadSummariesCore(); });
-}
-
-Task<std::vector<WorkoutTemplateSummary>>
-WorkoutTemplateService::searchSummaries(const QString& text)
-{
-    return invoke([this, text] { return searchSummariesCore(text); });
+    return invoke([this, text] { return searchRowsCore(text); });
 }
 
 Task<std::optional<WorkoutTemplate>> WorkoutTemplateService::findById(int id)
@@ -87,51 +84,16 @@ WorkoutTemplateService::searchTemplatesCore(const QString& text)
     return Result<std::vector<WorkoutTemplate>>::success(m_repository.findAll(query));
 }
 
-Result<std::vector<WorkoutTemplateSummary>> WorkoutTemplateService::loadSummariesCore()
+Result<std::vector<WorkoutTemplateRow>> WorkoutTemplateService::searchRowsCore(const QString& text)
 {
-    const auto templates = loadTemplatesCore();
-    if (templates.isFailure())
-        return Result<std::vector<WorkoutTemplateSummary>>::failure(templates.error());
+    WorkoutTemplateQuery query;
+    query.orderByName(SortDirection::Ascending);
 
-    return Result<std::vector<WorkoutTemplateSummary>>::success(summarize(templates.value()));
-}
+    const QString trimmed = text.trimmed();
+    if (!trimmed.isEmpty())
+        query.whereNameContains(trimmed);
 
-Result<std::vector<WorkoutTemplateSummary>>
-WorkoutTemplateService::searchSummariesCore(const QString& text)
-{
-    const auto templates = searchTemplatesCore(text);
-    if (templates.isFailure())
-        return Result<std::vector<WorkoutTemplateSummary>>::failure(templates.error());
-
-    return Result<std::vector<WorkoutTemplateSummary>>::success(summarize(templates.value()));
-}
-
-std::vector<WorkoutTemplateSummary>
-WorkoutTemplateService::summarize(const std::vector<WorkoutTemplate>& templates)
-{
-    std::vector<WorkoutTemplateSummary> summaries;
-    summaries.reserve(templates.size());
-
-    for (const auto& workoutTemplate : templates)
-    {
-        WorkoutTemplateSummary summary;
-        summary.workoutTemplate = workoutTemplate;
-
-        for (const auto& templateExercise : workoutTemplate.exercises())
-        {
-            summary.setCount += static_cast<int>(templateExercise.sets().size());
-
-            const auto definition = m_lookup.findDefinition(templateExercise.definitionId());
-            if (definition.has_value())
-                summary.exerciseNames.append(definition->name);
-            else
-                summary.complete = false;
-        }
-
-        summaries.push_back(summary);
-    }
-
-    return summaries;
+    return Result<std::vector<WorkoutTemplateRow>>::success(m_rowRepository.findAll(query));
 }
 
 Result<std::optional<WorkoutTemplate>> WorkoutTemplateService::findByIdCore(int id)

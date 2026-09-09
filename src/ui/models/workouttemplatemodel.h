@@ -1,6 +1,6 @@
 #pragma once
 
-#include "application/workout/workouttemplateservice.h"
+#include "domain/workout/workouttemplaterow.h"
 #include <QObject>
 #include <QString>
 #include <QStringList>
@@ -18,7 +18,7 @@ class WorkoutTemplateModel : public QObject
 
 public:
     explicit WorkoutTemplateModel(QObject* parent = nullptr);
-    explicit WorkoutTemplateModel(const WorkoutTemplateSummary& summary, QObject* parent = nullptr);
+    explicit WorkoutTemplateModel(const WorkoutTemplateRow& row, QObject* parent = nullptr);
 
     int templateId() const;
     QString name() const;
@@ -28,11 +28,11 @@ public:
     int setCount() const;
     bool isComplete() const;
 
-    const WorkoutTemplateSummary& entity() const;
+    const WorkoutTemplateRow& entity() const;
 
 signals:
     void dataChanged();
 
 private:
-    WorkoutTemplateSummary m_summary;
+    WorkoutTemplateRow m_row;
 };

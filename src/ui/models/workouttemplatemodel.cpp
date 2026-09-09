@@ -5,27 +5,24 @@ WorkoutTemplateModel::WorkoutTemplateModel(QObject* parent)
 {
 }
 
-WorkoutTemplateModel::WorkoutTemplateModel(const WorkoutTemplateSummary& summary, QObject* parent)
+WorkoutTemplateModel::WorkoutTemplateModel(const WorkoutTemplateRow& row, QObject* parent)
     : QObject(parent)
-    , m_summary(summary)
+    , m_row(row)
 {
 }
 
-int WorkoutTemplateModel::templateId() const { return m_summary.workoutTemplate.id(); }
+int WorkoutTemplateModel::templateId() const { return m_row.id; }
 
-QString WorkoutTemplateModel::name() const { return m_summary.workoutTemplate.name(); }
+QString WorkoutTemplateModel::name() const { return m_row.name; }
 
-QString WorkoutTemplateModel::notes() const { return m_summary.workoutTemplate.notes(); }
+QString WorkoutTemplateModel::notes() const { return m_row.notes; }
 
-QStringList WorkoutTemplateModel::exerciseNames() const { return m_summary.exerciseNames; }
+QStringList WorkoutTemplateModel::exerciseNames() const { return m_row.exerciseNames; }
 
-int WorkoutTemplateModel::exerciseCount() const
-{
-    return static_cast<int>(m_summary.workoutTemplate.exercises().size());
-}
+int WorkoutTemplateModel::exerciseCount() const { return m_row.exerciseCount; }
 
-int WorkoutTemplateModel::setCount() const { return m_summary.setCount; }
+int WorkoutTemplateModel::setCount() const { return m_row.setCount; }
 
-bool WorkoutTemplateModel::isComplete() const { return m_summary.complete; }
+bool WorkoutTemplateModel::isComplete() const { return m_row.complete; }
 
-const WorkoutTemplateSummary& WorkoutTemplateModel::entity() const { return m_summary; }
+const WorkoutTemplateRow& WorkoutTemplateModel::entity() const { return m_row; }

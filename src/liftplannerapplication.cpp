@@ -11,6 +11,7 @@
 #include "infrastructure/userprofile/userprofilerepositorydb.h"
 #include "infrastructure/workout/workoutrepositorydb.h"
 #include "infrastructure/workout/workouttemplaterepositorydb.h"
+#include "infrastructure/workout/workouttemplaterowrepositorydb.h"
 #include "qmlutils/coloredsvgprovider.h"
 #include "qmlutils/qmlregistrator.h"
 #include "ui/presentation/appinfo.h"
@@ -92,7 +93,8 @@ bool LiftPlannerApplication::initialize()
             m_definitionLookup
                 = std::make_unique<CatalogDefinitionLookup>(m_storage->exerciseDefinitionRepo());
             m_workoutTemplateService = std::make_unique<WorkoutTemplateService>(
-                m_storage->workoutTemplateRepo(), *m_definitionLookup, m_worker.get());
+                m_storage->workoutTemplateRepo(), m_storage->workoutTemplateRowRepo(),
+                *m_definitionLookup, m_worker.get());
         },
         Qt::BlockingQueuedConnection);
 

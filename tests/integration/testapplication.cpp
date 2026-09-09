@@ -12,6 +12,7 @@
 #include "infrastructure/userprofile/userprofilerepositorydb.h"
 #include "infrastructure/workout/workoutrepositorydb.h"
 #include "infrastructure/workout/workouttemplaterepositorydb.h"
+#include "infrastructure/workout/workouttemplaterowrepositorydb.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
 #include "ui/viewmodels/exercisecatalogviewmodel.h"
 #include "ui/viewmodels/plannedworkoutviewmodel.h"
@@ -54,6 +55,8 @@ TestApplication::TestApplication()
             m_exerciseDefinitionRepo->createTables();
             m_workoutTemplateRepo = std::make_unique<WorkoutTemplateRepositoryDb>(*m_dbStorage);
             m_workoutTemplateRepo->createTables();
+            m_workoutTemplateRowRepo
+                = std::make_unique<WorkoutTemplateRowRepositoryDb>(*m_dbStorage);
 
             m_workoutService = std::make_unique<WorkoutService>(*m_workoutRepo, m_worker.get());
             m_userProfileService
@@ -63,7 +66,8 @@ TestApplication::TestApplication()
             m_definitionLookup
                 = std::make_unique<CatalogDefinitionLookup>(*m_exerciseDefinitionRepo);
             m_workoutTemplateService = std::make_unique<WorkoutTemplateService>(
-                *m_workoutTemplateRepo, *m_definitionLookup, m_worker.get());
+                *m_workoutTemplateRepo, *m_workoutTemplateRowRepo, *m_definitionLookup,
+                m_worker.get());
         },
         Qt::BlockingQueuedConnection);
 
@@ -102,6 +106,7 @@ TestApplication::~TestApplication()
             m_exerciseCatalogService.reset();
             m_workoutService.reset();
             m_userProfileService.reset();
+            m_workoutTemplateRowRepo.reset();
             m_workoutTemplateRepo.reset();
             m_exerciseDefinitionRepo.reset();
             m_userProfileRepo.reset();

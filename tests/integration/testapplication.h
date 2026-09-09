@@ -11,6 +11,7 @@ class DbStorage;
 class WorkoutRepositoryDb;
 class WorkoutService;
 class WorkoutTemplateRepositoryDb;
+class WorkoutTemplateRowRepositoryDb;
 class WorkoutTemplateService;
 class UserProfileRepositoryDb;
 class UserProfileService;
@@ -71,6 +72,7 @@ private:
     std::unique_ptr<ExerciseCatalogService> m_exerciseCatalogService;
     std::unique_ptr<CatalogDefinitionLookup> m_definitionLookup;
     std::unique_ptr<WorkoutTemplateRepositoryDb> m_workoutTemplateRepo;
+    std::unique_ptr<WorkoutTemplateRowRepositoryDb> m_workoutTemplateRowRepo;
     std::unique_ptr<WorkoutTemplateService> m_workoutTemplateService;
 
     std::unique_ptr<ActiveWorkoutViewModel> m_activeWorkoutViewModel;

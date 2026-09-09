@@ -7,6 +7,8 @@
 #include "domain/workout/workouttemplate.h"
 #include "domain/workout/workouttemplatequery.h"
 #include "domain/workout/workouttemplaterepository.h"
+#include "domain/workout/workouttemplaterow.h"
+#include "domain/workout/workouttemplaterowrepository.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -25,6 +27,13 @@ public:
     MOCK_METHOD(bool, remove, (const WorkoutTemplateQuery& query), (override));
     MOCK_METHOD(int, count, (const WorkoutTemplateQuery& query), (const, override));
     MOCK_METHOD(bool, exists, (const WorkoutTemplateQuery& query), (const, override));
+};
+
+class MockWorkoutTemplateRowRepository : public WorkoutTemplateRowRepository
+{
+public:
+    MOCK_METHOD(std::vector<WorkoutTemplateRow>, findAll, (const WorkoutTemplateQuery& query),
+                (const, override));
 };
 
 class FakeDefinitionLookup : public ExerciseDefinitionLookup
@@ -54,7 +63,7 @@ protected:
     {
         m_lookup.add(7, QStringLiteral("Back Squat"), ExerciseKind::Strength, 180);
         m_lookup.add(9, QStringLiteral("Plank"), ExerciseKind::Interval, 60);
-        m_service = std::make_unique<WorkoutTemplateService>(m_repo, m_lookup, nullptr);
+        m_service = std::make_unique<WorkoutTemplateService>(m_repo, m_rowRepo, m_lookup, nullptr);
     }
 
     static TemplateExercise makeTemplateExercise(int definitionId, int setCount)
@@ -97,6 +106,7 @@ protected:
     }
 
     MockWorkoutTemplateRepository m_repo;
+    MockWorkoutTemplateRowRepository m_rowRepo;
     FakeDefinitionLookup m_lookup;
     std::unique_ptr<WorkoutTemplateService> m_service;
 };

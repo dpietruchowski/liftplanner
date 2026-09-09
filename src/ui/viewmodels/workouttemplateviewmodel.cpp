@@ -42,14 +42,14 @@ void WorkoutTemplateViewModel::load()
 
     setLoading(true);
 
-    m_service->searchSummaries(m_searchText)
+    m_service->searchRows(m_searchText)
         .then(this,
-              [this](std::vector<WorkoutTemplateSummary> summaries)
+              [this](std::vector<WorkoutTemplateRow> rows)
               {
                   qDeleteAll(m_templates);
                   m_templates.clear();
-                  for (const auto& summary : summaries)
-                      m_templates.append(new WorkoutTemplateModel(summary, this));
+                  for (const auto& row : rows)
+                      m_templates.append(new WorkoutTemplateModel(row, this));
 
                   setLoading(false);
                   emit templatesChanged();
