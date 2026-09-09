@@ -26,7 +26,6 @@
 #include "ui/viewmodels/workouthistoryviewmodel.h"
 #include "ui/viewmodels/workouttemplateviewmodel.h"
 #include <QDebug>
-#include <QEventLoop>
 #include <QMetaObject>
 
 LiftPlannerApplication::LiftPlannerApplication(const QString& dbPath)
@@ -37,8 +36,9 @@ LiftPlannerApplication::LiftPlannerApplication(const QString& dbPath)
 
 LiftPlannerApplication::~LiftPlannerApplication()
 {
-    drainWorker();
+    m_worker->drain();
 
+    m_appInfo.reset();
     m_clipboardHelper.reset();
     m_workoutTemplateViewModel.reset();
     m_workoutEditorViewModel.reset();
@@ -62,18 +62,19 @@ LiftPlannerApplication::~LiftPlannerApplication()
         Qt::BlockingQueuedConnection);
 }
 
-void LiftPlannerApplication::drainWorker()
+bool LiftPlannerApplication::initialize()
 {
-    QEventLoop loop;
-    for (int i = 0; i < 64; ++i)
+    if (!createServices())
     {
-        QMetaObject::invokeMethod(m_worker.get(), [] {}, Qt::BlockingQueuedConnection);
-        if (!loop.processEvents(QEventLoop::AllEvents))
-            break;
+        qCritical() << "Failed to open database";
+        return false;
     }
+
+    createViewModels();
+    return true;
 }
 
-bool LiftPlannerApplication::initialize()
+bool LiftPlannerApplication::createServices()
 {
     bool opened = true;
     QMetaObject::invokeMethod(
@@ -99,12 +100,11 @@ bool LiftPlannerApplication::initialize()
         },
         Qt::BlockingQueuedConnection);
 
-    if (!opened)
-    {
-        qCritical() << "Failed to open database";
-        return false;
-    }
+    return opened;
+}
 
+void LiftPlannerApplication::createViewModels()
+{
     m_activeWorkoutViewModel = std::make_unique<ActiveWorkoutViewModel>(m_workoutService.get());
     m_workoutHistoryViewModel = std::make_unique<WorkoutHistoryViewModel>(
         m_workoutService.get(), m_activeWorkoutViewModel.get());
@@ -119,8 +119,6 @@ bool LiftPlannerApplication::initialize()
         = std::make_unique<WorkoutTemplateViewModel>(m_workoutTemplateService.get());
     m_clipboardHelper = std::make_unique<ClipboardHelper>();
     m_appInfo = std::make_unique<AppInfo>();
-
-    return true;
 }
 
 void LiftPlannerApplication::registerQmlTypes(QmlRegistrator& registrator)

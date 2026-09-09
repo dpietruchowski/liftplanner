@@ -258,6 +258,13 @@ value)` trims, compares and assigns, and answers whether anything changed. Each
 view model keeps its own signal — the catalog has one `filtersChanged` for five
 fields, the template list has `searchTextChanged` for one.
 
+**The composition root names its two halves (batch 8, A27/A28/A29).**
+`initialize()` calls `createServices()` — everything built on the worker thread,
+returning whether the storage opened — and `createViewModels()` — everything
+built on the main thread. Draining the worker queue is `BackendWorker::drain()`
+in libs, so the app and `TestApplication` share it instead of each keeping the
+magic 64. The destructor names every member it releases, `m_appInfo` included.
+
 **A18 left as it is.** `WorkoutModel` has `addExercise` and `moveExercise`,
 `ExerciseModel` has `addSet` and `removeSet`. Those are exactly the operations
 the active workout screen performs — the editor works on the entity, not on the

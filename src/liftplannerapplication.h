@@ -32,7 +32,8 @@ public:
     void registerQmlTypes(QmlRegistrator& registrator);
 
 private:
-    void drainWorker();
+    bool createServices();
+    void createViewModels();
 
     std::unique_ptr<BackendWorker> m_worker;
     std::unique_ptr<AppDbStorage> m_storage;

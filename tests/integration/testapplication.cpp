@@ -20,7 +20,6 @@
 #include "ui/viewmodels/workouteditorviewmodel.h"
 #include "ui/viewmodels/workouthistoryviewmodel.h"
 #include "ui/viewmodels/workouttemplateviewmodel.h"
-#include <QEventLoop>
 #include <QMetaObject>
 #include <QSqlQuery>
 #include <dbtoolkit/dbstorage.h>
@@ -202,13 +201,4 @@ int TestApplication::seedTemplate(const WorkoutTemplate& workoutTemplate)
     return id;
 }
 
-void TestApplication::drain()
-{
-    QEventLoop loop;
-    for (int i = 0; i < 64; ++i)
-    {
-        QMetaObject::invokeMethod(m_worker.get(), [] {}, Qt::BlockingQueuedConnection);
-        if (!loop.processEvents(QEventLoop::AllEvents))
-            break;
-    }
-}
+void TestApplication::drain() { m_worker->drain(); }
