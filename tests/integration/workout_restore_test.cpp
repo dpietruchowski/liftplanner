@@ -33,7 +33,8 @@ protected:
         app.workoutService()
             .findWorkout(app.activeWorkoutViewModel().currentWorkout()->id())
             .then(&app.activeWorkoutViewModel(),
-                  [&stored](std::optional<Workout> found) { stored = found; });
+                  [&stored](std::optional<Workout> found) { stored = found; })
+            .warnOnError("read the stored workout");
         app.drain();
         return stored.value();
     }
@@ -43,7 +44,7 @@ protected:
         Workout stored = storedWorkout();
         stored.exercises()[0].setDefinitionId(definitionId);
         stored.exercises()[0].setName(name);
-        app.workoutService().saveWorkout(stored);
+        app.workoutService().saveWorkout(stored).warnOnError("relink the first exercise");
         app.drain();
     }
 
@@ -90,7 +91,7 @@ TEST_F(WorkoutRestoreTest, ARestartKeepsTheCompletionStateFromTheCache)
         for (Set& set : exercise.sets())
             set.setCompleted(false);
     }
-    app.workoutService().saveWorkout(stored);
+    app.workoutService().saveWorkout(stored).warnOnError("clear the completed sets");
     app.drain();
 
     ActiveWorkoutViewModel restored(&app.workoutService());
@@ -106,7 +107,9 @@ TEST_F(WorkoutRestoreTest, ARestartKeepsTheCompletionStateFromTheCache)
 
 TEST_F(WorkoutRestoreTest, ARestartFallsBackToTheCacheWhenTheDatabaseLostTheWorkout)
 {
-    app.workoutService().deleteWorkout(app.activeWorkoutViewModel().currentWorkout()->id());
+    app.workoutService()
+        .deleteWorkout(app.activeWorkoutViewModel().currentWorkout()->id())
+        .warnOnError("delete the workout behind the active one");
     app.drain();
 
     ActiveWorkoutViewModel restored(&app.workoutService());

@@ -320,8 +320,10 @@ TEST_F(WorkoutEditorTest, SaveStoresTheWorkoutAndClearsTheDirtyFlag)
 
     const int workoutId = saved.first().first().toInt();
     std::optional<Workout> reloaded;
-    m_app.workoutService().findWorkout(workoutId).then(
-        &editor(), [&reloaded](std::optional<Workout> found) { reloaded = found; });
+    m_app.workoutService()
+        .findWorkout(workoutId)
+        .then(&editor(), [&reloaded](std::optional<Workout> found) { reloaded = found; })
+        .warnOnError("reload the saved workout");
     m_app.drain();
 
     ASSERT_TRUE(reloaded.has_value());
@@ -435,7 +437,8 @@ TEST_F(WorkoutEditorTest, AWorkoutBuiltFromScratchNeedsNoAiImport)
     std::optional<Workout> reloaded;
     m_app.workoutService()
         .findWorkout(saved.first().first().toInt())
-        .then(&editor(), [&reloaded](std::optional<Workout> found) { reloaded = found; });
+        .then(&editor(), [&reloaded](std::optional<Workout> found) { reloaded = found; })
+        .warnOnError("reload the workout built from scratch");
     m_app.drain();
 
     ASSERT_TRUE(reloaded.has_value());
