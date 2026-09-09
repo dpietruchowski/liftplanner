@@ -43,10 +43,23 @@ WorkoutHistoryViewModel::WorkoutHistoryViewModel(WorkoutService* service,
     loadAllWorkouts();
 }
 
+bool WorkoutHistoryViewModel::isLoading() const { return m_loading; }
+
+void WorkoutHistoryViewModel::setLoading(bool value)
+{
+    if (m_loading == value)
+        return;
+
+    m_loading = value;
+    emit loadingChanged();
+}
+
 void WorkoutHistoryViewModel::loadAllWorkouts()
 {
     if (!m_service)
         return;
+
+    setLoading(true);
 
     m_service->loadHistory()
         .then(this,
@@ -57,11 +70,17 @@ void WorkoutHistoryViewModel::loadAllWorkouts()
                   for (const auto& entity : entities)
                       m_workouts.append(new WorkoutModel(entity, this));
 
+                  setLoading(false);
                   emit workoutsChanged();
                   refreshTopExercises();
                   refreshRecentTotals();
               })
-        .warnOnError("load the workout history");
+        .onError(this,
+                 [this](const QString& error)
+                 {
+                     setLoading(false);
+                     emit errorOccurred(error);
+                 });
 }
 
 void WorkoutHistoryViewModel::refreshTopExercises()

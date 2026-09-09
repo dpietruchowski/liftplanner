@@ -60,6 +60,7 @@ signals:
     void profileChanged();
     void dirtyChanged();
     void saved();
+    void errorOccurred(const QString& errorMessage);
 
 private:
     void markDirty();

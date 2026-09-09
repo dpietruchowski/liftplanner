@@ -35,10 +35,23 @@ WorkoutModel* PlannedWorkoutViewModel::nextWorkout() const
     return m_workouts.isEmpty() ? nullptr : m_workouts.first();
 }
 
+bool PlannedWorkoutViewModel::isLoading() const { return m_loading; }
+
+void PlannedWorkoutViewModel::setLoading(bool value)
+{
+    if (m_loading == value)
+        return;
+
+    m_loading = value;
+    emit loadingChanged();
+}
+
 void PlannedWorkoutViewModel::loadAll()
 {
     if (!m_service)
         return;
+
+    setLoading(true);
 
     m_service->loadPlannedWorkouts()
         .then(this,
@@ -49,9 +62,15 @@ void PlannedWorkoutViewModel::loadAll()
                   for (const auto& entity : entities)
                       m_workouts.append(new WorkoutModel(entity, this));
 
+                  setLoading(false);
                   emit workoutsChanged();
               })
-        .warnOnError("load planned workouts");
+        .onError(this,
+                 [this](const QString& error)
+                 {
+                     setLoading(false);
+                     emit errorOccurred(error);
+                 });
 }
 
 void PlannedWorkoutViewModel::importFromJson(const QString& jsonData)

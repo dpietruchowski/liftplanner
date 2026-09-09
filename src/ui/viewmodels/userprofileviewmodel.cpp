@@ -46,7 +46,7 @@ void UserProfileViewModel::load()
                   emit profileChanged();
                   emit dirtyChanged();
               })
-        .warnOnError("load the user profile");
+        .onError(this, [this](const QString& error) { emit errorOccurred(error); });
 }
 
 void UserProfileViewModel::save()
@@ -57,10 +57,15 @@ void UserProfileViewModel::save()
     if (m_profile.userId() < 0)
         m_profile.setUserId(default_user_id);
 
-    m_service->save(m_profile).warnOnError("save the user profile");
-    m_dirty = false;
-    emit dirtyChanged();
-    emit saved();
+    m_service->save(m_profile)
+        .then(this,
+              [this]()
+              {
+                  m_dirty = false;
+                  emit dirtyChanged();
+                  emit saved();
+              })
+        .onError(this, [this](const QString& error) { emit errorOccurred(error); });
 }
 
 QString UserProfileViewModel::sex() const { return sexToString(m_profile.sex()); }

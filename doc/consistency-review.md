@@ -239,6 +239,25 @@ hold a stale `-1`. The write-back is skipped while the view model is being
 destroyed, because a `then(this, …)` continuation asserts that its context object
 is still alive when it runs.
 
+**Every list view model reports `loading` (batch 7, A22).** A view model that
+fills a list from an asynchronous service has `loading` with a private
+`setLoading`, set before the call and cleared in both the continuation and the
+error handler. That is all four list view models — planned, history, templates,
+catalog. The editor, the active workout and the profile are not lists and do not
+have it. `LoadingOverlay` from `libs/qml/app` is the component a screen binds it
+to.
+
+**A chain that can tell the user uses `onError` (batch 7, A23/A26).** A view
+model with an `errorOccurred` signal ends every chain in `.onError(this, …)`;
+`warnOnError` is for chains with nobody to tell. `UserProfileViewModel` now has
+the signal, and its `saved()` is emitted from the continuation rather than
+before the save has happened.
+
+**Trimming a filter is one rule (batch 7, A24).** `FilterField::apply(target,
+value)` trims, compares and assigns, and answers whether anything changed. Each
+view model keeps its own signal — the catalog has one `filtersChanged` for five
+fields, the template list has `searchTextChanged` for one.
+
 **A18 left as it is.** `WorkoutModel` has `addExercise` and `moveExercise`,
 `ExerciseModel` has `addSet` and `removeSet`. Those are exactly the operations
 the active workout screen performs — the editor works on the entity, not on the

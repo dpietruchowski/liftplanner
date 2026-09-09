@@ -158,3 +158,37 @@ TEST_F(PlannedWorkoutTest, PlannedWorkouts_NotInHistory)
 
     EXPECT_EQ(history.workouts().size(), 0);
 }
+
+TEST_F(PlannedWorkoutTest, LoadAll_ReportsLoadingWhileItRuns)
+{
+    auto& vm = app.plannedWorkoutViewModel();
+
+    vm.loadAll();
+    EXPECT_TRUE(vm.isLoading());
+
+    app.drain();
+    EXPECT_FALSE(vm.isLoading());
+}
+
+TEST_F(PlannedWorkoutTest, LoadAll_NotifiesTheLoadingChange)
+{
+    auto& vm = app.plannedWorkoutViewModel();
+    QSignalSpy spy(&vm, &PlannedWorkoutViewModel::loadingChanged);
+
+    vm.loadAll();
+    app.drain();
+
+    EXPECT_EQ(spy.count(), 2);
+}
+
+TEST_F(PlannedWorkoutTest, HistoryLoad_ReportsLoadingWhileItRuns)
+{
+    auto& history = app.workoutHistoryViewModel();
+    app.drain();
+
+    history.loadAllWorkouts();
+    EXPECT_TRUE(history.isLoading());
+
+    app.drain();
+    EXPECT_FALSE(history.isLoading());
+}

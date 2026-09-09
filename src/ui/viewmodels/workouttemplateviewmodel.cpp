@@ -1,6 +1,7 @@
 #include "workouttemplateviewmodel.h"
 
 #include "application/workout/workouttemplateservice.h"
+#include "ui/presentation/filterfield.h"
 
 WorkoutTemplateViewModel::WorkoutTemplateViewModel(WorkoutTemplateService* service, QObject* parent)
     : QObject(parent)
@@ -26,11 +27,9 @@ QString WorkoutTemplateViewModel::searchText() const { return m_searchText; }
 
 void WorkoutTemplateViewModel::setSearchText(const QString& value)
 {
-    const QString trimmed = value.trimmed();
-    if (m_searchText == trimmed)
+    if (!FilterField::apply(m_searchText, value))
         return;
 
-    m_searchText = trimmed;
     emit searchTextChanged();
     load();
 }

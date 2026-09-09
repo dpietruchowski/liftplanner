@@ -2,6 +2,7 @@
 
 #include "application/exercisecatalog/exercisecatalogservice.h"
 #include "domain/exercisecatalog/exercisedefinitionquery.h"
+#include "ui/presentation/filterfield.h"
 
 ExerciseCatalogViewModel::ExerciseCatalogViewModel(ExerciseCatalogService* service, QObject* parent)
     : QObject(parent)
@@ -121,11 +122,9 @@ ExerciseDefinitionModel* ExerciseCatalogViewModel::findById(int definitionId) co
 
 void ExerciseCatalogViewModel::applyFilterChange(QString& target, const QString& value)
 {
-    const QString trimmed = value.trimmed();
-    if (target == trimmed)
+    if (!FilterField::apply(target, value))
         return;
 
-    target = trimmed;
     emit filtersChanged();
     load();
 }
