@@ -115,6 +115,49 @@ Each step is a commit, with the tests green.
    apart first. The gmock doubles in `tests/application` stop standing in for the
    repository's query building, which they never checked anyway.
 
+## What was done
+
+| Step | Outcome |
+|---|---|
+| 1 | done — `WorkoutTemplateConditions` is the one condition builder for templates, `addClause` and `isNullClause` for workouts |
+| 2 | done — `WorkoutTemplateRow` from one SELECT over three tables; `CatalogDefinitionLookup` is off the list path |
+| 3 | done differently — see below |
+| 4, 5 | **not done on purpose** — see below |
+| 6 | not needed — `DbRepository::count` and `exists` already issue `SELECT COUNT`; nothing counted by materialising a list |
+| 7 | done — `WorkoutRepository::saveSet`, used by the two adjustment paths |
+| 8 | done for templates — `WorkoutTemplateRepository` no longer lists |
+| 9 | done — `WorkoutTemplateRowRepositoryDbTest` runs the port against a real database, covering ordering with a limit, an offset and a null column |
+
+**Step 3 came out differently on purpose.** Grouping and summing in SQL would have
+written the one-rep-max formula a second time, in a place where nobody would
+notice it drifting from `Set::oneRepMax`. Instead the window is read as one flat
+row per set in a single SELECT, and the formulas — now named in
+`domain/workout/strengthmath.h` — are applied to those rows. The aggregate
+materialisation is gone, the rule is still written once.
+
+**Step 7 needed a prerequisite that was itself the bigger fix.** `saveChildren`
+deleted every exercise of the workout and reinserted it, so a set's id changed on
+every save and nothing could be addressed by id. Children are now updated in
+place. A set the model has never persisted still has id `-1` and falls back to
+the aggregate save; making the model learn its ids after a save would remove that
+last case, and is the obvious next step.
+
+## What was deliberately not done
+
+- **Rows for the history and planned lists (step 4).** The cards bind to
+  `workout.exercises` and each exercise's `sets` — the list genuinely displays
+  the aggregate. A row would have to be followed by a second read per expanded
+  card, trading one problem for another.
+
+- **A row for the exercise picker (step 5).** The catalog already loads in two
+  queries, not N+1: definitions, then all muscle involvements in one `IN`. The
+  join would save one round trip and cost a `GROUP_CONCAT` that has to agree with
+  how the domain orders primary muscles.
+
+- **Splitting the repository implementations into read and write classes.**
+  Splitting the interface does not split the responsibility. The seam that
+  matters runs along the tables.
+
 ## Rules adopted
 
 - **A row never travels back into a write.** If a caller needs to change

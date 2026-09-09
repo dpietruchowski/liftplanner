@@ -23,15 +23,19 @@ Weryfikacja: `bash tmp/verify.sh [configure|format|format_check|headers|build|te
 
 ## Faza 2 — repozytoria: read port i projekcje
 
-- [ ] Plan adopcji read portu jako dokument (`doc/read-port-adoption.md`).
-- [ ] Wydzielić read port obok agregatowego (płaskie wiersze, nie agregaty).
-- [ ] Czytać wiersze zamiast agregatów tam, gdzie odbiorca tylko wyświetla.
-- [ ] `count`/`exists`/`findIds` na projekcji jednej kolumny.
-- [ ] Warunki zapytań builderami, nie sklejanym stringiem.
-- [ ] Jeden `SELECT` z joinami zamiast N+1.
-- [ ] Zdjąć operacje listowe z repozytorium agregatowego.
-- [ ] Pojedyncze pola jednym `UPDATE`.
-- [ ] Testy portu na prawdziwej bazie przez fixture; kontrakt testowy portu.
+Wynik i decyzje: [read-port-adoption.md](read-port-adoption.md).
+
+- [x] Plan adopcji read portu jako dokument (`doc/read-port-adoption.md`).
+- [x] Wydzielić read port obok agregatowego (płaskie wiersze, nie agregaty).
+- [x] Czytać wiersze zamiast agregatów tam, gdzie odbiorca tylko wyświetla
+      (szablony i statystyki; listy historii świadomie zostają na agregatach).
+- [x] `count`/`exists` — już są `SELECT COUNT` w toolkicie, nic do zrobienia.
+- [x] Warunki zapytań builderami, nie sklejanym stringiem.
+- [x] Jeden `SELECT` z joinami zamiast N+1 (podsumowania szablonów).
+- [x] Zdjąć operacje listowe z repozytorium agregatowego szablonów.
+- [x] Pojedyncze pola jednym `UPDATE` (`saveSet`) + stabilne id dzieci.
+- [x] Kontrakt testowy portu na prawdziwej bazie.
+- [ ] Model uczy się id po zapisie, żeby zniknął fallback dla serii z id `-1`.
 
 ## Faza 3 — porządki wspólne
 
