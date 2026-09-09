@@ -75,12 +75,6 @@ void ExerciseCatalogViewModel::load()
     setLoading(true);
 
     m_service->search(query)
-        .onError(this,
-                 [this](const QString& error)
-                 {
-                     setLoading(false);
-                     emit errorOccurred(error);
-                 })
         .then(this,
               [this](std::vector<ExerciseDefinition> definitions)
               {
@@ -91,7 +85,13 @@ void ExerciseCatalogViewModel::load()
 
                   setLoading(false);
                   emit exercisesChanged();
-              });
+              })
+        .onError(this,
+                 [this](const QString& error)
+                 {
+                     setLoading(false);
+                     emit errorOccurred(error);
+                 });
 }
 
 void ExerciseCatalogViewModel::clearFilters()

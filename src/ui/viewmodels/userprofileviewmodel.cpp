@@ -26,26 +26,27 @@ void UserProfileViewModel::load()
     if (!m_service)
         return;
 
-    m_service->load().then(this,
-                           [this](std::optional<UserProfile> loaded)
-                           {
-                               if (loaded.has_value())
-                               {
-                                   m_profile = *loaded;
-                               }
-                               else
-                               {
-                                   m_profile = UserProfile::createDefault();
-                                   m_profile.setUserId(default_user_id);
-                                   m_profile.setTimezone(
-                                       QString::fromUtf8(QTimeZone::systemTimeZoneId()));
-                                   m_profile.setLanguage(QLocale::system().name().left(2));
-                               }
+    m_service->load()
+        .then(this,
+              [this](std::optional<UserProfile> loaded)
+              {
+                  if (loaded.has_value())
+                  {
+                      m_profile = *loaded;
+                  }
+                  else
+                  {
+                      m_profile = UserProfile::createDefault();
+                      m_profile.setUserId(default_user_id);
+                      m_profile.setTimezone(QString::fromUtf8(QTimeZone::systemTimeZoneId()));
+                      m_profile.setLanguage(QLocale::system().name().left(2));
+                  }
 
-                               m_dirty = false;
-                               emit profileChanged();
-                               emit dirtyChanged();
-                           });
+                  m_dirty = false;
+                  emit profileChanged();
+                  emit dirtyChanged();
+              })
+        .warnOnError("load the user profile");
 }
 
 void UserProfileViewModel::save()
@@ -56,7 +57,7 @@ void UserProfileViewModel::save()
     if (m_profile.userId() < 0)
         m_profile.setUserId(default_user_id);
 
-    m_service->save(m_profile);
+    m_service->save(m_profile).warnOnError("save the user profile");
     m_dirty = false;
     emit dirtyChanged();
     emit saved();

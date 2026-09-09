@@ -48,18 +48,20 @@ void WorkoutHistoryViewModel::loadAllWorkouts()
     if (!m_service)
         return;
 
-    m_service->loadHistory().then(this,
-                                  [this](std::vector<Workout> entities)
-                                  {
-                                      qDeleteAll(m_workouts);
-                                      m_workouts.clear();
-                                      for (const auto& entity : entities)
-                                          m_workouts.append(new WorkoutModel(entity, this));
+    m_service->loadHistory()
+        .then(this,
+              [this](std::vector<Workout> entities)
+              {
+                  qDeleteAll(m_workouts);
+                  m_workouts.clear();
+                  for (const auto& entity : entities)
+                      m_workouts.append(new WorkoutModel(entity, this));
 
-                                      emit workoutsChanged();
-                                      refreshTopExercises();
-                                      refreshRecentTotals();
-                                  });
+                  emit workoutsChanged();
+                  refreshTopExercises();
+                  refreshRecentTotals();
+              })
+        .warnOnError("load the workout history");
 }
 
 void WorkoutHistoryViewModel::refreshTopExercises()
@@ -81,7 +83,8 @@ void WorkoutHistoryViewModel::refreshTopExercises()
                       m_topExercises.append(item);
                   }
                   emit topExercisesChanged();
-              });
+              })
+        .warnOnError("load the top exercises");
 }
 
 void WorkoutHistoryViewModel::refreshRecentTotals()
@@ -104,7 +107,8 @@ void WorkoutHistoryViewModel::refreshRecentTotals()
                           "distance", WorkoutText::formatDistance(totals.totalDistanceMeters)));
 
                   emit recentTotalsChanged();
-              });
+              })
+        .warnOnError("load the recent totals");
 }
 
 void WorkoutHistoryViewModel::saveWorkout(WorkoutModel* workout)
@@ -114,7 +118,7 @@ void WorkoutHistoryViewModel::saveWorkout(WorkoutModel* workout)
     if (!workout->startedTime().isValid())
         return;
 
-    m_service->saveWorkout(workout->toEntity());
+    m_service->saveWorkout(workout->toEntity()).warnOnError("save the workout");
     loadAllWorkouts();
 }
 
@@ -123,7 +127,7 @@ void WorkoutHistoryViewModel::deleteWorkout(WorkoutModel* workout)
     if (!m_service || !workout)
         return;
 
-    m_service->deleteWorkout(workout->id());
+    m_service->deleteWorkout(workout->id()).warnOnError("delete the workout");
     loadAllWorkouts();
 }
 
@@ -194,7 +198,7 @@ void WorkoutHistoryViewModel::importFromJson(const QString& jsonData)
 
         auto workouts = WorkoutJson::workoutsFromJsonArray(doc.array());
         if (m_service)
-            m_service->importHistory(workouts);
+            m_service->importHistory(workouts).warnOnError("import the workout history");
         loadAllWorkouts();
     }
     catch (const std::exception& e)

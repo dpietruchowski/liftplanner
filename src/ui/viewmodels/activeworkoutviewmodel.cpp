@@ -133,9 +133,9 @@ void ActiveWorkoutViewModel::loadCurrentWorkout()
     }
 
     m_service->findWorkout(cached->id())
-        .onError(this, [this, cached = *cached](const QString&) { restoreWorkout(cached); })
         .then(this, [this, cached = *cached](std::optional<Workout> stored)
-              { restoreWorkout(stored ? withExecutionStateFrom(*stored, cached) : cached); });
+              { restoreWorkout(stored ? withExecutionStateFrom(*stored, cached) : cached); })
+        .onError(this, [this, cached = *cached](const QString&) { restoreWorkout(cached); });
 }
 
 void ActiveWorkoutViewModel::restoreWorkout(const Workout& entity)
@@ -170,7 +170,8 @@ void ActiveWorkoutViewModel::refreshPreviousPerformances()
                       exercises[entry.exerciseIndex]->setPreviousPerformance(
                           completedSetsSummary(entry.exercise), entry.performedAt);
                   }
-              });
+              })
+        .warnOnError("load previous performances");
 }
 
 void ActiveWorkoutViewModel::startWorkout(WorkoutModel* workout)
@@ -198,7 +199,8 @@ void ActiveWorkoutViewModel::startWorkout(WorkoutModel* workout)
     if (previousWorkout)
     {
         if (m_service && previousWorkout->id() != -1)
-            m_service->deleteWorkout(previousWorkout->id());
+            m_service->deleteWorkout(previousWorkout->id())
+                .warnOnError("delete the replaced workout");
         previousWorkout->deleteLater();
     }
 
@@ -581,5 +583,5 @@ void ActiveWorkoutViewModel::saveToDb()
     if (!m_service || !m_currentWorkout)
         return;
 
-    m_service->saveWorkout(m_currentWorkout->toEntity());
+    m_service->saveWorkout(m_currentWorkout->toEntity()).warnOnError("save the active workout");
 }

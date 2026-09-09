@@ -75,7 +75,6 @@ void WorkoutEditorViewModel::edit(int workoutId)
         return;
 
     m_service->findWorkout(workoutId)
-        .onError(this, [this](const QString& error) { emit errorOccurred(error); })
         .then(this,
               [this, workoutId](std::optional<Workout> found)
               {
@@ -87,7 +86,8 @@ void WorkoutEditorViewModel::edit(int workoutId)
                   }
 
                   adopt(found.value(), false);
-              });
+              })
+        .onError(this, [this](const QString& error) { emit errorOccurred(error); });
 }
 
 void WorkoutEditorViewModel::startFromTemplate(int templateId, const QDateTime& plannedTime)
@@ -96,8 +96,8 @@ void WorkoutEditorViewModel::startFromTemplate(int templateId, const QDateTime& 
         return;
 
     m_templateService->instantiate(templateId, plannedTime)
-        .onError(this, [this](const QString& error) { emit errorOccurred(error); })
-        .then(this, [this](Workout created) { adopt(created, true); });
+        .then(this, [this](Workout created) { adopt(created, true); })
+        .onError(this, [this](const QString& error) { emit errorOccurred(error); });
 }
 
 void WorkoutEditorViewModel::discard()
@@ -320,7 +320,6 @@ void WorkoutEditorViewModel::save()
     }
 
     m_service->saveWorkout(m_workout)
-        .onError(this, [this](const QString& error) { emit errorOccurred(error); })
         .then(this,
               [this](int savedId)
               {
@@ -328,7 +327,8 @@ void WorkoutEditorViewModel::save()
                   setDirty(false);
                   publish();
                   emit saved(savedId);
-              });
+              })
+        .onError(this, [this](const QString& error) { emit errorOccurred(error); });
 }
 
 void WorkoutEditorViewModel::saveAsTemplate(const QString& name)
@@ -337,8 +337,8 @@ void WorkoutEditorViewModel::saveAsTemplate(const QString& name)
         return;
 
     m_templateService->saveFromWorkout(m_workout, name)
-        .onError(this, [this](const QString& error) { emit errorOccurred(error); })
-        .then(this, [this](int templateId) { emit savedAsTemplate(templateId); });
+        .then(this, [this](int templateId) { emit savedAsTemplate(templateId); })
+        .onError(this, [this](const QString& error) { emit errorOccurred(error); });
 }
 
 Exercise* WorkoutEditorViewModel::exerciseAt(int exerciseIndex)

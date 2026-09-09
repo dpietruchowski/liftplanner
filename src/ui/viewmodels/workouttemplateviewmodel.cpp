@@ -43,12 +43,6 @@ void WorkoutTemplateViewModel::load()
     setLoading(true);
 
     m_service->searchSummaries(m_searchText)
-        .onError(this,
-                 [this](const QString& error)
-                 {
-                     setLoading(false);
-                     emit errorOccurred(error);
-                 })
         .then(this,
               [this](std::vector<WorkoutTemplateSummary> summaries)
               {
@@ -59,7 +53,13 @@ void WorkoutTemplateViewModel::load()
 
                   setLoading(false);
                   emit templatesChanged();
-              });
+              })
+        .onError(this,
+                 [this](const QString& error)
+                 {
+                     setLoading(false);
+                     emit errorOccurred(error);
+                 });
 }
 
 void WorkoutTemplateViewModel::duplicate(int templateId)
@@ -68,13 +68,13 @@ void WorkoutTemplateViewModel::duplicate(int templateId)
         return;
 
     m_service->duplicate(templateId, QString())
-        .onError(this, [this](const QString& error) { emit errorOccurred(error); })
         .then(this,
               [this](int newId)
               {
                   emit duplicated(newId);
                   load();
-              });
+              })
+        .onError(this, [this](const QString& error) { emit errorOccurred(error); });
 }
 
 void WorkoutTemplateViewModel::remove(int templateId)
@@ -83,13 +83,13 @@ void WorkoutTemplateViewModel::remove(int templateId)
         return;
 
     m_service->remove(templateId)
-        .onError(this, [this](const QString& error) { emit errorOccurred(error); })
         .then(this,
               [this, templateId](bool)
               {
                   emit removed(templateId);
                   load();
-              });
+              })
+        .onError(this, [this](const QString& error) { emit errorOccurred(error); });
 }
 
 WorkoutTemplateModel* WorkoutTemplateViewModel::findById(int templateId) const

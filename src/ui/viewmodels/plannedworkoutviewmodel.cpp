@@ -40,16 +40,18 @@ void PlannedWorkoutViewModel::loadAll()
     if (!m_service)
         return;
 
-    m_service->loadPlannedWorkouts().then(this,
-                                          [this](std::vector<Workout> entities)
-                                          {
-                                              qDeleteAll(m_workouts);
-                                              m_workouts.clear();
-                                              for (const auto& entity : entities)
-                                                  m_workouts.append(new WorkoutModel(entity, this));
+    m_service->loadPlannedWorkouts()
+        .then(this,
+              [this](std::vector<Workout> entities)
+              {
+                  qDeleteAll(m_workouts);
+                  m_workouts.clear();
+                  for (const auto& entity : entities)
+                      m_workouts.append(new WorkoutModel(entity, this));
 
-                                              emit workoutsChanged();
-                                          });
+                  emit workoutsChanged();
+              })
+        .warnOnError("load planned workouts");
 }
 
 void PlannedWorkoutViewModel::importFromJson(const QString& jsonData)
@@ -71,7 +73,8 @@ void PlannedWorkoutViewModel::importFromJson(const QString& jsonData)
         {
             QVariantMap vm = profileValue.toObject().toVariantMap();
             vm[UserProfileSerializer::user_id_key] = 1;
-            m_profileService->save(UserProfileSerializer::fromVariant(vm));
+            m_profileService->save(UserProfileSerializer::fromVariant(vm))
+                .warnOnError("save the imported user profile");
         }
 
         QJsonArray workoutsArray = root.value("workouts").toArray();
@@ -85,7 +88,7 @@ void PlannedWorkoutViewModel::importFromJson(const QString& jsonData)
                 workouts[i].setPlannedTime(baseTime.addDays(static_cast<qint64>(i + 1)));
         }
 
-        m_service->importPlannedWorkouts(workouts);
+        m_service->importPlannedWorkouts(workouts).warnOnError("import planned workouts");
         loadAll();
 
         if (!setErrors.isEmpty())
@@ -130,31 +133,32 @@ void PlannedWorkoutViewModel::generatePrompt()
 
     auto finish = [this](QString prompt, QString profileJson)
     {
-        m_service->loadHistory().then(
-            this,
-            [this, prompt, profileJson](std::vector<Workout> history) mutable
-            {
-                QJsonArray historyArray;
-                int count = std::min(9, static_cast<int>(history.size()));
-                for (int i = 0; i < count; ++i)
-                    historyArray.append(WorkoutJson::workoutToJsonCompact(history[i]));
+        m_service->loadHistory()
+            .then(this,
+                  [this, prompt, profileJson](std::vector<Workout> history) mutable
+                  {
+                      QJsonArray historyArray;
+                      int count = std::min(9, static_cast<int>(history.size()));
+                      for (int i = 0; i < count; ++i)
+                          historyArray.append(WorkoutJson::workoutToJsonCompact(history[i]));
 
-                QJsonArray plannedArray;
-                for (auto* w : m_workouts)
-                    plannedArray.append(WorkoutJson::workoutToJsonCompact(w->toEntity()));
+                      QJsonArray plannedArray;
+                      for (auto* w : m_workouts)
+                          plannedArray.append(WorkoutJson::workoutToJsonCompact(w->toEntity()));
 
-                prompt.replace("{{CURRENT_DATE}}",
-                               TimeProvider::instance().currentDate().toString("yyyy-MM-dd"));
-                prompt.replace("{{USER_PROFILE}}", profileJson);
-                prompt.replace("{{HISTORY_JSON}}",
-                               QJsonDocument(historyArray).toJson(QJsonDocument::Indented));
-                prompt.replace("{{PLANNED_JSON}}",
-                               QJsonDocument(plannedArray).toJson(QJsonDocument::Indented));
+                      prompt.replace("{{CURRENT_DATE}}",
+                                     TimeProvider::instance().currentDate().toString("yyyy-MM-dd"));
+                      prompt.replace("{{USER_PROFILE}}", profileJson);
+                      prompt.replace("{{HISTORY_JSON}}",
+                                     QJsonDocument(historyArray).toJson(QJsonDocument::Indented));
+                      prompt.replace("{{PLANNED_JSON}}",
+                                     QJsonDocument(plannedArray).toJson(QJsonDocument::Indented));
 
-                QClipboard* clipboard = QGuiApplication::clipboard();
-                clipboard->setText(prompt);
-                emit promptGenerated();
-            });
+                      QClipboard* clipboard = QGuiApplication::clipboard();
+                      clipboard->setText(prompt);
+                      emit promptGenerated();
+                  })
+            .warnOnError("read the workout history for the prompt");
     };
 
     if (!m_profileService)
@@ -163,21 +167,21 @@ void PlannedWorkoutViewModel::generatePrompt()
         return;
     }
 
-    m_profileService->load().then(this,
-                                  [prompt, finish](std::optional<UserProfile> profileOpt) mutable
-                                  {
-                                      QString profileJson = "null";
-                                      if (profileOpt.has_value())
-                                      {
-                                          QVariantMap vm
-                                              = UserProfileSerializer::toVariant(*profileOpt);
-                                          vm.remove(UserProfileSerializer::user_id_key);
-                                          profileJson
-                                              = QJsonDocument(QJsonObject::fromVariantMap(vm))
-                                                    .toJson(QJsonDocument::Indented);
-                                      }
-                                      finish(prompt, profileJson);
-                                  });
+    m_profileService->load()
+        .then(this,
+              [prompt, finish](std::optional<UserProfile> profileOpt) mutable
+              {
+                  QString profileJson = "null";
+                  if (profileOpt.has_value())
+                  {
+                      QVariantMap vm = UserProfileSerializer::toVariant(*profileOpt);
+                      vm.remove(UserProfileSerializer::user_id_key);
+                      profileJson = QJsonDocument(QJsonObject::fromVariantMap(vm))
+                                        .toJson(QJsonDocument::Indented);
+                  }
+                  finish(prompt, profileJson);
+              })
+        .warnOnError("read the user profile for the prompt");
 }
 
 QString PlannedWorkoutViewModel::summarizeErrors(const QStringList& errors)
