@@ -62,7 +62,9 @@ private:
     void updateCurrentSet();
     void selectFirstIncomplete();
     void selectNextIncomplete();
+    void cacheCurrentWorkout();
     void saveToDb();
+    void saveSetToDb(SetModel* set);
 
     WorkoutService* m_service;
     WorkoutTimer* m_timer;

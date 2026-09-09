@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "application/workout/workoutservice.h"
 #include "fixtures/test_data.h"
 #include "testapplication.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
@@ -34,8 +35,36 @@ protected:
     SetModel* plankSet() { return setOf(2, 0); }
     SetModel* runSet() { return setOf(4, 0); }
 
+    Workout storedWorkout()
+    {
+        std::optional<Workout> stored;
+        app.workoutService()
+            .findWorkout(app.activeWorkoutViewModel().currentWorkout()->id())
+            .then(&app.activeWorkoutViewModel(),
+                  [&stored](std::optional<Workout> found) { stored = found; })
+            .warnOnError("read the stored workout");
+        app.drain();
+        return stored.value();
+    }
+
     TestApplication app;
 };
+
+TEST_F(SetEditingTest, Adjustment_ReachesTheDatabase)
+{
+    auto& vm = app.activeWorkoutViewModel();
+
+    vm.adjustSetPrimary(benchSet(), 1);
+    vm.adjustSetSecondary(benchSet(), 2);
+    vm.adjustSetPrimary(plankSet(), 3);
+    app.drain();
+
+    const Workout stored = storedWorkout();
+
+    EXPECT_EQ(stored.exercises()[0].sets()[0].repetitions(), benchSet()->repetitions());
+    EXPECT_DOUBLE_EQ(stored.exercises()[0].sets()[0].weight(), benchSet()->weight());
+    EXPECT_EQ(stored.exercises()[2].sets()[0].durationSeconds(), plankSet()->durationSeconds());
+}
 
 TEST_F(SetEditingTest, WeightedSet_PrimaryStepsReps_SecondaryStepsWeight)
 {

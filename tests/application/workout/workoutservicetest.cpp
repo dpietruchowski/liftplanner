@@ -14,6 +14,7 @@ public:
     MOCK_METHOD(std::vector<Workout>, findAll, (const WorkoutQuery& query), (const, override));
     MOCK_METHOD(std::optional<Workout>, findOne, (const WorkoutQuery& query), (const, override));
     MOCK_METHOD(int, save, (const Workout& workout), (override));
+    MOCK_METHOD(bool, saveSet, (const Set& set), (override));
     MOCK_METHOD(bool, remove, (const WorkoutQuery& query), (override));
     MOCK_METHOD(int, count, (const WorkoutQuery& query), (const, override));
     MOCK_METHOD(bool, exists, (const WorkoutQuery& query), (const, override));

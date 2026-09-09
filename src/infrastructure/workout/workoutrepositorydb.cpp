@@ -145,6 +145,14 @@ int WorkoutRepositoryDb::save(const Workout& workout)
     return workoutId;
 }
 
+bool WorkoutRepositoryDb::saveSet(const Set& set)
+{
+    if (set.id() == -1 || set.exerciseId() == -1)
+        return false;
+
+    return m_setRepo.save(set) == set.id();
+}
+
 bool WorkoutRepositoryDb::remove(const WorkoutQuery& query)
 {
     auto where = buildWhereClause(query);

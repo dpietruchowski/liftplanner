@@ -100,7 +100,7 @@ ActiveWorkoutViewModel::~ActiveWorkoutViewModel() { saveCurrentWorkout(); }
 
 WorkoutTimer* ActiveWorkoutViewModel::timer() const { return m_timer; }
 
-void ActiveWorkoutViewModel::saveCurrentWorkout()
+void ActiveWorkoutViewModel::cacheCurrentWorkout()
 {
     const QString filePath = cacheFilePath();
 
@@ -116,7 +116,11 @@ void ActiveWorkoutViewModel::saveCurrentWorkout()
     if (file.open(QIODevice::WriteOnly))
         file.write(
             QJsonDocument(WorkoutJson::workoutToJson(m_currentWorkout->toEntity())).toJson());
+}
 
+void ActiveWorkoutViewModel::saveCurrentWorkout()
+{
+    cacheCurrentWorkout();
     saveToDb();
 }
 
@@ -376,7 +380,7 @@ void ActiveWorkoutViewModel::adjustSetPrimary(SetModel* set, int steps)
             break;
     }
 
-    saveCurrentWorkout();
+    saveSetToDb(set);
 }
 
 void ActiveWorkoutViewModel::adjustSetSecondary(SetModel* set, int steps)
@@ -391,7 +395,7 @@ void ActiveWorkoutViewModel::adjustSetSecondary(SetModel* set, int steps)
     else
         set->setWeight(std::max(0.0, entity.weight() + steps * SetAdjustment::weightKilograms));
 
-    saveCurrentWorkout();
+    saveSetToDb(set);
 }
 
 void ActiveWorkoutViewModel::moveExercise(int from, int to)
@@ -584,4 +588,17 @@ void ActiveWorkoutViewModel::saveToDb()
         return;
 
     m_service->saveWorkout(m_currentWorkout->toEntity()).warnOnError("save the active workout");
+}
+
+void ActiveWorkoutViewModel::saveSetToDb(SetModel* set)
+{
+    cacheCurrentWorkout();
+
+    if (!m_service || !set || set->entity().id() == -1)
+    {
+        saveToDb();
+        return;
+    }
+
+    m_service->saveSet(set->entity()).warnOnError("save the set");
 }

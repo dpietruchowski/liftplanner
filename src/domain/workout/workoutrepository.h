@@ -3,6 +3,7 @@
 #include <optional>
 #include <vector>
 
+class Set;
 class Workout;
 class WorkoutQuery;
 
@@ -14,6 +15,7 @@ public:
     virtual std::vector<Workout> findAll(const WorkoutQuery& query) const = 0;
     virtual std::optional<Workout> findOne(const WorkoutQuery& query) const = 0;
     virtual int save(const Workout& workout) = 0;
+    virtual bool saveSet(const Set& set) = 0;
     virtual bool remove(const WorkoutQuery& query) = 0;
     virtual int count(const WorkoutQuery& query) const = 0;
     virtual bool exists(const WorkoutQuery& query) const = 0;

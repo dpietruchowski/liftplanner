@@ -25,6 +25,7 @@ public:
     std::vector<Workout> findAll(const WorkoutQuery& query) const override;
     std::optional<Workout> findOne(const WorkoutQuery& query) const override;
     int save(const Workout& workout) override;
+    bool saveSet(const Set& set) override;
     bool remove(const WorkoutQuery& query) override;
     int count(const WorkoutQuery& query) const override;
     bool exists(const WorkoutQuery& query) const override;

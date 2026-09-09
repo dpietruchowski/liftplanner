@@ -90,6 +90,11 @@ Task<int> WorkoutService::saveWorkout(const Workout& workout)
     return invoke([this, workout] { return saveWorkoutCore(workout); });
 }
 
+Task<bool> WorkoutService::saveSet(const Set& set)
+{
+    return invoke([this, set] { return saveSetCore(set); });
+}
+
 Task<bool> WorkoutService::deleteWorkout(int id)
 {
     return invoke([this, id] { return deleteWorkoutCore(id); });
@@ -265,6 +270,11 @@ Result<std::optional<Workout>> WorkoutService::findWorkoutCore(int id)
 Result<int> WorkoutService::saveWorkoutCore(const Workout& workout)
 {
     return Result<int>::success(m_repository.save(workout));
+}
+
+Result<bool> WorkoutService::saveSetCore(const Set& set)
+{
+    return Result<bool>::success(m_repository.saveSet(set));
 }
 
 Result<bool> WorkoutService::deleteWorkoutCore(int id)
