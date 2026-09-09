@@ -575,3 +575,52 @@ TEST_F(WorkoutRepositoryDbTest, Save_WeightedSets_StillRoundtripUnchanged)
     EXPECT_EQ(found->exercises()[0].restSecondsForSet(0), 120);
     EXPECT_DOUBLE_EQ(found->totalWeight(), w.totalWeight());
 }
+
+TEST_F(WorkoutRepositoryDbTest, Save_ResavingAWorkout_KeepsTheChildIds)
+{
+    const int id = m_repo->save(makeFullWorkout("Push Day"));
+
+    Workout stored = m_repo->findOne(WorkoutQuery().whereId(id)).value();
+    const int exerciseId = stored.exercises()[0].id();
+    const int setId = stored.exercises()[0].sets()[0].id();
+
+    stored.exercises()[0].sets()[0].setCompleted(true);
+    m_repo->save(stored);
+
+    const Workout resaved = m_repo->findOne(WorkoutQuery().whereId(id)).value();
+
+    EXPECT_EQ(resaved.exercises()[0].id(), exerciseId);
+    EXPECT_EQ(resaved.exercises()[0].sets()[0].id(), setId);
+    EXPECT_TRUE(resaved.exercises()[0].sets()[0].completed());
+}
+
+TEST_F(WorkoutRepositoryDbTest, Save_DroppingAnExercise_RemovesItAndItsSets)
+{
+    const int id = m_repo->save(makeFullWorkout("Push Day"));
+
+    Workout stored = m_repo->findOne(WorkoutQuery().whereId(id)).value();
+    const int keptId = stored.exercises()[0].id();
+    stored.exercises().pop_back();
+    m_repo->save(stored);
+
+    const Workout resaved = m_repo->findOne(WorkoutQuery().whereId(id)).value();
+
+    ASSERT_EQ(resaved.exercises().size(), 1u);
+    EXPECT_EQ(resaved.exercises()[0].id(), keptId);
+    EXPECT_EQ(resaved.exercises()[0].sets().size(), 2u);
+}
+
+TEST_F(WorkoutRepositoryDbTest, Save_DroppingASet_RemovesOnlyThatSet)
+{
+    const int id = m_repo->save(makeFullWorkout("Push Day"));
+
+    Workout stored = m_repo->findOne(WorkoutQuery().whereId(id)).value();
+    const int keptSetId = stored.exercises()[0].sets()[0].id();
+    stored.exercises()[0].sets().pop_back();
+    m_repo->save(stored);
+
+    const Workout resaved = m_repo->findOne(WorkoutQuery().whereId(id)).value();
+
+    ASSERT_EQ(resaved.exercises()[0].sets().size(), 1u);
+    EXPECT_EQ(resaved.exercises()[0].sets()[0].id(), keptSetId);
+}

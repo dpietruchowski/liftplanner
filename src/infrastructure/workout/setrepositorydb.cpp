@@ -160,3 +160,12 @@ int SetRepositoryDb::save(const Set& set)
 
     return m_repository->insert(data).toInt();
 }
+
+void SetRepositoryDb::removeByExerciseIdExcept(int exerciseId, const QList<int>& keptIds)
+{
+    auto where = Where(SetSerializer::exercise_id_key).equals(exerciseId);
+    if (!keptIds.isEmpty())
+        where.and_(Where().not_(Where(SetSerializer::id_key).in(keptIds)));
+
+    m_repository->remove(where);
+}

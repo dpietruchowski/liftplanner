@@ -22,7 +22,7 @@ public:
     std::vector<Exercise> findByWorkoutId(int workoutId) const;
     std::vector<Exercise> findByWorkoutIds(const QList<int>& workoutIds) const;
     int save(const Exercise& exercise);
-    void removeByWorkoutId(int workoutId);
+    void removeByWorkoutIdExcept(int workoutId, const QList<int>& keptIds);
 
 private:
     static QStringList staticHoldNames();

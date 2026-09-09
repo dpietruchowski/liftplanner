@@ -163,8 +163,11 @@ int ExerciseRepositoryDb::save(const Exercise& exercise)
     return m_repository->insert(data).toInt();
 }
 
-void ExerciseRepositoryDb::removeByWorkoutId(int workoutId)
+void ExerciseRepositoryDb::removeByWorkoutIdExcept(int workoutId, const QList<int>& keptIds)
 {
     auto where = Where(ExerciseSerializer::workout_id_key).equals(workoutId);
+    if (!keptIds.isEmpty())
+        where.and_(Where().not_(Where(ExerciseSerializer::id_key).in(keptIds)));
+
     m_repository->remove(where);
 }

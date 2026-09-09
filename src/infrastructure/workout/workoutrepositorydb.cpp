@@ -224,22 +224,42 @@ void WorkoutRepositoryDb::loadChildren(std::vector<Workout>& workouts) const
 
 void WorkoutRepositoryDb::saveChildren(int workoutId, const Workout& workout)
 {
-    m_exerciseRepo.removeByWorkoutId(workoutId);
+    QList<int> storedExerciseIds;
+    for (const Exercise& stored : m_exerciseRepo.findByWorkoutId(workoutId))
+        storedExerciseIds.append(stored.id());
 
+    QHash<int, QList<int>> storedSetIds;
+    for (const Set& stored : m_setRepo.findByExerciseIds(storedExerciseIds))
+        storedSetIds[stored.exerciseId()].append(stored.id());
+
+    QList<int> keptExerciseIds;
     for (const auto& exercise : workout.exercises())
     {
         Exercise e = exercise;
         e.setWorkoutId(workoutId);
+        if (!storedExerciseIds.contains(e.id()))
+            e.setId(-1);
 
-        int exerciseId = m_exerciseRepo.save(e);
+        const int exerciseId = m_exerciseRepo.save(e);
+        keptExerciseIds.append(exerciseId);
 
+        const QList<int>& knownSetIds = storedSetIds[exerciseId];
+
+        QList<int> keptSetIds;
         for (const auto& set : exercise.sets())
         {
             Set s = set;
             s.setExerciseId(exerciseId);
-            m_setRepo.save(s);
+            if (!knownSetIds.contains(s.id()))
+                s.setId(-1);
+
+            keptSetIds.append(m_setRepo.save(s));
         }
+
+        m_setRepo.removeByExerciseIdExcept(exerciseId, keptSetIds);
     }
+
+    m_exerciseRepo.removeByWorkoutIdExcept(workoutId, keptExerciseIds);
 }
 
 Where WorkoutRepositoryDb::buildWhereClause(const WorkoutQuery& query) const
