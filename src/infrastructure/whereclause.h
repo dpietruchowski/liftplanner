@@ -8,3 +8,8 @@ inline void addClause(Where& where, const Where& clause)
 {
     where = where.isEmpty() ? grouped(clause) : where.and_(clause);
 }
+
+inline Where isNullClause(const QString& column, bool shouldBeNull)
+{
+    return shouldBeNull ? Where(column).isNull() : Where(column).isNotNull();
+}

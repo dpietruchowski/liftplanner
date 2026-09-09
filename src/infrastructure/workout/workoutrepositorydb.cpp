@@ -4,6 +4,7 @@
 #include "domain/workout/workout.h"
 #include "domain/workout/workoutquery.h"
 #include "domain/workout/workoutstatus.h"
+#include "infrastructure/whereclause.h"
 #include "infrastructure/workout/workoutserializer.h"
 
 #include <dbtoolkit/dbrepository.h>
@@ -246,55 +247,44 @@ Where WorkoutRepositoryDb::buildWhereClause(const WorkoutQuery& query) const
     Where where;
 
     if (query.id().has_value())
-        where = Where(WorkoutSerializer::id_key).equals(query.id().value());
+        addClause(where, Where(WorkoutSerializer::id_key).equals(query.id().value()));
 
     if (query.name().has_value())
-    {
-        auto nameWhere = Where(WorkoutSerializer::name_key).equals(query.name().value());
-        where = where.isEmpty() ? nameWhere : where.and_(nameWhere);
-    }
+        addClause(where, Where(WorkoutSerializer::name_key).equals(query.name().value()));
 
     if (query.createdAfter().has_value())
     {
-        auto afterWhere
-            = Where(WorkoutSerializer::created_time_key)
-                  .greaterThanOrEquals(query.createdAfter().value().toString(Qt::ISODate));
-        where = where.isEmpty() ? afterWhere : where.and_(afterWhere);
+        addClause(where,
+                  Where(WorkoutSerializer::created_time_key)
+                      .greaterThanOrEquals(query.createdAfter().value().toString(Qt::ISODate)));
     }
 
     if (query.createdBefore().has_value())
     {
-        auto beforeWhere
-            = Where(WorkoutSerializer::created_time_key)
-                  .lessThanOrEquals(query.createdBefore().value().toString(Qt::ISODate));
-        where = where.isEmpty() ? beforeWhere : where.and_(beforeWhere);
+        addClause(where,
+                  Where(WorkoutSerializer::created_time_key)
+                      .lessThanOrEquals(query.createdBefore().value().toString(Qt::ISODate)));
     }
 
     if (query.startedTimeIsNull().has_value())
     {
-        Where stWhere;
-        if (query.startedTimeIsNull().value())
-            stWhere = Where(WorkoutSerializer::started_time_key).isNull();
-        else
-            stWhere = Where(WorkoutSerializer::started_time_key).isNotNull();
-        where = where.isEmpty() ? stWhere : where.and_(stWhere);
+        addClause(
+            where,
+            isNullClause(WorkoutSerializer::started_time_key, query.startedTimeIsNull().value()));
     }
 
     if (query.plannedTimeIsNull().has_value())
     {
-        Where ptWhere;
-        if (query.plannedTimeIsNull().value())
-            ptWhere = Where(WorkoutSerializer::planned_time_key).isNull();
-        else
-            ptWhere = Where(WorkoutSerializer::planned_time_key).isNotNull();
-        where = where.isEmpty() ? ptWhere : where.and_(ptWhere);
+        addClause(
+            where,
+            isNullClause(WorkoutSerializer::planned_time_key, query.plannedTimeIsNull().value()));
     }
 
     if (query.status().has_value())
     {
-        auto statusWhere = Where(WorkoutSerializer::status_key)
-                               .equals(workoutStatusToString(query.status().value()));
-        where = where.isEmpty() ? statusWhere : where.and_(statusWhere);
+        addClause(where,
+                  Where(WorkoutSerializer::status_key)
+                      .equals(workoutStatusToString(query.status().value())));
     }
 
     return where;
