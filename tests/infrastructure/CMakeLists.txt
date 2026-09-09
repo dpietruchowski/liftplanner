@@ -1,9 +1,6 @@
-app_add_test(exercisecatalog_tests
+app_add_test(infrastructure_tests
     DEPS
-        domain
         infrastructure
-        application
-        app_utils
         app_dbtoolkit
         Qt6::Sql
     DEFINITIONS

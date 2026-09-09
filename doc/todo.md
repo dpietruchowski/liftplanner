@@ -14,12 +14,12 @@ Weryfikacja: `bash tmp/verify.sh [configure|format|format_check|headers|build|te
 
 ## Faza 1 — układ katalogów
 
-- [ ] Rozbić `src/modules/` na warstwy: `src/domain`, `src/infrastructure`,
+- [x] Rozbić `src/modules/` na warstwy: `src/domain`, `src/infrastructure`,
       `src/application`, `src/ui`. Podział po temacie **wewnątrz** warstwy.
-- [ ] Zlikwidować `src/core/` — rozlać do warstw.
-- [ ] Composition root obok `main.cpp`.
-- [ ] Drzewo testów odbite na warstwach.
-- [ ] Opisać layout w CLAUDE.md.
+- [x] Zlikwidować `src/core/` — rozlać do warstw.
+- [x] Composition root obok `main.cpp` (`liftplannerapplication.*` już tam był).
+- [x] Drzewo testów odbite na warstwach.
+- [x] Opisać layout w CLAUDE.md.
 
 ## Faza 2 — repozytoria: read port i projekcje
 

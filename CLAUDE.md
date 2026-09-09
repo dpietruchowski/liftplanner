@@ -19,7 +19,8 @@ src/ui/models/           QML-facing models
 src/ui/viewmodels/       view models
 src/ui/presentation/     formatting and QML helpers                          (ui)
 src/ui/qml/              QML module, URI LiftPlanner — Main.qml, Theme.qml, screens
-tests/                   GoogleTest suite
+tests/                   GoogleTest suite, mirroring the layers: domain, infrastructure,
+                         application, ui, integration — one target each
 libs/cpp                 async, utils, platform, qmlutils, dbtoolkit, eventbus, agent, automation
 libs/qml                 theme (Themed.Theme), themed (Themed.Components), app (App.Components), icons
 ```

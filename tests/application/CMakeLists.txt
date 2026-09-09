@@ -1,7 +1,5 @@
-app_add_test(userprofile_tests
+app_add_test(application_tests
     DEPS
-        domain
-        infrastructure
         application
         app_dbtoolkit
         Qt6::Sql
