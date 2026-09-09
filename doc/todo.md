@@ -60,6 +60,9 @@ Wykonane w partiach Fazy 4 — szczegóły w
       view modele → composition root. Po każdej partii testy i commit.
       Dziewięć partii, A7 i A18 świadomie zostawione z uzasadnieniem w sekcji
       „Rules adopted while repairing".
+- [x] Partia 10 — A20: encja w modelu to rekord skalarów, dzieci tylko w modelach
+      dzieci. Zostaje większy rozdział ról modelu (projekcja do list i edytora vs
+      mutowalny model aktywnego treningu) i mutowalne `exercises()`/`sets()`.
 
 ## Faza 5 — weryfikacja
 

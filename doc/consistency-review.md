@@ -191,6 +191,7 @@ domain upwards, tests and a commit after each:
 | 7 | one shape for the list view models | A22, A23, A24 | yes |
 | 8 | composition root split by group | A27, A28 | yes, plus A29 |
 | 9 | remaining small ones | A17, A7 | A17; A7 left |
+| 10 | one authoritative half in the models | A20 | yes |
 
 ## Rules adopted while repairing
 
@@ -276,6 +277,23 @@ place, moved and renumbered. A definition's muscles are a value list that
 position; giving `MuscleInvolvement` a `position` field would add a second source
 of truth for the same fact and break equality, which compares what a muscle
 involvement is, not where it sits.
+
+**A model keeps a record, never a second copy of its children (batch 10, A20).**
+`WorkoutModel` and `ExerciseModel` still hold an entity, but only for its
+scalars: `recordOf()` strips the collection as the entity enters the
+constructor, so `m_record` carries no children and the child models are the only
+answer. `toEntity()` is then the same two lines in both — copy the record, add
+what the child models say — instead of `WorkoutModel` listing seven setters by
+hand, which silently loses any field added to `Workout` later. `previousSummary`
+and `previousDate` stay outside the record, because they are what the screen
+knows about an exercise and not what the database stores.
+
+The mutable `Workout::exercises()` and `Exercise::sets()` remain, because
+`WorkoutEditorViewModel` and `ActiveWorkoutViewModel` edit an entity in place
+outside the models. Closing that needs the bigger split — a read-only projection
+for the lists and the editor, a mutable model for the active workout — which
+would also remove the editor's double state (`Workout` plus a `WorkoutModel*`
+rebuilt on every change).
 
 **A18 left as it is.** `WorkoutModel` has `addExercise` and `moveExercise`,
 `ExerciseModel` has `addSet` and `removeSet`. Those are exactly the operations

@@ -1,5 +1,15 @@
 #include "exercisemodel.h"
 
+namespace
+{
+Exercise recordOf(const Exercise& exercise)
+{
+    Exercise record = exercise;
+    record.sets().clear();
+    return record;
+}
+}
+
 ExerciseModel::ExerciseModel(QObject* parent)
     : QObject(parent)
 {
@@ -7,7 +17,7 @@ ExerciseModel::ExerciseModel(QObject* parent)
 
 ExerciseModel::ExerciseModel(const Exercise& exercise, QObject* parent)
     : QObject(parent)
-    , m_exercise(exercise)
+    , m_record(recordOf(exercise))
 {
     for (const auto& set : exercise.sets())
     {
@@ -17,10 +27,10 @@ ExerciseModel::ExerciseModel(const Exercise& exercise, QObject* parent)
     }
 }
 
-QString ExerciseModel::name() const { return m_exercise.name(); }
-QString ExerciseModel::description() const { return m_exercise.description(); }
-int ExerciseModel::restSeconds() const { return m_exercise.restSeconds(); }
-QString ExerciseModel::kindString() const { return exerciseKindToString(m_exercise.kind()); }
+QString ExerciseModel::name() const { return m_record.name(); }
+QString ExerciseModel::description() const { return m_record.description(); }
+int ExerciseModel::restSeconds() const { return m_record.restSeconds(); }
+QString ExerciseModel::kindString() const { return exerciseKindToString(m_record.kind()); }
 
 bool ExerciseModel::isCompleted() const { return toEntity().isCompleted(); }
 
@@ -71,9 +81,8 @@ void ExerciseModel::removeSet(SetModel* set)
 
 Exercise ExerciseModel::toEntity() const
 {
-    Exercise e = m_exercise;
-    e.sets().clear();
-    for (auto* s : m_sets)
-        e.addSet(s->entity());
-    return e;
+    Exercise exercise = m_record;
+    for (auto* set : m_sets)
+        exercise.addSet(set->entity());
+    return exercise;
 }

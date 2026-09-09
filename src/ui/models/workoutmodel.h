@@ -57,6 +57,6 @@ signals:
     void completedChanged();
 
 private:
-    Workout m_workout;
+    Workout m_record;
     QList<ExerciseModel*> m_exercises;
 };

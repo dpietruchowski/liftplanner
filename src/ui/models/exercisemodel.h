@@ -49,7 +49,7 @@ signals:
     void previousPerformanceChanged();
 
 private:
-    Exercise m_exercise;
+    Exercise m_record;
     QList<SetModel*> m_sets;
     QString m_previousSummary;
     QDateTime m_previousDate;
