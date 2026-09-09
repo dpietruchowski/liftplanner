@@ -180,17 +180,17 @@ automation port `49200` are unnamed literals.
 `[A]`, `[B]` and `[!]` get fixed; `[C]` is recorded and left. In batches from the
 domain upwards, tests and a commit after each:
 
-| # | Batch | Findings |
-|---|---|---|
-| 1 | dead validation hooks in the domain | A2, A3 |
-| 2 | one named policy for ordered children | A1 |
-| 3 | one rule for an inherited rest | A4 |
-| 4 | migrations through the runner, no raw SQL | A10 |
-| 5 | one shape for repository reads and saves | A11, A12, A13 |
-| 6 | one child API across the models | A18, A19, A21 |
-| 7 | one shape for the list view models | A22, A23, A24 |
-| 8 | composition root split by group | A27, A28 |
-| 9 | remaining small ones | A17, A7 |
+| # | Batch | Findings | Done |
+|---|---|---|---|
+| 1 | dead validation hooks in the domain | A2, A3 | yes |
+| 2 | one named policy for ordered children | A1 | yes |
+| 3 | one rule for an inherited rest | A4 | yes |
+| 4 | migrations through the runner, no raw SQL | A10 | yes |
+| 5 | one shape for repository reads and saves | A11, A12, A13 | yes |
+| 6 | one child API across the models | A18, A19, A21 | A19, A21; A18 left |
+| 7 | one shape for the list view models | A22, A23, A24 | yes |
+| 8 | composition root split by group | A27, A28 | yes, plus A29 |
+| 9 | remaining small ones | A17, A7 | A17; A7 left |
 
 ## Rules adopted while repairing
 
@@ -264,6 +264,18 @@ returning whether the storage opened — and `createViewModels()` — everything
 built on the main thread. Draining the worker queue is `BackendWorker::drain()`
 in libs, so the app and `TestApplication` share it instead of each keeping the
 magic 64. The destructor names every member it releases, `m_appInfo` included.
+
+**A task's result is consumed, never dropped (batch 9, A17).** The integration
+test now reads what `archive` returned instead of discarding the `Task<bool>`
+and warning on every build.
+
+**A7 left as it is.** A workout's exercises and sets each own their `position`
+because each is a row with an identity that survives a save — they are updated in
+place, moved and renumbered. A definition's muscles are a value list that
+`saveMuscles` deletes and reinserts whole, so the index in the vector *is* the
+position; giving `MuscleInvolvement` a `position` field would add a second source
+of truth for the same fact and break equality, which compares what a muscle
+involvement is, not where it sits.
 
 **A18 left as it is.** `WorkoutModel` has `addExercise` and `moveExercise`,
 `ExerciseModel` has `addSet` and `removeSet`. Those are exactly the operations

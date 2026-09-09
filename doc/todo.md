@@ -35,24 +35,31 @@ Wynik i decyzje: [read-port-adoption.md](read-port-adoption.md).
 - [x] Zdjąć operacje listowe z repozytorium agregatowego szablonów.
 - [x] Pojedyncze pola jednym `UPDATE` (`saveSet`) + stabilne id dzieci.
 - [x] Kontrakt testowy portu na prawdziwej bazie.
-- [ ] Model uczy się id po zapisie, żeby zniknął fallback dla serii z id `-1`.
+- [x] Model uczy się id po zapisie (`WorkoutModel::setId`, partia 6 Fazy 4).
 
 ## Faza 3 — porządki wspólne
 
-- [ ] Wspólne helpery wierszy repozytoriów w jedno miejsce.
-- [ ] Konwersje do/z SQL do toolkitu.
+Wykonane w partiach Fazy 4 — szczegóły w
+[consistency-review.md](consistency-review.md).
+
+- [x] Wspólne helpery wierszy repozytoriów w jedno miejsce (`DbRows::toEntities`,
+      prywatne `findBy(Where)`).
+- [x] Nazwać powtarzane literały (`RestSeconds::inherited`, `Ordered`,
+      `FilterField`, `BackendWorker::drain` zamiast magicznego 64).
+- [x] Usunąć martwy kod i nieużywane konwersje (puste `validate()`; konwertery
+      enumów mają wywołania — A9).
+- [ ] Konwersje do/z SQL do toolkitu (`infrastructure/whereclause.h` — A14).
 - [ ] Tabele poboczne w jedną klasę.
-- [ ] Nazwać powtarzane literały.
-- [ ] Helpery walidacyjne zamiast łańcuchów `if (...) throw`.
-- [ ] Usunąć martwy kod i nieużywane konwersje.
 - [ ] Współdzielić listę tabel między testami schematu.
 
 ## Faza 4 — review spójności i naprawa partiami
 
-- [ ] Przeczytać całe `src` partiami, wnioski do `doc/consistency-review.md`,
+- [x] Przeczytać całe `src` partiami, wnioski do `doc/consistency-review.md`,
       każdy oznaczony `[A]` / `[B]` / `[C]` / `[!]`. Nie poprawiać w trakcie.
-- [ ] Poprawić `[A]`, `[B]`, `[!]` partiami: domena → repozytoria → serwisy →
+- [x] Poprawić `[A]`, `[B]`, `[!]` partiami: domena → repozytoria → serwisy →
       view modele → composition root. Po każdej partii testy i commit.
+      Dziewięć partii, A7 i A18 świadomie zostawione z uzasadnieniem w sekcji
+      „Rules adopted while repairing".
 
 ## Faza 5 — weryfikacja
 

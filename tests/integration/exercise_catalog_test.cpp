@@ -153,8 +153,13 @@ TEST_F(ExerciseCatalogTest, ArchivedExercisesAreHiddenFromTheCatalog)
     viewModel().clearFilters();
     m_app.drain();
 
-    m_app.exerciseCatalogService().archive(pushUpId);
+    bool archived = false;
+    m_app.exerciseCatalogService()
+        .archive(pushUpId)
+        .then(&viewModel(), [&archived](bool result) { archived = result; })
+        .warnOnError("archive the exercise");
     m_app.drain();
+    ASSERT_TRUE(archived);
 
     viewModel().load();
     m_app.drain();
