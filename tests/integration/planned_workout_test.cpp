@@ -159,18 +159,7 @@ TEST_F(PlannedWorkoutTest, PlannedWorkouts_NotInHistory)
     EXPECT_EQ(history.workouts().size(), 0);
 }
 
-TEST_F(PlannedWorkoutTest, LoadAll_ReportsLoadingWhileItRuns)
-{
-    auto& vm = app.plannedWorkoutViewModel();
-
-    vm.loadAll();
-    EXPECT_TRUE(vm.isLoading());
-
-    app.drain();
-    EXPECT_FALSE(vm.isLoading());
-}
-
-TEST_F(PlannedWorkoutTest, LoadAll_NotifiesTheLoadingChange)
+TEST_F(PlannedWorkoutTest, LoadAll_TurnsLoadingOnAndOff)
 {
     auto& vm = app.plannedWorkoutViewModel();
     QSignalSpy spy(&vm, &PlannedWorkoutViewModel::loadingChanged);
@@ -179,16 +168,18 @@ TEST_F(PlannedWorkoutTest, LoadAll_NotifiesTheLoadingChange)
     app.drain();
 
     EXPECT_EQ(spy.count(), 2);
+    EXPECT_FALSE(vm.isLoading());
 }
 
-TEST_F(PlannedWorkoutTest, HistoryLoad_ReportsLoadingWhileItRuns)
+TEST_F(PlannedWorkoutTest, HistoryLoad_TurnsLoadingOnAndOff)
 {
     auto& history = app.workoutHistoryViewModel();
     app.drain();
+    QSignalSpy spy(&history, &WorkoutHistoryViewModel::loadingChanged);
 
     history.loadAllWorkouts();
-    EXPECT_TRUE(history.isLoading());
-
     app.drain();
+
+    EXPECT_EQ(spy.count(), 2);
     EXPECT_FALSE(history.isLoading());
 }

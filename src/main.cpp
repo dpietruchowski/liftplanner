@@ -30,9 +30,9 @@ int main(int argc, char* argv[])
         []() { QCoreApplication::exit(-1); }, Qt::QueuedConnection);
 
 #ifdef QML_LIVE_ENABLED
-    const QString uiRootDir = QStringLiteral(APP_QML_SOURCE_DIR);
+    const QString uiRootDir = QStringLiteral(APP_QML_SOURCE_DIR "/");
 #else
-    const QString uiRootDir = QStringLiteral("qrc:/" APP_QML_URI);
+    const QString uiRootDir = QStringLiteral("qrc:/" APP_QML_URI "/");
 #endif
 
     QmlRegistrator registrator(engine, uiRootDir, APP_QML_URI);

@@ -63,7 +63,15 @@ Wykonane w partiach Fazy 4 — szczegóły w
 
 ## Faza 5 — weryfikacja
 
-- [ ] Regresja pod automatyzacją UI (`tmp/ui_session`), czytać log aplikacji.
+- [x] Regresja pod automatyzacją UI (`tmp/ui_session`), log aplikacji czysty.
+      Przeszło: start aplikacji, migracje 7 i 8 na kopii prawdziwej bazy, ekran
+      główny ze statystykami z płaskich wierszy, aktywny trening (ukończenie
+      serii — zapis wyłącznie `Upserted` i `Deleted 0 rows`), edytor (dodanie
+      ćwiczenia, dodanie/duplikacja/usunięcie serii, stepper, zapis), picker
+      z filtrem (90 → 5, trim), zapis szablonu i lista szablonów z podsumowaniem
+      z jednego SELECT-a, wyszukiwanie szablonów, zamknięcie bez asercji.
+      Przy okazji: `qrc:/LiftPlannerMain.qml` — brakujący ukośnik w korzeniu QML
+      nie pozwalał aplikacji wystartować.
 
 ## Pułapki
 
