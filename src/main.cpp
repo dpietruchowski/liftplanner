@@ -1,3 +1,4 @@
+#include "infrastructure/appstoragepaths.h"
 #include "liftplannerapplication.h"
 #include "qmlutils/qmlregistrator.h"
 #include <QGuiApplication>
@@ -19,7 +20,7 @@ int main(int argc, char* argv[])
     // Material, desktop to Basic) so the UI renders identically everywhere.
     QQuickStyle::setStyle("Basic");
 
-    LiftPlannerApplication liftApp("liftplanner.db");
+    LiftPlannerApplication liftApp(AppStoragePaths::database(QStringLiteral("liftplanner.db")));
     if (!liftApp.initialize())
         return -1;
 

@@ -1,27 +1,21 @@
 #include "activeworkoutviewmodel.h"
 #include "application/workout/workoutservice.h"
 #include "domain/workout/setadjustment.h"
+#include "infrastructure/appstoragepaths.h"
 #include "infrastructure/workout/workoutjson.h"
 #include "platform/haptics.h"
 #include <QDebug>
-#include <QDir>
 #include <QFile>
-#include <QFileInfo>
 #include <QHash>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QPointer>
-#include <QStandardPaths>
 #include <algorithm>
 
 namespace
 {
 
-QString cacheFilePath()
-{
-    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
-        + QStringLiteral("/current_workout.json");
-}
+QString cacheFilePath() { return AppStoragePaths::file(QStringLiteral("current_workout.json")); }
 
 std::optional<Workout> readCachedWorkout()
 {
@@ -113,8 +107,6 @@ void ActiveWorkoutViewModel::cacheCurrentWorkout()
         QFile::remove(filePath);
         return;
     }
-
-    QDir().mkpath(QFileInfo(filePath).absolutePath());
 
     QFile file(filePath);
     if (file.open(QIODevice::WriteOnly))
