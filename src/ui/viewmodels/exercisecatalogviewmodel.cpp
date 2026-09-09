@@ -1,7 +1,7 @@
 #include "exercisecatalogviewmodel.h"
 
-#include "modules/exercisecatalog/application/exercisecatalogservice.h"
-#include "modules/exercisecatalog/domain/repositories/exercisedefinitionquery.h"
+#include "application/exercisecatalog/exercisecatalogservice.h"
+#include "domain/exercisecatalog/exercisedefinitionquery.h"
 
 ExerciseCatalogViewModel::ExerciseCatalogViewModel(ExerciseCatalogService* service, QObject* parent)
     : QObject(parent)

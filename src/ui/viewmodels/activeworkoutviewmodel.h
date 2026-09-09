@@ -3,7 +3,7 @@
 #include "ui/models/exercisemodel.h"
 #include "ui/models/setmodel.h"
 #include "ui/models/workoutmodel.h"
-#include "utils/serializationutils.h"
+#include "ui/presentation/serializationutils.h"
 #include "workouttimer.h"
 #include <QObject>
 

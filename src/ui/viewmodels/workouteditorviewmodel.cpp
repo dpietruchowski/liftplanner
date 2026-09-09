@@ -1,10 +1,10 @@
 #include "workouteditorviewmodel.h"
 
+#include "application/workout/workoutservice.h"
+#include "application/workout/workouttemplateservice.h"
 #include "async/timeprovider.h"
-#include "modules/workout/application/workoutservice.h"
-#include "modules/workout/application/workouttemplateservice.h"
-#include "modules/workout/domain/entities/setadjustment.h"
-#include "modules/workout/domain/entities/setcompatibility.h"
+#include "domain/workout/setadjustment.h"
+#include "domain/workout/setcompatibility.h"
 #include <algorithm>
 
 WorkoutEditorViewModel::WorkoutEditorViewModel(WorkoutService* service,

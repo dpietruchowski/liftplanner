@@ -1,4 +1,4 @@
-#include "modules/exercisecatalog/domain/services/exercisematcher.h"
+#include "domain/exercisecatalog/exercisematcher.h"
 #include <gtest/gtest.h>
 
 namespace

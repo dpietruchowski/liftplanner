@@ -1,8 +1,8 @@
 app_add_test(exercisecatalog_tests
     DEPS
-        core
-        exercisecatalog_module
-        workout_module
+        domain
+        infrastructure
+        application
         app_utils
         app_dbtoolkit
         Qt6::Sql

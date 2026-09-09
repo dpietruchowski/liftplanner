@@ -1,6 +1,6 @@
-#include "modules/workout/domain/entities/exercise.h"
-#include "modules/workout/domain/entities/set.h"
-#include "modules/workout/domain/entities/workout.h"
+#include "domain/workout/exercise.h"
+#include "domain/workout/set.h"
+#include "domain/workout/workout.h"
 #include <gtest/gtest.h>
 
 namespace

@@ -1,6 +1,6 @@
 #include "workouttemplateviewmodel.h"
 
-#include "modules/workout/application/workouttemplateservice.h"
+#include "application/workout/workouttemplateservice.h"
 
 WorkoutTemplateViewModel::WorkoutTemplateViewModel(WorkoutTemplateService* service, QObject* parent)
     : QObject(parent)

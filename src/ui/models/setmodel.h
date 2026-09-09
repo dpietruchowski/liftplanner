@@ -1,6 +1,6 @@
 #pragma once
 
-#include "modules/workout/domain/entities/set.h"
+#include "domain/workout/set.h"
 #include <QObject>
 #include <QString>
 

@@ -1,6 +1,6 @@
-#include "utils/workoutjson.h"
-#include "modules/workout/domain/entities/exercise.h"
-#include "modules/workout/domain/entities/set.h"
+#include "infrastructure/workout/workoutjson.h"
+#include "domain/workout/exercise.h"
+#include "domain/workout/set.h"
 #include <QJsonDocument>
 #include <QStringList>
 #include <gtest/gtest.h>

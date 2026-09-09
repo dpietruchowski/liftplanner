@@ -1,5 +1,5 @@
-#include "modules/workout/infrastructure/serializers/exerciseserializer.h"
-#include "modules/workout/domain/entities/exercise.h"
+#include "infrastructure/workout/exerciseserializer.h"
+#include "domain/workout/exercise.h"
 #include <gtest/gtest.h>
 
 class ExerciseSerializerTest : public ::testing::Test

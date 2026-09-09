@@ -1,6 +1,6 @@
 #pragma once
 
-#include "modules/exercisecatalog/domain/entities/exercisedefinition.h"
+#include "domain/exercisecatalog/exercisedefinition.h"
 #include <QObject>
 #include <QString>
 #include <QStringList>

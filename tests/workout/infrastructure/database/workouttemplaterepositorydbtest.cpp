@@ -1,9 +1,9 @@
-#include "modules/workout/infrastructure/database/workouttemplaterepositorydb.h"
-#include "modules/workout/domain/entities/setprescription.h"
-#include "modules/workout/domain/entities/templateexercise.h"
-#include "modules/workout/domain/entities/workouttemplate.h"
-#include "modules/workout/domain/repositories/workouttemplatequery.h"
-#include "modules/workout/infrastructure/serializers/workouttemplateserializer.h"
+#include "infrastructure/workout/workouttemplaterepositorydb.h"
+#include "domain/workout/setprescription.h"
+#include "domain/workout/templateexercise.h"
+#include "domain/workout/workouttemplate.h"
+#include "domain/workout/workouttemplatequery.h"
+#include "infrastructure/workout/workouttemplateserializer.h"
 
 #include <QSqlDatabase>
 #include <QSqlQuery>

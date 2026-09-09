@@ -1,6 +1,6 @@
-#include "modules/workout/domain/entities/workouttemplate.h"
-#include "modules/workout/domain/entities/setprescription.h"
-#include "modules/workout/domain/entities/templateexercise.h"
+#include "domain/workout/workouttemplate.h"
+#include "domain/workout/setprescription.h"
+#include "domain/workout/templateexercise.h"
 #include <gtest/gtest.h>
 
 namespace

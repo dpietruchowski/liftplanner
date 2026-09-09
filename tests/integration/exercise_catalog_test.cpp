@@ -1,5 +1,5 @@
-#include "modules/exercisecatalog/application/exercisecatalogservice.h"
-#include "modules/exercisecatalog/domain/entities/exercisedefinition.h"
+#include "application/exercisecatalog/exercisecatalogservice.h"
+#include "domain/exercisecatalog/exercisedefinition.h"
 #include "testapplication.h"
 #include "ui/models/exercisedefinitionmodel.h"
 #include "ui/viewmodels/exercisecatalogviewmodel.h"

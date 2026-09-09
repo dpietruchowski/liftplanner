@@ -1,8 +1,9 @@
 app_add_test(workout_tests
     DEPS
-        core
-        workout_module
-        liftplanner_utils
+        domain
+        infrastructure
+        application
+        ui
         app_dbtoolkit
         Qt6::Sql
 )

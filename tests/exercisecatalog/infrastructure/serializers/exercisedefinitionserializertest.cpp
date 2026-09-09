@@ -1,6 +1,6 @@
-#include "modules/exercisecatalog/infrastructure/serializers/exercisedefinitionserializer.h"
-#include "modules/exercisecatalog/domain/entities/exercisedefinition.h"
-#include "modules/exercisecatalog/infrastructure/serializers/muscleinvolvementserializer.h"
+#include "infrastructure/exercisecatalog/exercisedefinitionserializer.h"
+#include "domain/exercisecatalog/exercisedefinition.h"
+#include "infrastructure/exercisecatalog/muscleinvolvementserializer.h"
 
 #include <gtest/gtest.h>
 

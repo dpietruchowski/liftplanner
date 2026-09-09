@@ -5,19 +5,35 @@ Qt6/QML app built on the `libs` submodule (repo `app-libs`). Builds for Linux
 
 ## Layout
 
+`src` is split into layers, and each layer into topics. Dependencies point only
+downwards: `domain → infrastructure → application → ui`. One target per layer.
+
 ```
-app.env             every app parameter: name, target, version, Android package, AppImage metadata
-src/main.cpp        entry point: engine, QmlRegistrator, singletons, automation server
-src/ui/qml/         QML module, URI LiftPlanner — Main.qml, Theme.qml, screens
-src/ui/models/      QML-facing models      (liftplanner_models)
-src/ui/viewmodels/  view models            (liftplanner_viewmodels)
-src/core/           storage wiring         (core)
-src/modules/        workout, exercisecatalog, userprofile (<name>_module)
-src/utils/          app helpers            (liftplanner_utils)
-tests/              GoogleTest suite
-libs/cpp            async, utils, platform, qmlutils, dbtoolkit, eventbus, agent, automation
-libs/qml            theme (Themed.Theme), themed (Themed.Components), app (App.Components), icons
+app.env                  every app parameter: name, target, version, Android package, AppImage metadata
+src/main.cpp             entry point: engine, QmlRegistrator, singletons, automation server
+src/liftplannerapplication.*  composition root, next to main.cpp
+src/domain/              entities, value objects, queries, repository ports   (domain)
+src/infrastructure/      SQLite repositories, serializers, storage wiring     (infrastructure)
+src/application/         services returning Task<T>                          (application)
+src/ui/models/           QML-facing models
+src/ui/viewmodels/       view models
+src/ui/presentation/     formatting and QML helpers                          (ui)
+src/ui/qml/              QML module, URI LiftPlanner — Main.qml, Theme.qml, screens
+tests/                   GoogleTest suite
+libs/cpp                 async, utils, platform, qmlutils, dbtoolkit, eventbus, agent, automation
+libs/qml                 theme (Themed.Theme), themed (Themed.Components), app (App.Components), icons
 ```
+
+The topics are `workout`, `exercisecatalog` and `userprofile`, and each appears
+in every layer that needs it. An entity, its repository port, its SQLite
+implementation and its service therefore live in `domain/workout/`,
+`infrastructure/workout/` and `application/workout/` — split by topic **inside**
+a layer, never a topic directory holding its own layers.
+
+`src` is the include root, so a header is addressed by layer and topic:
+`#include "domain/workout/workout.h"`,
+`#include "infrastructure/workout/workoutrepositorydb.h"`,
+`#include "application/workout/workoutservice.h"`.
 
 `libs/cpp` is the include root, so libs headers are reached by concern:
 `#include "async/task.h"`, `#include "platform/haptics.h"`,
@@ -122,6 +138,9 @@ property that `DefaultTheme` and the themed components read from it.
 period. No Conventional Commits prefixes and **no attribution trailer**. Stage
 explicitly (`git commit -- <paths>`); never `git add -A`. Do not push unless
 asked.
+
+Body is **one paragraph of at most five lines**, or nothing at all when the
+subject already says it. No second paragraph, no bullet lists.
 
 `libs` is a submodule: when it changed, commit inside `libs` first, then commit
 the app together with the new submodule pointer.

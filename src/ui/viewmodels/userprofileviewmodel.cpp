@@ -1,6 +1,6 @@
 #include "userprofileviewmodel.h"
+#include "application/userprofile/userprofileservice.h"
 #include "async/timeprovider.h"
-#include "modules/userprofile/application/userprofileservice.h"
 #include <QDate>
 #include <QLocale>
 #include <QTimeZone>

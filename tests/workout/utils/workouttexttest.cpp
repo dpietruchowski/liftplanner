@@ -1,4 +1,4 @@
-#include "utils/workouttext.h"
+#include "ui/presentation/workouttext.h"
 #include <gtest/gtest.h>
 
 class WorkoutTextTest : public ::testing::Test

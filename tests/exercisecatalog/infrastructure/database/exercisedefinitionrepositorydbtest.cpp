@@ -1,7 +1,7 @@
-#include "modules/exercisecatalog/infrastructure/database/exercisedefinitionrepositorydb.h"
-#include "modules/exercisecatalog/domain/entities/exercisedefinition.h"
-#include "modules/exercisecatalog/domain/repositories/exercisedefinitionquery.h"
-#include "modules/exercisecatalog/infrastructure/serializers/muscleinvolvementserializer.h"
+#include "infrastructure/exercisecatalog/exercisedefinitionrepositorydb.h"
+#include "domain/exercisecatalog/exercisedefinition.h"
+#include "domain/exercisecatalog/exercisedefinitionquery.h"
+#include "infrastructure/exercisecatalog/muscleinvolvementserializer.h"
 
 #include <QSqlDatabase>
 #include <QSqlQuery>

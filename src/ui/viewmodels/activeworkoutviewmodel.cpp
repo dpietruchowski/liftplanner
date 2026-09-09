@@ -1,8 +1,8 @@
 #include "activeworkoutviewmodel.h"
-#include "modules/workout/application/workoutservice.h"
-#include "modules/workout/domain/entities/setadjustment.h"
+#include "application/workout/workoutservice.h"
+#include "domain/workout/setadjustment.h"
+#include "infrastructure/workout/workoutjson.h"
 #include "platform/haptics.h"
-#include "utils/workoutjson.h"
 #include <QDebug>
 #include <QDir>
 #include <QFile>

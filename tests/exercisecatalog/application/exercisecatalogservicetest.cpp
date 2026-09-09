@@ -1,6 +1,6 @@
-#include "modules/exercisecatalog/application/exercisecatalogservice.h"
-#include "modules/exercisecatalog/domain/repositories/exercisedefinitionquery.h"
-#include "modules/exercisecatalog/domain/repositories/exercisedefinitionrepository.h"
+#include "application/exercisecatalog/exercisecatalogservice.h"
+#include "domain/exercisecatalog/exercisedefinitionquery.h"
+#include "domain/exercisecatalog/exercisedefinitionrepository.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

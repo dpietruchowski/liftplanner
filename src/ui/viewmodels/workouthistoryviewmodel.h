@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ui/models/workoutmodel.h"
-#include "utils/serializationutils.h"
+#include "ui/presentation/serializationutils.h"
 #include <QClipboard>
 #include <QDateTime>
 #include <QGuiApplication>

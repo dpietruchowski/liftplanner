@@ -1,9 +1,9 @@
-#include "modules/userprofile/application/userprofileservice.h"
-#include "modules/userprofile/domain/entities/experiencelevel.h"
-#include "modules/userprofile/domain/entities/primarygoal.h"
-#include "modules/userprofile/domain/entities/sex.h"
-#include "modules/userprofile/domain/entities/userprofile.h"
-#include "modules/userprofile/domain/repositories/userprofilerepository.h"
+#include "application/userprofile/userprofileservice.h"
+#include "domain/userprofile/experiencelevel.h"
+#include "domain/userprofile/primarygoal.h"
+#include "domain/userprofile/sex.h"
+#include "domain/userprofile/userprofile.h"
+#include "domain/userprofile/userprofilerepository.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 

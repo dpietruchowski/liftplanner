@@ -1,10 +1,10 @@
-#include "modules/exercisecatalog/domain/entities/catalogorigin.h"
-#include "modules/exercisecatalog/domain/entities/equipment.h"
-#include "modules/exercisecatalog/domain/entities/laterality.h"
-#include "modules/exercisecatalog/domain/entities/mechanics.h"
-#include "modules/exercisecatalog/domain/entities/muscle.h"
-#include "modules/exercisecatalog/domain/entities/muscleinvolvement.h"
-#include "modules/exercisecatalog/domain/entities/musclerole.h"
+#include "domain/exercisecatalog/catalogorigin.h"
+#include "domain/exercisecatalog/equipment.h"
+#include "domain/exercisecatalog/laterality.h"
+#include "domain/exercisecatalog/mechanics.h"
+#include "domain/exercisecatalog/muscle.h"
+#include "domain/exercisecatalog/muscleinvolvement.h"
+#include "domain/exercisecatalog/musclerole.h"
 #include <QSet>
 #include <gtest/gtest.h>
 #include <vector>

@@ -1,12 +1,12 @@
-#include "modules/workout/application/workouttemplateservice.h"
-#include "modules/workout/domain/entities/set.h"
-#include "modules/workout/domain/entities/setprescription.h"
-#include "modules/workout/domain/entities/templateexercise.h"
-#include "modules/workout/domain/entities/workout.h"
-#include "modules/workout/domain/entities/workouttemplate.h"
-#include "modules/workout/domain/repositories/exercisedefinitionlookup.h"
-#include "modules/workout/domain/repositories/workouttemplatequery.h"
-#include "modules/workout/domain/repositories/workouttemplaterepository.h"
+#include "application/workout/workouttemplateservice.h"
+#include "domain/workout/exercisedefinitionlookup.h"
+#include "domain/workout/set.h"
+#include "domain/workout/setprescription.h"
+#include "domain/workout/templateexercise.h"
+#include "domain/workout/workout.h"
+#include "domain/workout/workouttemplate.h"
+#include "domain/workout/workouttemplatequery.h"
+#include "domain/workout/workouttemplaterepository.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

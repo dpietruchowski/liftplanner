@@ -1,4 +1,4 @@
-#include "modules/workout/domain/entities/set.h"
+#include "domain/workout/set.h"
 #include <gtest/gtest.h>
 
 class SetTest : public ::testing::Test

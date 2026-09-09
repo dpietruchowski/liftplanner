@@ -1,5 +1,5 @@
-#include "modules/workout/infrastructure/serializers/setserializer.h"
-#include "modules/workout/domain/entities/set.h"
+#include "infrastructure/workout/setserializer.h"
+#include "domain/workout/set.h"
 #include <gtest/gtest.h>
 
 class SetSerializerTest : public ::testing::Test

@@ -1,13 +1,10 @@
 app_add_test(integration_tests
     OWN_MAIN
     DEPS
-        core
-        workout_module
-        userprofile_module
-        exercisecatalog_module
-        liftplanner_utils
-        liftplanner_models
-        liftplanner_viewmodels
+        domain
+        infrastructure
+        application
+        ui
         app_dbtoolkit
         Qt6::Sql
 )

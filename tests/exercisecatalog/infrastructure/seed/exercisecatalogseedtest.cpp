@@ -1,6 +1,6 @@
-#include "modules/exercisecatalog/infrastructure/seed/exercisecatalogseed.h"
-#include "modules/exercisecatalog/domain/repositories/exercisedefinitionquery.h"
-#include "modules/exercisecatalog/infrastructure/database/exercisedefinitionrepositorydb.h"
+#include "infrastructure/exercisecatalog/exercisecatalogseed.h"
+#include "domain/exercisecatalog/exercisedefinitionquery.h"
+#include "infrastructure/exercisecatalog/exercisedefinitionrepositorydb.h"
 
 #include <QFile>
 #include <QSet>

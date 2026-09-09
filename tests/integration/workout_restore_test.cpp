@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
+#include "application/workout/workoutservice.h"
 #include "fixtures/test_data.h"
-#include "modules/workout/application/workoutservice.h"
 #include "testapplication.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
 #include "ui/viewmodels/plannedworkoutviewmodel.h"

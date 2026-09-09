@@ -5,13 +5,10 @@ set(CMAKE_AUTORCC ON)
 
 qt_standard_project_setup()
 
-add_subdirectory(core)
-add_subdirectory(modules/workout)
-add_subdirectory(modules/exercisecatalog)
-add_subdirectory(modules/userprofile)
-add_subdirectory(utils)
-add_subdirectory(ui/models)
-add_subdirectory(ui/viewmodels)
+add_subdirectory(domain)
+add_subdirectory(infrastructure)
+add_subdirectory(application)
+add_subdirectory(ui)
 
 if(NOT QML_LIVE_ENABLED)
     add_subdirectory(ui/qml)
@@ -41,13 +38,7 @@ target_compile_definitions(${APP_TARGET} PRIVATE
 
 target_link_libraries(${APP_TARGET}
     PRIVATE
-        core
-        workout_module
-        exercisecatalog_module
-        userprofile_module
-        liftplanner_utils
-        liftplanner_models
-        liftplanner_viewmodels
+        ui
         app_qmllive
         app_platform
         app_qmlutils

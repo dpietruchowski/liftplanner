@@ -1,10 +1,10 @@
-#include "modules/workout/domain/entities/exercise.h"
-#include "modules/workout/domain/entities/set.h"
-#include "modules/workout/domain/entities/workout.h"
-#include "modules/workout/domain/repositories/workoutquery.h"
-#include "modules/workout/infrastructure/database/workoutrepositorydb.h"
-#include "modules/workout/infrastructure/serializers/exerciseserializer.h"
-#include "modules/workout/infrastructure/serializers/setserializer.h"
+#include "domain/workout/exercise.h"
+#include "domain/workout/set.h"
+#include "domain/workout/workout.h"
+#include "domain/workout/workoutquery.h"
+#include "infrastructure/workout/exerciseserializer.h"
+#include "infrastructure/workout/setserializer.h"
+#include "infrastructure/workout/workoutrepositorydb.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QStringList>

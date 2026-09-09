@@ -1,5 +1,5 @@
-#include "modules/workout/domain/entities/exercise.h"
-#include "modules/workout/domain/entities/workout.h"
+#include "domain/workout/exercise.h"
+#include "domain/workout/workout.h"
 #include <gtest/gtest.h>
 
 class ExerciseDefinitionLinkTest : public ::testing::Test

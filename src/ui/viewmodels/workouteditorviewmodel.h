@@ -1,6 +1,6 @@
 #pragma once
 
-#include "modules/workout/domain/entities/workout.h"
+#include "domain/workout/workout.h"
 #include "ui/models/exercisedefinitionmodel.h"
 #include "ui/models/workoutmodel.h"
 #include <QDateTime>

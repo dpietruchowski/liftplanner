@@ -1,9 +1,9 @@
-#include "modules/userprofile/infrastructure/serializers/userprofileserializer.h"
-#include "modules/userprofile/domain/entities/experiencelevel.h"
-#include "modules/userprofile/domain/entities/primarygoal.h"
-#include "modules/userprofile/domain/entities/sex.h"
-#include "modules/userprofile/domain/entities/unitsystem.h"
-#include "modules/userprofile/domain/entities/userprofile.h"
+#include "infrastructure/userprofile/userprofileserializer.h"
+#include "domain/userprofile/experiencelevel.h"
+#include "domain/userprofile/primarygoal.h"
+#include "domain/userprofile/sex.h"
+#include "domain/userprofile/unitsystem.h"
+#include "domain/userprofile/userprofile.h"
 #include <gtest/gtest.h>
 
 class UserProfileSerializerTest : public ::testing::Test

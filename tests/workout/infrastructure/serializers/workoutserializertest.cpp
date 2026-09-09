@@ -1,6 +1,6 @@
-#include "modules/workout/infrastructure/serializers/workoutserializer.h"
-#include "modules/workout/domain/entities/workout.h"
-#include "modules/workout/domain/entities/workoutstatus.h"
+#include "infrastructure/workout/workoutserializer.h"
+#include "domain/workout/workout.h"
+#include "domain/workout/workoutstatus.h"
 #include <gtest/gtest.h>
 
 class WorkoutSerializerTest : public ::testing::Test

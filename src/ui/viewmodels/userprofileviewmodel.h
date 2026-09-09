@@ -1,6 +1,6 @@
 #pragma once
 
-#include "modules/userprofile/domain/entities/userprofile.h"
+#include "domain/userprofile/userprofile.h"
 #include <QObject>
 #include <QString>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "modules/workout/application/workouttemplateservice.h"
+#include "application/workout/workouttemplateservice.h"
 #include <QObject>
 #include <QString>
 #include <QStringList>

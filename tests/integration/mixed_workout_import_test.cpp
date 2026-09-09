@@ -2,11 +2,11 @@
 #include <gtest/gtest.h>
 
 #include "fixtures/test_data.h"
+#include "infrastructure/workout/workoutjson.h"
 #include "testapplication.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
 #include "ui/viewmodels/plannedworkoutviewmodel.h"
 #include "ui/viewmodels/workouthistoryviewmodel.h"
-#include "utils/workoutjson.h"
 
 // =============================================================================
 // Importing plans that mix strength, bodyweight, timed, interval and cardio work

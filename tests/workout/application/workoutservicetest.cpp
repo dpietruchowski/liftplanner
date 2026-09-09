@@ -1,8 +1,8 @@
-#include "modules/workout/application/workoutservice.h"
-#include "modules/workout/domain/entities/workout.h"
-#include "modules/workout/domain/entities/workoutstatus.h"
-#include "modules/workout/domain/repositories/workoutquery.h"
-#include "modules/workout/domain/repositories/workoutrepository.h"
+#include "application/workout/workoutservice.h"
+#include "domain/workout/workout.h"
+#include "domain/workout/workoutquery.h"
+#include "domain/workout/workoutrepository.h"
+#include "domain/workout/workoutstatus.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 

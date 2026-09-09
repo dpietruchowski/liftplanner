@@ -1,9 +1,0 @@
-app_add_module(core
-    DEPS
-        app_dbtoolkit
-        app_async
-        Qt6::Core
-        Qt6::Sql
-        Qt6::Qml
-        Qt6::Quick
-)

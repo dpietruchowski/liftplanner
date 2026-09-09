@@ -1,8 +1,8 @@
 #pragma once
 
+#include "domain/workout/workout.h"
+#include "domain/workout/workoutstatus.h"
 #include "exercisemodel.h"
-#include "modules/workout/domain/entities/workout.h"
-#include "modules/workout/domain/entities/workoutstatus.h"
 #include <QDateTime>
 #include <QList>
 #include <QObject>

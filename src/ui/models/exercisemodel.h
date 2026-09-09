@@ -1,6 +1,6 @@
 #pragma once
 
-#include "modules/workout/domain/entities/exercise.h"
+#include "domain/workout/exercise.h"
 #include "setmodel.h"
 #include <QDateTime>
 #include <QList>

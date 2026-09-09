@@ -1,4 +1,4 @@
-#include "modules/exercisecatalog/domain/repositories/exercisedefinitionquery.h"
+#include "domain/exercisecatalog/exercisedefinitionquery.h"
 #include <gtest/gtest.h>
 
 class ExerciseDefinitionQueryTest : public ::testing::Test

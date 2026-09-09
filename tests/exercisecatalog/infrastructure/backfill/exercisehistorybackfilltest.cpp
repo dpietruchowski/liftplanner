@@ -1,12 +1,12 @@
-#include "modules/exercisecatalog/infrastructure/backfill/exercisehistorybackfill.h"
-#include "modules/exercisecatalog/domain/repositories/exercisedefinitionquery.h"
-#include "modules/exercisecatalog/infrastructure/database/exercisedefinitionrepositorydb.h"
-#include "modules/exercisecatalog/infrastructure/seed/exercisecatalogseed.h"
-#include "modules/workout/domain/entities/exercise.h"
-#include "modules/workout/domain/entities/set.h"
-#include "modules/workout/domain/entities/workout.h"
-#include "modules/workout/infrastructure/database/workoutrepositorydb.h"
-#include "modules/workout/infrastructure/serializers/exerciseserializer.h"
+#include "infrastructure/exercisecatalog/exercisehistorybackfill.h"
+#include "domain/exercisecatalog/exercisedefinitionquery.h"
+#include "domain/workout/exercise.h"
+#include "domain/workout/set.h"
+#include "domain/workout/workout.h"
+#include "infrastructure/exercisecatalog/exercisecatalogseed.h"
+#include "infrastructure/exercisecatalog/exercisedefinitionrepositorydb.h"
+#include "infrastructure/workout/exerciseserializer.h"
+#include "infrastructure/workout/workoutrepositorydb.h"
 
 #include <QFile>
 #include <QSqlDatabase>
