@@ -88,7 +88,7 @@ Rectangle {
         Text {
             objectName: "templatesEmptyHint"
             Layout.fillWidth: true
-            visible: WorkoutTemplateViewModel.count === 0
+            visible: WorkoutTemplateViewModel.count === 0 && !WorkoutTemplateViewModel.loading
             horizontalAlignment: Text.AlignHCenter
             text: WorkoutTemplateViewModel.searchText.length > 0
                 ? qsTr("No template matches this search.")
@@ -96,6 +96,12 @@ Rectangle {
             color: Theme.colors.textMuted
             font.pixelSize: Theme.fontSize.small
         }
+    }
+
+    LoadingOverlay {
+        objectName: "templatesLoadingOverlay"
+        visible: WorkoutTemplateViewModel.loading && WorkoutTemplateViewModel.count === 0
+        message: qsTr("Loading templates")
     }
 
     NotificationPopup {

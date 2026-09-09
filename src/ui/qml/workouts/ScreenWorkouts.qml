@@ -121,7 +121,9 @@ Rectangle {
             }
 
             Text {
+                objectName: "plannedEmptyHint"
                 visible: plannedSection.expanded && plannedRepeater.count === 0
+                         && !PlannedWorkoutViewModel.loading
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
                 text: "No planned workouts.\nTap the AI button to generate a plan prompt."
@@ -184,7 +186,9 @@ Rectangle {
             }
 
             Text {
+                objectName: "historyEmptyHint"
                 visible: historySection.expanded && root.historyMonths.length === 0
+                         && !WorkoutHistoryViewModel.loading
                 Layout.fillWidth: true
                 horizontalAlignment: Text.AlignHCenter
                 text: "No completed workouts yet."

@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import LiftPlanner 1.0
 import Themed.Components
+import App.Components
 
 Rectangle {
     id: root
@@ -98,12 +99,18 @@ Rectangle {
         Text {
             objectName: "exercisePickerEmpty"
             Layout.fillWidth: true
-            visible: ExerciseCatalogViewModel.count === 0
+            visible: ExerciseCatalogViewModel.count === 0 && !ExerciseCatalogViewModel.loading
             horizontalAlignment: Text.AlignHCenter
             text: qsTr("No exercise matches these filters.")
             color: Theme.colors.textMuted
             font.pixelSize: Theme.fontSize.small
         }
+    }
+
+    LoadingOverlay {
+        objectName: "exercisePickerLoadingOverlay"
+        visible: ExerciseCatalogViewModel.loading && ExerciseCatalogViewModel.count === 0
+        message: qsTr("Loading exercises")
     }
 
     ExerciseFilterPanel {
