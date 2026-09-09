@@ -22,8 +22,6 @@ public:
                            WorkoutTemplateRowRepository& rowRepository,
                            const ExerciseDefinitionLookup& lookup, QObject* worker);
 
-    Task<std::vector<WorkoutTemplate>> loadTemplates();
-    Task<std::vector<WorkoutTemplate>> searchTemplates(const QString& text);
     Task<std::vector<WorkoutTemplateRow>> searchRows(const QString& text);
     Task<std::optional<WorkoutTemplate>> findById(int id);
 
@@ -37,8 +35,6 @@ public:
 private:
     LIBS_TEST_FRIEND(WorkoutTemplateServiceTest)
 
-    Result<std::vector<WorkoutTemplate>> loadTemplatesCore();
-    Result<std::vector<WorkoutTemplate>> searchTemplatesCore(const QString& text);
     Result<std::vector<WorkoutTemplateRow>> searchRowsCore(const QString& text);
     Result<std::optional<WorkoutTemplate>> findByIdCore(int id);
     Result<int> saveCore(WorkoutTemplate workoutTemplate);

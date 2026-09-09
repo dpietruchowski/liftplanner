@@ -206,66 +206,6 @@ TEST_F(WorkoutTemplateRepositoryDbTest, SavingAnExistingIdUpdatesInPlace)
     EXPECT_EQ(reload(id).name(), "Push Day A");
 }
 
-TEST_F(WorkoutTemplateRepositoryDbTest, FindAllLoadsChildrenForEveryTemplate)
-{
-    m_repo->save(pushDay());
-
-    WorkoutTemplate pullDay("Pull Day");
-    pullDay.addExercise(strengthExercise(9, 2, 8, 70.0));
-    m_repo->save(pullDay);
-
-    const auto all = m_repo->findAll(WorkoutTemplateQuery().orderByName(SortDirection::Ascending));
-
-    ASSERT_EQ(all.size(), 2u);
-    EXPECT_EQ(all[0].name(), "Pull Day");
-    EXPECT_EQ(all[0].exercises().size(), 1u);
-    EXPECT_EQ(all[1].exercises().size(), 3u);
-    EXPECT_EQ(all[1].exercises()[0].sets().size(), 3u);
-}
-
-TEST_F(WorkoutTemplateRepositoryDbTest, OrderByNameSortsBothWays)
-{
-    m_repo->save(pushDay());
-    WorkoutTemplate pullDay("Pull Day");
-    pullDay.addExercise(strengthExercise(9, 1, 8, 70.0));
-    m_repo->save(pullDay);
-
-    const auto descending
-        = m_repo->findAll(WorkoutTemplateQuery().orderByName(SortDirection::Descending));
-
-    ASSERT_EQ(descending.size(), 2u);
-    EXPECT_EQ(descending[0].name(), "Push Day");
-}
-
-TEST_F(WorkoutTemplateRepositoryDbTest, NameContainsFilters)
-{
-    m_repo->save(pushDay());
-    WorkoutTemplate pullDay("Pull Day");
-    pullDay.addExercise(strengthExercise(9, 1, 8, 70.0));
-    m_repo->save(pullDay);
-
-    const auto found = m_repo->findAll(WorkoutTemplateQuery().whereNameContains("Pull"));
-
-    ASSERT_EQ(found.size(), 1u);
-    EXPECT_EQ(found[0].name(), "Pull Day");
-}
-
-TEST_F(WorkoutTemplateRepositoryDbTest, ReferencesDefinitionFindsTemplatesUsingAnExercise)
-{
-    m_repo->save(pushDay());
-
-    WorkoutTemplate pullDay("Pull Day");
-    pullDay.addExercise(strengthExercise(9, 2, 8, 70.0));
-    m_repo->save(pullDay);
-
-    const auto found = m_repo->findAll(WorkoutTemplateQuery().whereReferencesDefinition(2));
-
-    ASSERT_EQ(found.size(), 1u);
-    EXPECT_EQ(found[0].name(), "Push Day");
-    EXPECT_EQ(m_repo->count(WorkoutTemplateQuery().whereReferencesDefinition(9)), 1);
-    EXPECT_EQ(m_repo->count(WorkoutTemplateQuery().whereReferencesDefinition(404)), 0);
-}
-
 TEST_F(WorkoutTemplateRepositoryDbTest, ReferencesDefinitionMatchesATemplateOnlyOnce)
 {
     WorkoutTemplate repeated("Superset");
@@ -274,21 +214,6 @@ TEST_F(WorkoutTemplateRepositoryDbTest, ReferencesDefinitionMatchesATemplateOnly
     m_repo->save(repeated);
 
     EXPECT_EQ(m_repo->count(WorkoutTemplateQuery().whereReferencesDefinition(5)), 1);
-}
-
-TEST_F(WorkoutTemplateRepositoryDbTest, NameContainsKeepsWorkingAlongsideAnotherFilter)
-{
-    m_repo->save(pushDay());
-
-    WorkoutTemplate other("Push Day Light");
-    other.addExercise(strengthExercise(9, 1, 8, 20.0));
-    m_repo->save(other);
-
-    const auto found = m_repo->findAll(
-        WorkoutTemplateQuery().whereNameContains("Push").whereReferencesDefinition(9));
-
-    ASSERT_EQ(found.size(), 1u);
-    EXPECT_EQ(found[0].name(), "Push Day Light");
 }
 
 TEST_F(WorkoutTemplateRepositoryDbTest, CountAndExistsAgreeWithTheFilter)

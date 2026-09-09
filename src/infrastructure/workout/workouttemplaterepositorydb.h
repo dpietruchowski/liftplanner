@@ -25,7 +25,6 @@ public:
     bool createTables();
     void registerMigrations(MigrationRunner& runner);
 
-    std::vector<WorkoutTemplate> findAll(const WorkoutTemplateQuery& query) const override;
     std::optional<WorkoutTemplate> findOne(const WorkoutTemplateQuery& query) const override;
     int save(const WorkoutTemplate& workoutTemplate) override;
     bool remove(const WorkoutTemplateQuery& query) override;

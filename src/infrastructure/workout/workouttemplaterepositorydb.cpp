@@ -130,22 +130,6 @@ bool WorkoutTemplateRepositoryDb::createTables()
 
 void WorkoutTemplateRepositoryDb::registerMigrations(MigrationRunner&) { }
 
-std::vector<WorkoutTemplate>
-WorkoutTemplateRepositoryDb::findAll(const WorkoutTemplateQuery& query) const
-{
-    const auto rows
-        = m_templateRepo->select(buildWhereClause(query), buildOrderClause(query),
-                                 query.limit().value_or(-1), query.offset().value_or(-1));
-
-    std::vector<WorkoutTemplate> results;
-    results.reserve(rows.size());
-    for (const auto& row : rows)
-        results.push_back(WorkoutTemplateSerializer::fromVariant(row));
-
-    loadChildren(results);
-    return results;
-}
-
 std::optional<WorkoutTemplate>
 WorkoutTemplateRepositoryDb::findOne(const WorkoutTemplateQuery& query) const
 {

@@ -18,16 +18,6 @@ WorkoutTemplateService::WorkoutTemplateService(WorkoutTemplateRepository& reposi
 {
 }
 
-Task<std::vector<WorkoutTemplate>> WorkoutTemplateService::loadTemplates()
-{
-    return invoke([this] { return loadTemplatesCore(); });
-}
-
-Task<std::vector<WorkoutTemplate>> WorkoutTemplateService::searchTemplates(const QString& text)
-{
-    return invoke([this, text] { return searchTemplatesCore(text); });
-}
-
 Task<std::vector<WorkoutTemplateRow>> WorkoutTemplateService::searchRows(const QString& text)
 {
     return invoke([this, text] { return searchRowsCore(text); });
@@ -61,27 +51,6 @@ Task<bool> WorkoutTemplateService::remove(int id)
 Task<Workout> WorkoutTemplateService::instantiate(int id, const QDateTime& plannedTime)
 {
     return invoke([this, id, plannedTime] { return instantiateCore(id, plannedTime); });
-}
-
-Result<std::vector<WorkoutTemplate>> WorkoutTemplateService::loadTemplatesCore()
-{
-    WorkoutTemplateQuery query;
-    query.orderByName(SortDirection::Ascending);
-
-    return Result<std::vector<WorkoutTemplate>>::success(m_repository.findAll(query));
-}
-
-Result<std::vector<WorkoutTemplate>>
-WorkoutTemplateService::searchTemplatesCore(const QString& text)
-{
-    const QString trimmed = text.trimmed();
-    if (trimmed.isEmpty())
-        return loadTemplatesCore();
-
-    WorkoutTemplateQuery query;
-    query.whereNameContains(trimmed).orderByName(SortDirection::Ascending);
-
-    return Result<std::vector<WorkoutTemplate>>::success(m_repository.findAll(query));
 }
 
 Result<std::vector<WorkoutTemplateRow>> WorkoutTemplateService::searchRowsCore(const QString& text)

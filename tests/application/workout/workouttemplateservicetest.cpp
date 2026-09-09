@@ -19,8 +19,6 @@ using ::testing::Return;
 class MockWorkoutTemplateRepository : public WorkoutTemplateRepository
 {
 public:
-    MOCK_METHOD(std::vector<WorkoutTemplate>, findAll, (const WorkoutTemplateQuery& query),
-                (const, override));
     MOCK_METHOD(std::optional<WorkoutTemplate>, findOne, (const WorkoutTemplateQuery& query),
                 (const, override));
     MOCK_METHOD(int, save, (const WorkoutTemplate& workoutTemplate), (override));
@@ -82,10 +80,9 @@ protected:
         return workoutTemplate;
     }
 
-    Result<std::vector<WorkoutTemplate>> loadTemplates() { return m_service->loadTemplatesCore(); }
-    Result<std::vector<WorkoutTemplate>> searchTemplates(const QString& text)
+    Result<std::vector<WorkoutTemplateRow>> searchRows(const QString& text)
     {
-        return m_service->searchTemplatesCore(text);
+        return m_service->searchRowsCore(text);
     }
     Result<int> save(const WorkoutTemplate& workoutTemplate)
     {
@@ -111,54 +108,54 @@ protected:
     std::unique_ptr<WorkoutTemplateService> m_service;
 };
 
-// --- loadTemplates / searchTemplates ---
+// --- searchRows ---
 
-TEST_F(WorkoutTemplateServiceTest, LoadTemplatesOrdersByNameAscending)
+TEST_F(WorkoutTemplateServiceTest, SearchRowsOrdersByNameAscending)
 {
     WorkoutTemplateQuery seen;
-    EXPECT_CALL(m_repo, findAll(_))
+    EXPECT_CALL(m_rowRepo, findAll(_))
         .WillOnce(
             [&seen](const WorkoutTemplateQuery& query)
             {
                 seen = query;
-                return std::vector<WorkoutTemplate> {};
+                return std::vector<WorkoutTemplateRow> {};
             });
 
-    loadTemplates();
+    searchRows(QString());
 
     ASSERT_TRUE(seen.orderByNameDirection().has_value());
     EXPECT_EQ(seen.orderByNameDirection().value(), SortDirection::Ascending);
 }
 
-TEST_F(WorkoutTemplateServiceTest, SearchTemplatesFiltersByNameFragment)
+TEST_F(WorkoutTemplateServiceTest, SearchRowsFiltersByNameFragment)
 {
     WorkoutTemplateQuery seen;
-    EXPECT_CALL(m_repo, findAll(_))
+    EXPECT_CALL(m_rowRepo, findAll(_))
         .WillOnce(
             [&seen](const WorkoutTemplateQuery& query)
             {
                 seen = query;
-                return std::vector<WorkoutTemplate> {};
+                return std::vector<WorkoutTemplateRow> {};
             });
 
-    searchTemplates(QStringLiteral("  push  "));
+    searchRows(QStringLiteral("  push  "));
 
     ASSERT_TRUE(seen.nameContains().has_value());
     EXPECT_EQ(seen.nameContains().value(), QStringLiteral("push"));
 }
 
-TEST_F(WorkoutTemplateServiceTest, SearchTemplatesWithBlankTextFallsBackToFullList)
+TEST_F(WorkoutTemplateServiceTest, SearchRowsWithBlankTextListsEverything)
 {
     WorkoutTemplateQuery seen;
-    EXPECT_CALL(m_repo, findAll(_))
+    EXPECT_CALL(m_rowRepo, findAll(_))
         .WillOnce(
             [&seen](const WorkoutTemplateQuery& query)
             {
                 seen = query;
-                return std::vector<WorkoutTemplate> {};
+                return std::vector<WorkoutTemplateRow> {};
             });
 
-    searchTemplates(QStringLiteral("   "));
+    searchRows(QStringLiteral("   "));
 
     EXPECT_FALSE(seen.nameContains().has_value());
 }
