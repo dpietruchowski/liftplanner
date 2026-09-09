@@ -9,13 +9,15 @@
 
 #include <dbtoolkit/dbrepository.h>
 #include <dbtoolkit/dbstorage.h>
+#include <dbtoolkit/migrationrunner.h>
+#include <dbtoolkit/query/altertable.h>
 #include <dbtoolkit/query/column.h>
 #include <dbtoolkit/query/createtable.h>
 #include <dbtoolkit/query/order.h>
+#include <dbtoolkit/query/update.h>
 #include <dbtoolkit/query/where.h>
 
 #include <QHash>
-#include <QSqlQuery>
 
 WorkoutRepositoryDb::WorkoutRepositoryDb(DbStorage& storage)
     : m_workoutRepo(std::make_unique<DbRepository>(
@@ -44,42 +46,52 @@ bool WorkoutRepositoryDb::createTables()
         .column(Column(WorkoutSerializer::ended_time_key).text())
         .column(Column(WorkoutSerializer::status_key).text());
 
-    bool ok = m_workoutRepo->createTable(workouts) && m_exerciseRepo.createTable()
+    return m_workoutRepo->createTable(workouts) && m_exerciseRepo.createTable()
         && m_setRepo.createTable();
-
-    // Migration: add status column if missing (existing databases)
-    QSqlQuery pragmaQuery(m_workoutRepo->storage().database());
-    pragmaQuery.exec(QStringLiteral("PRAGMA table_info(%1)").arg(WorkoutSerializer::table));
-    bool hasStatusColumn = false;
-    while (pragmaQuery.next())
-    {
-        if (pragmaQuery.value(1).toString() == WorkoutSerializer::status_key)
-        {
-            hasStatusColumn = true;
-            break;
-        }
-    }
-    if (!hasStatusColumn)
-    {
-        QSqlQuery alter(m_workoutRepo->storage().database());
-        alter.exec(QStringLiteral("ALTER TABLE %1 ADD COLUMN %2 TEXT DEFAULT 'Planned'")
-                       .arg(WorkoutSerializer::table, WorkoutSerializer::status_key));
-        alter.exec(QStringLiteral("UPDATE %1 SET %2 = 'Ended' WHERE %3 IS NOT NULL")
-                       .arg(WorkoutSerializer::table, WorkoutSerializer::status_key,
-                            WorkoutSerializer::ended_time_key));
-        alter.exec(
-            QStringLiteral("UPDATE %1 SET %2 = 'Started' WHERE %3 IS NOT NULL AND %4 IS NULL")
-                .arg(WorkoutSerializer::table, WorkoutSerializer::status_key,
-                     WorkoutSerializer::started_time_key, WorkoutSerializer::ended_time_key));
-    }
-
-    return ok;
 }
 
 void WorkoutRepositoryDb::registerMigrations(MigrationRunner& runner)
 {
     m_exerciseRepo.registerMigrations(runner);
     m_setRepo.registerMigrations(runner);
+
+    runner.add(
+        8,
+        [](QSqlDatabase& db)
+        {
+            const QString planned = workoutStatusToString(WorkoutStatus::Planned);
+            const bool columnAdded
+                = AlterTable(WorkoutSerializer::table)
+                      .addColumn(Column(WorkoutSerializer::status_key).text().defaultValue(planned))
+                      .execute(db)
+                      .toInt()
+                != 0;
+
+            const bool endedMarked
+                = Update(WorkoutSerializer::table)
+                      .set(WorkoutSerializer::status_key,
+                           workoutStatusToString(WorkoutStatus::Ended))
+                      .where(Where(WorkoutSerializer::status_key)
+                                 .equals(planned)
+                                 .and_(Where(WorkoutSerializer::ended_time_key).isNotNull()))
+                      .execute(db)
+                      .toInt()
+                >= 0;
+
+            const bool startedMarked
+                = Update(WorkoutSerializer::table)
+                      .set(WorkoutSerializer::status_key,
+                           workoutStatusToString(WorkoutStatus::Started))
+                      .where(Where(WorkoutSerializer::status_key)
+                                 .equals(planned)
+                                 .and_(Where(WorkoutSerializer::started_time_key).isNotNull())
+                                 .and_(Where(WorkoutSerializer::ended_time_key).isNull()))
+                      .execute(db)
+                      .toInt()
+                >= 0;
+
+            return columnAdded && endedMarked && startedMarked;
+        });
 }
 
 std::vector<Workout> WorkoutRepositoryDb::findAll(const WorkoutQuery& query) const

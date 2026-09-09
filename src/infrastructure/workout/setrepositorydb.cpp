@@ -15,8 +15,6 @@
 
 #include "positionbackfill.h"
 
-#include <QSqlQuery>
-
 SetRepositoryDb::SetRepositoryDb(DbStorage& storage)
     : m_repository(std::make_unique<DbRepository>(
           SetSerializer::table, SetSerializer::id_key,
@@ -50,27 +48,7 @@ bool SetRepositoryDb::createTable()
         .column(Column(SetSerializer::position_key).integer().defaultValue(0))
         .foreignKey(SetSerializer::exercise_id_key, ExerciseSerializer::table,
                     ExerciseSerializer::id_key, OnDeleteAction::Cascade);
-    bool ok = m_repository->createTable(table);
-
-    QSqlQuery pragmaQuery(m_repository->storage().database());
-    pragmaQuery.exec(QStringLiteral("PRAGMA table_info(%1)").arg(SetSerializer::table));
-    bool hasCompletedColumn = false;
-    while (pragmaQuery.next())
-    {
-        if (pragmaQuery.value(1).toString() == SetSerializer::completed_key)
-        {
-            hasCompletedColumn = true;
-            break;
-        }
-    }
-    if (!hasCompletedColumn)
-    {
-        QSqlQuery alter(m_repository->storage().database());
-        alter.exec(QStringLiteral("ALTER TABLE %1 ADD COLUMN %2 INTEGER DEFAULT 0")
-                       .arg(SetSerializer::table, SetSerializer::completed_key));
-    }
-
-    return ok;
+    return m_repository->createTable(table);
 }
 
 void SetRepositoryDb::registerMigrations(MigrationRunner& runner)
@@ -113,6 +91,17 @@ void SetRepositoryDb::registerMigrations(MigrationRunner& runner)
                 && backfillPositions(db, SetSerializer::table, SetSerializer::exercise_id_key,
                                      SetSerializer::id_key, SetSerializer::position_key);
         });
+
+    runner.add(7,
+               [](QSqlDatabase& db)
+               {
+                   return AlterTable(SetSerializer::table)
+                              .addColumn(
+                                  Column(SetSerializer::completed_key).integer().defaultValue(0))
+                              .execute(db)
+                              .toInt()
+                       != 0;
+               });
 }
 
 std::vector<Set> SetRepositoryDb::findByExerciseId(int exerciseId) const

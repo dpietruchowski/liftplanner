@@ -5,6 +5,7 @@
 #include "infrastructure/workout/exerciseserializer.h"
 #include "infrastructure/workout/setserializer.h"
 #include "infrastructure/workout/workoutrepositorydb.h"
+#include "infrastructure/workout/workoutserializer.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QStringList>
@@ -85,6 +86,42 @@ protected:
                                "VALUES (11, 9, 8, 60.0, 1)"));
         ASSERT_TRUE(query.exec("INSERT INTO sets (id, exercise_id, repetitions, weight, completed) "
                                "VALUES (17, 9, 8, 65.0, 1)"));
+    }
+
+    void createPreStatusSchema()
+    {
+        QSqlQuery query(m_database);
+        ASSERT_TRUE(query.exec("CREATE TABLE workouts ("
+                               "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                               "name TEXT, created_time TEXT, planned_time TEXT, "
+                               "started_time TEXT, ended_time TEXT)"));
+        ASSERT_TRUE(query.exec("CREATE TABLE exercises ("
+                               "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                               "workout_id INTEGER NOT NULL, name TEXT, description TEXT, "
+                               "rest_seconds INTEGER, "
+                               "FOREIGN KEY (workout_id) REFERENCES workouts(id) "
+                               "ON DELETE CASCADE)"));
+        ASSERT_TRUE(query.exec("CREATE TABLE sets ("
+                               "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+                               "exercise_id INTEGER NOT NULL, repetitions INTEGER, weight REAL, "
+                               "FOREIGN KEY (exercise_id) REFERENCES exercises(id) "
+                               "ON DELETE CASCADE)"));
+        ASSERT_TRUE(query.exec("PRAGMA user_version = 0"));
+    }
+
+    void insertPreStatusWorkouts()
+    {
+        QSqlQuery query(m_database);
+        ASSERT_TRUE(query.exec("INSERT INTO workouts (id, name, started_time, ended_time) "
+                               "VALUES (1, 'Finished', '2026-05-01T18:00:00', "
+                               "'2026-05-01T19:10:00')"));
+        ASSERT_TRUE(query.exec("INSERT INTO workouts (id, name, started_time) "
+                               "VALUES (2, 'In progress', '2026-05-02T18:00:00')"));
+        ASSERT_TRUE(query.exec("INSERT INTO workouts (id, name) VALUES (3, 'Not started yet')"));
+        ASSERT_TRUE(query.exec("INSERT INTO exercises (id, workout_id, name, rest_seconds) "
+                               "VALUES (1, 1, 'Bench Press', 120)"));
+        ASSERT_TRUE(query.exec("INSERT INTO sets (id, exercise_id, repetitions, weight) "
+                               "VALUES (1, 1, 10, 80.0)"));
     }
 
     void migrate()
@@ -209,7 +246,7 @@ TEST_F(MigrationTest, LegacyDatabase_ReachesLatestSchemaVersion)
 
     migrate();
 
-    EXPECT_EQ(m_schemaVersion, 6);
+    EXPECT_EQ(m_schemaVersion, 8);
 }
 
 TEST_F(MigrationTest, Migration_IsIdempotent)
@@ -222,7 +259,7 @@ TEST_F(MigrationTest, Migration_IsIdempotent)
     m_repo->registerMigrations(second);
 
     EXPECT_TRUE(second.run());
-    EXPECT_EQ(second.currentVersion(), 6);
+    EXPECT_EQ(second.currentVersion(), 8);
     EXPECT_EQ(scalar("SELECT COUNT(*) FROM sets").toInt(), 2);
     EXPECT_EQ(scalar("SELECT metric FROM sets WHERE id = 1").toString(), "reps");
 }
@@ -262,7 +299,7 @@ TEST_F(MigrationTest, FreshDatabase_HasAllColumnsAndLatestVersion)
     EXPECT_TRUE(setColumns.contains(SetSerializer::metric_key));
     EXPECT_TRUE(setColumns.contains(SetSerializer::rest_seconds_override_key));
     EXPECT_TRUE(columnsOf(ExerciseSerializer::table).contains(ExerciseSerializer::kind_key));
-    EXPECT_EQ(m_schemaVersion, 6);
+    EXPECT_EQ(m_schemaVersion, 8);
 }
 
 TEST_F(MigrationTest, FreshDatabase_RoundtripsTimedAndDistanceSets)
@@ -371,4 +408,38 @@ TEST_F(MigrationTest, MigratedOrderSurvivesReadBack)
     EXPECT_EQ(workout->exercises()[2].name(), "Curl");
     for (size_t i = 0; i < workout->exercises().size(); ++i)
         EXPECT_EQ(workout->exercises()[i].position(), static_cast<int>(i));
+}
+
+TEST_F(MigrationTest, PreStatusDatabase_GainsStatusAndCompletedColumns)
+{
+    createPreStatusSchema();
+    insertPreStatusWorkouts();
+
+    migrate();
+
+    EXPECT_TRUE(columnsOf(WorkoutSerializer::table).contains(WorkoutSerializer::status_key));
+    EXPECT_TRUE(columnsOf(SetSerializer::table).contains(SetSerializer::completed_key));
+    EXPECT_EQ(m_schemaVersion, 8);
+}
+
+TEST_F(MigrationTest, PreStatusWorkouts_GetStatusFromTheirTimes)
+{
+    createPreStatusSchema();
+    insertPreStatusWorkouts();
+
+    migrate();
+
+    EXPECT_EQ(scalar("SELECT status FROM workouts WHERE id = 1").toString(), "Ended");
+    EXPECT_EQ(scalar("SELECT status FROM workouts WHERE id = 2").toString(), "Started");
+    EXPECT_EQ(scalar("SELECT status FROM workouts WHERE id = 3").toString(), "Planned");
+}
+
+TEST_F(MigrationTest, PreStatusSets_DefaultToNotCompleted)
+{
+    createPreStatusSchema();
+    insertPreStatusWorkouts();
+
+    migrate();
+
+    EXPECT_EQ(scalar("SELECT completed FROM sets WHERE id = 1").toInt(), 0);
 }
