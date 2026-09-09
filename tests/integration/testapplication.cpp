@@ -17,6 +17,7 @@
 #include "ui/viewmodels/activeworkoutviewmodel.h"
 #include "ui/viewmodels/exercisecatalogviewmodel.h"
 #include "ui/viewmodels/plannedworkoutviewmodel.h"
+#include "ui/viewmodels/userprofileviewmodel.h"
 #include "ui/viewmodels/workouteditorviewmodel.h"
 #include "ui/viewmodels/workouthistoryviewmodel.h"
 #include "ui/viewmodels/workouttemplateviewmodel.h"
@@ -84,6 +85,7 @@ TestApplication::TestApplication()
         m_workoutService.get(), m_workoutTemplateService.get());
     m_workoutTemplateViewModel
         = std::make_unique<WorkoutTemplateViewModel>(m_workoutTemplateService.get());
+    m_userProfileViewModel = std::make_unique<UserProfileViewModel>(m_userProfileService.get());
 
     drain();
 }
@@ -92,6 +94,7 @@ TestApplication::~TestApplication()
 {
     drain();
 
+    m_userProfileViewModel.reset();
     m_workoutTemplateViewModel.reset();
     m_workoutEditorViewModel.reset();
     m_exerciseCatalogViewModel.reset();
@@ -168,6 +171,8 @@ WorkoutTemplateViewModel& TestApplication::workoutTemplateViewModel()
 {
     return *m_workoutTemplateViewModel;
 }
+
+UserProfileViewModel& TestApplication::userProfileViewModel() { return *m_userProfileViewModel; }
 
 WorkoutEditorViewModel& TestApplication::workoutEditorViewModel()
 {

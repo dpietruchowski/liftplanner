@@ -27,6 +27,7 @@ class PlannedWorkoutViewModel;
 class ExerciseCatalogViewModel;
 class WorkoutEditorViewModel;
 class WorkoutTemplateViewModel;
+class UserProfileViewModel;
 
 class TestApplication final
 {
@@ -40,6 +41,7 @@ public:
     ExerciseCatalogViewModel& exerciseCatalogViewModel();
     WorkoutEditorViewModel& workoutEditorViewModel();
     WorkoutTemplateViewModel& workoutTemplateViewModel();
+    UserProfileViewModel& userProfileViewModel();
 
     WorkoutService& workoutService();
     WorkoutTemplateService& workoutTemplateService();
@@ -83,4 +85,5 @@ private:
     std::unique_ptr<ExerciseCatalogViewModel> m_exerciseCatalogViewModel;
     std::unique_ptr<WorkoutEditorViewModel> m_workoutEditorViewModel;
     std::unique_ptr<WorkoutTemplateViewModel> m_workoutTemplateViewModel;
+    std::unique_ptr<UserProfileViewModel> m_userProfileViewModel;
 };

@@ -199,6 +199,7 @@ Rectangle {
                 FormLabel { text: "Sex" }
                 ProfileCombo {
                     id: sexCombo
+                    objectName: "profileSexCombo"
                     field: "sex"
                     values: ["male", "female", "other"]
                     model: ["Male", "Female", "Other"]
@@ -207,6 +208,7 @@ Rectangle {
                 FormLabel { text: "Date of birth" }
                 FormInput {
                     id: dobField
+                    objectName: "profileDateOfBirthField"
                     placeholder: "YYYY-MM-DD"
                     inputMethodHints: Qt.ImhPreferNumbers
 
@@ -228,6 +230,7 @@ Rectangle {
                 }
 
                 Text {
+                    objectName: "profileDateOfBirthError"
                     visible: root.dobInvalid
                     Layout.columnSpan: 2
                     Layout.alignment: Qt.AlignRight
@@ -239,6 +242,7 @@ Rectangle {
                 FormLabel { text: "Bodyweight (" + UserProfileViewModel.bodyweightUnit + ")" }
                 FormInput {
                     id: bodyweightField
+                    objectName: "profileBodyweightField"
                     placeholder: "e.g. 82.5"
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     validator: RegularExpressionValidator {
@@ -264,6 +268,7 @@ Rectangle {
                 FormLabel { text: "Primary goal" }
                 ProfileCombo {
                     id: goalCombo
+                    objectName: "profilePrimaryGoalCombo"
                     field: "primaryGoal"
                     values: ["general_fitness", "weight_loss", "muscle_gain",
                              "strength", "endurance"]
@@ -274,6 +279,7 @@ Rectangle {
                 FormLabel { text: "Experience" }
                 ProfileCombo {
                     id: experienceCombo
+                    objectName: "profileExperienceCombo"
                     field: "experienceLevel"
                     values: ["beginner", "intermediate", "advanced"]
                     model: ["Beginner", "Intermediate", "Advanced"]
@@ -282,6 +288,7 @@ Rectangle {
                 FormLabel { text: "Sessions per week" }
                 ThemedSpinBox {
                     id: sessionsSpin
+                    objectName: "profileSessionsSpin"
                     Layout.preferredWidth: root.controlWidth
                     Layout.alignment: Qt.AlignRight
                     from: 1
@@ -305,6 +312,7 @@ Rectangle {
                 FormLabel { text: "Units" }
                 ProfileCombo {
                     id: unitsCombo
+                    objectName: "profileUnitsCombo"
                     field: "unitSystem"
                     values: ["metric", "imperial"]
                     model: ["Metric (kg)", "Imperial (lb)"]
@@ -313,6 +321,7 @@ Rectangle {
                 FormLabel { text: "Language" }
                 ProfileCombo {
                     id: languageCombo
+                    objectName: "profileLanguageCombo"
                     field: "language"
                     values: ["en", "pl"]
                     model: ["English", "Polski"]
@@ -321,6 +330,7 @@ Rectangle {
                 FormLabel { text: "Timezone" }
                 FormInput {
                     id: timezoneField
+                    objectName: "profileTimezoneField"
                     placeholder: "Europe/Warsaw"
                     font.pixelSize: Theme.fontSize.small
                     onTextChanged: UserProfileViewModel.timezone = text.trim()
@@ -335,6 +345,7 @@ Rectangle {
 
             ThemedTextArea {
                 id: notesArea
+                objectName: "profileNotesArea"
                 Layout.fillWidth: true
                 Layout.preferredHeight: 120
                 onTextChanged: {
