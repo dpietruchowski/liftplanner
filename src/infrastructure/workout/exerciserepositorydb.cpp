@@ -1,4 +1,5 @@
 #include "exerciserepositorydb.h"
+#include "infrastructure/dbrows.h"
 #include "infrastructure/workout/exerciseserializer.h"
 #include "infrastructure/workout/workoutserializer.h"
 
@@ -117,17 +118,17 @@ QStringList ExerciseRepositoryDb::staticHoldNames()
              QStringLiteral("Dead Hang"), QStringLiteral("Wall Sit") };
 }
 
+std::vector<Exercise> ExerciseRepositoryDb::findBy(const Where& where) const
+{
+    return DbRows::toEntities(m_repository->select(where,
+                                                   positionOrder(ExerciseSerializer::workout_id_key,
+                                                                 ExerciseSerializer::position_key)),
+                              ExerciseSerializer::fromVariant);
+}
+
 std::vector<Exercise> ExerciseRepositoryDb::findByWorkoutId(int workoutId) const
 {
-    auto where = Where(ExerciseSerializer::workout_id_key).equals(workoutId);
-    auto rows = m_repository->select(
-        where, positionOrder(ExerciseSerializer::workout_id_key, ExerciseSerializer::position_key));
-
-    std::vector<Exercise> results;
-    results.reserve(rows.size());
-    for (const auto& row : rows)
-        results.push_back(ExerciseSerializer::fromVariant(row));
-    return results;
+    return findBy(Where(ExerciseSerializer::workout_id_key).equals(workoutId));
 }
 
 std::vector<Exercise> ExerciseRepositoryDb::findByWorkoutIds(const QList<int>& workoutIds) const
@@ -135,32 +136,12 @@ std::vector<Exercise> ExerciseRepositoryDb::findByWorkoutIds(const QList<int>& w
     if (workoutIds.isEmpty())
         return {};
 
-    auto where = Where(ExerciseSerializer::workout_id_key).in(workoutIds);
-    auto rows = m_repository->select(
-        where, positionOrder(ExerciseSerializer::workout_id_key, ExerciseSerializer::position_key));
-
-    std::vector<Exercise> results;
-    results.reserve(rows.size());
-    for (const auto& row : rows)
-        results.push_back(ExerciseSerializer::fromVariant(row));
-    return results;
+    return findBy(Where(ExerciseSerializer::workout_id_key).in(workoutIds));
 }
 
 int ExerciseRepositoryDb::save(const Exercise& exercise)
 {
-    QVariantMap data = ExerciseSerializer::toVariant(exercise);
-
-    if (exercise.id() != -1)
-    {
-        auto where = Where(ExerciseSerializer::id_key).equals(exercise.id());
-        if (m_repository->exists(where))
-        {
-            m_repository->update(data, where);
-            return exercise.id();
-        }
-    }
-
-    return m_repository->insert(data).toInt();
+    return m_repository->upsert(ExerciseSerializer::toVariant(exercise)).toInt();
 }
 
 void ExerciseRepositoryDb::removeByWorkoutIdExcept(int workoutId, const QList<int>& keptIds)

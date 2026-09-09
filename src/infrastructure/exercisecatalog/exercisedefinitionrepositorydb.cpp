@@ -3,6 +3,7 @@
 #include "infrastructure/exercisecatalog/exercisedefinitionserializer.h"
 #include "infrastructure/exercisecatalog/muscleinvolvementserializer.h"
 
+#include "infrastructure/dbrows.h"
 #include "infrastructure/whereclause.h"
 
 #include <dbtoolkit/dbrepository.h>
@@ -150,14 +151,10 @@ void ExerciseDefinitionRepositoryDb::registerMigrations(MigrationRunner&) { }
 std::vector<ExerciseDefinition>
 ExerciseDefinitionRepositoryDb::findAll(const ExerciseDefinitionQuery& query) const
 {
-    const auto rows
-        = m_definitionRepo->select(buildWhereClause(query), buildOrderClause(query),
-                                   query.limit().value_or(-1), query.offset().value_or(-1));
-
-    std::vector<ExerciseDefinition> results;
-    results.reserve(rows.size());
-    for (const auto& row : rows)
-        results.push_back(ExerciseDefinitionSerializer::fromVariant(row));
+    auto results = DbRows::toEntities(
+        m_definitionRepo->select(buildWhereClause(query), buildOrderClause(query),
+                                 query.limit().value_or(-1), query.offset().value_or(-1)),
+        ExerciseDefinitionSerializer::fromVariant);
 
     loadMuscles(results);
     return results;
@@ -188,15 +185,9 @@ int ExerciseDefinitionRepositoryDb::save(const ExerciseDefinition& definition)
         definitionId = findIdBySlug(definition.slug());
 
     if (definitionId != -1)
-    {
         data.insert(ExerciseDefinitionSerializer::id_key, definitionId);
-        m_definitionRepo->update(data,
-                                 Where(ExerciseDefinitionSerializer::id_key).equals(definitionId));
-    }
-    else
-    {
-        definitionId = m_definitionRepo->insert(data).toInt();
-    }
+
+    definitionId = m_definitionRepo->upsert(data).toInt();
 
     saveMuscles(definitionId, definition);
 

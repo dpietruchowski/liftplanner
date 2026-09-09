@@ -1,4 +1,5 @@
 #include "setrepositorydb.h"
+#include "infrastructure/dbrows.h"
 #include "infrastructure/workout/exerciseserializer.h"
 #include "infrastructure/workout/setserializer.h"
 
@@ -104,17 +105,17 @@ void SetRepositoryDb::registerMigrations(MigrationRunner& runner)
                });
 }
 
+std::vector<Set> SetRepositoryDb::findBy(const Where& where) const
+{
+    return DbRows::toEntities(
+        m_repository->select(
+            where, positionOrder(SetSerializer::exercise_id_key, SetSerializer::position_key)),
+        SetSerializer::fromVariant);
+}
+
 std::vector<Set> SetRepositoryDb::findByExerciseId(int exerciseId) const
 {
-    auto where = Where(SetSerializer::exercise_id_key).equals(exerciseId);
-    auto rows = m_repository->select(
-        where, positionOrder(SetSerializer::exercise_id_key, SetSerializer::position_key));
-
-    std::vector<Set> results;
-    results.reserve(rows.size());
-    for (const auto& row : rows)
-        results.push_back(SetSerializer::fromVariant(row));
-    return results;
+    return findBy(Where(SetSerializer::exercise_id_key).equals(exerciseId));
 }
 
 std::vector<Set> SetRepositoryDb::findByExerciseIds(const QList<int>& exerciseIds) const
@@ -122,32 +123,12 @@ std::vector<Set> SetRepositoryDb::findByExerciseIds(const QList<int>& exerciseId
     if (exerciseIds.isEmpty())
         return {};
 
-    auto where = Where(SetSerializer::exercise_id_key).in(exerciseIds);
-    auto rows = m_repository->select(
-        where, positionOrder(SetSerializer::exercise_id_key, SetSerializer::position_key));
-
-    std::vector<Set> results;
-    results.reserve(rows.size());
-    for (const auto& row : rows)
-        results.push_back(SetSerializer::fromVariant(row));
-    return results;
+    return findBy(Where(SetSerializer::exercise_id_key).in(exerciseIds));
 }
 
 int SetRepositoryDb::save(const Set& set)
 {
-    QVariantMap data = SetSerializer::toVariant(set);
-
-    if (set.id() != -1)
-    {
-        auto where = Where(SetSerializer::id_key).equals(set.id());
-        if (m_repository->exists(where))
-        {
-            m_repository->update(data, where);
-            return set.id();
-        }
-    }
-
-    return m_repository->insert(data).toInt();
+    return m_repository->upsert(SetSerializer::toVariant(set)).toInt();
 }
 
 void SetRepositoryDb::removeByExerciseIdExcept(int exerciseId, const QList<int>& keptIds)

@@ -3,6 +3,7 @@
 #include "domain/workout/exercise.h"
 #include <QList>
 #include <QStringList>
+#include <dbtoolkit/query/where.h>
 #include <memory>
 #include <vector>
 
@@ -26,6 +27,8 @@ public:
 
 private:
     static QStringList staticHoldNames();
+
+    std::vector<Exercise> findBy(const Where& where) const;
 
     std::unique_ptr<DbRepository> m_repository;
 };

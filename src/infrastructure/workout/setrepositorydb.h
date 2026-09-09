@@ -2,6 +2,7 @@
 
 #include "domain/workout/set.h"
 #include <QList>
+#include <dbtoolkit/query/where.h>
 #include <memory>
 #include <vector>
 
@@ -24,5 +25,7 @@ public:
     void removeByExerciseIdExcept(int exerciseId, const QList<int>& keptIds);
 
 private:
+    std::vector<Set> findBy(const Where& where) const;
+
     std::unique_ptr<DbRepository> m_repository;
 };

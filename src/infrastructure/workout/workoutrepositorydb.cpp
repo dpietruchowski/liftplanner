@@ -4,6 +4,7 @@
 #include "domain/workout/workout.h"
 #include "domain/workout/workoutquery.h"
 #include "domain/workout/workoutstatus.h"
+#include "infrastructure/dbrows.h"
 #include "infrastructure/whereclause.h"
 #include "infrastructure/workout/workoutserializer.h"
 
@@ -101,12 +102,8 @@ std::vector<Workout> WorkoutRepositoryDb::findAll(const WorkoutQuery& query) con
     int limit = query.limit().value_or(-1);
     int offset = query.offset().value_or(-1);
 
-    auto rows = m_workoutRepo->select(where, order, limit, offset);
-
-    std::vector<Workout> results;
-    results.reserve(rows.size());
-    for (const auto& row : rows)
-        results.push_back(WorkoutSerializer::fromVariant(row));
+    auto results = DbRows::toEntities(m_workoutRepo->select(where, order, limit, offset),
+                                      WorkoutSerializer::fromVariant);
 
     loadChildren(results);
     return results;
@@ -130,26 +127,7 @@ int WorkoutRepositoryDb::save(const Workout& workout)
     DbStorage& storage = m_workoutRepo->storage();
     storage.beginTransaction();
 
-    QVariantMap data = WorkoutSerializer::toVariant(workout);
-
-    int workoutId;
-    if (workout.id() != -1)
-    {
-        auto where = Where(WorkoutSerializer::id_key).equals(workout.id());
-        if (m_workoutRepo->exists(where))
-        {
-            m_workoutRepo->update(data, where);
-            workoutId = workout.id();
-        }
-        else
-        {
-            workoutId = m_workoutRepo->insert(data).toInt();
-        }
-    }
-    else
-    {
-        workoutId = m_workoutRepo->insert(data).toInt();
-    }
+    const int workoutId = m_workoutRepo->upsert(WorkoutSerializer::toVariant(workout)).toInt();
 
     saveChildren(workoutId, workout);
 
