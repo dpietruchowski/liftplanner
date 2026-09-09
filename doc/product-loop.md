@@ -45,10 +45,20 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 - **Nigdy nie ruszam prawdziwych danych**: `liftplanner.db` w korzeniu ani
   `~/.local/share/LiftPlanner/`. Sesja UI sama się piaskownicuje w `tmp/run`.
 - **Nie pushuję.** Commity zostają lokalnie.
+- **Buduję zawsze `-j 4`**, nigdy `-j$(nproc)` — użytkownik pracuje równolegle
+  w innych oknach.
 - Agentów trzymam przy życiu i odzywam się do nich `SendMessage` zamiast
   spawnować nowych — świeży agent to kilkanaście tysięcy tokenów na samo wejście.
-- Obchód aplikacji leci przez skrypt zwracający skrót, nie przez surowe dumpy.
-  Zrzuty oglądam wybiórczo, bo obrazek to ponad tysiąc tokenów.
+- Definicje z `.claude/agents/` wczytują się przy starcie sesji, więc w sesji, w
+  której powstały, `subagent_type` ich nie zna. Obejście bez restartu: spawnuję
+  `general-purpose` i w prompcie każę mu przeczytać
+  `.claude/agents/<rola>.md` i przyjąć to jako swoją instrukcję. Przy okazji
+  treść definicji nie wchodzi wtedy do mojego kontekstu.
+- Obchód aplikacji leci przez `tmp/walk.py` — jedno wywołanie na całą ścieżkę,
+  zwraca skrót plus podejrzane linie z logu, zamiast surowych dumpów. Zrzuty
+  oglądam wybiórczo, bo obrazek to ponad tysiąc tokenów.
+- Buduję przez `bash tmp/buildwarn.sh` (log do `tmp/build.log`, na wyjściu
+  liczba ostrzeżeń), nie gołym `cmake --build` — ten wypluwa setki linii.
 
 ## Stan
 
