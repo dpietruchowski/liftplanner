@@ -1,4 +1,5 @@
 #include "set.h"
+#include "domain/workout/restseconds.h"
 #include "domain/workout/strengthmath.h"
 #include <cmath>
 
@@ -64,7 +65,7 @@ QString Set::formatSeconds(int seconds)
 
 int Set::effectiveRestSeconds(int exerciseDefault) const
 {
-    return m_restSecondsOverride >= 0 ? m_restSecondsOverride : exerciseDefault;
+    return RestSeconds::effective(m_restSecondsOverride, exerciseDefault);
 }
 
 QString Set::toCompactString() const

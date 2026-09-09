@@ -1,6 +1,7 @@
 #pragma once
 
 #include "loadtype.h"
+#include "restseconds.h"
 #include "setmetric.h"
 #include <QString>
 
@@ -56,6 +57,6 @@ private:
     LoadType m_loadType { LoadType::External };
     int m_durationSeconds { 0 };
     double m_distanceMeters { 0.0 };
-    int m_restSecondsOverride { -1 };
+    int m_restSecondsOverride { RestSeconds::inherited };
     int m_position { 0 };
 };

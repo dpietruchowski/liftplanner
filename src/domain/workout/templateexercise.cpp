@@ -1,5 +1,6 @@
 #include "templateexercise.h"
 #include "domain/ordered.h"
+#include "domain/workout/restseconds.h"
 
 TemplateExercise::TemplateExercise() = default;
 
@@ -33,7 +34,7 @@ void TemplateExercise::normalizePositions() { Ordered::renumber(m_sets); }
 
 int TemplateExercise::effectiveRestSeconds(int definitionDefault) const
 {
-    return m_restSecondsOverride >= 0 ? m_restSecondsOverride : definitionDefault;
+    return RestSeconds::effective(m_restSecondsOverride, definitionDefault);
 }
 
 Exercise TemplateExercise::toExercise(const QString& name, ExerciseKind kind,

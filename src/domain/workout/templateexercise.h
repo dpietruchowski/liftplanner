@@ -2,6 +2,7 @@
 
 #include "exercise.h"
 #include "exercisekind.h"
+#include "restseconds.h"
 #include "setprescription.h"
 #include <QString>
 #include <QStringList>
@@ -39,7 +40,7 @@ public:
 private:
     int m_definitionId { -1 };
     int m_position { 0 };
-    int m_restSecondsOverride { -1 };
+    int m_restSecondsOverride { RestSeconds::inherited };
     QString m_notes;
     std::vector<SetPrescription> m_sets;
 };

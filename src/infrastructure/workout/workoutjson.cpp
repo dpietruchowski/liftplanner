@@ -1,4 +1,5 @@
 #include "workoutjson.h"
+#include "domain/workout/restseconds.h"
 #include "domain/workout/workoutstatus.h"
 #include <QJsonDocument>
 #include <QRegularExpression>
@@ -248,7 +249,7 @@ std::vector<Set> parseSets(const QString& text, QStringList* errors)
         };
 
         int count = 1;
-        int restOverride = -1;
+        int restOverride = RestSeconds::inherited;
         QString work = token;
 
         const auto repeat = repeatRe.match(token);

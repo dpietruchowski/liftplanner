@@ -1,6 +1,7 @@
 #pragma once
 
 #include "loadtype.h"
+#include "restseconds.h"
 #include "set.h"
 #include "setmetric.h"
 
@@ -41,6 +42,6 @@ private:
     double m_weight { 0.0 };
     int m_durationSeconds { 0 };
     double m_distanceMeters { 0.0 };
-    int m_restSecondsOverride { -1 };
+    int m_restSecondsOverride { RestSeconds::inherited };
     int m_position { 0 };
 };
