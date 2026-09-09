@@ -52,7 +52,6 @@ public:
     static Workout createDefault(const QString& name);
 
 private:
-    void validate() const;
     void renumberExercises();
 
     int m_id { -1 };

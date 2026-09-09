@@ -62,7 +62,6 @@ public:
     double bestOneRepMax() const;
 
 private:
-    void validate() const;
     void renumberSets();
 
     int m_id { -1 };

@@ -9,7 +9,6 @@ Exercise::Exercise(const QString& name, int restSeconds)
     : m_name(name)
     , m_restSeconds(restSeconds)
 {
-    validate();
 }
 
 Exercise Exercise::createFromDefinition(int definitionId, const QString& name, ExerciseKind kind,
@@ -247,5 +246,3 @@ QStringList Exercise::validationErrors() const
 }
 
 bool Exercise::isValid() const { return validationErrors().isEmpty(); }
-
-void Exercise::validate() const { }

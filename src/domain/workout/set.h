@@ -47,8 +47,6 @@ public:
     void setPosition(int position);
 
 private:
-    void validate() const;
-
     int m_id { -1 };
     int m_exerciseId { -1 };
     int m_repetitions { 0 };

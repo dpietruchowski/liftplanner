@@ -7,7 +7,6 @@ Workout::Workout(const QString& name, const QDateTime& createdTime)
     : m_name(name)
     , m_createdTime(createdTime)
 {
-    validate();
 }
 
 int Workout::id() const { return m_id; }
@@ -161,5 +160,3 @@ Workout Workout::createDefault(const QString& name)
 {
     return Workout(name, TimeProvider::instance().currentDateTime());
 }
-
-void Workout::validate() const { }

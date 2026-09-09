@@ -8,7 +8,6 @@ Set::Set(int repetitions, double weight)
     : m_repetitions(repetitions)
     , m_weight(weight)
 {
-    validate();
 }
 
 Set Set::createDuration(int seconds)
@@ -17,7 +16,6 @@ Set Set::createDuration(int seconds)
     set.m_metric = SetMetric::Duration;
     set.m_loadType = LoadType::None;
     set.m_durationSeconds = seconds;
-    set.validate();
     return set;
 }
 
@@ -28,7 +26,6 @@ Set Set::createDistance(double meters, int seconds)
     set.m_loadType = LoadType::None;
     set.m_distanceMeters = meters;
     set.m_durationSeconds = seconds;
-    set.validate();
     return set;
 }
 
@@ -125,5 +122,3 @@ double Set::oneRepMax() const
 {
     return isWeighted() ? StrengthMath::oneRepMax(m_repetitions, m_weight) : 0.0;
 }
-
-void Set::validate() const { }
