@@ -7,6 +7,7 @@ import Themed.Components
 Column {
     id: exerciseDelegate
     property var exercise: modelData
+    property int exerciseIndex: 0
     property var screen
     property int exerciseCount: 0
     signal showExerciseInfo(var exercise)
@@ -130,7 +131,7 @@ Column {
             }
 
             ThemedButton {
-                objectName: "exerciseInfoButton"
+                objectName: "exerciseInfoButton" + exerciseDelegate.exerciseIndex
                 iconSource: Theme.icons.info
                 circular: true
                 buttonSize: Theme.button.badge
@@ -188,19 +189,23 @@ Column {
                 z: 1
 
                 ThemedButton {
+                    objectName: "activeMoveExerciseUpButton" + exerciseDelegate.exerciseIndex
                     iconSource: Theme.icons.moveUp
                     buttonSize: Theme.button.square
                     buttonStyle: Theme.button.subtle
-                    enabled: index > 0
-                    onClicked: exerciseDelegate.screen.requestMove(exercise, index, -1)
+                    enabled: exerciseDelegate.exerciseIndex > 0
+                    onClicked: exerciseDelegate.screen.requestMove(
+                                   exercise, exerciseDelegate.exerciseIndex, -1)
                 }
 
                 ThemedButton {
+                    objectName: "activeMoveExerciseDownButton" + exerciseDelegate.exerciseIndex
                     iconSource: Theme.icons.moveDown
                     buttonSize: Theme.button.square
                     buttonStyle: Theme.button.subtle
-                    enabled: index < exerciseDelegate.exerciseCount - 1
-                    onClicked: exerciseDelegate.screen.requestMove(exercise, index, 1)
+                    enabled: exerciseDelegate.exerciseIndex < exerciseDelegate.exerciseCount - 1
+                    onClicked: exerciseDelegate.screen.requestMove(
+                                   exercise, exerciseDelegate.exerciseIndex, 1)
                 }
             }
         }
@@ -214,7 +219,7 @@ Column {
     }
 
     Text {
-        objectName: "previousPerformanceText"
+        objectName: "previousPerformanceText" + exerciseDelegate.exerciseIndex
         width: exerciseDelegate.width
         visible: exerciseDelegate.isExpanded && exercise.previousSummary.length > 0
         text: qsTr("Last time") + " · " + Qt.formatDate(exercise.previousDate, "d MMM")
@@ -238,7 +243,7 @@ Column {
             model: exercise.sets
 
             delegate: ActiveWorkoutSetItem {
-                objectName: "activeWorkoutSetItem" + index
+                objectName: "activeWorkoutSetItem" + exerciseDelegate.exerciseIndex + "_" + index
                 width: setsColumn.width
                 number: index + 1
                 setData: modelData

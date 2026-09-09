@@ -29,6 +29,8 @@ Rectangle {
                                   : root.loadType === "assisted" ? qsTr("- KG")
                                                                  : qsTr("KG")
 
+    readonly property string namePrefix: root.objectName.length > 0 ? root.objectName + "_" : ""
+
     signal completionToggled()
     signal primaryAdjusted(int direction)
     signal secondaryAdjusted(int direction)
@@ -105,6 +107,7 @@ Rectangle {
 
             CompletionDot {
                 id: dot
+                objectName: root.namePrefix + "completionDot"
                 size: root.current ? Theme.layout.indicatorSizeLarge : Theme.layout.indicatorSize
                 completed: root.completed
                 highlighted: root.current
@@ -145,8 +148,8 @@ Rectangle {
 
                 StepperField {
                     label: root.primaryLabel
-                    decrementName: "primaryDecrementButton"
-                    incrementName: "primaryIncrementButton"
+                    decrementName: root.namePrefix + "primaryDecrementButton"
+                    incrementName: root.namePrefix + "primaryIncrementButton"
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     onDecremented: root.primaryAdjusted(-1)
@@ -155,8 +158,8 @@ Rectangle {
 
                 StepperField {
                     label: root.secondaryLabel
-                    decrementName: "secondaryDecrementButton"
-                    incrementName: "secondaryIncrementButton"
+                    decrementName: root.namePrefix + "secondaryDecrementButton"
+                    incrementName: root.namePrefix + "secondaryIncrementButton"
                     visible: root.secondaryAdjustable
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -172,7 +175,7 @@ Rectangle {
                 spacing: Theme.spacing.small
 
                 ThemedButton {
-                    objectName: "duplicateSetButton"
+                    objectName: root.namePrefix + "duplicateSetButton"
                     text: qsTr("Duplicate set")
                     iconSource: Theme.icons.addSet
                     buttonSize: Theme.button.small
@@ -183,7 +186,7 @@ Rectangle {
                 }
 
                 ThemedButton {
-                    objectName: "removeSetButton"
+                    objectName: root.namePrefix + "removeSetButton"
                     iconSource: Theme.icons.removeSet
                     buttonSize: Theme.button.small
                     buttonStyle: Theme.button.dangerSubtle

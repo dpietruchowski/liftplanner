@@ -74,7 +74,9 @@ Rectangle {
                     model: ActiveWorkoutViewModel.currentWorkout ? ActiveWorkoutViewModel.currentWorkout.exercises : []
 
                     delegate: ActiveWorkoutExerciseItem {
+                        objectName: "activeWorkoutExerciseItem" + index
                         exercise: modelData
+                        exerciseIndex: index
                         screen: contentColumn
                         exerciseCount: exerciseRepeater.count
                         onShowExerciseInfo: function(exercise) {
