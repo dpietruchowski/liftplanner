@@ -444,6 +444,11 @@ DefaultTheme {
     property QtObject setRow: QtObject {
         readonly property int numberWidth: 24
         readonly property int primaryWidth: 66
+        readonly property int previousWidth: 84
+        readonly property int previousFontSize: 10
+        readonly property int valueMinWidth: 78
+        readonly property int valueFontSize: 14
+        readonly property int valueCurrentFontSize: 16
         readonly property int stepperHeight: 38
         readonly property int actionHeight: 36
         readonly property int removeWidth: 72

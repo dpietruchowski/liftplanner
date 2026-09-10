@@ -15,6 +15,8 @@ Column {
     spacing: Theme.spacing.small
 
     readonly property bool isCurrent: ActiveWorkoutViewModel.currentExercise === exercise
+    readonly property bool hasPreviousSession: exercise && exercise.previousDate
+                                               && !isNaN(exercise.previousDate.getTime())
     readonly property bool isExpanded: !screen.reorderMode && screen.expandedExercise === exercise
     readonly property real moveStep: Theme.layout.rowHeight + Theme.spacing.small
     property real moveStartY: 0
@@ -221,9 +223,8 @@ Column {
     Text {
         objectName: "previousPerformanceText" + exerciseDelegate.exerciseIndex
         width: exerciseDelegate.width
-        visible: exerciseDelegate.isExpanded && exercise.previousSummary.length > 0
-        text: qsTr("Last time") + " · " + Qt.formatDate(exercise.previousDate, "d MMM")
-              + ": " + exercise.previousSummary
+        visible: exerciseDelegate.isExpanded && exerciseDelegate.hasPreviousSession
+        text: qsTr("Last time") + " · " + Qt.formatDate(exercise.previousDate, "d MMM yyyy")
         color: Theme.colors.textMuted
         font.pixelSize: Theme.fontSize.small
         elide: Text.ElideRight
@@ -247,6 +248,10 @@ Column {
                 width: setsColumn.width
                 number: index + 1
                 setData: modelData
+                previousShown: exercise.previousSetTexts.length > 0
+                previousText: index < exercise.previousSetTexts.length
+                              ? exercise.previousSetTexts[index]
+                              : ""
             }
         }
     }

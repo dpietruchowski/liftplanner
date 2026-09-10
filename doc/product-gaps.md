@@ -8,6 +8,29 @@ najpierw przepływy, które urywają się w połowie, potem zdolności, które
 aplikacja ma, ale nigdy nie oferuje, potem rzeczy, po których traci się do niej
 zaufanie, a dopiero na końcu nowe powierzchnie.
 
+## Zmiana kierunku: dziennik, nie odhaczanie planu
+
+Trzy prośby użytkownika z jednego wieczoru (G37, G38, G39) ciągną w tę samą
+stronę, i to jest ważniejsze niż każda z nich osobno. Poprzedni wynik **przy
+serii**, przycięcie zapisu **do tego, co zrobione**, i **trening bez planu**
+mówią razem jedno: on prowadzi dziennik tego, co się wydarzyło, a nie odhacza
+listę ułożoną wcześniej. Aplikacja jest zbudowana odwrotnie — plan najpierw,
+sesja jako jego wykonanie — i stąd biorą się wszystkie trzy tarcia.
+
+Nie unieważnia to planowania: import z AI zostaje sztandarową drogą wejścia i
+komuś, kto ma cykl, plan nadal służy. Zmienia się to, **która droga jest
+domyślna**, i przez to zmienia się waga reszty listy:
+
+- **Rośnie** wszystko, co dotyczy zapisu po fakcie: poprawianie liczb w
+  zakończonym treningu (G13b) i ciężar nieznany pokazywany jako „0 kg" (G18) —
+  ten drugi wchodzi wprost na nową ścieżkę, bo w treningu bez planu ćwiczenie
+  zaczyna się bez żadnej wartości.
+- **Maleje** wszystko, co obsługuje układanie planu z wyprzedzeniem: historia
+  ćwiczenia w edytorze (G35b) i przerabianie szablonów (G14). Piszę to o G35b
+  wprost, bo sam ją dwie iteracje temu postawiłem na czele — pytanie „ile
+  wpisać w plan" jest mniej ważne, jeśli plan przestaje być punktem wyjścia, a
+  odpowiedź na nie i tak stoi teraz przy serii dzięki G37.
+
 ## Stan produktu po 25 iteracjach
 
 Ocena product managera, nie sprawozdanie — spis zrobionej roboty jest w commitach
@@ -53,11 +76,11 @@ naprawdę zostało zrobione.
 
 ### Od czego zacząłbym dalej
 
-Od **G35, plaster pierwszy: historii jednego ćwiczenia w panelu informacji**.
-Reszta listy to poprawki i drobiazgi; to jedyna pozostała rzecz, która dokłada
-aplikacji nową wartość, a nie odejmuje jej wady. Potem seria S-ek z punktu 3
-(G11, G12, G10), a G13b wtedy, gdy któryś raz okaże się, że
-eksport-poprawka-import jest za dużym zachodem.
+Kolejność ustawiona po zmianie kierunku opisanej na górze: **G37 → G38 → G39**,
+czyli trzy prośby użytkownika w tej kolejności, bo G38 ustala reguły kończenia
+sesji, na których G39 się opiera (pusty trening porzucony bez niczego nie ma
+planu, na który mógłby wrócić). Dopiero potem **G13b** i **G18** — obie obsługują
+zapis po fakcie, czyli to, czym ta aplikacja właśnie się staje.
 
 ### Trzy wnioski metodyczne dla następnej sesji
 
@@ -73,6 +96,131 @@ eksport-poprawka-import jest za dużym zachodem.
   ma się **nie** zmienić" złapał regresję, zanim powstała.
 
 ## Open
+
+### G38 — Kończąc trening, nie wiadomo, że coś zostaje niezrobione
+- **Pochodzenie: prosto od użytkownika**, kilka minut po G37 i o tym samym
+  ekranie. Cytat: „jak sie wychodzi z treningu i ma sie nieskończone zadania to
+  pisac czy na pewno chcesz wyjść. I usuwać nieskończone zamiast potem trzymać i
+  skreślać w historii".
+- **Dla kogo/po co:** dwie rzeczy naraz. Po pierwsze, okno kończące trening pyta
+  dziś zawsze tak samo („End workout? / Do you want to end workout?",
+  `ScreenActiveWorkout.qml:194`) i ani słowem nie mówi, że dziewiętnaście serii
+  zostaje niezrobionych — czyli pyta, ale nie daje się przy czym zatrzymać. Po
+  drugie, użytkownik chce, żeby jego dziennik był zapisem tego, **co zrobił**, a
+  nie listą wyrzutów; przekreślone żetony w historii uważa za śmieci.
+- **Zakres:** M
+- **Gotowe, gdy:**
+  1. zakończenie treningu, w którym część serii nie jest odhaczona, otwiera okno
+     mówiące wprost, ile serii zostanie usuniętych i że znikną bezpowrotnie;
+  2. anulowanie tego okna nie zmienia **niczego** — trening dalej trwa, wszystkie
+     serie są na miejscu, w bazie ani jeden wiersz nie ubył;
+  3. po potwierdzeniu trening w historii ma wyłącznie serie zrobione — ani jednego
+     przekreślonego żetonu — a podsumowanie zaraz po zakończeniu opisuje to, co
+     zostało zapisane, a nie plan sprzed przycięcia;
+  4. ćwiczenie, w którym nie zrobiono ani jednej serii, wypada z zapisu w całości;
+  5. trening, w którym nie zrobiono nic, nadal wraca na listę zaplanowanych
+     (G23) i nie ląduje w historii jako pusty wpis;
+  6. treningi już leżące w historii — zaimportowane, ręcznie poprawione,
+     zakończone przed tą zmianą — wyglądają dokładnie jak dotąd, z przekreśleniem
+     włącznie;
+  7. odznaczenie serii w zakończonym treningu (G13) nadal ją **zachowuje** i
+     pokazuje jako niezrobioną; kasowanie zdarza się wyłącznie w chwili kończenia
+     treningu i wyłącznie po potwierdzeniu.
+
+#### Rozstrzygnięcia, o które prosiłeś
+
+**Jedno okno, jedno potwierdzenie — nie wybór między dwiema drogami.** Użytkownik
+poprosił o jedno zachowanie, a nie o pytanie „jak dziś zapisać". Widełki „zakończ
+i usuń" obok „zakończ i zachowaj" kazałyby mu rozstrzygać to samo po każdym
+treningu, w najbardziej zmęczonym momencie dnia, na dwóch podobnych przyciskach
+obok siebie — tak się gubi dane przez pomyłkę palca. Okno ma powiedzieć prawdę
+(ile znika) i mieć jedno potwierdzenie oraz anulowanie. Nie dokładam też
+przełącznika w profilu: to podwaja powierzchnię testów dla przypadku, o który
+nikt nie prosił.
+
+**G31 zostaje w mocy.** Przekreślony żeton przestanie powstawać nową drogą, ale
+nadal ma robotę: w historii zaimportowanej, w sesjach poprawionych ręcznie i we
+wszystkim, co zostało zakończone przed tą zmianą. Wycofanie go oznaczałoby, że
+odznaczenie serii w historii po cichu kasuje dane — czyli dokładnie to, co w
+iteracji 13 uznaliśmy za najgroźniejszą rzecz w aplikacji. Kasowanie ma być
+jednym świadomym zdarzeniem w jednym miejscu, nie skutkiem ubocznym edycji.
+
+**Ćwiczenie bez ani jednej zrobionej serii wypada w całości.** Skoro zapis ma być
+tym, co się zrobiło, ćwiczenie, którego się nie zrobiło, nie jest jego częścią; a
+nagłówek ćwiczenia bez ani jednego żetonu pod spodem wyglądałby jak usterka i był
+tym samym śmieciem, na który użytkownik narzeka.
+
+**Konsekwencja, którą trzeba znać z góry:** powtórzenie treningu z historii (G25)
+kopiuje to, co w historii zostało. Kto regularnie odpuszcza ostatnie ćwiczenie,
+dostanie z powtórzenia plan bez niego, i przy kolejnym powtórzeniu jeszcze
+krótszy. To uczciwa cena modelu „dziennik = co zrobiłem" i nie blokuje tej
+pozycji, ale jeśli kiedyś wróci jako skarga, wiadomo, skąd się wzięła.
+
+### G39 — Nie da się zacząć treningu bez planu
+- **Pochodzenie: prosto od użytkownika**, tego samego wieczoru co G37 i G38.
+  Cytat: „jeszcze jedna funkcjonalność produktowa. Tworzenie pustego aktywnego
+  treningu i dodawanie sobie ćwiczeń i serii".
+- **Dla kogo/po co:** wchodzisz na siłownię, nie wiesz jeszcze, co dziś zrobisz, i
+  chcesz po prostu zacząć — a aplikacja każe najprzód pójść do edytora i ułożyć
+  plan. To zakłada wiedzę, której się w tym momencie nie ma, i jest jedynym
+  miejscem, w którym aplikacja stawia warunek przed treningiem, zamiast go
+  zapisywać.
+- **Połowa tego już stoi:** dorzucanie ćwiczeń w trakcie sesji działa od G9
+  (`addExerciseButton`), dokładanie serii od zawsze („Duplicate set"), przerwa i
+  zasiew ciężaru też. Brakuje wyłącznie wejścia. Dziś przy braku wybranego
+  treningu `WorkoutStartPolicy::decide` zwraca `missing`
+  (`workoutstartpolicy.cpp:101`), a ekran główny otwiera na to `noPlannedPopup`
+  (`ScreenHome.qml:190`) — ślepy zaułek tłumaczący, jak wygenerować plan.
+- **Zakres:** M
+- **Gotowe, gdy:**
+  1. przy pustej liście zaplanowanych da się wystartować trening od zera, bez
+     zaglądania do edytora, i ląduje się od razu na ekranie aktywnego treningu;
+  2. ta sama droga jest dostępna, gdy plan na dziś **jest** — bo „nie wiem, co
+     dziś zrobię" nie zależy od tego, czy coś leży na liście — i nie powstaje
+     przy tym drugi wielki przycisk startu konkurujący z pierwszym;
+  3. świeżo zaczęty pusty trening pokazuje stan zerowy, który mówi, co zrobić
+     („dodaj pierwsze ćwiczenie"), a nie pustą stronę; przycisk dodania ćwiczenia
+     jest widoczny bez szukania, a pozostałe przyciski paska nie wyglądają na
+     zepsute;
+  4. dodane ćwiczenie zachowuje się dokładnie jak dorzucone w G9 — z ciężarem z
+     ostatniego razu, z serią do odhaczenia — a po zakończeniu trening jest w
+     historii pod nazwą, która pozwala go odróżnić na liście i w bębnie, bez
+     „---";
+  5. pusty trening porzucony bez zrobienia czegokolwiek **znika**, a aplikacja
+     mówi o tym przed, nie po: nie zostaje ani pusty wpis w historii, ani nic na
+     liście zaplanowanych.
+
+#### Rozstrzygnięcia, o które prosiłeś
+
+**Wejście stoi tam, gdzie już się wybiera, co wystartować — nie w drugim wielkim
+przycisku.** Ekran główny ma od G4 jedno miejsce decyzji: wskazujesz pozycję,
+naciskasz jeden przycisk. „Pusty trening" ma być kolejną pozycją do wskazania, a
+nie równoległą drogą, bo dwa duże przyciski startu na jednym ekranie zmuszają do
+wyboru za każdym razem, także wtedy, gdy nie ma czego wybierać. Przy okazji
+`noPlannedPopup` przestaje być ślepym zaułkiem: skoro tłumaczy, co robić bez
+planu, ma prowadzić także tędy.
+
+**Nazwa nadawana automatycznie, bez pytania.** Pytanie o nazwę w chwili startu to
+tarcie dokładnie tam, gdzie obiecujemy jego brak — a odpowiedzi i tak jeszcze nie
+ma, bo trening dopiero się wydarzy. Sesja dostaje nazwę z dnia, wystarczającą do
+odróżnienia w bębnie i w historii. Zmiana tej nazwy później jest sensowna i
+pewnie o nią przyjdzie prośba, ale to osobny plaster — razem z nazywaniem
+szablonów z G14.
+
+**Pusty znaczy pusty.** Żadnego ćwiczenia na start, żadnego „przykładowego"
+wiersza. Stan zerowy ma być zaproszeniem z jednym oczywistym ruchem — dlatego
+punkt 3 warunku mówi o nim wprost, żeby nie skończyło się pustą stroną.
+
+**Porzucony pusty trening znika, ale nie po cichu.** Nie ma planu, na który
+mógłby wrócić, a pusty wpis w historii byłby dokładnie tym śmieciem, przeciw
+któremu jest G38. Zasada z G38 zostaje w mocy w obie strony: nic nie znika bez
+zdania, które powie z góry, że zniknie.
+
+**Uwaga, żeby nikt nie zobaczył tu sprzeczności z G17:** G17 mówi, że w
+**edytorze** nie da się zapisać planu bez ćwiczeń. To nadal prawda i nadal jest
+słuszne — plan bez ćwiczeń jest do niczego, bo nic z nim potem nie zrobisz.
+Pusta **sesja** to co innego: naczynie, które napełnia się w trakcie. Te dwie
+pozycje się nie gryzą.
 
 ### G13b — Ciężar i powtórzenia w zakończonym treningu tylko do czytania
 - **Dla kogo/po co:** drugi plaster po G13. Odhaczenie da się już poprawić, ale
@@ -90,6 +238,19 @@ eksport-poprawka-import jest za dużym zachodem.
   i powtórzenia pojedynczej serii; zmiana przeżywa restart; objętość i „ostatnio"
   na ekranie głównym liczą się po zmianie z nowej wartości; wykonanie serii nie
   zmienia się przy okazji edycji liczby.
+
+### G18 — Seria bez ciężaru wygląda jak seria z zerowym ciężarem
+- **Dla kogo/po co:** reszta po G15 — ćwiczenie robione pierwszy raz w życiu
+  albo plan z AI, który nie podał obciążenia. „0 kg" to wtedy nieprawda podana
+  z pewnością siebie; użytkownik nie wie, czy aplikacja mu każe wziąć pustą
+  sztangę, czy po prostu nie wie.
+- **Dowód:** ta sama ścieżka co w G15 — `SetRow.qml` pokazuje `secondaryText`
+  bez rozróżnienia „zero" od „nieustawione", a `Set` trzyma zwykły `double`
+  bez stanu „brak wartości".
+- **Zakres:** M
+- **Gotowe, gdy:** seria, dla której nie ma ani historii, ani wartości z planu,
+  pokazuje w aktywnym treningu i w edytorze znak braku wartości zamiast „0 kg",
+  a po ustawieniu ciężaru zachowuje się jak każda inna.
 
 ### G17 — Pusty trening da się zapisać i wystartować
 - **Dla kogo/po co:** trening bez ani jednego ćwiczenia trafia na listę
@@ -128,19 +289,6 @@ eksport-poprawka-import jest za dużym zachodem.
   głównym jest ta sama co w profilu; powrót na „Metric (kg)" przywraca stan
   sprzed zmiany.
 
-### G18 — Seria bez ciężaru wygląda jak seria z zerowym ciężarem
-- **Dla kogo/po co:** reszta po G15 — ćwiczenie robione pierwszy raz w życiu
-  albo plan z AI, który nie podał obciążenia. „0 kg" to wtedy nieprawda podana
-  z pewnością siebie; użytkownik nie wie, czy aplikacja mu każe wziąć pustą
-  sztangę, czy po prostu nie wie.
-- **Dowód:** ta sama ścieżka co w G15 — `SetRow.qml` pokazuje `secondaryText`
-  bez rozróżnienia „zero" od „nieustawione", a `Set` trzyma zwykły `double`
-  bez stanu „brak wartości".
-- **Zakres:** M
-- **Gotowe, gdy:** seria, dla której nie ma ani historii, ani wartości z planu,
-  pokazuje w aktywnym treningu i w edytorze znak braku wartości zamiast „0 kg",
-  a po ustawieniu ciężaru zachowuje się jak każda inna.
-
 ### G11 — Kolejność serii w ćwiczeniu jest nie do zmiany
 - **Dla kogo/po co:** rozgrzewkowa seria wpisana jako ostatnia zostaje na
   końcu; jedyne wyjście to usunąć i dodać na nowo, tracąc wpisane wartości.
@@ -165,21 +313,6 @@ eksport-poprawka-import jest za dużym zachodem.
   zapisie i wystartowaniu treningu ta sama notatka jest widoczna w panelu
   informacji o ćwiczeniu.
 
-### G36 — Pusty bęben mówi „---"
-- **Dla kogo/po co:** ktoś otwiera aplikację pierwszy raz albo po zrobieniu
-  wszystkiego z planu i w najbardziej wyeksponowanym miejscu ekranu głównego widzi
-  trzy myślniki. To moment, w którym aplikacja ma powiedzieć, co dalej, a mówi
-  znak zastępczy.
-- **Dowód:** zgłoszone z obchodu w iteracji 25 — w wierszu „PLANNED WORKOUT" przy
-  pustej liście stoi „---". Stan sprzed całej pętli, nie regresja.
-- **Osłabienie:** naciśnięcie „Start workout" tłumaczy wtedy całą drogę od
-  przycisku AI po import, a zakładka Workouts ma własną podpowiedź w pustym
-  stanie. Czyli użytkownik nie zostaje bez wyjścia — tylko musi najpierw nacisnąć.
-- **Zakres:** S
-- **Gotowe, gdy:** przy pustej liście zaplanowanych wiersz bębna mówi po ludzku,
-  że nie ma nic zaplanowanego, i kieruje dalej; gdy zaplanowany trening jest,
-  wiersz wygląda dokładnie jak dotąd.
-
 ### G10 — Filtr po mięśniu w katalogu ćwiczeń bez wejścia
 - **Dla kogo/po co:** wybierając ćwiczenie na zastępstwo szuka się po partii
   („coś na biceps"), a nie po całej okolicy ciała.
@@ -191,6 +324,31 @@ eksport-poprawka-import jest za dużym zachodem.
 - **Gotowe, gdy:** w panelu filtrów pickera jest wybór mięśnia; ustawienie go
   zmniejsza licznik dopasowanych ćwiczeń i zawęża listę, a „Clear filters"
   przywraca pełną liczbę.
+
+### G35b — Układając plan, nie widzisz, co robiłeś
+- **Dla kogo/po co:** drugi plaster po G35. Historię jednego ćwiczenia widać już
+  w trakcie treningu, czyli wtedy, gdy na zmianę planu jest za późno. Pytanie
+  „ile wpisać" pada wcześniej — przy układaniu treningu na przyszły tydzień, w
+  edytorze. Tam użytkownik nadal jest ślepy: widzi liczby, które ktoś (AI,
+  powtórzenie, on sam miesiąc temu) już wpisał, i nie ma jak sprawdzić, czy mają
+  sens wobec tego, co naprawdę dźwigał.
+- **Dowód:** obejrzałem edytor w działającej aplikacji
+  (`tmp/loop/pm16-editor.png`, po G6 doszedł wiersz przerwy): przy ćwiczeniu są
+  strzałki kolejności, kosz, przerwa, serie i „Add set" — ani słowa o historii.
+  Jedyne dzisiejsze wsparcie to zasiew z G15, i to wyłącznie w chwili dodawania
+  ćwiczenia z katalogu; trening z importu albo z powtórzenia nie zasiewa niczego.
+  Zapytanie, którego brakowało, **już istnieje** — `exerciseSessions(exercise,
+  limit)` (`workoutservice.h`, dołożone w iteracji 26) przyjmuje dowolne
+  ćwiczenie i dopasowuje je przez `sameExercise`, więc pozostaje wejście z ekranu.
+- **Zakres:** M (wejście w edytorze; wejście z katalogu przy wybieraniu ćwiczenia
+  to osobny, późniejszy plaster — tam pada inne pytanie: „które", nie „ile")
+- **Gotowe, gdy:** w edytorze treningu przy ćwiczeniu da się otworzyć jego
+  ostatnie sesje i widać tę samą listę co w trakcie treningu — data i co w niej
+  zrobiono, od najnowszej; ćwiczenie bez historii mówi to wprost; ćwiczenie
+  pochodzące z importu od AI, czyli niepowiązane z katalogiem, też dostaje swoje
+  sesje, a nie pustą listę; otwarcie i zamknięcie tego widoku niczego w treningu
+  nie zmienia — po wyjściu z niego zapis zachowuje się tak samo jak przed
+  otwarciem, a edytor nie zaczyna twierdzić, że ma niezapisane zmiany.
 
 ### G14 — Szablon nie do przerobienia
 - **Dla kogo/po co:** szablon to plan, do którego się wraca miesiącami; dziś po
@@ -237,6 +395,11 @@ osobna iteracja.
 Identyfikatory nie wracają do obiegu, więc pozycje wchłonięte przez inne
 zostają tutaj.
 
+### G36 — Pusty bęben mówi „---" → G39
+Pusty stan ekranu głównego to dokładnie miejsce, w którym ma stanąć wejście do
+treningu bez planu, więc komunikat i wejście robi się raz, nie dwa razy. Warunek
+G39 obejmuje jedno i drugie.
+
 ### G20 — Zaimportowana historia przychodzi bez śladu wykonania → G31 (iteracja 18)
 Warunek akceptacji tej pozycji brzmiał: serie zaimportowanej historii mają być
 widoczne jako zrobione w podglądzie treningu z historii. Dokładnie to dowiozło
@@ -251,6 +414,16 @@ Osobna iteracja na samą wielkość liter byłaby marnotrawstwem, a G8 i tak dok
 kafelki podsumowania — więc warunek spójności etykiet stał się częścią G8.
 
 ## Done
+
+### G37 — Poprzedni wynik przy każdej serii z osobna (iteracja 27)
+Wiersz serii pokazuje wynik z tej samej pozycji poprzedniej sesji, a nagłówek
+ćwiczenia oddał liczby i został przy dacie. Ósme spotkanie pętli z regułą pustych
+flag, po raz pierwszy bez dopisywania czegokolwiek do `performedsets.h`. Dwa
+zawroty, oba o szerokość: kolumna podpowiedzi ucinała `10xBW+22.5kg`, a jej
+poszerzenie zabrało miejsce napisom, które wcześniej się mieściły. Rozwiązało to
+dopiero skrócenie `BW + 22.5 kg` do `+22.5 kg`, bo bodyweight wynika z samego
+ćwiczenia. Pilnuje tego `SetRowFitTest`, który mierzy obie kolumny w obu krojach
+wiersza przeciwko liczbom odczytanym z `Theme.qml`.
 
 ### G13 — Poprawienie zakończonego treningu, plaster 1: jedna seria (iteracja 23)
 Żeton serii w rozwiniętym kaflu historii jest klikalny i przełącza wykonanie;

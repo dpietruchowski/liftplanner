@@ -3,6 +3,7 @@
 #include "domain/workout/workout.h"
 #include <QDate>
 #include <QString>
+#include <QStringList>
 
 namespace WorkoutText
 {
@@ -18,6 +19,7 @@ QString workoutToText(const Workout& workout);
 QString finishPrompt(int completedSets, int plannedSets);
 QString amnestyLossWarning(const QString& workoutName, int plannedSets);
 QString plannedDayLabel(const QDate& day, const QDate& today);
+QStringList previousSetHints(const Exercise& previousPerformance, int currentSetCount);
 
 QString formatDuration(qint64 seconds);
 QString formatRest(int seconds);

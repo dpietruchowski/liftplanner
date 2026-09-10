@@ -1,4 +1,5 @@
 #include "workouttext.h"
+#include "domain/workout/performedsets.h"
 #include "ui/presentation/plural.h"
 #include <QLocale>
 #include <QRegularExpression>
@@ -51,6 +52,19 @@ QString plannedDayLabel(const QDate& day, const QDate& today)
         return QStringLiteral("Tomorrow · %1").arg(date);
 
     return date;
+}
+
+QStringList previousSetHints(const Exercise& previousPerformance, int currentSetCount)
+{
+    const std::vector<Set> done = performedSets(previousPerformance);
+
+    QStringList hints;
+    for (int i = 0; i < currentSetCount; ++i)
+    {
+        hints.append(i < static_cast<int>(done.size()) ? done[i].toCompactString() : QString());
+    }
+
+    return hints;
 }
 
 QString formatDuration(qint64 seconds)

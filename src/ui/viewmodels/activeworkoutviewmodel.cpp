@@ -68,12 +68,7 @@ Workout withExecutionStateFrom(Workout stored, const Workout& cached)
 QString completedSetsSummary(const Exercise& exercise)
 {
     Exercise done = exercise;
-    done.sets().clear();
-    for (const Set& set : exercise.sets())
-    {
-        if (set.completed())
-            done.addSet(set);
-    }
+    done.sets() = performedSets(exercise);
     return done.setsToString();
 }
 
@@ -175,8 +170,12 @@ void ActiveWorkoutViewModel::refreshPreviousPerformances()
                   {
                       if (entry.exerciseIndex < 0 || entry.exerciseIndex >= exercises.size())
                           continue;
-                      exercises[entry.exerciseIndex]->setPreviousPerformance(
-                          completedSetsSummary(entry.exercise), entry.performedAt);
+
+                      ExerciseModel* exercise = exercises[entry.exerciseIndex];
+                      exercise->setPreviousPerformance(
+                          completedSetsSummary(entry.exercise), entry.performedAt,
+                          WorkoutText::previousSetHints(entry.exercise,
+                                                        static_cast<int>(exercise->sets().size())));
                   }
               })
         .warnOnError("load previous performances");

@@ -6,6 +6,7 @@
 #include <QList>
 #include <QObject>
 #include <QQmlListProperty>
+#include <QStringList>
 
 class ExerciseModel : public QObject
 {
@@ -19,6 +20,7 @@ class ExerciseModel : public QObject
     Q_PROPERTY(bool completed READ isCompleted NOTIFY completedChanged)
     Q_PROPERTY(QString previousSummary READ previousSummary NOTIFY previousPerformanceChanged)
     Q_PROPERTY(QDateTime previousDate READ previousDate NOTIFY previousPerformanceChanged)
+    Q_PROPERTY(QStringList previousSetTexts READ previousSetTexts NOTIFY previousPerformanceChanged)
 
 public:
     explicit ExerciseModel(QObject* parent = nullptr);
@@ -32,7 +34,9 @@ public:
     bool isCompleted() const;
     QString previousSummary() const;
     QDateTime previousDate() const;
-    void setPreviousPerformance(const QString& summary, const QDateTime& date);
+    QStringList previousSetTexts() const;
+    void setPreviousPerformance(const QString& summary, const QDateTime& date,
+                                const QStringList& setTexts);
 
     QQmlListProperty<SetModel> setsProperty();
     QList<SetModel*> sets() const;
@@ -55,4 +59,5 @@ private:
     QList<SetModel*> m_sets;
     QString m_previousSummary;
     QDateTime m_previousDate;
+    QStringList m_previousSetTexts;
 };

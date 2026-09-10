@@ -48,6 +48,18 @@ inline bool wasPerformed(const HistorySetRow& row, bool flagsAreMeaningful)
     return countsAsPerformed(row.hasSet, row.completed, flagsAreMeaningful);
 }
 
+inline std::vector<Set> performedSets(const Exercise& exercise)
+{
+    std::vector<Set> done;
+    for (const Set& set : exercise.sets())
+    {
+        if (set.completed())
+            done.push_back(set);
+    }
+
+    return done;
+}
+
 inline Exercise asPerformed(const Exercise& exercise, bool flagsAreMeaningful)
 {
     if (flagsAreMeaningful)

@@ -68,9 +68,9 @@ QString SetModel::secondaryText() const
         case LoadType::External:
             return weightText;
         case LoadType::Added:
-            return QStringLiteral("BW + %1").arg(weightText);
+            return QStringLiteral("+%1").arg(weightText);
         case LoadType::Assisted:
-            return QStringLiteral("BW - %1").arg(weightText);
+            return QStringLiteral("-%1").arg(weightText);
         case LoadType::Band:
             return QStringLiteral("band");
         case LoadType::Bodyweight:

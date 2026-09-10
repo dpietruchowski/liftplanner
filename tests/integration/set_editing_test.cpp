@@ -195,7 +195,7 @@ TEST_F(SetEditingTest, DisplayText_FollowsTheMetric)
     EXPECT_EQ(pullupSet()->primaryText(), "8 reps");
     EXPECT_EQ(pullupSet()->secondaryText(), "BW");
 
-    EXPECT_EQ(assistedPullupSet()->secondaryText(), "BW - 10 kg");
+    EXPECT_EQ(assistedPullupSet()->secondaryText(), "-10 kg");
 
     EXPECT_EQ(plankSet()->primaryText(), "45 s");
     EXPECT_TRUE(plankSet()->secondaryText().isEmpty());

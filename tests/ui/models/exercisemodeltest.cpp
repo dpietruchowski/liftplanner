@@ -64,8 +64,10 @@ TEST(ExerciseModelTest, PreviousPerformance_IsModelStateAndNeverReachesTheEntity
     ExerciseModel model { exerciseWithThreeSets() };
 
     model.setPreviousPerformance(QStringLiteral("3x8 @ 60 kg"),
-                                 QDateTime(QDate(2026, 2, 20), QTime(18, 0)));
+                                 QDateTime(QDate(2026, 2, 20), QTime(18, 0)),
+                                 { QStringLiteral("8x60kg"), QString() });
 
     EXPECT_EQ(model.previousSummary(), QStringLiteral("3x8 @ 60 kg"));
+    EXPECT_EQ(model.previousSetTexts(), QStringList({ QStringLiteral("8x60kg"), QString() }));
     EXPECT_EQ(model.toEntity().notes(), QStringLiteral("Belt from set two"));
 }

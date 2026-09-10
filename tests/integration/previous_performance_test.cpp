@@ -70,6 +70,15 @@ protected:
             ->previousSummary();
     }
 
+    QStringList previousSetTextsOfFirstExercise()
+    {
+        return app.activeWorkoutViewModel()
+            .currentWorkout()
+            ->exercises()
+            .first()
+            ->previousSetTexts();
+    }
+
     void TearDown() override
     {
         app.activeWorkoutViewModel().endWorkout();
@@ -144,4 +153,54 @@ TEST_F(PreviousPerformanceTest, AnExerciseWithoutAnySetsIsNotAPreviousPerformanc
     importAndStartFirstWorkout();
 
     EXPECT_TRUE(previousSummaryOfFirstExercise().isEmpty());
+}
+
+TEST_F(PreviousPerformanceTest, EverySetLearnsWhatTheSamePositionCarriedLastTime)
+{
+    endSessionWith({ benchPress({ tickedSet(10, 55.0), tickedSet(8, 65.0), tickedSet(6, 75.0) }) },
+                   QDate(2024, 12, 20));
+
+    importAndStartFirstWorkout();
+
+    const QStringList hints = previousSetTextsOfFirstExercise();
+
+    ASSERT_EQ(hints.size(), 3);
+    EXPECT_EQ(hints[0], QStringLiteral("10x55kg"));
+    EXPECT_EQ(hints[1], QStringLiteral("8x65kg"));
+    EXPECT_EQ(hints[2], QStringLiteral("6x75kg"));
+}
+
+TEST_F(PreviousPerformanceTest, ASetTheLastSessionNeverReachedStaysWithoutAHint)
+{
+    endSessionWith({ benchPress({ tickedSet(10, 55.0) }) }, QDate(2024, 12, 20));
+
+    importAndStartFirstWorkout();
+
+    const QStringList hints = previousSetTextsOfFirstExercise();
+
+    ASSERT_EQ(hints.size(), 3);
+    EXPECT_EQ(hints[0], QStringLiteral("10x55kg"));
+    EXPECT_TRUE(hints[1].isEmpty());
+    EXPECT_TRUE(hints[2].isEmpty());
+}
+
+TEST_F(PreviousPerformanceTest, ASessionWithoutASingleTickStillFeedsEverySetHint)
+{
+    endSessionWith({ benchPress({ Set(8, 40.0), Set(8, 42.5) }) }, QDate(2024, 6, 14));
+
+    importAndStartFirstWorkout();
+
+    const QStringList hints = previousSetTextsOfFirstExercise();
+
+    ASSERT_EQ(hints.size(), 3);
+    EXPECT_EQ(hints[0], QStringLiteral("8x40kg"));
+    EXPECT_EQ(hints[1], QStringLiteral("8x42.5kg"));
+    EXPECT_TRUE(hints[2].isEmpty());
+}
+
+TEST_F(PreviousPerformanceTest, AFirstTimeExerciseHasNoSetHintsAtAll)
+{
+    importAndStartFirstWorkout();
+
+    EXPECT_TRUE(previousSetTextsOfFirstExercise().isEmpty());
 }

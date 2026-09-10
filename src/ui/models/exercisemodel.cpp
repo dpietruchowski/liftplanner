@@ -39,14 +39,17 @@ bool ExerciseModel::isCompleted() const { return toEntity().isCompleted(); }
 
 QString ExerciseModel::previousSummary() const { return m_previousSummary; }
 QDateTime ExerciseModel::previousDate() const { return m_previousDate; }
+QStringList ExerciseModel::previousSetTexts() const { return m_previousSetTexts; }
 
-void ExerciseModel::setPreviousPerformance(const QString& summary, const QDateTime& date)
+void ExerciseModel::setPreviousPerformance(const QString& summary, const QDateTime& date,
+                                           const QStringList& setTexts)
 {
-    if (m_previousSummary == summary && m_previousDate == date)
+    if (m_previousSummary == summary && m_previousDate == date && m_previousSetTexts == setTexts)
         return;
 
     m_previousSummary = summary;
     m_previousDate = date;
+    m_previousSetTexts = setTexts;
     emit previousPerformanceChanged();
 }
 

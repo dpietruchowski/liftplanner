@@ -8,6 +8,8 @@ Rectangle {
     id: root
 
     property int number: 0
+    property string previousText: ""
+    property bool previousShown: false
     property string primaryText: ""
     property string secondaryText: ""
     property string metric: "reps"
@@ -89,29 +91,45 @@ Rectangle {
                 font.bold: root.current
                 color: root.current ? Theme.colors.textPrimary : Theme.colors.textFaint
                 Layout.preferredWidth: Theme.setRow.numberWidth
-                Layout.leftMargin: Theme.padding.large
+                Layout.leftMargin: Theme.padding.medium
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            Text {
+                objectName: root.namePrefix + "previousValueText"
+                text: root.previousText
+                font.pixelSize: Theme.setRow.previousFontSize
+                color: Theme.colors.textFaint
+                horizontalAlignment: Text.AlignLeft
+                elide: Text.ElideRight
+                Layout.preferredWidth: root.previousShown ? Theme.setRow.previousWidth : 0
+                Layout.minimumWidth: Layout.preferredWidth
                 Layout.alignment: Qt.AlignVCenter
             }
 
             Text {
                 objectName: root.namePrefix + "primaryValueText"
                 text: root.primaryText
-                font.pixelSize: root.current ? Theme.fontSize.medium : Theme.fontSize.normal
+                font.pixelSize: root.current ? Theme.setRow.valueCurrentFontSize
+                                             : Theme.setRow.valueFontSize
                 font.bold: root.current
                 color: root.valueColor
                 elide: Text.ElideRight
                 Layout.preferredWidth: Theme.setRow.primaryWidth
+                Layout.minimumWidth: Theme.setRow.primaryWidth
                 Layout.alignment: Qt.AlignVCenter
             }
 
             Text {
                 objectName: root.namePrefix + "secondaryValueText"
                 text: root.secondaryText
-                font.pixelSize: root.current ? Theme.fontSize.medium : Theme.fontSize.normal
+                font.pixelSize: root.current ? Theme.setRow.valueCurrentFontSize
+                                             : Theme.setRow.valueFontSize
                 font.bold: root.current
                 color: root.valueColor
                 elide: Text.ElideRight
                 Layout.fillWidth: true
+                Layout.minimumWidth: Theme.setRow.valueMinWidth
                 Layout.alignment: Qt.AlignVCenter
             }
 
@@ -142,7 +160,7 @@ Rectangle {
                 Layout.preferredWidth: dot.size
                 Layout.preferredHeight: dot.size
                 Layout.alignment: Qt.AlignVCenter
-                Layout.rightMargin: Theme.padding.large
+                Layout.rightMargin: Theme.padding.medium
                 onToggled: root.completionToggled()
             }
         }
