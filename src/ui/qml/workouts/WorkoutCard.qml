@@ -20,6 +20,7 @@ Rectangle {
     property color dateColor: Theme.colors.textMuted
     property Component expandedActions: null
     property string expandButtonName: ""
+    property string titleName: ""
 
     default property alias headerActions: headerActionsRow.data
 
@@ -67,6 +68,7 @@ Rectangle {
                 name: root.workout ? root.workout.name : ""
                 dateText: root.dateText
                 dateColor: root.dateColor
+                titleName: root.titleName
             }
 
             Row {

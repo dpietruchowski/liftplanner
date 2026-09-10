@@ -94,12 +94,11 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 13 zamknięta (G27 — zamiana treningu nie kasuje przerwanej sesji)
+- **Iteracja:** 14 zamknięta (G16 — pełna nazwa treningu na kaflu zaplanowanego)
 - **W locie:** nic
-- **Ostatni commit pętli:** G27
-- **Następna pozycja wg backlogu:** do wyboru przez PM. Na liście zostały m.in.
-  G16 (ucięte nazwy na kaflach — widoczne na zrzucie trzecią iterację z rzędu)
-  i G26 (nieudany import historii milczy).
+- **Ostatni commit pętli:** G16
+- **Następna pozycja wg backlogu:** do wyboru przez PM. Na liście został m.in.
+  G26 (nieudany import historii milczy).
 - **Zawroty do developera:** 4, wszystkie przy zielonym `ctest`:
   G5 (brakujący import QML — aplikacja nie wstawała), G23 (lista zaplanowanych
   nieodświeżana po porzuceniu sesji — baza poprawna, ekran kłamał), G8 (etykieta

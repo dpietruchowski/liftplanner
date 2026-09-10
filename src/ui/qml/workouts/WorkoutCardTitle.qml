@@ -9,15 +9,19 @@ ColumnLayout {
     property string name: ""
     property string dateText: ""
     property color dateColor: Theme.colors.textMuted
+    property string titleName: ""
 
     spacing: 2
 
     Text {
+        objectName: root.titleName
         Layout.fillWidth: true
         text: root.name
         font.pixelSize: Theme.fontSize.medium
         font.bold: true
         color: Theme.colors.textPrimary
+        wrapMode: Text.WordWrap
+        maximumLineCount: 2
         elide: Text.ElideRight
     }
 

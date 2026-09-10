@@ -10,29 +10,6 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
 
 ## Open
 
-### G16 — Nazwa treningu na kaflu przegrywa z przyciskami
-- **Dla kogo/po co:** nazwa jest jedyną rzeczą, po której odróżnia się „Push A"
-  od „Push B" na liście zaplanowanych. Dziś ucina się po kilkunastu znakach, a
-  kafel oddaje większość szerokości przyciskom, z których dwa (edycja,
-  usunięcie) używane są raz na kilka tygodni.
-- **Dowód:** raport z iteracji 11 (sekcja „Obserwacja", zrzut
-  `tmp/loop/g25-history.png`): kafle pokazują „Discard che…" i „Summary c…".
-  Wcześniej to samo w iteracji 3 („Naming che..."), więc nie jest to
-  jednorazowy przypadek długiej nazwy. `WorkoutCardTitle.qml:15-22` elidzie
-  tytuł, a nagłówek (`WorkoutCard.qml:46-77`) to przycisk rozwijania + tytuł +
-  rząd akcji; `PlannedWorkoutItem.qml:21-55` wstawia w ten rząd trzy przyciski,
-  więc przy oknie 360 px (`Main.qml:9`) na nazwę zostaje reszta. Wzorzec, który
-  to rozwiązuje, jest już w repo i działa: kafel historii
-  (`WorkoutItem.qml:19-59`) trzyma wszystkie trzy akcje w `expandedActions` i ma
-  w nagłówku tylko tytuł.
-- **Waga po iteracji 11:** wyższa. Powtórzenie treningu z historii odkłada kopię
-  właśnie na tę listę, więc użytkownik ląduje na niej częściej, i to z nazwami,
-  które różnią się dopiero na końcu.
-- **Zakres:** S
-- **Gotowe, gdy:** przy oknie 360 px kafel zaplanowanego treningu pokazuje pełną
-  nazwę długości typowej dla treningu (np. „Naming check upper A") bez
-  wielokropka, a edycja i usunięcie pozostają osiągalne.
-
 ### G2 — Wybór dnia zaplanowanego treningu
 - **Dla kogo/po co:** manualnie utworzony trening zawsze ląduje na „teraz", więc
   tygodnia nie da się rozłożyć na poniedziałek, środę i piątek z wyprzedzeniem.
@@ -210,6 +187,17 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
 - **Zakres:** L
 - **Gotowe, gdy:** (do rozbicia — pierwszy plaster to zmiana nazwy istniejącego
   szablonu)
+
+## Odrzucone
+
+Zgłoszenia sprawdzone i świadomie niebrane na backlog — żeby nie wracały.
+
+### Trening wrócony do planu zachowuje stary `started_time` (iteracja 13)
+Sprawdzone: nigdzie nie kłamie. Kafel zaplanowanego treningu pokazuje
+`plannedTime`, a bęben na ekranie głównym stawia taki trening po stronie planów.
+Człowiek nie widzi z tego powodu ani złej daty, ani złej liczby, więc to sprawa
+porządku w bazie, nie produktu. Wraca na listę dopiero wtedy, gdy pojawi się
+ekran, na którym ta data będzie widoczna.
 
 ## Scalone
 
