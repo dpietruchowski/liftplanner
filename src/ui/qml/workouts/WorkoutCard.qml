@@ -19,6 +19,7 @@ Rectangle {
     property color borderColor: Theme.colors.cardBorder
     property color dateColor: Theme.colors.textMuted
     property Component expandedActions: null
+    property string expandButtonName: ""
 
     default property alias headerActions: headerActionsRow.data
 
@@ -48,6 +49,7 @@ Rectangle {
             spacing: Theme.spacing.medium
 
             ThemedButton {
+                objectName: root.expandButtonName
                 iconSource: root.expanded ? Theme.icons.collapse : Theme.icons.expand
                 circular: true
                 buttonSize: Theme.button.square

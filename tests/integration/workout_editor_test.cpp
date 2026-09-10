@@ -7,6 +7,7 @@
 #include "ui/models/setmodel.h"
 #include "ui/models/workoutmodel.h"
 #include "ui/viewmodels/exercisecatalogviewmodel.h"
+#include "ui/viewmodels/plannedworkoutviewmodel.h"
 #include "ui/viewmodels/workouteditorviewmodel.h"
 
 #include <QSignalSpy>
@@ -50,6 +51,14 @@ protected:
 
     ExerciseCatalogViewModel& catalog() { return m_app.exerciseCatalogViewModel(); }
     WorkoutEditorViewModel& editor() { return m_app.workoutEditorViewModel(); }
+    PlannedWorkoutViewModel& planned() { return m_app.plannedWorkoutViewModel(); }
+
+    QList<WorkoutModel*> reloadPlanned()
+    {
+        planned().loadAll();
+        m_app.drain();
+        return planned().workouts();
+    }
 
     ExerciseDefinitionModel* definition(const QString& name)
     {
@@ -354,6 +363,99 @@ TEST_F(WorkoutEditorTest, EditReopensAStoredWorkout)
     EXPECT_FALSE(editor().isDirty());
     EXPECT_EQ(editor().name(), QStringLiteral("Leg Day"));
     EXPECT_EQ(editor().exerciseCount(), 1);
+}
+
+TEST_F(WorkoutEditorTest, EditFillsTheEditorWithTheStoredNameExercisesAndSets)
+{
+    startWorkout(QStringLiteral("Push Day"));
+    addExercise(QStringLiteral("Back Squat"));
+    editor().setSetRepetitions(0, 0, 5);
+    editor().setSetWeight(0, 0, 100.0);
+    editor().addSet(0);
+    addExercise(QStringLiteral("Plank"));
+
+    QSignalSpy saved(&editor(), &WorkoutEditorViewModel::saved);
+    editor().save();
+    m_app.drain();
+    ASSERT_EQ(saved.count(), 1);
+    const int workoutId = saved.first().first().toInt();
+
+    editor().discard();
+    editor().edit(workoutId);
+    m_app.drain();
+
+    EXPECT_EQ(editor().name(), QStringLiteral("Push Day"));
+    ASSERT_NE(editor().workout(), nullptr);
+    EXPECT_EQ(editor().workout()->id(), workoutId);
+
+    const auto exercises = editor().workout()->exercises();
+    ASSERT_EQ(exercises.size(), 2);
+    EXPECT_EQ(exercises[0]->name(), QStringLiteral("Back Squat"));
+    EXPECT_EQ(exercises[1]->name(), QStringLiteral("Plank"));
+    ASSERT_EQ(exercises[0]->sets().size(), 2);
+    EXPECT_EQ(exercises[0]->sets().first()->repetitions(), 5);
+    EXPECT_DOUBLE_EQ(exercises[0]->sets().first()->weight(), 100.0);
+}
+
+TEST_F(WorkoutEditorTest, EditingAPlannedWorkoutUpdatesItInPlaceInsteadOfAddingASecondOne)
+{
+    startWorkout(QStringLiteral("Push Day"));
+    addExercise(QStringLiteral("Back Squat"));
+
+    QSignalSpy saved(&editor(), &WorkoutEditorViewModel::saved);
+    editor().save();
+    m_app.drain();
+    ASSERT_EQ(saved.count(), 1);
+    const int workoutId = saved.first().first().toInt();
+
+    auto before = reloadPlanned();
+    ASSERT_EQ(before.size(), 1);
+    ASSERT_EQ(before.first()->exercises().first()->sets().size(), 1);
+
+    editor().discard();
+    editor().edit(workoutId);
+    m_app.drain();
+    ASSERT_TRUE(editor().isEditing());
+
+    editor().addSet(0);
+    EXPECT_TRUE(editor().isDirty());
+    editor().save();
+    m_app.drain();
+
+    ASSERT_EQ(saved.count(), 2);
+    EXPECT_EQ(saved.at(1).first().toInt(), workoutId);
+
+    auto after = reloadPlanned();
+    ASSERT_EQ(after.size(), 1);
+    EXPECT_EQ(after.first()->id(), workoutId);
+    EXPECT_EQ(after.first()->name(), QStringLiteral("Push Day"));
+    ASSERT_EQ(after.first()->exercises().size(), 1);
+    EXPECT_EQ(after.first()->exercises().first()->sets().size(), 2);
+}
+
+TEST_F(WorkoutEditorTest, RenamingAnEditedWorkoutKeepsItInThePlannedList)
+{
+    startWorkout(QStringLiteral("Push Day"));
+    addExercise(QStringLiteral("Back Squat"));
+
+    QSignalSpy saved(&editor(), &WorkoutEditorViewModel::saved);
+    editor().save();
+    m_app.drain();
+    const int workoutId = saved.first().first().toInt();
+
+    editor().discard();
+    editor().edit(workoutId);
+    m_app.drain();
+
+    editor().setName(QStringLiteral("Push Day A"));
+    editor().save();
+    m_app.drain();
+
+    auto after = reloadPlanned();
+    ASSERT_EQ(after.size(), 1);
+    EXPECT_EQ(after.first()->id(), workoutId);
+    EXPECT_EQ(after.first()->name(), QStringLiteral("Push Day A"));
+    EXPECT_EQ(after.first()->status(), WorkoutStatus::Planned);
 }
 
 TEST_F(WorkoutEditorTest, EditReportsAMissingWorkout)

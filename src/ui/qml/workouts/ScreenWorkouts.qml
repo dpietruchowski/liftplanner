@@ -15,6 +15,7 @@ Rectangle {
     property var workoutToDelete
 
     signal createWorkoutRequest()
+    signal editWorkoutRequest(int workoutId)
     signal openTemplatesRequest()
 
     property var historyMonths: {
@@ -108,6 +109,7 @@ Rectangle {
                     model: PlannedWorkoutViewModel.workouts
                     delegate: PlannedWorkoutItem {
                         workout: modelData
+                        itemIndex: index
                         onStartWorkoutRequest: function(workout) {
                             root.currentWorkout = workout
                             if (ActiveWorkoutViewModel.currentWorkout) {
@@ -115,6 +117,10 @@ Rectangle {
                             } else {
                                 startWorkout()
                             }
+                        }
+                        onEditWorkoutRequest: function(workout) {
+                            if (workout)
+                                root.editWorkoutRequest(workout.id)
                         }
                     }
                 }

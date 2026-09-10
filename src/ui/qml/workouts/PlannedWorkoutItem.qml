@@ -6,13 +6,31 @@ import Themed.Components
 WorkoutCard {
     id: root
 
-    signal startWorkoutRequest(var workout)
+    property int itemIndex: 0
 
+    signal startWorkoutRequest(var workout)
+    signal editWorkoutRequest(var workout)
+
+    objectName: "plannedWorkoutItem" + itemIndex
+    expandButtonName: "plannedWorkoutExpandButton" + itemIndex
     borderColor: Theme.colors.primaryBorder
     dateColor: Theme.colors.primary
     dateText: workout ? Qt.formatDateTime(workout.plannedTime, "ddd, d MMM yyyy") : ""
 
     ThemedButton {
+        objectName: "plannedWorkoutEditButton" + root.itemIndex
+        iconSource: Theme.icons.edit
+        circular: true
+        buttonSize: Theme.button.circle
+        buttonStyle: Theme.button.tonal
+        onClicked: root.editWorkoutRequest(root.workout)
+        ToolTip.visible: hovered
+        ToolTip.text: "Edit workout"
+        ToolTip.delay: 500
+    }
+
+    ThemedButton {
+        objectName: "plannedWorkoutStartButton" + root.itemIndex
         iconSource: Theme.icons.startWorkout
         circular: true
         buttonSize: Theme.button.circle

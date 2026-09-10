@@ -64,7 +64,10 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 0 (jeszcze nie ruszyła)
+- **Iteracja:** 1 zamknięta (G1 — edycja zaplanowanego treningu)
 - **W locie:** nic
-- **Ostatni commit pętli:** brak
+- **Ostatni commit pętli:** G1
 - **Odłożone:** nic
+- **Agenty przy życiu:** product-manager i developer z iteracji 1 — odzywać się
+  do nich `SendMessage`, nie spawnować nowych.
+- **Raport testowy dla PM:** `tmp/loop/test-report.md` (nadpisywany co iterację)

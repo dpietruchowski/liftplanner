@@ -13,6 +13,19 @@ Rectangle {
     signal closed()
     signal addExerciseRequested()
 
+    readonly property bool editingExisting: WorkoutEditorViewModel.workout
+        ? WorkoutEditorViewModel.workout.id > 0
+        : false
+
+    Connections {
+        target: WorkoutEditorViewModel
+
+        function onWorkoutChanged() {
+            if (nameField.text !== WorkoutEditorViewModel.name)
+                nameField.text = WorkoutEditorViewModel.name
+        }
+    }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: Theme.padding.screen
@@ -31,8 +44,9 @@ Rectangle {
             }
 
             Text {
+                objectName: "editorTitle"
                 Layout.fillWidth: true
-                text: qsTr("New workout")
+                text: root.editingExisting ? qsTr("Edit workout") : qsTr("New workout")
                 color: Theme.colors.textPrimary
                 font.pixelSize: Theme.fontSize.large
             }

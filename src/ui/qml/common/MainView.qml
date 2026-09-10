@@ -12,6 +12,7 @@ Item {
     property var homeScreen: ScreenHome {}
     property var workoutsScreen: ScreenWorkouts {
         onCreateWorkoutRequest: root.openWorkoutEditor()
+        onEditWorkoutRequest: function(workoutId) { root.editPlannedWorkout(workoutId) }
         onOpenTemplatesRequest: {
             workoutTemplatesScreen.reset()
             stackView.push(workoutTemplatesScreen)
@@ -52,6 +53,11 @@ Item {
 
     function openWorkoutEditor() {
         WorkoutEditorViewModel.createNew("", new Date())
+        stackView.push(workoutEditorScreen)
+    }
+
+    function editPlannedWorkout(workoutId) {
+        WorkoutEditorViewModel.edit(workoutId)
         stackView.push(workoutEditorScreen)
     }
 

@@ -6,22 +6,6 @@ Kolejność sekcji „Open" to kolejność ważności.
 
 ## Open
 
-### G1 — Edycja zaplanowanego treningu
-- **Dla kogo/po co:** plan przyszedł z AI albo został zbudowany tydzień temu i
-  dziś wymaga poprawki — dołożenia ćwiczenia, skreślenia serii, zmiany ciężaru.
-  Dziś jedyne, co można z nim zrobić, to go wystartować.
-- **Dowód:** `WorkoutEditorViewModel::edit(int workoutId)`
-  (`src/ui/viewmodels/workouteditorviewmodel.h:44`) jest w pełni napisany
-  (`workouteditorviewmodel.cpp:72` — wczytuje trening po id i podaje go do
-  edytora, a `save()` zapisuje pod tym samym id), ale nie wywołuje go żaden plik
-  QML. `PlannedWorkoutItem.qml` (całe 25 linii) ma wyłącznie przycisk startu.
-  `MainView.qml:53` otwiera edytor tylko przez `createNew`.
-- **Zakres:** M
-- **Gotowe, gdy:** na ekranie Workouts, w kaflu zaplanowanego treningu, jest
-  przycisk edycji; kliknięcie otwiera edytor wypełniony nazwą i ćwiczeniami tego
-  treningu; po zmianie (np. dodaniu serii) i zapisie lista zaplanowanych pokazuje
-  ten sam jeden trening ze zmianą, a nie drugi obok.
-
 ### G2 — Wybór dnia zaplanowanego treningu
 - **Dla kogo/po co:** aplikacja nazywa się planerem, a każdy nowo utworzony
   trening ląduje na „teraz". Nie da się rozłożyć tygodnia na poniedziałek,
@@ -197,4 +181,8 @@ Kolejność sekcji „Open" to kolejność ważności.
 
 ## Done
 
-*(pusto — pierwsza iteracja)*
+### G1 — Edycja zaplanowanego treningu (iteracja 1)
+Kafel zaplanowanego treningu dostał przycisk edycji, który otwiera edytor przez
+istniejące `WorkoutEditorViewModel::edit(int)`. Sprawdzone w działającej
+aplikacji: edytor wypełnia się nazwą i ćwiczeniami, a zapis po dodaniu serii
+aktualizuje ten sam trening zamiast dokładać drugi obok.
