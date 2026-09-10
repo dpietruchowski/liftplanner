@@ -119,9 +119,19 @@ aplikacja nie wstawała), G23 (ekran nie odświeżał listy, baza była poprawna
 G8 (ucięta etykieta), G27 i pośrednio G32 (odmiana liczebników). Żadnego z nich
 nie złapałby build ani testy jednostkowe.
 
-- **Iteracja:** 24 zamknięta (G2 — wybór dnia zaplanowanego treningu)
+- **Iteracja:** 24 zamknięta (G2 — wybór dnia zaplanowanego treningu), plus
+  osobny commit domykający trop z bębnem (data zaplanowanego treningu)
 - **W locie:** nic
-- **Ostatni commit pętli:** G2
+- **Ostatni commit pętli:** data zaplanowanego treningu na bębnie
+- **PILNE na start następnej tury — kafelki statystyk na ekranie głównym
+  nachodzą na siebie.** Dwa kafelki rekordów rysują się jeden na drugim w lewym
+  slocie, prawy jest pusty, „TIME" zniknął, kafelki straciły tła. Trwałe, nie
+  przejściowe (zrzuty `tmp/loop/g2-drum.png`, `g2-drum2.png`). Przy dwunastu
+  treningach w piaskownicy ten wiersz wyglądał poprawnie (`g28-continue.png`),
+  dziś jest ich 165 i dużo więcej rekordów. Podejrzenie: kafelków jest więcej,
+  niż wiersz mieści, a limit wysokości kolumny z G28 nie pozwala im zejść niżej
+  — **niesprawdzone**, zabrakło limitu sesji. To najbardziej widoczna usterka
+  pierwszego ekranu.
 - **Zużyty przypadek testowy:** `w4 Base Strength` nie jest już „importem bez ani
   jednej flagi" — postawiłem w nim ptaszek, sprawdzając G13. Zastępniki: `w36`,
   `w61`, `w62`, `w111`, `w112`.
