@@ -1,8 +1,10 @@
 #include "activeworkoutviewmodel.h"
 #include "application/workout/workoutservice.h"
+#include "domain/workout/exerciseseeding.h"
 #include "domain/workout/performedsets.h"
 #include "domain/workout/sessionsummary.h"
 #include "domain/workout/setadjustment.h"
+#include "domain/workout/setseeding.h"
 #include "infrastructure/appstoragepaths.h"
 #include "infrastructure/workout/workoutjson.h"
 #include "platform/haptics.h"
@@ -495,6 +497,64 @@ void ActiveWorkoutViewModel::adjustSetSecondary(SetModel* set, int steps)
         set->setWeight(std::max(0.0, entity.weight() + steps * SetAdjustment::weightKilograms));
 
     saveSetToDb(set);
+}
+
+void ActiveWorkoutViewModel::addExercise(ExerciseDefinitionModel* definition)
+{
+    if (!m_isActive || !m_currentWorkout || definition == nullptr)
+        return;
+
+    const ExerciseDefinition& entity = definition->entity();
+    const Exercise added
+        = seededExercise(entity.id(), entity.name(), entity.kind(), entity.defaultRestSeconds(),
+                         entity.defaultMetric(), entity.defaultLoadType());
+
+    auto* exercise = new ExerciseModel(added, m_currentWorkout);
+    m_currentWorkout->addExercise(exercise);
+
+    selectFirstIncomplete();
+    saveCurrentWorkout();
+
+    seedAddedExerciseFromHistory(exercise);
+    refreshPreviousPerformances();
+}
+
+void ActiveWorkoutViewModel::seedAddedExerciseFromHistory(ExerciseModel* exercise)
+{
+    if (!m_service || !exercise || exercise->sets().size() != 1)
+        return;
+
+    const Exercise added = exercise->toEntity();
+    const Set seed = added.sets().front();
+    QPointer<ExerciseModel> target(exercise);
+
+    m_service->lastPerformance(added)
+        .then(this,
+              [this, target, seed](std::optional<Exercise> previous)
+              {
+                  if (target && previous.has_value())
+                      applyHistorySeed(target, seed, previous.value());
+              })
+        .warnOnError("seed an exercise added mid-workout from history");
+}
+
+void ActiveWorkoutViewModel::applyHistorySeed(ExerciseModel* exercise, const Set& seed,
+                                              const Exercise& previous)
+{
+    const QList<SetModel*> sets = exercise->sets();
+    if (sets.size() != 1)
+        return;
+
+    SetModel* current = sets.first();
+    if (current->completed() || !sameSetValues(current->entity(), seed))
+        return;
+
+    const std::optional<Set> seeded = seedFromPreviousExercise(previous, seed);
+    if (!seeded.has_value())
+        return;
+
+    current->adoptPrescription(seeded.value());
+    saveCurrentWorkout();
 }
 
 void ActiveWorkoutViewModel::moveExercise(int from, int to)

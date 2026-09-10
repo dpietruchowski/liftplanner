@@ -76,10 +76,6 @@ signals:
 private:
     Exercise* exerciseAt(int exerciseIndex);
     Set* setAt(int exerciseIndex, int setIndex);
-    Set seedSetFor(const ExerciseDefinitionModel& definition) const;
-    Set seedSetFor(const Exercise& exercise) const;
-    Set seedSet(SetMetric metric, LoadType loadType) const;
-
     void seedFromHistory(int exerciseIndex);
     void applyHistorySeed(int exerciseIndex, const QString& expectedName, const Set& seed,
                           const Exercise& previous);

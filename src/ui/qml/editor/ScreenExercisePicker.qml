@@ -13,6 +13,13 @@ Rectangle {
     signal exerciseSelected(var definition)
     signal cancelled()
 
+    property string destination: "editor"
+
+    function openFor(target) {
+        root.destination = target
+        root.reset()
+    }
+
     function reset() {
         searchField.text = ""
         filterPanel.reset()

@@ -145,6 +145,22 @@ void SetModel::setDistanceMeters(double value)
     }
 }
 
+void SetModel::adoptPrescription(const Set& set)
+{
+    const Set previous = m_set;
+
+    m_set = set;
+    m_set.setId(previous.id());
+    m_set.setExerciseId(previous.exerciseId());
+    m_set.setCompleted(previous.completed());
+
+    emit repetitionsChanged();
+    emit weightChanged();
+    emit durationSecondsChanged();
+    emit distanceChanged();
+    emit displayChanged();
+}
+
 bool SetModel::performed(bool completionFlagsMeaningful) const
 {
     return countsAsPerformed(true, m_set.completed(), completionFlagsMeaningful);

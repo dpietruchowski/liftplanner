@@ -3,6 +3,7 @@
 #include "application/workout/workoutservice.h"
 #include "application/workout/workouttemplateservice.h"
 #include "async/timeprovider.h"
+#include "domain/workout/exerciseseeding.h"
 #include "domain/workout/restadjustment.h"
 #include "domain/workout/setadjustment.h"
 #include "domain/workout/setcompatibility.h"
@@ -116,9 +117,9 @@ void WorkoutEditorViewModel::addExercise(ExerciseDefinitionModel* definition)
         return;
 
     const ExerciseDefinition& entity = definition->entity();
-    Exercise exercise = Exercise::createFromDefinition(entity.id(), entity.name(), entity.kind(),
-                                                       entity.defaultRestSeconds());
-    exercise.addSet(seedSetFor(*definition));
+    const Exercise exercise
+        = seededExercise(entity.id(), entity.name(), entity.kind(), entity.defaultRestSeconds(),
+                         entity.defaultMetric(), entity.defaultLoadType());
 
     m_workout.addExercise(exercise);
     markDirty();
@@ -226,7 +227,7 @@ void WorkoutEditorViewModel::addSet(int exerciseIndex)
 
     if (exercise->sets().empty())
     {
-        exercise->addSet(seedSetFor(*exercise));
+        exercise->addSet(seedSetForKind(exercise->kind()));
     }
     else
     {
@@ -411,43 +412,6 @@ Set* WorkoutEditorViewModel::setAt(int exerciseIndex, int setIndex)
         return nullptr;
 
     return &exercise->sets()[static_cast<size_t>(setIndex)];
-}
-
-Set WorkoutEditorViewModel::seedSetFor(const ExerciseDefinitionModel& definition) const
-{
-    const ExerciseDefinition& entity = definition.entity();
-    const SetMetric metric = metricSuitsKind(entity.kind(), entity.defaultMetric())
-        ? entity.defaultMetric()
-        : defaultMetricFor(entity.kind());
-
-    return seedSet(metric, entity.defaultLoadType());
-}
-
-Set WorkoutEditorViewModel::seedSetFor(const Exercise& exercise) const
-{
-    return seedSet(defaultMetricFor(exercise.kind()), defaultLoadTypeFor(exercise.kind()));
-}
-
-Set WorkoutEditorViewModel::seedSet(SetMetric metric, LoadType loadType) const
-{
-    Set set;
-    set.setMetric(metric);
-    set.setLoadType(loadType);
-
-    switch (metric)
-    {
-        case SetMetric::Reps:
-            set.setRepetitions(8);
-            break;
-        case SetMetric::Duration:
-            set.setDurationSeconds(30);
-            break;
-        case SetMetric::Distance:
-            set.setDistanceMeters(1000.0);
-            break;
-    }
-
-    return set;
 }
 
 void WorkoutEditorViewModel::adopt(const Workout& workout, bool dirty)

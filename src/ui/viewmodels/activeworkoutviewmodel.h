@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ui/models/exercisedefinitionmodel.h"
 #include "ui/models/exercisemodel.h"
 #include "ui/models/setmodel.h"
 #include "ui/models/workoutmodel.h"
@@ -49,6 +50,7 @@ public:
     Q_INVOKABLE void adjustSetPrimary(SetModel* set, int steps);
     Q_INVOKABLE void adjustSetSecondary(SetModel* set, int steps);
     Q_INVOKABLE void moveExercise(int from, int to);
+    Q_INVOKABLE void addExercise(ExerciseDefinitionModel* definition);
 
     Q_INVOKABLE void startWorkTimer();
     Q_INVOKABLE void startRestTimer();
@@ -71,6 +73,8 @@ private:
     void restoreWorkout(const Workout& entity);
     void settleInterruptedWorkout(WorkoutModel* workout);
     void refreshPreviousPerformances();
+    void seedAddedExerciseFromHistory(ExerciseModel* exercise);
+    void applyHistorySeed(ExerciseModel* exercise, const Set& seed, const Exercise& previous);
     void saveCompletedSet();
     void updateCurrentExercise();
     void updateCurrentSet();

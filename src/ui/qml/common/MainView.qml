@@ -8,7 +8,12 @@ Item {
     objectName: "mainView"
     anchors.fill: parent
 
-    property var activeWorkoutScreen: ScreenActiveWorkout {}
+    property var activeWorkoutScreen: ScreenActiveWorkout {
+        onAddExerciseRequested: {
+            exercisePickerScreen.openFor("activeWorkout")
+            stackView.push(exercisePickerScreen)
+        }
+    }
     property var homeScreen: ScreenHome {}
     property var workoutsScreen: ScreenWorkouts {
         onCreateWorkoutRequest: root.openWorkoutEditor()
@@ -29,7 +34,7 @@ Item {
     property var workoutEditorScreen: ScreenWorkoutEditor {
         onClosed: root.closeWorkoutEditor()
         onAddExerciseRequested: {
-            exercisePickerScreen.reset()
+            exercisePickerScreen.openFor("editor")
             stackView.push(exercisePickerScreen)
         }
     }
@@ -37,7 +42,10 @@ Item {
     property var exercisePickerScreen: ScreenExercisePicker {
         onCancelled: stackView.pop()
         onExerciseSelected: function(definition) {
-            WorkoutEditorViewModel.addExercise(definition)
+            if (root.exercisePickerScreen.destination === "activeWorkout")
+                ActiveWorkoutViewModel.addExercise(definition)
+            else
+                WorkoutEditorViewModel.addExercise(definition)
             stackView.pop()
         }
     }

@@ -86,42 +86,6 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
   głównym jest ta sama co w profilu; powrót na „Metric (kg)" przywraca stan
   sprzed zmiany.
 
-### G9 — Nie da się zmienić składu treningu w trakcie
-- **Dla kogo/po co:** stanowisko zajęte, bark boli, zostało dziesięć minut — w
-  praktyce trening przebudowuje się na miejscu. Dziś ćwiczenia można tylko
-  przestawić kolejnością.
-- **Dowód:** pasek akcji w `ScreenActiveWorkout.qml:101-143` ma trzy przyciski:
-  timer, „Done" i zmianę kolejności. `ActiveWorkoutViewModel`
-  (`src/ui/viewmodels/activeworkoutviewmodel.h:36-41`) ma operacje na seriach i
-  `moveExercise`, ale żadnej na dodanie ani usunięcie ćwiczenia — mimo że ekran
-  wyboru z katalogu (`ScreenExercisePicker.qml`) już istnieje i jest używany
-  przez edytor.
-- **Zakres:** M
-- **Gotowe, gdy:** w aktywnym treningu da się dorzucić ćwiczenie z katalogu; po
-  dodaniu pojawia się ono na liście, ma serie do odhaczenia, a po zakończeniu
-  treningu widać je w historii.
-
-### G20 — Zaimportowana historia przychodzi bez śladu wykonania
-- **Dla kogo/po co:** import planu i historii z AI to sztandarowa droga do
-  aplikacji, a wszystko, co tą drogą wchodzi, jest oznaczone jako niezrobione.
-  To źródło zer, na które natrafił raport, i dopóki działa, każdy kolejny import
-  dokłada danych, które dla aplikacji nie istnieją.
-- **Dowód:** `parseSets` (`workoutjson.cpp:229` i dalej) buduje serie z
-  kompaktowego zapisu (`"5x60kg,5x75kg"`) i nigdy nie dotyka `completed`;
-  format kompaktowy, czyli ten, który produkuje prompt dla AI, w ogóle nie ma
-  takiego pola. Pełny JSON ustawia flagę tylko wtedy, gdy klucz jest obecny
-  (`workoutjson.cpp:120-121`). Trening zaimportowany ze statusem „ended" ląduje
-  więc w bazie z każdą serią na zero.
-- **Zakres:** M
-- **Gotowe, gdy:** trening zaimportowany jako historia (status zakończony) ma po
-  imporcie serie oznaczone jako wykonane, widoczne jako odhaczone w podglądzie
-  treningu z historii; import planu na przyszłość nadal wchodzi jako niezrobiony.
-- **Uwaga po G19 i G21:** pilność spadła. Odkąd sesja bez ani jednego ptaszka
-  liczy się w całości, zaimportowana historia znów zasila „Last time",
-  dziedziczenie ciężaru i statystyki. Zostaje niezgodność tego, co użytkownik
-  widzi w podglądzie treningu (nic nieodhaczone), z tym, co aplikacja z tego
-  wnioskuje — warto naprawić, ale to już nie blokuje niczego.
-
 ### G18 — Seria bez ciężaru wygląda jak seria z zerowym ciężarem
 - **Dla kogo/po co:** reszta po G15 — ćwiczenie robione pierwszy raz w życiu
   albo plan z AI, który nie podał obciążenia. „0 kg" to wtedy nieprawda podana
@@ -238,6 +202,14 @@ osobna iteracja.
 
 Identyfikatory nie wracają do obiegu, więc pozycje wchłonięte przez inne
 zostają tutaj.
+
+### G20 — Zaimportowana historia przychodzi bez śladu wykonania → G31 (iteracja 18)
+Warunek akceptacji tej pozycji brzmiał: serie zaimportowanej historii mają być
+widoczne jako zrobione w podglądzie treningu z historii. Dokładnie to dowiozło
+G31 — trening „Base Strength" z importu pokazuje dwadzieścia żetonów jako
+zrobione, mimo zera flag w bazie, bo rozstrzyga o tym wspólna reguła z
+`performedsets.h`, a nie surowa flaga. W danych flag nadal nie ma i nie musi być:
+człowiek nie widzi z tego powodu żadnej złej liczby.
 
 ### G24 — Kafelki na ekranie głównym mówią dwoma stylami → G8 (iteracja 10)
 Etykiety kafelków w trzech konwencjach naraz („Bench Press", „volume", „AGE").

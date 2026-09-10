@@ -10,6 +10,8 @@ Rectangle {
     objectName: "screenActiveWorkout"
     color: Theme.colors.background
 
+    signal addExerciseRequested()
+
     function leaveActiveWorkout() {
         stackView.replace(homeScreen)
         bottomNav.currentIndex = 1
@@ -153,6 +155,18 @@ Rectangle {
                             ActiveWorkoutViewModel.completeCurrentSet()
                         }
                     }
+                }
+
+                ThemedButton {
+                    objectName: "addExerciseButton"
+                    iconSource: Theme.icons.plus
+                    enabled: ActiveWorkoutViewModel.isActive
+                    buttonSize: Theme.button.mediumSquare
+                    buttonStyle: Theme.button.subtle
+                    onClicked: root.addExerciseRequested()
+                    ToolTip.visible: hovered
+                    ToolTip.text: qsTr("Add exercise")
+                    ToolTip.delay: 500
                 }
 
                 ThemedButton {

@@ -94,12 +94,22 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 18 zamknięta (G31 — historia odróżnia serię opuszczoną od zrobionej)
+- **Iteracja:** 19 zamknięta (G9 — dorzucenie ćwiczenia w trakcie treningu)
 - **W locie:** nic
-- **Ostatni commit pętli:** G31
+- **Ostatni commit pętli:** G9
+- **Sprawdzając zasiew z historii, nie ufaj danym, które zostawił developer.**
+  Przy G9 pierwszy przebieg czytał wpis, który sam odłożył w `tmp/run`, i nie
+  dowodził niczego. Dopiero ćwiczenie z historii **z importu, bez ani jednej
+  flagi**, pokazało, że zasiew przechodzi przez amnestię z G19. Piaskownica jest
+  wspólna, więc przed pomiarem sprawdzam, skąd wzięły się dane, na których mierzę.
 - **Następna pozycja wg backlogu:** do wyboru przez PM. Na liście zostały G26
   (nieudany import historii milczy), G29 (wybór funtów kończy się na profilu)
   i G32 („1 exercises · 1 sets" na kaflu szablonu).
+- **Plan na resztę budżetu** (wg PM, po iteracji 18): duża pozostała pozycja to
+  G9, potem G29 (jednostki, M). Małe, po jednej na obrót, gdyby zabrakło
+  budżetu: G26, G32, G11, G12, G17. Przy pięciu obrotach sensowna kolejność to
+  G9, G26, G17, G11, G32 — G29 tylko wtedy, gdy zamiast dwóch małych lepiej
+  wejść w jedną średnią.
 - **Pułapka pustych flag `completed` — czwarte spotkanie** (G19, G23, G25, G31).
   Kształt bez ani jednego ptaszka nie znaczy „nic nie zrobione", tylko „flagi
   nic nie znaczą"; w piaskownicy leży `w4 Base Strength` z importu, 20 serii,

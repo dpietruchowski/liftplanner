@@ -43,6 +43,7 @@ public:
     void setCompleted(bool value);
     void setDurationSeconds(int value);
     void setDistanceMeters(double value);
+    void adoptPrescription(const Set& set);
 
     const Set& entity() const;
 
