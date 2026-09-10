@@ -73,6 +73,23 @@ void PlannedWorkoutViewModel::loadAll()
                  });
 }
 
+void PlannedWorkoutViewModel::deleteWorkout(WorkoutModel* workout)
+{
+    if (!m_service || !workout || workout->id() <= 0)
+        return;
+
+    setLoading(true);
+
+    m_service->deleteWorkout(workout->id())
+        .then(this, [this](bool) { loadAll(); })
+        .onError(this,
+                 [this](const QString& error)
+                 {
+                     setLoading(false);
+                     emit errorOccurred(error);
+                 });
+}
+
 void PlannedWorkoutViewModel::importFromJson(const QString& jsonData)
 {
     QString validationError;

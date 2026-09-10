@@ -21,19 +21,6 @@ Kolejność sekcji „Open" to kolejność ważności.
   liście zaplanowanych pokazuje wybrany dzień, a nie dzisiejszy, i ta data
   przeżywa restart aplikacji.
 
-### G3 — Usunięcie zaplanowanego treningu
-- **Dla kogo/po co:** import z AI dokłada treningi do listy; nietrafiony plan
-  albo trening, na który się nie poszło, zostaje na ekranie na zawsze.
-- **Dowód:** `PlannedWorkoutItem.qml` ma tylko przycisk startu, podczas gdy
-  bliźniaczy `WorkoutItem.qml:29-38` (historia) ma już akcję usunięcia opartą
-  o `WorkoutHistoryViewModel.deleteWorkout`, która działa na dowolnym treningu.
-  Jedyne masowe wyjście to `WorkoutService::removeAllPlannedWorkouts`
-  (`src/application/workout/workoutservice.h:46`) — bez wejścia z UI.
-- **Zakres:** S
-- **Gotowe, gdy:** kafel zaplanowanego treningu ma akcję usunięcia z
-  potwierdzeniem; po potwierdzeniu trening znika z sekcji PLANNED i nie wraca po
-  restarcie aplikacji.
-
 ### G4 — „Start workout" ignoruje wybór na bębnie
 - **Dla kogo/po co:** użytkownik przewija bęben na ekranie głównym, wybiera
   konkretny trening i naciska duży przycisk startu — a rusza inny. To dokładnie
@@ -185,6 +172,12 @@ Kolejność sekcji „Open" to kolejność ważności.
   szablonu)
 
 ## Done
+
+### G3 — Usunięcie zaplanowanego treningu (iteracja 3)
+`PlannedWorkoutViewModel` dostał `deleteWorkout(WorkoutModel*)`, a kafel
+zaplanowanego treningu czerwony przycisk z potwierdzeniem, wzorowany na akcji
+usuwania w historii. Sprawdzone w aplikacji łącznie z restartem: usunięty
+trening nie wraca.
 
 ### G7 — Zapis w edytorze wygląda na martwy i niczego nie potwierdza (iteracja 2)
 Warunek `enabled` przycisku Save zszedł z `valid && dirty` na samo `valid`, więc

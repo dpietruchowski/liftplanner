@@ -10,6 +10,7 @@ WorkoutCard {
 
     signal startWorkoutRequest(var workout)
     signal editWorkoutRequest(var workout)
+    signal deleteWorkoutRequest(var workout)
 
     objectName: "plannedWorkoutItem" + itemIndex
     expandButtonName: "plannedWorkoutExpandButton" + itemIndex
@@ -26,6 +27,18 @@ WorkoutCard {
         onClicked: root.editWorkoutRequest(root.workout)
         ToolTip.visible: hovered
         ToolTip.text: "Edit workout"
+        ToolTip.delay: 500
+    }
+
+    ThemedButton {
+        objectName: "plannedWorkoutDeleteButton" + root.itemIndex
+        iconSource: Theme.icons.close
+        circular: true
+        buttonSize: Theme.button.circle
+        buttonStyle: Theme.button.danger
+        onClicked: root.deleteWorkoutRequest(root.workout)
+        ToolTip.visible: hovered
+        ToolTip.text: "Delete workout"
         ToolTip.delay: 500
     }
 

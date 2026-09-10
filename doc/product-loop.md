@@ -73,13 +73,25 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 2 zamknięta (G7 — zapis w edytorze)
+- **Iteracja:** 3 zamknięta (G3 — usunięcie zaplanowanego treningu, kontrolna)
 - **W locie:** nic
-- **Ostatni commit pętli:** G7
-- **Kontrola kosztu:** iteracja 1 kosztowała 7 punktów sesji (29% → 36%), z tego
-  product manager ~3. Jedną z kolejnych iteracji przeprowadzić samemu, bez
-  agentów, i porównać deltę — to jedyny sposób rozstrzygnięcia, czy agenty
-  wychodzą taniej niż robota w jednej sesji.
+- **Ostatni commit pętli:** G3
+
+### Koszt: agenty kontra robota własna
+
+Zmierzone na sondzie `/usage`, w punktach okna 5-godzinnego:
+
+| iteracja | pozycja | rozmiar | tryb | koszt |
+|---|---|---|---|---|
+| 1 | G1 | M | agenty | 7 pkt (PM ~3) |
+| 2 | G7 | S | agenty | 6 pkt (PM 2, developer + testy 4) |
+| 3 | G3 | S | solo | **2 pkt** |
+
+Przy tym samym rozmiarze pozycji (S) agenty kosztują trzy razy tyle. Ale to nie
+jest stała: robota własna wpycha treść plików do kontekstu głównej sesji na
+stałe, więc jej koszt rośnie z każdą iteracją i kończy się kompakcją, podczas
+gdy agenty trzymają ten kontekst płaski. Dwie różne krzywe, nie dwie liczby —
+zbierać dalej i porównać po kilku iteracjach, a nie po jednej.
 - **Odłożone:** nic
 - **Agenty przy życiu:** product-manager i developer z iteracji 1 — odzywać się
   do nich `SendMessage`, nie spawnować nowych.

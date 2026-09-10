@@ -13,6 +13,7 @@ Rectangle {
 
     property var currentWorkout
     property var workoutToDelete
+    property var plannedToDelete
 
     signal createWorkoutRequest()
     signal editWorkoutRequest(int workoutId)
@@ -121,6 +122,10 @@ Rectangle {
                         onEditWorkoutRequest: function(workout) {
                             if (workout)
                                 root.editWorkoutRequest(workout.id)
+                        }
+                        onDeleteWorkoutRequest: function(workout) {
+                            root.plannedToDelete = workout
+                            deletePlannedPopup.open()
                         }
                     }
                 }
@@ -253,6 +258,20 @@ Rectangle {
             if (root.workoutToDelete) {
                 WorkoutHistoryViewModel.deleteWorkout(root.workoutToDelete)
                 root.workoutToDelete = null
+            }
+        }
+    }
+
+    NotificationPopup {
+        id: deletePlannedPopup
+        objectName: "deletePlannedPopup"
+        text: "Do you want to delete this planned workout?"
+        type: Notification.Type.Warning
+        buttons: Notification.Button.Ok | Notification.Button.Cancel
+        onAccepted: {
+            if (root.plannedToDelete) {
+                PlannedWorkoutViewModel.deleteWorkout(root.plannedToDelete)
+                root.plannedToDelete = null
             }
         }
     }

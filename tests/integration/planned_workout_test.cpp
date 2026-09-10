@@ -183,3 +183,48 @@ TEST_F(PlannedWorkoutTest, HistoryLoad_TurnsLoadingOnAndOff)
     EXPECT_EQ(spy.count(), 2);
     EXPECT_FALSE(history.isLoading());
 }
+
+TEST_F(PlannedWorkoutTest, DeleteWorkout_TakesOutOnlyTheChosenOne)
+{
+    auto& vm = app.plannedWorkoutViewModel();
+    vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
+    vm.loadAll();
+    app.drain();
+
+    vm.deleteWorkout(vm.workouts().at(1));
+    app.drain();
+
+    ASSERT_EQ(vm.workouts().size(), 2);
+    EXPECT_EQ(vm.workouts().at(0)->name(), "Push Day");
+    EXPECT_EQ(vm.workouts().at(1)->name(), "Leg Day");
+}
+
+TEST_F(PlannedWorkoutTest, DeleteWorkout_DoesNotComeBackOnTheNextLoad)
+{
+    auto& vm = app.plannedWorkoutViewModel();
+    vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
+    vm.loadAll();
+    app.drain();
+
+    vm.deleteWorkout(vm.workouts().at(0));
+    app.drain();
+
+    vm.loadAll();
+    app.drain();
+
+    ASSERT_EQ(vm.workouts().size(), 2);
+    EXPECT_EQ(vm.workouts().at(0)->name(), "Pull Day");
+}
+
+TEST_F(PlannedWorkoutTest, DeleteWorkout_IgnoresNothing)
+{
+    auto& vm = app.plannedWorkoutViewModel();
+    vm.importFromJson(TestData::THREE_WORKOUTS_JSON);
+    vm.loadAll();
+    app.drain();
+
+    vm.deleteWorkout(nullptr);
+    app.drain();
+
+    EXPECT_EQ(vm.workouts().size(), 3);
+}

@@ -25,6 +25,7 @@ public:
     bool isLoading() const;
 
     Q_INVOKABLE void loadAll();
+    Q_INVOKABLE void deleteWorkout(WorkoutModel* workout);
     Q_INVOKABLE void importFromClipboard();
     Q_INVOKABLE void importFromJson(const QString& jsonData);
     Q_INVOKABLE void generatePrompt();
