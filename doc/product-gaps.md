@@ -77,21 +77,6 @@ Kolejność sekcji „Open" to kolejność ważności.
   się go zmienić; po zapisaniu i wystartowaniu treningu timer po ukończeniu
   serii tego ćwiczenia odlicza ustawioną wartość.
 
-### G7 — Zablokowany zapis w edytorze nie mówi, czego brakuje
-- **Dla kogo/po co:** użytkownik dodaje ćwiczenia, przycisk „Save" pozostaje
-  szary i nie ma żadnej informacji, co jest nie tak. Kończy się to porzuceniem
-  ekranu.
-- **Dowód:** `ScreenWorkoutEditor.qml:45` — `enabled:
-  WorkoutEditorViewModel.valid && WorkoutEditorViewModel.dirty`. Gotowa lista
-  powodów, `validationErrors` (`workouteditorviewmodel.h:23`), nie jest czytana
-  w żadnym pliku QML; te same komunikaty idą tylko do `errorOccurred` po
-  kliknięciu zapisu (`workouteditorviewmodel.cpp:315-319`), którego nie da się
-  kliknąć.
-- **Zakres:** S
-- **Gotowe, gdy:** przy nieaktywnym przycisku „Save" na ekranie edytora widać
-  tekst mówiący, czego brakuje (np. brak nazwy, brak ćwiczeń), i tekst znika,
-  gdy warunek zostanie spełniony.
-
 ### G8 — Brak podsumowania po zakończonym treningu
 - **Dla kogo/po co:** trening kończy się wyrzuceniem na ekran główny bez ani
   jednego zdania o tym, co się właśnie zrobiło. Zamknięcie sesji to najlepszy
@@ -156,6 +141,26 @@ Kolejność sekcji „Open" to kolejność ważności.
   zapisie i wystartowaniu treningu ta sama notatka jest widoczna w panelu
   informacji o ćwiczeniu.
 
+### G15 — Nowe ćwiczenie zaczyna od zera kilogramów
+- **Dla kogo/po co:** ćwiczenie wzięte z katalogu wchodzi do planu z „0 kg", a
+  plan, w którym każda seria mówi zero, nie jest planem — użytkownik i tak musi
+  wyklikać ciężar od nowa przy sztandze, choć aplikacja pamięta, ile podniósł
+  ostatnim razem.
+- **Dowód:** raport z iteracji 1 zauważył „0 kg" przy 8 powtórzeniach.
+  Źródło: `WorkoutEditorViewModel::seedSet`
+  (`workouteditorviewmodel.cpp:378-398`) ustawia powtórzenia, czas albo
+  dystans, ale nigdy ciężaru. `addSet` na niepustym ćwiczeniu kopiuje już
+  ostatnią serię wraz z ciężarem (`workouteditorviewmodel.cpp:180-184`), więc
+  zero bierze się wyłącznie z pierwszej serii nowo dodanego ćwiczenia.
+  Historia potrzebna do sensownej wartości jest już liczona i pokazywana w
+  aktywnym treningu jako „Last time" (`WorkoutService::previousPerformances`,
+  `src/application/workout/workoutservice.h:53`;
+  `ActiveWorkoutExerciseItem.qml:221-230`).
+- **Zakres:** L
+- **Gotowe, gdy:** (do rozbicia — pierwszy plaster to podpowiedź w edytorze,
+  ile użytkownik podniósł w tym ćwiczeniu ostatnim razem, zanim wartość zacznie
+  być wstawiana automatycznie)
+
 ### G13 — Poprawienie zakończonego treningu
 - **Dla kogo/po co:** telefon padł w połowie sesji albo seria została odhaczona
   przez pomyłkę — historia zostaje nieprawdziwa, a to ona karmi statystyki i
@@ -180,6 +185,13 @@ Kolejność sekcji „Open" to kolejność ważności.
   szablonu)
 
 ## Done
+
+### G7 — Zapis w edytorze wygląda na martwy i niczego nie potwierdza (iteracja 2)
+Warunek `enabled` przycisku Save zszedł z `valid && dirty` na samo `valid`, więc
+poprawny trening rysuje się wypełnionym przyciskiem zamiast wyblakłego obrysu.
+Obok przycisku doszedł komunikat z `validationErrors` — pierwszy konsument tej
+właściwości w QML — a po udanym zapisie pojawia się potwierdzenie „Workout
+saved". Sprawdzone w aplikacji na wszystkich trzech stanach.
 
 ### G1 — Edycja zaplanowanego treningu (iteracja 1)
 Kafel zaplanowanego treningu dostał przycisk edycji, który otwiera edytor przez

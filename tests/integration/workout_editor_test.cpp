@@ -296,6 +296,73 @@ TEST_F(WorkoutEditorTest, AWorkoutWithoutANameIsNotValid)
     EXPECT_FALSE(editor().validationErrors().isEmpty());
 }
 
+TEST_F(WorkoutEditorTest, ValidationErrorsNameTheMissingNameAndClearOnceItIsFilledIn)
+{
+    editor().createNew(QStringLiteral(""), QDateTime::currentDateTime());
+    addExercise(QStringLiteral("Back Squat"));
+
+    ASSERT_FALSE(editor().isValid());
+    const QStringList errors = editor().validationErrors();
+    ASSERT_EQ(errors.size(), 1);
+    EXPECT_TRUE(errors.first().contains(QStringLiteral("name"))) << errors.first().toStdString();
+
+    editor().setName(QStringLiteral("Leg Day"));
+
+    EXPECT_TRUE(editor().isValid());
+    EXPECT_TRUE(editor().validationErrors().isEmpty());
+}
+
+TEST_F(WorkoutEditorTest, ClearingTheNameBlocksSavingAgainAndSaysWhy)
+{
+    startWorkout();
+    addExercise(QStringLiteral("Back Squat"));
+    ASSERT_TRUE(editor().isValid());
+
+    editor().setName(QStringLiteral(""));
+
+    EXPECT_FALSE(editor().isValid());
+    ASSERT_EQ(editor().validationErrors().size(), 1);
+    EXPECT_TRUE(editor().validationErrors().first().contains(QStringLiteral("name")));
+}
+
+TEST_F(WorkoutEditorTest, AClosedEditorOffersNoValidationHint)
+{
+    EXPECT_TRUE(editor().validationErrors().isEmpty());
+
+    startWorkout();
+    addExercise(QStringLiteral("Back Squat"));
+    editor().discard();
+
+    EXPECT_TRUE(editor().validationErrors().isEmpty());
+}
+
+TEST_F(WorkoutEditorTest, AReopenedWorkoutIsSaveableBeforeAnythingIsChanged)
+{
+    startWorkout();
+    addExercise(QStringLiteral("Back Squat"));
+
+    QSignalSpy saved(&editor(), &WorkoutEditorViewModel::saved);
+    editor().save();
+    m_app.drain();
+    ASSERT_EQ(saved.count(), 1);
+    const int workoutId = saved.first().first().toInt();
+
+    editor().discard();
+    editor().edit(workoutId);
+    m_app.drain();
+
+    EXPECT_TRUE(editor().isValid());
+    EXPECT_FALSE(editor().isDirty());
+    EXPECT_TRUE(editor().validationErrors().isEmpty());
+
+    editor().save();
+    m_app.drain();
+
+    ASSERT_EQ(saved.count(), 2);
+    EXPECT_EQ(saved.at(1).first().toInt(), workoutId);
+    EXPECT_EQ(reloadPlanned().size(), 1);
+}
+
 TEST_F(WorkoutEditorTest, SaveRefusesAnInvalidWorkoutAndReportsWhy)
 {
     editor().createNew(QStringLiteral(""), QDateTime::currentDateTime());

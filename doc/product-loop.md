@@ -42,6 +42,11 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
   `tmp/probe_usage.sh` kosztuje zero tokenów, więc sprawdzam co obrót.
 - **Nigdy nie piszę do innych sesji** z `ListAgents` — to inne projekty
   użytkownika.
+- **Sesję UI uruchamiam zawsze z `--port 49251`**, nie na domyślnym 49210. Na
+  domyślnym porcie nasłuchuje `appfillin` z innego projektu użytkownika, a
+  `ui_session.py start` adoptuje cudzą instancję zamiast wystartować naszą
+  („already running, unknown pid"). `tmp/walk.py` łączy się na 49251.
+  Cudzej instancji nigdy nie ubijam.
 - **Nigdy nie ruszam prawdziwych danych**: `liftplanner.db` w korzeniu ani
   `~/.local/share/LiftPlanner/`. Sesja UI sama się piaskownicuje w `tmp/run`.
 - **Nie pushuję.** Commity zostają lokalnie.
@@ -49,6 +54,10 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
   w innych oknach.
 - Agentów trzymam przy życiu i odzywam się do nich `SendMessage` zamiast
   spawnować nowych — świeży agent to kilkanaście tysięcy tokenów na samo wejście.
+- Agenty mają myślenie włączone — dziedziczą je z sesji. Zmierzone na
+  transkryptach iteracji 1 (`tmp/thinkcheck.py`): developer 28 bloków / 8352
+  tokeny, product manager 26 bloków / 9318 tokenów. Poziom podbijam słowami
+  kluczowymi w prompcie tam, gdzie liczy się projekt, nie wykonanie.
 - Definicje z `.claude/agents/` wczytują się przy starcie sesji, więc w sesji, w
   której powstały, `subagent_type` ich nie zna. Obejście bez restartu: spawnuję
   `general-purpose` i w prompcie każę mu przeczytać
@@ -64,9 +73,13 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 1 zamknięta (G1 — edycja zaplanowanego treningu)
+- **Iteracja:** 2 zamknięta (G7 — zapis w edytorze)
 - **W locie:** nic
-- **Ostatni commit pętli:** G1
+- **Ostatni commit pętli:** G7
+- **Kontrola kosztu:** iteracja 1 kosztowała 7 punktów sesji (29% → 36%), z tego
+  product manager ~3. Jedną z kolejnych iteracji przeprowadzić samemu, bez
+  agentów, i porównać deltę — to jedyny sposób rozstrzygnięcia, czy agenty
+  wychodzą taniej niż robota w jednej sesji.
 - **Odłożone:** nic
 - **Agenty przy życiu:** product-manager i developer z iteracji 1 — odzywać się
   do nich `SendMessage`, nie spawnować nowych.

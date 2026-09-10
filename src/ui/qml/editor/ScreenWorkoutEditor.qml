@@ -56,9 +56,20 @@ Rectangle {
                 text: qsTr("Save")
                 buttonSize: Theme.button.small
                 buttonStyle: Theme.button.primary
-                enabled: WorkoutEditorViewModel.valid && WorkoutEditorViewModel.dirty
+                enabled: WorkoutEditorViewModel.valid
                 onClicked: WorkoutEditorViewModel.save()
             }
+        }
+
+        Text {
+            objectName: "saveValidationHint"
+            Layout.fillWidth: true
+            visible: text !== ""
+            text: WorkoutEditorViewModel.validationErrors.join(", ")
+            horizontalAlignment: Text.AlignRight
+            wrapMode: Text.WordWrap
+            color: Theme.colors.error
+            font.pixelSize: Theme.fontSize.small
         }
 
         ThemedInput {

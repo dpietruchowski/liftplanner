@@ -120,6 +120,15 @@ Item {
         buttons: Notification.Button.Ok
     }
 
+    NotificationPopup {
+        id: workoutSavedPopup
+        objectName: "workoutSavedPopup"
+        type: Notification.Type.Success
+        buttons: Notification.Button.Ok
+        title: qsTr("Workout saved")
+        text: qsTr("It is on your planned list, ready to start.")
+    }
+
     function showError(error) {
         notificationPopup.type = Notification.Type.Error
         notificationPopup.title = qsTr("Something went wrong")
@@ -156,6 +165,7 @@ Item {
             PlannedWorkoutViewModel.loadAll()
             while (stackView.currentItem !== workoutsScreen && stackView.depth > 1)
                 stackView.pop()
+            workoutSavedPopup.open()
         }
 
         function onSavedAsTemplate(templateId) {
