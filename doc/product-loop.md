@@ -21,7 +21,8 @@ limitu albo do wyczerpania backlogu.
    (`tmp/loop/test-report.md`). Oddaje jedną pozycję i warunek „gotowe, gdy".
 3. **Developer.** Dostaje id pozycji i ten warunek. Oddaje listę plików,
    `objectName` do klikania i wynik testów. Nie commituje.
-4. **Ja — test.** Buduję, `ctest`, potem sesja UI: przechodzę ścieżkę
+4. **Ja — test.** Buduję, `ctest`, a przy zmianach w QML dodatkowo
+   `cmake --build build-desktop -j 4 --target liftplanner_qml_qmllint`. Potem sesja UI: przechodzę ścieżkę
    użytkownika, sprawdzam warunek akceptacji, robię zrzut, czytam log aplikacji.
    Wynik zapisuję do `tmp/loop/test-report.md`.
    Nie działa → wracam do developera z konkretem, maksymalnie dwa razy; za
@@ -30,6 +31,14 @@ limitu albo do wyczerpania backlogu.
    Ścieżki biorę z raportu developera i z `git status --porcelain`.
    Odhaczam pozycję w `product-gaps.md` i aktualizuję stan na dole.
 6. Wracam do 1.
+
+**Zielony build i zielony `ctest` nie są dowodem, że aplikacja działa.**
+Sprawdzone na G5 (iteracja 4): `SetRow.qml` używał `ToolTip` bez
+`import QtQuick.Controls`, build przeszedł bez ostrzeżeń, 704 testy na zielono,
+a aplikacja nie wstawała — cały ekran aktywnego treningu niedostępny.
+`qmlcachegen` sprawdza składnię, nie rozwiązywalność typów z brakującego modułu,
+a testy C++ nie ładują QML-a. Dlatego krok z prawdziwą aplikacją jest
+obowiązkowy, a `liftplanner_qml_qmllint` łapie tę klasę błędu wcześniej.
 
 **Diffów nie czytam.** Recenzja kodu wpuszczałaby do kontekstu setki linii co
 obrót, a z `/usage` wynika, że to właśnie duży kontekst pali limit. Bramką
@@ -73,9 +82,10 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 3 zamknięta (G3 — usunięcie zaplanowanego treningu, kontrolna)
+- **Iteracja:** 4 zamknięta (G5 — edytor serii w aktywnym treningu)
 - **W locie:** nic
-- **Ostatni commit pętli:** G3
+- **Ostatni commit pętli:** G5
+- **Zawroty do developera:** 1 (G5, brakujący import w QML)
 
 ### Koszt: agenty kontra robota własna
 

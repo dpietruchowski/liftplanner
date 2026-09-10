@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 import LiftPlanner
 import Themed.Components
@@ -18,7 +19,10 @@ Rectangle {
 
     property bool completable: true
     property bool editable: true
+    property bool expandable: true
     property bool secondaryAdjustable: true
+
+    readonly property bool revealable: root.editable && root.expandable
 
     property string primaryLabel: root.metric === "duration" ? qsTr("TIME")
                                 : root.metric === "distance" ? qsTr("DIST")
@@ -64,6 +68,10 @@ Rectangle {
         anchors.fill: parent
         enabled: root.editable
         onHeld: root.expanded = !root.expanded
+        onTapped: {
+            if (root.revealable)
+                root.expanded = !root.expanded
+        }
     }
 
     Column {
@@ -103,6 +111,22 @@ Rectangle {
                 elide: Text.ElideRight
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignVCenter
+            }
+
+            ThemedButton {
+                objectName: root.namePrefix + "expandSetButton"
+                iconSource: root.expanded ? Theme.icons.chevronUp : Theme.icons.chevronDown
+                iconColor: root.expanded ? Theme.colors.primary : Theme.colors.textFaint
+                circular: true
+                buttonSize: Theme.button.square
+                buttonStyle: Theme.button.ghost
+                visible: root.revealable
+                Layout.alignment: Qt.AlignVCenter
+                Layout.rightMargin: Theme.spacing.small
+                onClicked: root.expanded = !root.expanded
+                ToolTip.visible: hovered
+                ToolTip.text: root.expanded ? qsTr("Hide set editor") : qsTr("Edit this set")
+                ToolTip.delay: 500
             }
 
             CompletionDot {

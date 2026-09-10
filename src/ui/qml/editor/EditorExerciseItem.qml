@@ -78,6 +78,7 @@ Rectangle {
                 secondaryAdjustable: modelData.secondaryAdjustable
                 completable: false
                 expanded: true
+                expandable: false
 
                 onPrimaryAdjusted: function(direction) {
                     WorkoutEditorViewModel.adjustSetPrimary(root.exerciseIndex, index, direction)

@@ -21,6 +21,25 @@ Kolejność sekcji „Open" to kolejność ważności.
   liście zaplanowanych pokazuje wybrany dzień, a nie dzisiejszy, i ta data
   przeżywa restart aplikacji.
 
+### G16 — Nazwa treningu na kaflu przegrywa z przyciskami
+- **Dla kogo/po co:** nazwa jest jedyną rzeczą, po której odróżnia się „Push A"
+  od „Push B" na liście. Dziś ucina się po kilkunastu znakach, a kafel oddaje
+  większość szerokości przyciskom, z których dwa (edycja, usunięcie) używane są
+  raz na kilka tygodni.
+- **Dowód:** raport z iteracji 3 (`tmp/loop/test-report.md`, „Obserwacje",
+  zrzut `tmp/loop/g3-confirm.png`): „Naming che..." przy szerokości, na której
+  zmieściłoby się dużo więcej. Nagłówek kafla (`WorkoutCard.qml:46-77`) to
+  przycisk rozwijania + tytuł z `Layout.fillWidth` + rząd akcji; do
+  `PlannedWorkoutItem.qml` doszły w iteracjach 1 i 3 przyciski edycji i
+  usunięcia, więc rząd akcji urósł z jednego przycisku do trzech i tytuł dostaje
+  resztę przy oknie 360 px (`Main.qml:9`). Wzorzec, który to rozwiązuje, jest już
+  w repo: `WorkoutItem.qml:14-40` trzyma rzadkie i groźne akcje w
+  `expandedActions`, czyli pokazuje je dopiero po rozwinięciu kafla.
+- **Zakres:** S
+- **Gotowe, gdy:** przy oknie 360 px kafel zaplanowanego treningu pokazuje pełną
+  nazwę długości typowej dla treningu (np. „Naming check upper A") bez wielokropka,
+  a edycja i usunięcie pozostają osiągalne.
+
 ### G4 — „Start workout" ignoruje wybór na bębnie
 - **Dla kogo/po co:** użytkownik przewija bęben na ekranie głównym, wybiera
   konkretny trening i naciska duży przycisk startu — a rusza inny. To dokładnie
@@ -35,20 +54,6 @@ Kolejność sekcji „Open" to kolejność ważności.
   drugiego i naciśnięcie „Start workout" uruchamia ten drugi (ekran aktywnego
   treningu ma jego nazwę w tytule); dla pozycji, której nie da się wystartować
   (miniony trening), przycisk nie startuje cudzego treningu.
-
-### G5 — Edytor serii w aktywnym treningu nie daje o sobie znać
-- **Dla kogo/po co:** zmiana ciężaru albo powtórzeń w trakcie serii to
-  najczęstsza czynność na siłowni, a jedyny sposób jej otwarcia to długie
-  przytrzymanie wiersza, o którym nic nie informuje.
-- **Dowód:** `SetRow.qml:63-67` — `HoldToRevealArea` z `onHeld: root.expanded =
-  !root.expanded` i żadnej ikony ani podpowiedzi; w edytorze treningu ten sam
-  komponent dostaje `expanded: true` na sztywno
-  (`EditorExerciseItem.qml:80`), więc problem dotyczy tylko aktywnego treningu.
-  Pozycja odnotowana też w `doc/todo.md:89` jako „do decyzji".
-- **Zakres:** S
-- **Gotowe, gdy:** w aktywnym treningu wiersz serii ma widoczny sygnał, że da
-  się go rozwinąć, i da się go rozwinąć bez przytrzymywania; steppery REPS/KG
-  oraz akcje duplikuj/usuń są po tym widoczne.
 
 ### G6 — Czas przerwy jest niewidoczny i nie do ustawienia
 - **Dla kogo/po co:** przerwa decyduje o charakterze treningu (siła vs
@@ -91,6 +96,23 @@ Kolejność sekcji „Open" to kolejność ważności.
 - **Gotowe, gdy:** w aktywnym treningu da się dorzucić ćwiczenie z katalogu; po
   dodaniu pojawia się ono na liście, ma serie do odhaczenia, a po zakończeniu
   treningu widać je w historii.
+
+### G17 — Pusty trening da się zapisać i wystartować
+- **Dla kogo/po co:** trening bez ani jednego ćwiczenia trafia na listę
+  zaplanowanych i można go wystartować. Użytkownik ląduje wtedy na ekranie
+  aktywnego treningu, na którym nie ma czego odhaczyć i z którego nie widać
+  wyjścia — wygląda to jak zepsuta aplikacja, a nie jak własna pomyłka.
+- **Dowód:** raport z iteracji 3 („Obserwacje"): trening z nazwą, ale bez
+  ćwiczeń, wciąż jest zapisywalny. `Workout::validationErrors`
+  (`src/domain/workout/workout.cpp:75-89`) sprawdza tylko nazwę i deleguje
+  resztę do ćwiczeń — przy pustej liście pętla nie wykonuje się ani razu, więc
+  trening jest „valid" i przycisk „Save" w edytorze aktywny
+  (`ScreenWorkoutEditor.qml:59`). Na ekranie aktywnego treningu przycisk „Done"
+  jest wtedy wyłączony, bo nie ma `currentSet` (`ScreenActiveWorkout.qml:119`).
+- **Zakres:** S
+- **Gotowe, gdy:** w edytorze trening bez ćwiczeń nie da się zapisać, a przy
+  zablokowanym przycisku widać, że brakuje ćwiczeń; trening z co najmniej jednym
+  ćwiczeniem zapisuje się jak dotąd.
 
 ### G10 — Filtr po mięśniu w katalogu ćwiczeń bez wejścia
 - **Dla kogo/po co:** wybierając ćwiczenie na zastępstwo szuka się po partii
@@ -172,6 +194,12 @@ Kolejność sekcji „Open" to kolejność ważności.
   szablonu)
 
 ## Done
+
+### G5 — Edytor serii w aktywnym treningu nie daje o sobie znać (iteracja 4)
+Wiersz serii dostał szewron rozwijający edytor jednym kliknięciem; przytrzymanie
+zostało jako skrót. Edytor treningu wyłącza tę ścieżkę przez `expandable: false`,
+więc tam nic się nie zmieniło. Sprawdzone w aplikacji: rozwijanie, zwijanie,
+kropka ukończenia dalej odhacza serię zamiast rozwijać.
 
 ### G3 — Usunięcie zaplanowanego treningu (iteracja 3)
 `PlannedWorkoutViewModel` dostał `deleteWorkout(WorkoutModel*)`, a kafel

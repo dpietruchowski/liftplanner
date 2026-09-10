@@ -8,15 +8,28 @@ MouseArea {
     property color progressColor: Theme.colors.primary
     property int progressHeight: Theme.border.medium
 
+    property bool heldDuringThisPress: false
+
     signal held()
+    signal tapped()
 
     function resetProgress() {
         holdAnimation.stop()
         progress.width = 0
     }
 
-    onPressAndHold: root.held()
-    onPressed: holdAnimation.restart()
+    onPressAndHold: {
+        root.heldDuringThisPress = true
+        root.held()
+    }
+    onPressed: {
+        root.heldDuringThisPress = false
+        holdAnimation.restart()
+    }
+    onClicked: {
+        if (!root.heldDuringThisPress)
+            root.tapped()
+    }
     onReleased: root.resetProgress()
     onCanceled: root.resetProgress()
 
