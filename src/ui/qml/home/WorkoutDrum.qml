@@ -60,6 +60,7 @@ Item {
                 readonly property bool isCurrent: index === root.currentIndex
 
                 objectName: "drumItem_" + index
+                nameObjectName: "drumItemName_" + index
                 x: boxed ? Theme.drum.cardInset : 0
                 width: root.width - 2 * x
                 height: isCurrent ? root.slotHeightLarge : root.slotHeight

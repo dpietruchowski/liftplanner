@@ -219,6 +219,12 @@ Człowiek nie widzi z tego powodu ani złej daty, ani złej liczby, więc to spr
 porządku w bazie, nie produktu. Wraca na listę dopiero wtedy, gdy pojawi się
 ekran, na którym ta data będzie widoczna.
 
+### Pusta przestrzeń nad bębnem przy dwóch pozycjach (iteracja 15)
+Zgłoszone dla porządku razem z G28. Treść jest dosunięta do dołu i nic się nie
+psuje — użytkownik nie traci ani informacji, ani akcji. Rozstrzygnięcie odstępów
+w pustym stanie to robota na wtedy, gdy ekran główny dostanie nową zawartość, nie
+osobna iteracja.
+
 ## Scalone
 
 Identyfikatory nie wracają do obiegu, więc pozycje wchłonięte przez inne

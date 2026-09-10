@@ -13,6 +13,7 @@ Rectangle {
     property bool dotted: false
     property color accent: Theme.colors.primary
     property color accentText: Theme.colors.primaryLight
+    property string nameObjectName: ""
 
     readonly property var workoutDate: {
         if (!workout)
@@ -37,9 +38,20 @@ Rectangle {
 
     readonly property int animationDuration: 260
 
+    readonly property string nameText: workout ? workout.name : "---"
+    readonly property real targetGap: highlighted ? Theme.drum.gapLarge : Theme.drum.gap
+    readonly property real targetPadding: boxed ? Theme.drum.paddingLarge : Theme.drum.padding
+    readonly property real targetTextWidth: width - 2 * targetPadding - Theme.drum.dateWidth
+                                            - 2 * targetGap
+    readonly property bool nameNeedsTwoLines: nameMetrics.width > targetTextWidth
+    readonly property bool stretchTexts: highlighted && nameNeedsTwoLines
+    readonly property bool compactRow: height < Theme.drum.rowHeightLarge
+
     property real sidePadding: boxed ? Theme.drum.paddingLarge : Theme.drum.padding
     property real textInset: sidePadding + Theme.drum.dateWidth
                              + (highlighted ? Theme.drum.gapLarge : Theme.drum.gap)
+    property real textInsetRight: sidePadding
+                                  + (highlighted ? Theme.drum.gapLarge : Theme.drum.gap)
     property real borderWidth: boxed ? Theme.border.medium : 0
     property real nameSize: highlighted ? Theme.drum.nameSizeLarge : Theme.drum.nameSize
     property real labelSize: highlighted ? Theme.drum.labelSizeLarge : Theme.drum.labelSize
@@ -47,6 +59,7 @@ Rectangle {
 
     Behavior on sidePadding { NumberAnimation { duration: root.animationDuration } }
     Behavior on textInset { NumberAnimation { duration: root.animationDuration } }
+    Behavior on textInsetRight { NumberAnimation { duration: root.animationDuration } }
     Behavior on borderWidth { NumberAnimation { duration: root.animationDuration } }
     Behavior on nameSize { NumberAnimation { duration: root.animationDuration } }
     Behavior on labelSize { NumberAnimation { duration: root.animationDuration } }
@@ -58,6 +71,13 @@ Rectangle {
     border.color: accent
 
     Behavior on color { ColorAnimation { duration: root.animationDuration } }
+
+    TextMetrics {
+        id: nameMetrics
+        text: root.nameText
+        font.pixelSize: root.highlighted ? Theme.drum.nameSizeLarge : Theme.drum.nameSize
+        font.bold: true
+    }
 
     Column {
         anchors.left: parent.left
@@ -94,9 +114,13 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
+        anchors.bottom: root.stretchTexts ? parent.bottom : undefined
         anchors.leftMargin: root.textInset
-        anchors.rightMargin: root.textInset
-        anchors.topMargin: Math.round((root.height - implicitHeight) / 2)
+        anchors.rightMargin: root.textInsetRight
+        anchors.topMargin: root.stretchTexts
+                           ? Theme.drum.textSpacing
+                           : Math.round((root.height - implicitHeight) / 2)
+        anchors.bottomMargin: Theme.drum.textSpacing
         spacing: root.highlighted ? Theme.drum.textSpacingLarge : Theme.drum.textSpacing
 
         RowLayout {
@@ -125,12 +149,19 @@ Rectangle {
         }
 
         Text {
+            objectName: root.nameObjectName
             Layout.fillWidth: true
-            text: root.workout ? root.workout.name : "---"
+            Layout.fillHeight: root.stretchTexts
+            text: root.nameText
             color: root.highlighted ? Theme.colors.textPrimary : Theme.colors.textSoft
             font.pixelSize: Math.round(root.nameSize)
             font.bold: true
             horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            wrapMode: root.stretchTexts ? Text.WordWrap : Text.NoWrap
+            maximumLineCount: root.stretchTexts ? 2 : 1
+            fontSizeMode: root.stretchTexts ? Text.Fit : Text.HorizontalFit
+            minimumPixelSize: Math.round(root.nameSize * 0.55)
             elide: Text.ElideRight
 
             Behavior on color { ColorAnimation { duration: root.animationDuration } }
@@ -142,10 +173,10 @@ Rectangle {
             color: root.highlighted ? Theme.colors.textMuted : Theme.colors.textFaint
             font.pixelSize: Theme.drum.exerciseSize
             horizontalAlignment: Text.AlignHCenter
-            wrapMode: root.highlighted ? Text.WordWrap : Text.NoWrap
-            maximumLineCount: root.highlighted ? 2 : 1
+            wrapMode: root.highlighted && !root.compactRow ? Text.WordWrap : Text.NoWrap
+            maximumLineCount: root.highlighted && !root.compactRow ? 2 : 1
             elide: Text.ElideRight
-            visible: root.exerciseText.length > 0
+            visible: root.exerciseText.length > 0 && !root.stretchTexts
 
             Behavior on color { ColorAnimation { duration: root.animationDuration } }
         }

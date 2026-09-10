@@ -94,13 +94,16 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 15 zamknięta (G28 — ekran główny mieści nagłówek i przycisk startu)
+- **Iteracja:** 16 zamknięta (G30 — pełna nazwa w zaznaczonym wierszu bębna)
 - **W locie:** nic
-- **Ostatni commit pętli:** G28
+- **Ostatni commit pętli:** G30
 - **Następna pozycja wg backlogu:** do wyboru przez PM. Na liście zostały G26
   (nieudany import historii milczy) i G29 (wybór funtów kończy się na profilu).
-  W raporcie z iteracji 15 czeka znalezisko: nazwa na bębnie elidzie także
-  w zaznaczonym wierszu, a od G4 to bęben decyduje, co wystartuje.
+- **Gdy dwie pozycje ciągną ten sam układ w przeciwne strony**, warunek
+  akceptacji tej wcześniejszej wchodzi do zlecenia następnej i sprawdzam oba
+  naraz. Zrobione przy G30 wobec G28 (nazwa nie mogła urosnąć kosztem przycisku)
+  — pomiary wyszły identyczne, więc regresji nie było, ale bez wpisania tego do
+  zlecenia nikt by jej nie szukał.
 - **Zrzut oglądam najpierw jako całość.** G28 (przycisk startu przecięty przez
   dolną nawigację) był na moich zrzutach z iteracji 12 i 13 i go nie zobaczyłem,
   bo za każdym razem szukałem na nich konkretnej rzeczy. Znalazł to dopiero
