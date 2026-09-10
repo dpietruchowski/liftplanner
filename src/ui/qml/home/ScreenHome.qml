@@ -11,10 +11,33 @@ Rectangle {
 
     anchors.margins: Theme.padding.screen
 
+    property var plannedWorkouts: []
+    property var historyWorkouts: []
+
+    function readWorkoutLists() {
+        root.plannedWorkouts = PlannedWorkoutViewModel.workouts
+        root.historyWorkouts = WorkoutHistoryViewModel.workouts
+    }
+
+    Component.onCompleted: root.readWorkoutLists()
+
+    Connections {
+        target: PlannedWorkoutViewModel
+        function onWorkoutsChanged() { root.readWorkoutLists() }
+    }
+
+    Connections {
+        target: WorkoutHistoryViewModel
+        function onWorkoutsChanged() { root.readWorkoutLists() }
+    }
+
     readonly property var drumEntries: {
         var list = []
-        var planned = PlannedWorkoutViewModel.workouts
+        var planned = root.plannedWorkouts
         var current = ActiveWorkoutViewModel.currentWorkout
+        var history = root.historyWorkouts
+        list.push({ label: "without a plan", kind: "blank", itemName: "drumItemBlank",
+                    workout: PlannedWorkoutViewModel.blankWorkout })
         if (current) {
             if (planned.length > 0)
                 list.push({ label: "planned workout", kind: "planned", workout: planned[0] })
@@ -22,11 +45,11 @@ Rectangle {
         } else {
             if (planned.length > 1)
                 list.push({ label: "next planned", kind: "upcoming", workout: planned[1] })
-            list.push({ label: "planned workout", kind: "planned",
-                        workout: planned.length > 0 ? planned[0] : null })
+            if (planned.length > 0)
+                list.push({ label: "planned workout", kind: "planned", workout: planned[0] })
         }
-        list.push({ label: "last workout", kind: "last",
-                    workout: WorkoutHistoryViewModel.lastWorkout })
+        list.push({ label: "last workout", kind: "last", placeholder: "Nothing done yet",
+                    workout: history.length > 0 ? history[0] : null })
         return list
     }
 
@@ -160,12 +183,15 @@ Rectangle {
     NotificationPopup {
         id: noPlannedPopup
         objectName: "noPlannedPopup"
-        text: "No planned workouts yet.\n\n" +
-              "Head to the workouts tab (calendar icon) and tap the AI button — it will copy a ready-made prompt to your clipboard. " +
+        title: "Nothing to start here"
+        text: "You can begin without a plan: an empty session opens right away and you add exercises as you go.\n\n" +
+              "For a plan, head to the workouts tab (calendar icon) and tap the AI button — it copies a ready-made prompt to your clipboard. " +
               "Paste it into any AI assistant (ChatGPT, Gemini, etc.), describe your training goals, and let it generate a workout plan. " +
               "Once you receive the JSON, come back and tap the import button next to 'Planned'."
         type: Notification.Type.Info
-        buttons: Notification.Button.Ok
+        buttons: Notification.Button.Ok | Notification.Button.Cancel
+        okText: "Start empty"
+        onAccepted: root.startBlankWorkout()
     }
 
     NotificationPopup {
@@ -205,6 +231,31 @@ Rectangle {
             return
         }
         startWorkout(root.selectedWorkout)
+    }
+
+    function blankEntryIndex() {
+        for (var i = 0; i < root.drumEntries.length; ++i) {
+            if (root.drumEntries[i].kind === "blank")
+                return i
+        }
+        return -1
+    }
+
+    function startBlankWorkout() {
+        var index = root.blankEntryIndex()
+        if (index >= 0)
+            workoutDrum.focusEntry(index)
+
+        var blank = PlannedWorkoutViewModel.blankWorkout
+        if (!blank)
+            return
+
+        var decision = WorkoutStartPolicy.decide(blank, ActiveWorkoutViewModel.currentWorkout)
+        if (decision.action === "replace") {
+            startWorkoutPopup.open()
+            return
+        }
+        root.startWorkout(blank)
     }
 
     function startWorkout(workout) {

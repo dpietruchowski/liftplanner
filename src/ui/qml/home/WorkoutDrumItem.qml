@@ -14,6 +14,7 @@ Rectangle {
     property color accent: Theme.colors.primary
     property color accentText: Theme.colors.primaryLight
     property string nameObjectName: ""
+    property string placeholder: ""
 
     readonly property var workoutDate: {
         if (!workout)
@@ -41,7 +42,7 @@ Rectangle {
 
     readonly property int animationDuration: 260
 
-    readonly property string nameText: workout ? workout.name : "---"
+    readonly property string nameText: workout ? workout.name : root.placeholder
     readonly property real targetGap: highlighted ? Theme.drum.gapLarge : Theme.drum.gap
     readonly property real targetPadding: boxed ? Theme.drum.paddingLarge : Theme.drum.padding
     readonly property real targetTextWidth: width - 2 * targetPadding - Theme.drum.dateWidth

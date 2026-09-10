@@ -97,71 +97,41 @@ zapis po fakcie, czyli to, czym ta aplikacja właśnie się staje.
 
 ## Open
 
-### G39 — Nie da się zacząć treningu bez planu
-- **Pochodzenie: prosto od użytkownika**, tego samego wieczoru co G37 i G38.
-  Cytat: „jeszcze jedna funkcjonalność produktowa. Tworzenie pustego aktywnego
-  treningu i dodawanie sobie ćwiczeń i serii".
-- **Dla kogo/po co:** wchodzisz na siłownię, nie wiesz jeszcze, co dziś zrobisz, i
-  chcesz po prostu zacząć — a aplikacja każe najprzód pójść do edytora i ułożyć
-  plan. To zakłada wiedzę, której się w tym momencie nie ma, i jest jedynym
-  miejscem, w którym aplikacja stawia warunek przed treningiem, zamiast go
-  zapisywać.
-- **Połowa tego już stoi:** dorzucanie ćwiczeń w trakcie sesji działa od G9
-  (`addExerciseButton`), dokładanie serii od zawsze („Duplicate set"), przerwa i
-  zasiew ciężaru też. Brakuje wyłącznie wejścia. Dziś przy braku wybranego
-  treningu `WorkoutStartPolicy::decide` zwraca `missing`
-  (`workoutstartpolicy.cpp:101`), a ekran główny otwiera na to `noPlannedPopup`
-  (`ScreenHome.qml:190`) — ślepy zaułek tłumaczący, jak wygenerować plan.
-- **Zakres:** M
-- **Gotowe, gdy:**
-  1. przy pustej liście zaplanowanych da się wystartować trening od zera, bez
-     zaglądania do edytora, i ląduje się od razu na ekranie aktywnego treningu;
-  2. ta sama droga jest dostępna, gdy plan na dziś **jest** — bo „nie wiem, co
-     dziś zrobię" nie zależy od tego, czy coś leży na liście — i nie powstaje
-     przy tym drugi wielki przycisk startu konkurujący z pierwszym;
-  3. świeżo zaczęty pusty trening pokazuje stan zerowy, który mówi, co zrobić
-     („dodaj pierwsze ćwiczenie"), a nie pustą stronę; przycisk dodania ćwiczenia
-     jest widoczny bez szukania, a pozostałe przyciski paska nie wyglądają na
-     zepsute;
-  4. dodane ćwiczenie zachowuje się dokładnie jak dorzucone w G9 — z ciężarem z
-     ostatniego razu, z serią do odhaczenia — a po zakończeniu trening jest w
-     historii pod nazwą, która pozwala go odróżnić na liście i w bębnie, bez
-     „---";
-  5. pusty trening porzucony bez zrobienia czegokolwiek **znika**, a aplikacja
-     mówi o tym przed, nie po: nie zostaje ani pusty wpis w historii, ani nic na
-     liście zaplanowanych.
-
-#### Rozstrzygnięcia, o które prosiłeś
-
-**Wejście stoi tam, gdzie już się wybiera, co wystartować — nie w drugim wielkim
-przycisku.** Ekran główny ma od G4 jedno miejsce decyzji: wskazujesz pozycję,
-naciskasz jeden przycisk. „Pusty trening" ma być kolejną pozycją do wskazania, a
-nie równoległą drogą, bo dwa duże przyciski startu na jednym ekranie zmuszają do
-wyboru za każdym razem, także wtedy, gdy nie ma czego wybierać. Przy okazji
-`noPlannedPopup` przestaje być ślepym zaułkiem: skoro tłumaczy, co robić bez
-planu, ma prowadzić także tędy.
-
-**Nazwa nadawana automatycznie, bez pytania.** Pytanie o nazwę w chwili startu to
-tarcie dokładnie tam, gdzie obiecujemy jego brak — a odpowiedzi i tak jeszcze nie
-ma, bo trening dopiero się wydarzy. Sesja dostaje nazwę z dnia, wystarczającą do
-odróżnienia w bębnie i w historii. Zmiana tej nazwy później jest sensowna i
-pewnie o nią przyjdzie prośba, ale to osobny plaster — razem z nazywaniem
-szablonów z G14.
-
-**Pusty znaczy pusty.** Żadnego ćwiczenia na start, żadnego „przykładowego"
-wiersza. Stan zerowy ma być zaproszeniem z jednym oczywistym ruchem — dlatego
-punkt 3 warunku mówi o nim wprost, żeby nie skończyło się pustą stroną.
-
-**Porzucony pusty trening znika, ale nie po cichu.** Nie ma planu, na który
-mógłby wrócić, a pusty wpis w historii byłby dokładnie tym śmieciem, przeciw
-któremu jest G38. Zasada z G38 zostaje w mocy w obie strony: nic nie znika bez
-zdania, które powie z góry, że zniknie.
-
-**Uwaga, żeby nikt nie zobaczył tu sprzeczności z G17:** G17 mówi, że w
-**edytorze** nie da się zapisać planu bez ćwiczeń. To nadal prawda i nadal jest
-słuszne — plan bez ćwiczeń jest do niczego, bo nic z nim potem nie zrobisz.
-Pusta **sesja** to co innego: naczynie, które napełnia się w trakcie. Te dwie
-pozycje się nie gryzą.
+### G40 — Okno, które kasuje dane, wygląda jak każde inne pytanie
+- **Dla kogo/po co:** od G38 jest w aplikacji miejsce, w którym jedno kliknięcie
+  bezpowrotnie usuwa serie. Treść okna mówi prawdę, ale układ prowadzi rękę ku
+  skasowaniu: potwierdzenie jest dużym wypełnionym przyciskiem, wyjście —
+  bladym obrysem obok, dokładnie jak w oknie pytającym „skopiować prompt?".
+  Kto klika w biegu, między seriami, klika to, co wygląda na domyślne.
+- **Dowód:** zauważone przez orkiestratora przy oglądaniu zrzutu z iteracji 28
+  jako całości, nie w celowanym sprawdzeniu — czyli tą samą drogą co G28.
+  `NotificationPopup` jest wspólny dla wszystkich okien i ma już
+  `Theme.button.dangerSubtle`, używane przy usuwaniu serii, więc materiał
+  istnieje; brakuje reguły, kiedy go użyć.
+- **Dlaczego osobna pozycja, a nie dopisek przy okazji:** zmiana dotyka
+  komponentu wspólnego dla **każdego** okna w aplikacji. To znaczy, że trzeba
+  osobno sprawdzić, że pozostałe okna nie zmieniły się przy okazji — a takiej
+  weryfikacji nie da się doczepić do cudzej pozycji bez rozmycia jej warunku.
+- **Rozstrzygnięcie: tak, okna kasujące mają wyglądać inaczej — ale ważniejszy od
+  koloru jest napis.** Kolor można przegapić: na słońcu, w ciemnym motywie, przy
+  wadzie widzenia barw. „OK" nie mówi nic o skutku, a „Usuń 21 serii" mówi
+  wszystko i działa niezależnie od tego, czy ktoś w ogóle zobaczy czerwień.
+  Dlatego reguła brzmi: przycisk, który niszczy dane, nazywa to, co zniszczy, i
+  nie jest przedstawiony jako domyślny wybór; bezpieczne wyjście jest co najmniej
+  tak samo widoczne.
+- **Reguła obejmuje wszystkie takie miejsca naraz**, nie jedno: kończenie treningu
+  z przycięciem (G38), usunięcie zaplanowanego treningu, usunięcie treningu z
+  historii, usunięcie serii, porzucenie zmian w edytorze. Zrobione tylko w jednym
+  z nich, tworzy nową niespójność zamiast zamykać starą.
+- **Zakres:** S
+- **Gotowe, gdy:** okno kończące trening z nieodhaczonymi seriami ma przycisk
+  nazywający usunięcie i odróżniający się od bezpiecznego wyjścia, a to wyjście
+  nie jest słabiej widoczne niż potwierdzenie; to samo w oknach usuwania treningu
+  zaplanowanego, treningu z historii, serii i porzucania zmian w edytorze;
+  **zakończenie treningu, w którym odhaczono wszystko** — czyli takie, które
+  niczego nie usuwa — wygląda jak zwykłe potwierdzenie, nie jak ostrzeżenie;
+  okna, które o nic groźnego nie pytają (import, „prompt skopiowany", „workout
+  saved", podsumowanie treningu), wyglądają dokładnie jak dotąd.
 
 ### G13b — Ciężar i powtórzenia w zakończonym treningu tylko do czytania
 - **Dla kogo/po co:** drugi plaster po G13. Odhaczenie da się już poprawić, ale
@@ -355,6 +325,17 @@ Osobna iteracja na samą wielkość liter byłaby marnotrawstwem, a G8 i tak dok
 kafelki podsumowania — więc warunek spójności etykiet stał się częścią G8.
 
 ## Done
+
+### G39 — Nie da się zacząć treningu bez planu (iteracja 29, wchłania G36)
+„Bez planu" stoi jako pozycja na bębnie, więc trening zaczyna się tym samym
+przyciskiem co każdy inny i żaden drugi nie powstał. Pusta sesja dostaje nazwę z
+dnia — bęben nie mówi już „---" — a ekran bez ćwiczeń prowadzi jednym zdaniem i
+jednym przyciskiem. Porzucona pusta sesja znika z bazy, ale dopiero po zdaniu,
+które to zapowiada, i tym samym oknem co G38. Sprawdzone na bazie: anulowanie nie
+ruszyło ani wiersza, potwierdzenie zabrało sam trening i nic poza nim.
+**Otwarte po tej pozycji:** dwie sesje bez planu z tego samego dnia mają
+identyczną nazwę i na liście nie da się ich rozróżnić — do rozstrzygnięcia razem
+z nazywaniem sesji z G14.
 
 ### G38 — Kończąc trening, nie wiadomo, że coś zostaje niezrobione (iteracja 28)
 Okno kończące trening mówi, ile serii znika i że bezpowrotnie, a po potwierdzeniu

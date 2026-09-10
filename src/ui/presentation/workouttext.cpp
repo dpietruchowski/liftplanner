@@ -27,6 +27,19 @@ QString finishPrompt(int completedSets, int plannedSets)
                              QStringLiteral("sets")));
 }
 
+QString abandonPrompt(int exerciseCount)
+{
+    if (exerciseCount > 0)
+    {
+        return QStringLiteral("No set is ticked off yet, so there is nothing to record. "
+                              "This workout goes back to your planned list.");
+    }
+
+    return QStringLiteral("Nothing is ticked off and not a single exercise was added.\n\n"
+                          "Leaving now throws this session away for good: it lands neither in "
+                          "your history nor on your planned list.");
+}
+
 QString amnestyLossWarning(const QString& workoutName, int plannedSets)
 {
     const QString name = workoutName.trimmed().isEmpty()

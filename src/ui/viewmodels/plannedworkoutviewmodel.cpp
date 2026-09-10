@@ -2,6 +2,7 @@
 #include "application/userprofile/userprofileservice.h"
 #include "application/workout/workoutservice.h"
 #include "async/timeprovider.h"
+#include "domain/workout/blanksession.h"
 #include "infrastructure/userprofile/userprofileserializer.h"
 #include "infrastructure/workout/workoutjson.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
@@ -22,6 +23,8 @@ PlannedWorkoutViewModel::PlannedWorkoutViewModel(WorkoutService* service,
     , m_service(service)
     , m_profileService(profileService)
 {
+    refreshBlankWorkout();
+
     if (activeWorkoutViewModel)
     {
         connect(activeWorkoutViewModel, &ActiveWorkoutViewModel::workoutDiscarded, this,
@@ -44,6 +47,23 @@ WorkoutModel* PlannedWorkoutViewModel::nextWorkout() const
     return m_workouts.isEmpty() ? nullptr : m_workouts.first();
 }
 
+WorkoutModel* PlannedWorkoutViewModel::blankWorkout() const { return m_blankWorkout; }
+
+void PlannedWorkoutViewModel::refreshBlankWorkout()
+{
+    const Workout session = blankSession(TimeProvider::instance().currentDateTime());
+    if (m_blankWorkout && m_blankWorkout->name() == session.name())
+        return;
+
+    auto* previous = m_blankWorkout;
+    m_blankWorkout = new WorkoutModel(session, this);
+
+    if (previous)
+        previous->deleteLater();
+
+    emit blankWorkoutChanged();
+}
+
 bool PlannedWorkoutViewModel::isLoading() const { return m_loading; }
 
 void PlannedWorkoutViewModel::setLoading(bool value)
@@ -57,6 +77,8 @@ void PlannedWorkoutViewModel::setLoading(bool value)
 
 void PlannedWorkoutViewModel::loadAll()
 {
+    refreshBlankWorkout();
+
     if (!m_service)
         return;
 

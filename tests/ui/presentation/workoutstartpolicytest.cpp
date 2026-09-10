@@ -240,6 +240,41 @@ TEST(WorkoutStartPolicyTest, ReplacingAnUntouchedSession_PromisesThePlannedList)
     EXPECT_FALSE(confirmation.contains(QStringLiteral("history")));
 }
 
+TEST(WorkoutStartPolicyTest, ReplacingASessionWithoutASingleExercise_PromisesItDisappears)
+{
+    Workout empty(QStringLiteral("Freestyle · 5 Jan"), baseTime);
+    empty.setId(3);
+    empty.setStartedTime(baseTime);
+    empty.setStatus(WorkoutStatus::Started);
+
+    WorkoutStartPolicy policy;
+    WorkoutModel selected { plannedWorkout(QStringLiteral("Push B"), 7) };
+    WorkoutModel active { empty };
+
+    const QString confirmation = confirmationOf(policy.decide(&selected, &active));
+
+    EXPECT_TRUE(confirmation.contains(QStringLiteral("\"Freestyle · 5 Jan\"")));
+    EXPECT_TRUE(confirmation.contains(QStringLiteral("not a single exercise")));
+    EXPECT_TRUE(confirmation.contains(QStringLiteral("for good")));
+    EXPECT_TRUE(confirmation.contains(QStringLiteral("\"Push B\"")));
+    EXPECT_FALSE(confirmation.contains(QStringLiteral("ticked off")));
+    EXPECT_FALSE(confirmation.contains(QStringLiteral("puts it back")));
+}
+
+TEST(WorkoutStartPolicyTest, AnEmptySessionOfferedForAStart_NeedsNoConfirmation)
+{
+    Workout blank(QStringLiteral("Freestyle · 5 Jan"), baseTime);
+    blank.setPlannedTime(baseTime);
+
+    WorkoutStartPolicy policy;
+    WorkoutModel selected { blank };
+
+    const QVariantMap decision = policy.decide(&selected, nullptr);
+
+    EXPECT_EQ(actionOf(decision), QStringLiteral("start"));
+    EXPECT_TRUE(confirmationOf(decision).isEmpty());
+}
+
 TEST(WorkoutStartPolicyTest, ANormalStart_NeedsNoConfirmation)
 {
     WorkoutStartPolicy policy;

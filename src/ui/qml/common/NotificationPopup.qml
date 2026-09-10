@@ -18,6 +18,7 @@ Popup {
     property int buttons: NotificationPopup.Ok
     property string title: ""
     property string text: ""
+    property string okText: qsTr("OK")
     property bool copyEnabled: false
     property int textFormat: Text.PlainText
 
@@ -125,7 +126,7 @@ Popup {
             ThemedButton {
                 objectName: "notificationOkButton"
                 visible: (notificationPopup.buttons & NotificationPopup.Ok) !== 0
-                text: qsTr("OK")
+                text: notificationPopup.okText
                 buttonSize: Theme.button.medium
                 buttonStyle: Theme.button.primary
                 onClicked: {

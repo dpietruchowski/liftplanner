@@ -42,8 +42,10 @@ public:
     Q_INVOKABLE int completedSetCount() const;
     Q_INVOKABLE int totalSetCount() const;
     Q_INVOKABLE int untickedSetCount() const;
+    Q_INVOKABLE int exerciseCount() const;
     Q_INVOKABLE bool hasAnythingToRecord() const;
     Q_INVOKABLE QString finishPrompt() const;
+    Q_INVOKABLE QString abandonPrompt() const;
 
     QVariantMap lastSessionSummary() const;
 
@@ -79,6 +81,7 @@ private:
 
     void restoreWorkout(const Workout& entity);
     void settleInterruptedWorkout(WorkoutModel* workout);
+    void dropEmptySession(const Workout& entity, const char* what);
     void refreshPreviousPerformances();
     void seedAddedExerciseFromHistory(ExerciseModel* exercise);
     void applyHistorySeed(ExerciseModel* exercise, const Set& seed, const Exercise& previous);

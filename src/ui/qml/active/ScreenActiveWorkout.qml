@@ -12,6 +12,10 @@ Rectangle {
 
     signal addExerciseRequested()
 
+    readonly property int exerciseCount: ActiveWorkoutViewModel.currentWorkout
+                                         ? ActiveWorkoutViewModel.currentWorkout.exercises.length
+                                         : 0
+
     function leaveActiveWorkout() {
         stackView.replace(homeScreen)
         bottomNav.currentIndex = 1
@@ -19,8 +23,13 @@ Rectangle {
 
     function askToFinishWorkout() {
         if (!ActiveWorkoutViewModel.hasAnythingToRecord()) {
-            discardWorkoutPopup.text = qsTr("No set is ticked off yet, so there is nothing to record. "
-                                            + "This workout goes back to your planned list.")
+            discardWorkoutPopup.title = root.exerciseCount > 0
+                                        ? qsTr("Nothing done yet")
+                                        : qsTr("Throw this session away?")
+            discardWorkoutPopup.text = ActiveWorkoutViewModel.abandonPrompt()
+            discardWorkoutPopup.okText = root.exerciseCount > 0
+                                         ? qsTr("OK")
+                                         : qsTr("Throw away")
             discardWorkoutPopup.open()
             return
         }
@@ -106,6 +115,52 @@ Rectangle {
                         }
                     }
                 }
+
+                Item {
+                    objectName: "activeWorkoutEmptyState"
+                    width: contentColumn.width
+                    height: emptyState.implicitHeight + 2 * Theme.spacing.xLarge
+                    visible: ActiveWorkoutViewModel.isActive && root.exerciseCount === 0
+
+                    Column {
+                        id: emptyState
+                        width: parent.width
+                        anchors.centerIn: parent
+                        spacing: Theme.spacing.medium
+
+                        Text {
+                            objectName: "activeWorkoutEmptyTitle"
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                            text: qsTr("Add your first exercise")
+                            color: Theme.colors.textPrimary
+                            font.pixelSize: Theme.fontSize.xMedium
+                            font.bold: true
+                            wrapMode: Text.WordWrap
+                        }
+
+                        Text {
+                            objectName: "activeWorkoutEmptyHint"
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                            text: qsTr("This session is empty. Pick an exercise and it arrives with a set to tick off and the weight you used last time.")
+                            color: Theme.colors.textMuted
+                            font.pixelSize: Theme.fontSize.normal
+                            wrapMode: Text.WordWrap
+                        }
+
+                        ThemedButton {
+                            objectName: "addFirstExerciseButton"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: qsTr("Add exercise")
+                            iconSource: Theme.icons.plus
+                            pill: true
+                            buttonSize: Theme.button.large
+                            buttonStyle: Theme.button.primary
+                            onClicked: root.addExerciseRequested()
+                        }
+                    }
+                }
             }
         }
 
@@ -129,7 +184,7 @@ Rectangle {
                 ThemedButton {
                     objectName: "startTimerButton"
                     iconSource: Theme.icons.timer
-                    enabled: ActiveWorkoutViewModel.isActive
+                    enabled: ActiveWorkoutViewModel.isActive && root.exerciseCount > 0
                     buttonSize: Theme.button.mediumSquare
                     buttonStyle: Theme.button.tonal
                     onClicked: ActiveWorkoutViewModel.toggleTimer()
@@ -181,6 +236,7 @@ Rectangle {
                 ThemedButton {
                     objectName: "reorderButton"
                     iconSource: Theme.icons.reorder
+                    visible: root.exerciseCount > 0
                     enabled: ActiveWorkoutViewModel.isActive
                     buttonSize: Theme.button.mediumSquare
                     buttonStyle: contentColumn.reorderMode ? Theme.button.tonal : Theme.button.subtle

@@ -212,12 +212,27 @@ void ActiveWorkoutViewModel::startWorkout(WorkoutModel* workout)
     qDebug() << "Workout started:" << clonedWorkout->name();
 }
 
+void ActiveWorkoutViewModel::dropEmptySession(const Workout& entity, const char* what)
+{
+    if (!m_service || entity.id() == -1)
+        return;
+
+    m_service->deleteWorkout(entity.id()).warnOnError(what);
+}
+
 void ActiveWorkoutViewModel::settleInterruptedWorkout(WorkoutModel* workout)
 {
     if (!m_service || !workout)
         return;
 
     Workout entity = workout->toEntity();
+
+    if (entity.isEmpty())
+    {
+        dropEmptySession(entity, "drop the replaced session that held no exercise");
+        emit interruptedWorkoutSettled();
+        return;
+    }
 
     if (completionFlagsAreMeaningful(entity))
     {
@@ -340,8 +355,15 @@ void ActiveWorkoutViewModel::discardWorkout()
     if (m_service)
     {
         Workout entity = m_currentWorkout->toEntity();
-        entity.setStatus(WorkoutStatus::Planned);
-        m_service->saveWorkout(entity).warnOnError("return the abandoned workout to the plan");
+        if (entity.isEmpty())
+        {
+            dropEmptySession(entity, "drop the abandoned session that held no exercise");
+        }
+        else
+        {
+            entity.setStatus(WorkoutStatus::Planned);
+            m_service->saveWorkout(entity).warnOnError("return the abandoned workout to the plan");
+        }
     }
 
     auto* oldWorkout = m_currentWorkout;
@@ -388,11 +410,21 @@ int ActiveWorkoutViewModel::untickedSetCount() const
     return totalSetCount() - completedSetCount();
 }
 
+int ActiveWorkoutViewModel::exerciseCount() const
+{
+    return m_currentWorkout ? static_cast<int>(m_currentWorkout->exercises().size()) : 0;
+}
+
 bool ActiveWorkoutViewModel::hasAnythingToRecord() const { return completedSetCount() > 0; }
 
 QString ActiveWorkoutViewModel::finishPrompt() const
 {
     return WorkoutText::finishPrompt(completedSetCount(), totalSetCount());
+}
+
+QString ActiveWorkoutViewModel::abandonPrompt() const
+{
+    return WorkoutText::abandonPrompt(exerciseCount());
 }
 
 QVariantMap ActiveWorkoutViewModel::lastSessionSummary() const { return m_lastSessionSummary; }

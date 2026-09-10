@@ -53,6 +53,14 @@ QString replaceConfirmation(const WorkoutModel& selected, const WorkoutModel& ac
     const QString next = quotedName(selected, QStringLiteral("the selected workout"));
     const Workout entity = active.toEntity();
 
+    if (entity.isEmpty())
+    {
+        return QStringLiteral("%1 is still running, but not a single exercise was added to it.\n\n"
+                              "Starting %2 now throws it away for good: it lands neither in your "
+                              "history nor on your planned list.")
+            .arg(running, next);
+    }
+
     if (!completionFlagsAreMeaningful(entity))
     {
         return QStringLiteral("%1 is still running, but no set is ticked off yet.\n\n"

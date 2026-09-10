@@ -32,6 +32,23 @@ Exercise sessionOf(std::initializer_list<Set> sets)
 
 }
 
+TEST_F(WorkoutTextTest, AbandonPrompt_PromisesThePlannedListWhenExercisesWereAdded)
+{
+    const QString prompt = WorkoutText::abandonPrompt(2);
+
+    EXPECT_TRUE(prompt.contains(QStringLiteral("planned list")));
+    EXPECT_FALSE(prompt.contains(QStringLiteral("for good")));
+}
+
+TEST_F(WorkoutTextTest, AbandonPrompt_SaysUpFrontThatAnEmptySessionDisappears)
+{
+    const QString prompt = WorkoutText::abandonPrompt(0);
+
+    EXPECT_TRUE(prompt.contains(QStringLiteral("for good")));
+    EXPECT_TRUE(prompt.contains(QStringLiteral("history")));
+    EXPECT_TRUE(prompt.contains(QStringLiteral("planned list")));
+}
+
 TEST_F(WorkoutTextTest, FormatDuration_DropsToSecondsBelowAMinute)
 {
     EXPECT_EQ(WorkoutText::formatDuration(0), "0s");
