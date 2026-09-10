@@ -86,20 +86,6 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
   głównym jest ta sama co w profilu; powrót na „Metric (kg)" przywraca stan
   sprzed zmiany.
 
-### G6 — Czas przerwy jest niewidoczny i nie do ustawienia
-- **Dla kogo/po co:** przerwa decyduje o charakterze treningu (siła vs
-  hipertrofia), a timer sam odlicza wartość, której użytkownik nigdzie nie widzi
-  ani nie może zmienić inaczej niż klikając ±15 s w trakcie odliczania.
-- **Dowód:** `ExerciseModel` wystawia `restSeconds`
-  (`src/ui/models/exercisemodel.h:15`), ale ciąg „restSeconds" nie występuje w
-  żadnym pliku pod `src/ui/qml/`. `WorkoutEditorViewModel::setExerciseRest`
-  (`workouteditorviewmodel.h:51`) nie jest wywoływany z QML —
-  `EditorExerciseItem.qml` ma tylko nazwę, strzałki kolejności, usunięcie i serie.
-- **Zakres:** M
-- **Gotowe, gdy:** w edytorze treningu przy ćwiczeniu widać czas przerwy i da
-  się go zmienić; po zapisaniu i wystartowaniu treningu timer po ukończeniu
-  serii tego ćwiczenia odlicza ustawioną wartość.
-
 ### G9 — Nie da się zmienić składu treningu w trakcie
 - **Dla kogo/po co:** stanowisko zajęte, bark boli, zostało dziesięć minut — w
   praktyce trening przebudowuje się na miejscu. Dziś ćwiczenia można tylko
@@ -218,6 +204,18 @@ Sprawdzone: nigdzie nie kłamie. Kafel zaplanowanego treningu pokazuje
 Człowiek nie widzi z tego powodu ani złej daty, ani złej liczby, więc to sprawa
 porządku w bazie, nie produktu. Wraca na listę dopiero wtedy, gdy pojawi się
 ekran, na którym ta data będzie widoczna.
+
+### Dwie linie nazwy na bębnie zabierają listę ćwiczeń (iteracja 16)
+Kompromis z G30, przyjęty świadomie. W momencie naciskania startu liczy się to,
+**który** trening ruszy, a nie z czego się składa; podgląd ćwiczeń zostaje w
+wierszach niezaznaczonych, na kaflu listy zaplanowanych i po rozwinięciu kafla.
+Przy krótkiej nazwie widać jedno i drugie.
+
+### Nazwa 46-znakowa nadal ucina się na bębnie (iteracja 16)
+Zachowanie zamierzone: wielokropek jako ostatnia deska ratunku powyżej dwóch
+linii, żeby układ ekranu głównego się nie rozjechał. Pełny tytuł jest o jedno
+przejście stąd — ten sam trening na kaflu listy zaplanowanych mieści się w
+całości. Nikt nie nazywa dnia planu zdaniem na 46 znaków częściej niż raz.
 
 ### Pusta przestrzeń nad bębnem przy dwóch pozycjach (iteracja 15)
 Zgłoszone dla porządku razem z G28. Treść jest dosunięta do dołu i nic się nie

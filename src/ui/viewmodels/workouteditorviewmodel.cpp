@@ -3,6 +3,7 @@
 #include "application/workout/workoutservice.h"
 #include "application/workout/workouttemplateservice.h"
 #include "async/timeprovider.h"
+#include "domain/workout/restadjustment.h"
 #include "domain/workout/setadjustment.h"
 #include "domain/workout/setcompatibility.h"
 #include "domain/workout/setseeding.h"
@@ -195,6 +196,15 @@ void WorkoutEditorViewModel::setExerciseRest(int exerciseIndex, int restSeconds)
     exercise->setRestSeconds(restSeconds);
     markDirty();
     publish();
+}
+
+void WorkoutEditorViewModel::adjustExerciseRest(int exerciseIndex, int steps)
+{
+    const Exercise* exercise = exerciseAt(exerciseIndex);
+    if (exercise == nullptr || steps == 0)
+        return;
+
+    setExerciseRest(exerciseIndex, RestAdjustment::adjusted(exercise->restSeconds(), steps));
 }
 
 void WorkoutEditorViewModel::setExerciseNotes(int exerciseIndex, const QString& notes)

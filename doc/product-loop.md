@@ -94,11 +94,17 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 16 zamknięta (G30 — pełna nazwa w zaznaczonym wierszu bębna)
+- **Iteracja:** 17 zamknięta (G6 — czas przerwy widoczny i do ustawienia)
 - **W locie:** nic
-- **Ostatni commit pętli:** G30
+- **Ostatni commit pętli:** G6
 - **Następna pozycja wg backlogu:** do wyboru przez PM. Na liście zostały G26
   (nieudany import historii milczy) i G29 (wybór funtów kończy się na profilu).
+- **Nieobecność elementu w drzewie nie jest dowodem usterki** — serwer
+  automatyzacji przycina niewidoczne poddrzewa. Przy G6 odhaczyłem serię w
+  treningu mającym **jedną** serię, timera nie było i o mało nie zawróciłem
+  poprawnej roboty jako „przerwa nie działa". Nie ma po czym odpoczywać, więc
+  paska nie ma. Zanim uznam brak za defekt, sprawdzam, czy scenariusz w ogóle
+  wywołuje ten stan.
 - **Gdy dwie pozycje ciągną ten sam układ w przeciwne strony**, warunek
   akceptacji tej wcześniejszej wchodzi do zlecenia następnej i sprawdzam oba
   naraz. Zrobione przy G30 wobec G28 (nazwa nie mogła urosnąć kosztem przycisku)

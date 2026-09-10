@@ -19,6 +19,20 @@ TEST_F(WorkoutTextTest, FormatDuration_UsesMinutesThenHours)
     EXPECT_EQ(WorkoutText::formatDuration(4500), "1h 15m");
 }
 
+TEST_F(WorkoutTextTest, FormatRest_ReadsAsMinutesAndPaddedSeconds)
+{
+    EXPECT_EQ(WorkoutText::formatRest(120), "2:00");
+    EXPECT_EQ(WorkoutText::formatRest(90), "1:30");
+    EXPECT_EQ(WorkoutText::formatRest(45), "0:45");
+    EXPECT_EQ(WorkoutText::formatRest(605), "10:05");
+}
+
+TEST_F(WorkoutTextTest, FormatRest_TreatsMissingRestAsZero)
+{
+    EXPECT_EQ(WorkoutText::formatRest(0), "0:00");
+    EXPECT_EQ(WorkoutText::formatRest(-30), "0:00");
+}
+
 TEST_F(WorkoutTextTest, FormatDistance_UsesMetresBelowAKilometre)
 {
     EXPECT_EQ(WorkoutText::formatDistance(0.0), "0 m");

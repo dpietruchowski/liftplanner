@@ -49,6 +49,7 @@ public:
     Q_INVOKABLE void removeExercise(int exerciseIndex);
     Q_INVOKABLE void moveExercise(int from, int to);
     Q_INVOKABLE void setExerciseRest(int exerciseIndex, int restSeconds);
+    Q_INVOKABLE void adjustExerciseRest(int exerciseIndex, int steps);
     Q_INVOKABLE void setExerciseNotes(int exerciseIndex, const QString& notes);
 
     Q_INVOKABLE void addSet(int exerciseIndex);

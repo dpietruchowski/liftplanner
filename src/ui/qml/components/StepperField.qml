@@ -7,6 +7,7 @@ Rectangle {
     id: root
 
     property string label
+    property string labelName
     property string decrementName
     property string incrementName
 
@@ -33,6 +34,7 @@ Rectangle {
         }
 
         Text {
+            objectName: root.labelName
             Layout.fillWidth: true
             text: root.label
             color: Theme.colors.textMuted

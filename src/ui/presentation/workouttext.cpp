@@ -16,6 +16,12 @@ QString formatDuration(qint64 seconds)
     return QString("%1s").arg(seconds);
 }
 
+QString formatRest(int seconds)
+{
+    const int safe = seconds > 0 ? seconds : 0;
+    return QStringLiteral("%1:%2").arg(safe / 60).arg(safe % 60, 2, 10, QChar('0'));
+}
+
 QString formatDistance(double meters)
 {
     if (meters < 1000.0)

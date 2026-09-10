@@ -1,5 +1,7 @@
 #include "exercisemodel.h"
 
+#include "ui/presentation/workouttext.h"
+
 namespace
 {
 Exercise recordOf(const Exercise& exercise)
@@ -30,6 +32,7 @@ ExerciseModel::ExerciseModel(const Exercise& exercise, QObject* parent)
 QString ExerciseModel::name() const { return m_record.name(); }
 QString ExerciseModel::description() const { return m_record.description(); }
 int ExerciseModel::restSeconds() const { return m_record.restSeconds(); }
+QString ExerciseModel::restText() const { return WorkoutText::formatRest(m_record.restSeconds()); }
 QString ExerciseModel::kindString() const { return exerciseKindToString(m_record.kind()); }
 
 bool ExerciseModel::isCompleted() const { return toEntity().isCompleted(); }

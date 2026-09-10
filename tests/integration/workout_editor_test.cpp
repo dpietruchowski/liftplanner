@@ -6,9 +6,11 @@
 #include "ui/models/exercisemodel.h"
 #include "ui/models/setmodel.h"
 #include "ui/models/workoutmodel.h"
+#include "ui/viewmodels/activeworkoutviewmodel.h"
 #include "ui/viewmodels/exercisecatalogviewmodel.h"
 #include "ui/viewmodels/plannedworkoutviewmodel.h"
 #include "ui/viewmodels/workouteditorviewmodel.h"
+#include "ui/viewmodels/workouttimer.h"
 
 #include <QSignalSpy>
 #include <gtest/gtest.h>
@@ -584,6 +586,114 @@ TEST_F(WorkoutEditorTest, AClosedEditorOffersNoValidationHint)
     editor().discard();
 
     EXPECT_TRUE(editor().validationErrors().isEmpty());
+}
+
+// --- rest between sets ---
+
+TEST_F(WorkoutEditorTest, AnAddedExerciseStartsWithTheRestFromTheCatalog)
+{
+    startWorkout();
+    addExercise(QStringLiteral("Back Squat"));
+
+    ASSERT_EQ(editor().exerciseCount(), 1);
+    EXPECT_EQ(editor().workout()->exercises().first()->restSeconds(), 180);
+    EXPECT_EQ(editor().workout()->exercises().first()->restText(), QStringLiteral("3:00"));
+}
+
+TEST_F(WorkoutEditorTest, SteppingTheRestDownChangesWhatTheEditorShows)
+{
+    startWorkout();
+    addExercise(QStringLiteral("Plank"));
+    ASSERT_EQ(editor().workout()->exercises().first()->restSeconds(), 60);
+
+    editor().adjustExerciseRest(0, -1);
+
+    EXPECT_EQ(editor().workout()->exercises().first()->restSeconds(), 45);
+    EXPECT_EQ(editor().workout()->exercises().first()->restText(), QStringLiteral("0:45"));
+    EXPECT_TRUE(editor().isDirty());
+}
+
+TEST_F(WorkoutEditorTest, SteppingTheRestOfAMissingExerciseChangesNothing)
+{
+    startWorkout();
+    addExercise(QStringLiteral("Plank"));
+    QSignalSpy changed(&editor(), &WorkoutEditorViewModel::workoutChanged);
+
+    editor().adjustExerciseRest(7, 1);
+
+    EXPECT_EQ(editor().workout()->exercises().first()->restSeconds(), 60);
+    EXPECT_EQ(changed.count(), 0);
+}
+
+TEST_F(WorkoutEditorTest, TheChosenRestSurvivesSavingAndReopeningTheEditor)
+{
+    startWorkout();
+    addExercise(QStringLiteral("Back Squat"));
+    editor().adjustExerciseRest(0, -6);
+    ASSERT_EQ(editor().workout()->exercises().first()->restSeconds(), 90);
+
+    QSignalSpy saved(&editor(), &WorkoutEditorViewModel::saved);
+    editor().save();
+    m_app.drain();
+    ASSERT_EQ(saved.count(), 1);
+    const int workoutId = saved.first().first().toInt();
+
+    editor().discard();
+    editor().edit(workoutId);
+    m_app.drain();
+
+    ASSERT_EQ(editor().exerciseCount(), 1);
+    EXPECT_EQ(editor().workout()->exercises().first()->restSeconds(), 90);
+    EXPECT_EQ(editor().workout()->exercises().first()->restText(), QStringLiteral("1:30"));
+}
+
+TEST_F(WorkoutEditorTest, TheChosenRestReachesThePlannedList)
+{
+    startWorkout();
+    addExercise(QStringLiteral("Back Squat"));
+    editor().adjustExerciseRest(0, -6);
+
+    editor().save();
+    m_app.drain();
+
+    const auto planned = reloadPlanned();
+    ASSERT_EQ(planned.size(), 1);
+    const Workout stored = planned.first()->toEntity();
+    ASSERT_EQ(stored.exercises().size(), 1u);
+    EXPECT_EQ(stored.exercises().front().restSeconds(), 90);
+}
+
+TEST_F(WorkoutEditorTest, TheChosenRestDrivesTheCountdownAfterATickedSet)
+{
+    startWorkout();
+    addExercise(QStringLiteral("Back Squat"));
+    editor().addSet(0);
+    editor().adjustExerciseRest(0, -6);
+    editor().save();
+    m_app.drain();
+
+    ActiveWorkoutViewModel& active = m_app.activeWorkoutViewModel();
+    active.startWorkout(reloadPlanned().first());
+    active.completeCurrentSet();
+
+    EXPECT_EQ(active.timer()->phaseLabel(), QStringLiteral("Rest"));
+    EXPECT_EQ(active.timer()->remainingSeconds(), 90);
+    EXPECT_EQ(active.timer()->remainingText(), QStringLiteral("01:30"));
+}
+
+TEST_F(WorkoutEditorTest, AnUntouchedRestStillDrivesTheCatalogDefault)
+{
+    startWorkout();
+    addExercise(QStringLiteral("Back Squat"));
+    editor().addSet(0);
+    editor().save();
+    m_app.drain();
+
+    ActiveWorkoutViewModel& active = m_app.activeWorkoutViewModel();
+    active.startWorkout(reloadPlanned().first());
+    active.completeCurrentSet();
+
+    EXPECT_EQ(active.timer()->remainingSeconds(), 180);
 }
 
 TEST_F(WorkoutEditorTest, AReopenedWorkoutIsSaveableBeforeAnythingIsChanged)

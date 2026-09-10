@@ -64,6 +64,30 @@ Rectangle {
             }
         }
 
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Theme.spacing.small
+
+            Text {
+                text: qsTr("REST")
+                color: Theme.colors.textMuted
+                font.pixelSize: Theme.setRow.labelSize
+                font.letterSpacing: Theme.setRow.labelSpacing
+                font.bold: true
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            StepperField {
+                Layout.fillWidth: true
+                label: root.exercise ? root.exercise.restText : ""
+                labelName: "exerciseRestValue" + root.exerciseIndex
+                decrementName: "exerciseRestDecreaseButton" + root.exerciseIndex
+                incrementName: "exerciseRestIncreaseButton" + root.exerciseIndex
+                onDecremented: WorkoutEditorViewModel.adjustExerciseRest(root.exerciseIndex, -1)
+                onIncremented: WorkoutEditorViewModel.adjustExerciseRest(root.exerciseIndex, 1)
+            }
+        }
+
         Repeater {
             model: root.exercise ? root.exercise.sets : []
 
