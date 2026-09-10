@@ -21,6 +21,7 @@ class ActiveWorkoutViewModel : public QObject
     Q_PROPERTY(WorkoutTimer* timer READ timer CONSTANT)
     Q_PROPERTY(
         QVariantMap lastSessionSummary READ lastSessionSummary NOTIFY lastSessionSummaryChanged)
+    Q_PROPERTY(QVariantList exerciseSessions READ exerciseSessions NOTIFY exerciseSessionsChanged)
 
 public:
     explicit ActiveWorkoutViewModel(WorkoutService* service, QObject* parent = nullptr);
@@ -45,6 +46,9 @@ public:
 
     QVariantMap lastSessionSummary() const;
 
+    QVariantList exerciseSessions() const;
+    Q_INVOKABLE void loadExerciseSessions(ExerciseModel* exercise);
+
     Q_INVOKABLE void duplicateSet(SetModel* set);
     Q_INVOKABLE void removeSet(SetModel* set);
     Q_INVOKABLE void toggleSetCompleted(SetModel* set);
@@ -62,6 +66,7 @@ signals:
     void workoutDiscarded();
     void interruptedWorkoutSettled();
     void lastSessionSummaryChanged();
+    void exerciseSessionsChanged();
     void errorOccurred(const QString& errorMessage);
 
 private:
@@ -90,5 +95,6 @@ private:
     WorkoutService* m_service;
     WorkoutTimer* m_timer;
     QVariantMap m_lastSessionSummary;
+    QVariantList m_exerciseSessions;
     bool m_shuttingDown { false };
 };

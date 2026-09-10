@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import LiftPlanner 1.0
 import Themed.Components
 
 ThemedPanel {
@@ -17,7 +18,46 @@ ThemedPanel {
 
     function showExercise(item) {
         panel.exercise = item
+        ActiveWorkoutViewModel.loadExerciseSessions(item)
         panel.open()
+    }
+
+    ColumnLayout {
+        objectName: "exerciseHistorySection"
+        Layout.fillWidth: true
+        spacing: Theme.spacing.small
+
+        Text {
+            objectName: "exerciseHistoryTitle"
+            Layout.fillWidth: true
+            text: qsTr("Last sessions")
+            color: Theme.colors.textMuted
+            font.pixelSize: Theme.fontSize.small
+            font.bold: true
+        }
+
+        Text {
+            objectName: "exerciseHistoryEmpty"
+            Layout.fillWidth: true
+            visible: ActiveWorkoutViewModel.exerciseSessions.length === 0
+            text: qsTr("No earlier sessions yet — this is the first time you are doing it.")
+            color: Theme.colors.textMuted
+            font.pixelSize: Theme.fontSize.small
+            wrapMode: Text.WordWrap
+        }
+
+        Repeater {
+            model: ActiveWorkoutViewModel.exerciseSessions
+
+            Text {
+                objectName: "exerciseHistoryRow" + index
+                Layout.fillWidth: true
+                text: modelData.date + " · " + modelData.summary
+                color: Theme.colors.textPrimary
+                font.pixelSize: Theme.fontSize.small
+                wrapMode: Text.WordWrap
+            }
+        }
     }
 
     Rectangle {

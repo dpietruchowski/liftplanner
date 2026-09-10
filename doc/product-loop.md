@@ -119,10 +119,18 @@ aplikacja nie wstawała), G23 (ekran nie odświeżał listy, baza była poprawna
 G8 (ucięta etykieta), G27 i pośrednio G32 (odmiana liczebników). Żadnego z nich
 nie złapałby build ani testy jednostkowe.
 
-- **Iteracja:** 25 zamknięta (G34 — kafelki statystyk przeliczane przy schowanym
-  ekranie nie zapadają się już do zerowej szerokości)
+- **Iteracja:** 26 zamknięta (G35, pierwszy plaster — lista ostatnich sesji
+  ćwiczenia w panelu informacji)
 - **W locie:** nic
-- **Ostatni commit pętli:** G34
+- **Ostatni commit pętli:** G35
+- **Gdy lista jest krótsza, niż powinna, sprawdź kandydatów w bazie.** Przy G35
+  panel pokazał pięć sesji przy sześciu kandydatach — brakujący był treningiem,
+  w którym ptaszek stał gdzie indziej niż na tym ćwiczeniu, więc reguła flag
+  słusznie go pominęła. Tego nie było w warunku akceptacji; wyszło z porównania
+  liczby wierszy z zapytaniem do bazy.
+- **Sterownik UI potrafi się zablokować** — kliknięcia raportują „clicked",
+  ekran się nie zmienia, żadnego popupu nie ma. `ui_session restart` wystarcza.
+  Nie mylić z usterką aplikacji.
 - **Pułapka `Layout.fillWidth` przy przebudowie delegatów.** Element bez
   własnego `implicitWidth`, któremu geometrię daje `RowLayout`, zostaje
   z `width = 0`, gdy `Repeater` przebuduje go w chwili, gdy ekran jest schowany

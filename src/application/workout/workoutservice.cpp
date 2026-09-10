@@ -82,6 +82,12 @@ Task<std::optional<Exercise>> WorkoutService::lastPerformance(const Exercise& ex
     return invoke([this, exercise] { return lastPerformanceCore(exercise); });
 }
 
+Task<std::vector<WorkoutService::ExerciseSession>>
+WorkoutService::exerciseSessions(const Exercise& exercise, int limit)
+{
+    return invoke([this, exercise, limit] { return exerciseSessionsCore(exercise, limit); });
+}
+
 Task<std::optional<Workout>> WorkoutService::findWorkout(int id)
 {
     return invoke([this, id] { return findWorkoutCore(id); });
@@ -296,6 +302,31 @@ Result<std::optional<Exercise>> WorkoutService::lastPerformanceCore(const Exerci
         return Result<std::optional<Exercise>>::success(std::nullopt);
 
     return Result<std::optional<Exercise>>::success(found.front().exercise);
+}
+
+Result<std::vector<WorkoutService::ExerciseSession>>
+WorkoutService::exerciseSessionsCore(const Exercise& exercise, int limit)
+{
+    const std::vector<Workout> history = loadHistoryCore(previous_performance_window).value();
+
+    std::vector<ExerciseSession> sessions;
+    for (const Workout& past : history)
+    {
+        const bool trustFlags = completionFlagsAreMeaningful(past);
+        const auto& candidates = past.exercises();
+        const auto match = std::find_if(
+            candidates.begin(), candidates.end(), [&](const Exercise& candidate)
+            { return sameExercise(candidate, exercise) && wasPerformed(candidate, trustFlags); });
+        if (match == candidates.end())
+            continue;
+
+        sessions.push_back({ past.startedTime(), asPerformed(*match, trustFlags) });
+
+        if (limit > 0 && static_cast<int>(sessions.size()) >= limit)
+            break;
+    }
+
+    return Result<std::vector<ExerciseSession>>::success(sessions);
 }
 
 Result<std::optional<Workout>> WorkoutService::findWorkoutCore(int id)

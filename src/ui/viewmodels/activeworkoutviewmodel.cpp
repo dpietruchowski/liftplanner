@@ -14,11 +14,14 @@
 #include <QHash>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QLocale>
 #include <QPointer>
 #include <algorithm>
 
 namespace
 {
+
+constexpr int exercise_session_history = 5;
 
 QString cacheFilePath() { return AppStoragePaths::file(QStringLiteral("current_workout.json")); }
 
@@ -384,6 +387,36 @@ QString ActiveWorkoutViewModel::finishPrompt() const
 }
 
 QVariantMap ActiveWorkoutViewModel::lastSessionSummary() const { return m_lastSessionSummary; }
+
+QVariantList ActiveWorkoutViewModel::exerciseSessions() const { return m_exerciseSessions; }
+
+void ActiveWorkoutViewModel::loadExerciseSessions(ExerciseModel* exercise)
+{
+    m_exerciseSessions.clear();
+    emit exerciseSessionsChanged();
+
+    if (!m_service || !exercise)
+        return;
+
+    m_service->exerciseSessions(exercise->toEntity(), exercise_session_history)
+        .then(this,
+              [this](std::vector<WorkoutService::ExerciseSession> sessions)
+              {
+                  QVariantList entries;
+                  for (const auto& session : sessions)
+                  {
+                      QVariantMap entry;
+                      entry[QStringLiteral("date")] = QLocale::c().toString(
+                          session.performedAt.date(), QStringLiteral("d MMM yyyy"));
+                      entry[QStringLiteral("summary")] = completedSetsSummary(session.exercise);
+                      entries.append(entry);
+                  }
+
+                  m_exerciseSessions = entries;
+                  emit exerciseSessionsChanged();
+              })
+        .warnOnError("load the sessions of one exercise");
+}
 
 void ActiveWorkoutViewModel::captureSessionSummary()
 {

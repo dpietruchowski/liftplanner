@@ -8,7 +8,7 @@ najpierw przepływy, które urywają się w połowie, potem zdolności, które
 aplikacja ma, ale nigdy nie oferuje, potem rzeczy, po których traci się do niej
 zaufanie, a dopiero na końcu nowe powierzchnie.
 
-## Stan produktu po 23 iteracjach
+## Stan produktu po 25 iteracjach
 
 Ocena product managera, nie sprawozdanie — spis zrobionej roboty jest w commitach
 i w sekcji „Done". To jest punkt wyjścia dla następnej sesji.
@@ -34,10 +34,11 @@ naprawdę zostało zrobione.
 
 ### Czego brakuje najbardziej — moim zdaniem, w tej kolejności
 
-1. **Planowania w czasie (G2).** Aplikacja umie „dziś". Rozłożenie tygodnia na
-   poniedziałek, środę i piątek bez pomocy AI nie jest możliwe, bo w edytorze nie
-   ma wyboru dnia. Po zamknięciu G13 to jedyna duża rzecz, której nie da się
-   obejść żadną inną drogą w aplikacji.
+1. **Przeczytania własnego dziennika (G35).** Zapis wreszcie mówi prawdę, ale nie
+   da się z niego odczytać przebiegu jednego ćwiczenia. Aplikacja odpowiada tylko
+   „ostatnio"; „czy przysiad idzie w górę" wymaga rozwijania kafli historii jeden
+   po drugim. To dziś największa rzecz, jakiej brakuje, i jedyna, która zamienia
+   dziennik w narzędzie treningowe.
 2. **Poprawienia liczb w zapisanym treningu (G13b).** Plaster pierwszy zamknął
    pomyłkę w odhaczeniu; ciężar i powtórzenia w zakończonej sesji nadal są tylko
    do czytania. Obejście istnieje — eksport, poprawka w tekście, import, i od G33
@@ -52,10 +53,11 @@ naprawdę zostało zrobione.
 
 ### Od czego zacząłbym dalej
 
-Od **G2 — wyboru dnia w edytorze**. To ostatnia rzecz, której użytkownik nie ma
-jak obejść: bez AI nie rozłoży tygodnia. Potem seria S-ek z punktu 3 (G11, G12,
-G10) — dają najwięcej odczucia kompletności za najmniej roboty — a G13b wtedy,
-gdy któryś raz okaże się, że eksport-poprawka-import jest za dużym zachodem.
+Od **G35, plaster pierwszy: historii jednego ćwiczenia w panelu informacji**.
+Reszta listy to poprawki i drobiazgi; to jedyna pozostała rzecz, która dokłada
+aplikacji nową wartość, a nie odejmuje jej wady. Potem seria S-ek z punktu 3
+(G11, G12, G10), a G13b wtedy, gdy któryś raz okaże się, że
+eksport-poprawka-import jest za dużym zachodem.
 
 ### Trzy wnioski metodyczne dla następnej sesji
 
@@ -162,6 +164,21 @@ gdy któryś raz okaże się, że eksport-poprawka-import jest za dużym zachode
 - **Gotowe, gdy:** w edytorze treningu da się wpisać notatkę do ćwiczenia; po
   zapisie i wystartowaniu treningu ta sama notatka jest widoczna w panelu
   informacji o ćwiczeniu.
+
+### G36 — Pusty bęben mówi „---"
+- **Dla kogo/po co:** ktoś otwiera aplikację pierwszy raz albo po zrobieniu
+  wszystkiego z planu i w najbardziej wyeksponowanym miejscu ekranu głównego widzi
+  trzy myślniki. To moment, w którym aplikacja ma powiedzieć, co dalej, a mówi
+  znak zastępczy.
+- **Dowód:** zgłoszone z obchodu w iteracji 25 — w wierszu „PLANNED WORKOUT" przy
+  pustej liście stoi „---". Stan sprzed całej pętli, nie regresja.
+- **Osłabienie:** naciśnięcie „Start workout" tłumaczy wtedy całą drogę od
+  przycisku AI po import, a zakładka Workouts ma własną podpowiedź w pustym
+  stanie. Czyli użytkownik nie zostaje bez wyjścia — tylko musi najpierw nacisnąć.
+- **Zakres:** S
+- **Gotowe, gdy:** przy pustej liście zaplanowanych wiersz bębna mówi po ludzku,
+  że nie ma nic zaplanowanego, i kieruje dalej; gdy zaplanowany trening jest,
+  wiersz wygląda dokładnie jak dotąd.
 
 ### G10 — Filtr po mięśniu w katalogu ćwiczeń bez wejścia
 - **Dla kogo/po co:** wybierając ćwiczenie na zastępstwo szuka się po partii

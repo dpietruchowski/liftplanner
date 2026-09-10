@@ -115,6 +115,11 @@ protected:
     {
         return m_service->previousPerformancesCore(workout).value();
     }
+    std::vector<WorkoutService::ExerciseSession> exerciseSessions(const Exercise& exercise,
+                                                                  int limit)
+    {
+        return m_service->exerciseSessionsCore(exercise, limit).value();
+    }
     int saveWorkout(const Workout& workout) { return m_service->saveWorkoutCore(workout).value(); }
     bool deleteWorkout(int id) { return m_service->deleteWorkoutCore(id).value(); }
 
@@ -770,4 +775,82 @@ TEST_F(WorkoutServiceTest, PreviousPerformances_SkipsTheWorkoutItselfAndNameMism
     active.addExercise(exerciseWithSets("Bench Press", 0.0, false, 7));
 
     EXPECT_TRUE(previousPerformances(active).empty());
+}
+
+// --- exerciseSessions ---
+
+TEST_F(WorkoutServiceTest, ExerciseSessions_ListsSeveralSessionsNewestFirst)
+{
+    const std::vector<Workout> history = {
+        endedWorkout(5, 1, { exerciseWithSets("Back Squat", 100.0, true, 7) }),
+        endedWorkout(4, 4, { exerciseWithSets("Back Squat", 95.0, true, 7) }),
+        endedWorkout(3, 9, { exerciseWithSets("Back Squat", 90.0, true, 7) }),
+    };
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+
+    const auto result = exerciseSessions(exerciseWithSets("Back Squat", 0.0, false, 7), 5);
+
+    ASSERT_EQ(result.size(), 3u);
+    EXPECT_EQ(result[0].performedAt, history[0].startedTime());
+    EXPECT_EQ(result[1].performedAt, history[1].startedTime());
+    EXPECT_EQ(result[2].performedAt, history[2].startedTime());
+    EXPECT_DOUBLE_EQ(result[0].exercise.sets()[0].weight(), 100.0);
+    EXPECT_DOUBLE_EQ(result[2].exercise.sets()[0].weight(), 90.0);
+}
+
+TEST_F(WorkoutServiceTest, ExerciseSessions_StopsAtTheLimit)
+{
+    std::vector<Workout> history;
+    for (int i = 0; i < 12; ++i)
+        history.push_back(
+            endedWorkout(100 + i, i, { exerciseWithSets("Back Squat", 100.0, true) }));
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+
+    const auto result = exerciseSessions(exerciseWithSets("Back Squat", 0.0, false), 5);
+
+    ASSERT_EQ(result.size(), 5u);
+    EXPECT_EQ(result.back().performedAt, history[4].startedTime());
+}
+
+TEST_F(WorkoutServiceTest, ExerciseSessions_CountsASessionThatWasNeverTickedOff)
+{
+    const std::vector<Workout> history = {
+        endedWorkout(5, 1, { exerciseWithSets("Back Squat", 40.0, false, 7) }),
+    };
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+
+    const auto result = exerciseSessions(exerciseWithSets("Back Squat", 0.0, false, 7), 5);
+
+    ASSERT_EQ(result.size(), 1u);
+    ASSERT_EQ(result[0].exercise.sets().size(), 2u);
+    EXPECT_TRUE(result[0].exercise.sets()[0].completed());
+    EXPECT_TRUE(result[0].exercise.sets()[1].completed());
+    EXPECT_DOUBLE_EQ(result[0].exercise.sets()[0].weight(), 40.0);
+}
+
+TEST_F(WorkoutServiceTest, ExerciseSessions_SkipsAnUntickedExerciseInATickedSession)
+{
+    const std::vector<Workout> history = {
+        endedWorkout(5, 1,
+                     { exerciseWithSets("Back Squat", 120.0, false, 7),
+                       exerciseWithSets("Bench Press", 80.0, true, 8) }),
+        endedWorkout(4, 4, { exerciseWithSets("Back Squat", 95.0, true, 7) }),
+    };
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+
+    const auto result = exerciseSessions(exerciseWithSets("Back Squat", 0.0, false, 7), 5);
+
+    ASSERT_EQ(result.size(), 1u);
+    EXPECT_EQ(result[0].performedAt, history[1].startedTime());
+    EXPECT_DOUBLE_EQ(result[0].exercise.sets()[0].weight(), 95.0);
+}
+
+TEST_F(WorkoutServiceTest, ExerciseSessions_AreEmptyForAnExerciseDoneForTheFirstTime)
+{
+    const std::vector<Workout> history = {
+        endedWorkout(5, 1, { exerciseWithSets("Bench Press", 80.0, true, 8) }),
+    };
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+
+    EXPECT_TRUE(exerciseSessions(exerciseWithSets("Back Squat", 0.0, false, 7), 5).empty());
 }
