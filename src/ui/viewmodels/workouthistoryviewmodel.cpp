@@ -117,6 +117,10 @@ void WorkoutHistoryViewModel::refreshRecentTotals()
               {
                   m_recentTotals.clear();
 
+                  if (totals.totalWeight > 0.0)
+                      m_recentTotals.append(
+                          statTile("volume", WorkoutText::formatVolume(totals.totalWeight)));
+
                   if (totals.totalDurationSeconds > 0)
                       m_recentTotals.append(statTile(
                           "time", WorkoutText::formatDuration(totals.totalDurationSeconds)));

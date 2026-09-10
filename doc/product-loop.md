@@ -83,9 +83,10 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 7 zamknięta (G21 — jedna reguła „co się liczy jako zrobione")
+- **Iteracja:** 8 zamknięta (G22 — objętość na ekranie głównym)
 - **W locie:** nic
-- **Ostatni commit pętli:** G21
+- **Ostatni commit pętli:** G22
+- **Następna pozycja wg backlogu:** G8 — podsumowanie po zakończonym treningu
 - **Korekta roli PM (po uwadze użytkownika):** product manager zaczął zachowywać
   się jak analityk kodu — G19 i G21 to defekty spójności wyłowione z
   `workoutservice.cpp`, a nie braki, które czuje ktoś na siłowni. Definicja

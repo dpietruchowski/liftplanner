@@ -1,42 +1,27 @@
 # Product gaps
 
 Backlog produktowy LiftPlannera. Każda pozycja opisuje, czego brakuje
-użytkownikowi na siłowni, i wskazuje miejsce w kodzie, z którego to wynika.
-Kolejność sekcji „Open" to kolejność ważności.
+człowiekowi, który trenuje z tą aplikacją w ręce, i wskazuje, gdzie to widać.
+
+Kolejność sekcji „Open" to kolejność ważności dla użytkownika, nie trudności:
+najpierw przepływy, które urywają się w połowie, potem zdolności, które
+aplikacja ma, ale nigdy nie oferuje, potem rzeczy, po których traci się do niej
+zaufanie, a dopiero na końcu nowe powierzchnie.
 
 ## Open
 
-### G22 — Objętość treningu jest liczona i wyrzucana
-- **Dla kogo/po co:** dla kogoś, kto podnosi ciężary, objętość (powtórzenia ×
-  ciężar) jest podstawową miarą tygodnia i najczęstszą odpowiedzią na pytanie
-  „czy robię więcej niż miesiąc temu". Aplikacja tę liczbę ma policzoną i nigdy
-  jej nie pokazuje.
-- **Dowód:** raport z iteracji 7. `WorkoutService::TrainingTotals` liczy
-  `totalWeight` z ostatnich 20 treningów, ale `refreshRecentTotals`
-  (`workouthistoryviewmodel.cpp:118-127`) buduje kafelki wyłącznie dla czasu i
-  dystansu — `totalWeight` jest wyrzucane tuż przed ekranem. Przy okazji: w
-  historii użytkownika nie ma ani jednej serii z czasem lub dystansem, więc oba
-  istniejące kafelki są zawsze puste i sekcja statystyk nie pokazuje nic.
-- **Zakres:** S
-- **Gotowe, gdy:** na ekranie głównym widać objętość z ostatnich treningów w
-  kilogramach, a sekcja statystyk przestaje być pusta dla użytkownika, który
-  podnosi ciężary i nie robi ćwiczeń na czas.
-
-### G20 — Zaimportowana historia przychodzi bez śladu wykonania
-- **Dla kogo/po co:** import planu i historii z AI to sztandarowa droga do
-  aplikacji, a wszystko, co tą drogą wchodzi, jest oznaczone jako niezrobione.
-  To źródło zer, na które natrafił raport, i dopóki działa, każdy kolejny import
-  dokłada danych, które dla aplikacji nie istnieją.
-- **Dowód:** `parseSets` (`workoutjson.cpp:229` i dalej) buduje serie z
-  kompaktowego zapisu (`"5x60kg,5x75kg"`) i nigdy nie dotyka `completed`;
-  format kompaktowy, czyli ten, który produkuje prompt dla AI, w ogóle nie ma
-  takiego pola. Pełny JSON ustawia flagę tylko wtedy, gdy klucz jest obecny
-  (`workoutjson.cpp:120-121`). Trening zaimportowany ze statusem „ended" ląduje
-  więc w bazie z każdą serią na zero.
+### G8 — Brak podsumowania po zakończonym treningu
+- **Dla kogo/po co:** trening kończy się wyrzuceniem na ekran główny bez ani
+  jednego zdania o tym, co się właśnie zrobiło. Zamknięcie sesji to najlepszy
+  moment na nagrodę i jedyny, w którym liczby jeszcze kogoś obchodzą.
+- **Dowód:** `ScreenActiveWorkout.qml:161-167` — `onWorkoutCompleted` robi
+  wyłącznie `stackView.replace(homeScreen)`. Dane do podsumowania już są
+  liczone: `WorkoutService::TrainingTotals` (objętość, czas, dystans) i
+  `topExercises` (`src/application/workout/workoutservice.h:19-32,51-52`).
 - **Zakres:** M
-- **Gotowe, gdy:** trening zaimportowany jako historia (status zakończony) ma po
-  imporcie serie oznaczone jako wykonane, widoczne jako odhaczone w podglądzie
-  treningu z historii; import planu na przyszłość nadal wchodzi jako niezrobiony.
+- **Gotowe, gdy:** po zakończeniu treningu pojawia się ekran lub panel z czasem
+  trwania i liczbą ukończonych serii tej sesji, zamykany jednym przyciskiem,
+  który odprowadza na ekran główny.
 
 ### G2 — Wybór dnia zaplanowanego treningu
 - **Dla kogo/po co:** aplikacja nazywa się planerem, a każdy nowo utworzony
@@ -52,6 +37,67 @@ Kolejność sekcji „Open" to kolejność ważności.
 - **Gotowe, gdy:** w edytorze treningu da się ustawić dzień; po zapisie kafel na
   liście zaplanowanych pokazuje wybrany dzień, a nie dzisiejszy, i ta data
   przeżywa restart aplikacji.
+
+### G4 — „Start workout" ignoruje wybór na bębnie
+- **Dla kogo/po co:** użytkownik przewija bęben na ekranie głównym, wybiera
+  konkretny trening i naciska duży przycisk startu — a rusza inny. To dokładnie
+  ten rodzaj zachowania, po którym przestaje się ufać aplikacji.
+- **Dowód:** `WorkoutDrum.qml:24-28` — kliknięcie pozycji zmienia tylko
+  `currentIndex`. `ScreenHome.qml:145-153` — `startWorkout()` startuje zawsze
+  `PlannedWorkoutViewModel.nextWorkout`, nigdzie nie czyta stanu bębna. Bęben
+  potrafi pokazać też „next planned" (`ScreenHome.qml:24`) i „last workout"
+  (`ScreenHome.qml:28`).
+- **Zakres:** S
+- **Gotowe, gdy:** przy dwóch zaplanowanych treningach wybranie na bębnie tego
+  drugiego i naciśnięcie „Start workout" uruchamia ten drugi (ekran aktywnego
+  treningu ma jego nazwę w tytule); dla pozycji, której nie da się wystartować
+  (miniony trening), przycisk nie startuje cudzego treningu.
+
+### G17 — Pusty trening da się zapisać i wystartować
+- **Dla kogo/po co:** trening bez ani jednego ćwiczenia trafia na listę
+  zaplanowanych i można go wystartować. Użytkownik ląduje wtedy na ekranie
+  aktywnego treningu, na którym nie ma czego odhaczyć i z którego nie widać
+  wyjścia — wygląda to jak zepsuta aplikacja, a nie jak własna pomyłka.
+- **Dowód:** raport z iteracji 3 („Obserwacje"): trening z nazwą, ale bez
+  ćwiczeń, wciąż jest zapisywalny. `Workout::validationErrors`
+  (`src/domain/workout/workout.cpp:75-89`) sprawdza tylko nazwę i deleguje
+  resztę do ćwiczeń — przy pustej liście pętla nie wykonuje się ani razu, więc
+  trening jest „valid" i przycisk „Save" w edytorze aktywny
+  (`ScreenWorkoutEditor.qml:59`). Na ekranie aktywnego treningu przycisk „Done"
+  jest wtedy wyłączony, bo nie ma `currentSet` (`ScreenActiveWorkout.qml:119`).
+- **Zakres:** S
+- **Gotowe, gdy:** w edytorze trening bez ćwiczeń nie da się zapisać, a przy
+  zablokowanym przycisku widać, że brakuje ćwiczeń; trening z co najmniej jednym
+  ćwiczeniem zapisuje się jak dotąd.
+
+### G6 — Czas przerwy jest niewidoczny i nie do ustawienia
+- **Dla kogo/po co:** przerwa decyduje o charakterze treningu (siła vs
+  hipertrofia), a timer sam odlicza wartość, której użytkownik nigdzie nie widzi
+  ani nie może zmienić inaczej niż klikając ±15 s w trakcie odliczania.
+- **Dowód:** `ExerciseModel` wystawia `restSeconds`
+  (`src/ui/models/exercisemodel.h:15`), ale ciąg „restSeconds" nie występuje w
+  żadnym pliku pod `src/ui/qml/`. `WorkoutEditorViewModel::setExerciseRest`
+  (`workouteditorviewmodel.h:51`) nie jest wywoływany z QML —
+  `EditorExerciseItem.qml` ma tylko nazwę, strzałki kolejności, usunięcie i serie.
+- **Zakres:** M
+- **Gotowe, gdy:** w edytorze treningu przy ćwiczeniu widać czas przerwy i da
+  się go zmienić; po zapisaniu i wystartowaniu treningu timer po ukończeniu
+  serii tego ćwiczenia odlicza ustawioną wartość.
+
+### G9 — Nie da się zmienić składu treningu w trakcie
+- **Dla kogo/po co:** stanowisko zajęte, bark boli, zostało dziesięć minut — w
+  praktyce trening przebudowuje się na miejscu. Dziś ćwiczenia można tylko
+  przestawić kolejnością.
+- **Dowód:** pasek akcji w `ScreenActiveWorkout.qml:101-143` ma trzy przyciski:
+  timer, „Done" i zmianę kolejności. `ActiveWorkoutViewModel`
+  (`src/ui/viewmodels/activeworkoutviewmodel.h:36-41`) ma operacje na seriach i
+  `moveExercise`, ale żadnej na dodanie ani usunięcie ćwiczenia — mimo że ekran
+  wyboru z katalogu (`ScreenExercisePicker.qml`) już istnieje i jest używany
+  przez edytor.
+- **Zakres:** M
+- **Gotowe, gdy:** w aktywnym treningu da się dorzucić ćwiczenie z katalogu; po
+  dodaniu pojawia się ono na liście, ma serie do odhaczenia, a po zakończeniu
+  treningu widać je w historii.
 
 ### G16 — Nazwa treningu na kaflu przegrywa z przyciskami
 - **Dla kogo/po co:** nazwa jest jedyną rzeczą, po której odróżnia się „Push A"
@@ -72,91 +118,39 @@ Kolejność sekcji „Open" to kolejność ważności.
   nazwę długości typowej dla treningu (np. „Naming check upper A") bez wielokropka,
   a edycja i usunięcie pozostają osiągalne.
 
-### G4 — „Start workout" ignoruje wybór na bębnie
-- **Dla kogo/po co:** użytkownik przewija bęben na ekranie głównym, wybiera
-  konkretny trening i naciska duży przycisk startu — a rusza inny. To dokładnie
-  ten rodzaj zachowania, po którym przestaje się ufać aplikacji.
-- **Dowód:** `WorkoutDrum.qml:24-28` — kliknięcie pozycji zmienia tylko
-  `currentIndex`. `ScreenHome.qml:145-153` — `startWorkout()` startuje zawsze
-  `PlannedWorkoutViewModel.nextWorkout`, nigdzie nie czyta stanu bębna. Bęben
-  potrafi pokazać też „next planned" (`ScreenHome.qml:24`) i „last workout"
-  (`ScreenHome.qml:28`).
-- **Zakres:** S
-- **Gotowe, gdy:** przy dwóch zaplanowanych treningach wybranie na bębnie tego
-  drugiego i naciśnięcie „Start workout" uruchamia ten drugi (ekran aktywnego
-  treningu ma jego nazwę w tytule); dla pozycji, której nie da się wystartować
-  (miniony trening), przycisk nie startuje cudzego treningu.
-
-### G6 — Czas przerwy jest niewidoczny i nie do ustawienia
-- **Dla kogo/po co:** przerwa decyduje o charakterze treningu (siła vs
-  hipertrofia), a timer sam odlicza wartość, której użytkownik nigdzie nie widzi
-  ani nie może zmienić inaczej niż klikając ±15 s w trakcie odliczania.
-- **Dowód:** `ExerciseModel` wystawia `restSeconds`
-  (`src/ui/models/exercisemodel.h:15`), ale ciąg „restSeconds" nie występuje w
-  żadnym pliku pod `src/ui/qml/`. `WorkoutEditorViewModel::setExerciseRest`
-  (`workouteditorviewmodel.h:51`) nie jest wywoływany z QML —
-  `EditorExerciseItem.qml` ma tylko nazwę, strzałki kolejności, usunięcie i serie.
+### G20 — Zaimportowana historia przychodzi bez śladu wykonania
+- **Dla kogo/po co:** import planu i historii z AI to sztandarowa droga do
+  aplikacji, a wszystko, co tą drogą wchodzi, jest oznaczone jako niezrobione.
+  To źródło zer, na które natrafił raport, i dopóki działa, każdy kolejny import
+  dokłada danych, które dla aplikacji nie istnieją.
+- **Dowód:** `parseSets` (`workoutjson.cpp:229` i dalej) buduje serie z
+  kompaktowego zapisu (`"5x60kg,5x75kg"`) i nigdy nie dotyka `completed`;
+  format kompaktowy, czyli ten, który produkuje prompt dla AI, w ogóle nie ma
+  takiego pola. Pełny JSON ustawia flagę tylko wtedy, gdy klucz jest obecny
+  (`workoutjson.cpp:120-121`). Trening zaimportowany ze statusem „ended" ląduje
+  więc w bazie z każdą serią na zero.
 - **Zakres:** M
-- **Gotowe, gdy:** w edytorze treningu przy ćwiczeniu widać czas przerwy i da
-  się go zmienić; po zapisaniu i wystartowaniu treningu timer po ukończeniu
-  serii tego ćwiczenia odlicza ustawioną wartość.
+- **Gotowe, gdy:** trening zaimportowany jako historia (status zakończony) ma po
+  imporcie serie oznaczone jako wykonane, widoczne jako odhaczone w podglądzie
+  treningu z historii; import planu na przyszłość nadal wchodzi jako niezrobiony.
+- **Uwaga po G19 i G21:** pilność spadła. Odkąd sesja bez ani jednego ptaszka
+  liczy się w całości, zaimportowana historia znów zasila „Last time",
+  dziedziczenie ciężaru i statystyki. Zostaje niezgodność tego, co użytkownik
+  widzi w podglądzie treningu (nic nieodhaczone), z tym, co aplikacja z tego
+  wnioskuje — warto naprawić, ale to już nie blokuje niczego.
 
-### G8 — Brak podsumowania po zakończonym treningu
-- **Dla kogo/po co:** trening kończy się wyrzuceniem na ekran główny bez ani
-  jednego zdania o tym, co się właśnie zrobiło. Zamknięcie sesji to najlepszy
-  moment na nagrodę i jedyny, w którym liczby jeszcze kogoś obchodzą.
-- **Dowód:** `ScreenActiveWorkout.qml:161-167` — `onWorkoutCompleted` robi
-  wyłącznie `stackView.replace(homeScreen)`. Dane do podsumowania już są
-  liczone: `WorkoutService::TrainingTotals` (objętość, czas, dystans) i
-  `topExercises` (`src/application/workout/workoutservice.h:19-32,51-52`).
+### G18 — Seria bez ciężaru wygląda jak seria z zerowym ciężarem
+- **Dla kogo/po co:** reszta po G15 — ćwiczenie robione pierwszy raz w życiu
+  albo plan z AI, który nie podał obciążenia. „0 kg" to wtedy nieprawda podana
+  z pewnością siebie; użytkownik nie wie, czy aplikacja mu każe wziąć pustą
+  sztangę, czy po prostu nie wie.
+- **Dowód:** ta sama ścieżka co w G15 — `SetRow.qml` pokazuje `secondaryText`
+  bez rozróżnienia „zero" od „nieustawione", a `Set` trzyma zwykły `double`
+  bez stanu „brak wartości".
 - **Zakres:** M
-- **Gotowe, gdy:** po zakończeniu treningu pojawia się ekran lub panel z czasem
-  trwania i liczbą ukończonych serii tej sesji, zamykany jednym przyciskiem,
-  który odprowadza na ekran główny.
-
-### G9 — Nie da się zmienić składu treningu w trakcie
-- **Dla kogo/po co:** stanowisko zajęte, bark boli, zostało dziesięć minut — w
-  praktyce trening przebudowuje się na miejscu. Dziś ćwiczenia można tylko
-  przestawić kolejnością.
-- **Dowód:** pasek akcji w `ScreenActiveWorkout.qml:101-143` ma trzy przyciski:
-  timer, „Done" i zmianę kolejności. `ActiveWorkoutViewModel`
-  (`src/ui/viewmodels/activeworkoutviewmodel.h:36-41`) ma operacje na seriach i
-  `moveExercise`, ale żadnej na dodanie ani usunięcie ćwiczenia — mimo że ekran
-  wyboru z katalogu (`ScreenExercisePicker.qml`) już istnieje i jest używany
-  przez edytor.
-- **Zakres:** M
-- **Gotowe, gdy:** w aktywnym treningu da się dorzucić ćwiczenie z katalogu; po
-  dodaniu pojawia się ono na liście, ma serie do odhaczenia, a po zakończeniu
-  treningu widać je w historii.
-
-### G17 — Pusty trening da się zapisać i wystartować
-- **Dla kogo/po co:** trening bez ani jednego ćwiczenia trafia na listę
-  zaplanowanych i można go wystartować. Użytkownik ląduje wtedy na ekranie
-  aktywnego treningu, na którym nie ma czego odhaczyć i z którego nie widać
-  wyjścia — wygląda to jak zepsuta aplikacja, a nie jak własna pomyłka.
-- **Dowód:** raport z iteracji 3 („Obserwacje"): trening z nazwą, ale bez
-  ćwiczeń, wciąż jest zapisywalny. `Workout::validationErrors`
-  (`src/domain/workout/workout.cpp:75-89`) sprawdza tylko nazwę i deleguje
-  resztę do ćwiczeń — przy pustej liście pętla nie wykonuje się ani razu, więc
-  trening jest „valid" i przycisk „Save" w edytorze aktywny
-  (`ScreenWorkoutEditor.qml:59`). Na ekranie aktywnego treningu przycisk „Done"
-  jest wtedy wyłączony, bo nie ma `currentSet` (`ScreenActiveWorkout.qml:119`).
-- **Zakres:** S
-- **Gotowe, gdy:** w edytorze trening bez ćwiczeń nie da się zapisać, a przy
-  zablokowanym przycisku widać, że brakuje ćwiczeń; trening z co najmniej jednym
-  ćwiczeniem zapisuje się jak dotąd.
-
-### G10 — Filtr po mięśniu w katalogu ćwiczeń bez wejścia
-- **Dla kogo/po co:** wybierając ćwiczenie na zastępstwo szuka się po partii
-  („coś na biceps"), a nie po całej okolicy ciała.
-- **Dowód:** `ExerciseCatalogViewModel` ma zapisywalny filtr `muscle`
-  (`src/ui/viewmodels/exercisecatalogviewmodel.h:17,42`), a
-  `ExerciseFilterPanel.qml:46-80` wystawia tylko `region`, `equipment` i `kind`.
-  Ciąg „muscle" jako filtr nie pada w żadnym pliku QML.
-- **Zakres:** S
-- **Gotowe, gdy:** w panelu filtrów pickera jest wybór mięśnia; ustawienie go
-  zmniejsza licznik dopasowanych ćwiczeń i zawęża listę, a „Clear filters"
-  przywraca pełną liczbę.
+- **Gotowe, gdy:** seria, dla której nie ma ani historii, ani wartości z planu,
+  pokazuje w aktywnym treningu i w edytorze znak braku wartości zamiast „0 kg",
+  a po ustawieniu ciężaru zachowuje się jak każda inna.
 
 ### G11 — Kolejność serii w ćwiczeniu jest nie do zmiany
 - **Dla kogo/po co:** rozgrzewkowa seria wpisana jako ostatnia zostaje na
@@ -182,18 +176,17 @@ Kolejność sekcji „Open" to kolejność ważności.
   zapisie i wystartowaniu treningu ta sama notatka jest widoczna w panelu
   informacji o ćwiczeniu.
 
-### G18 — Seria bez ciężaru wygląda jak seria z zerowym ciężarem
-- **Dla kogo/po co:** reszta po G15 — ćwiczenie robione pierwszy raz w życiu
-  albo plan z AI, który nie podał obciążenia. „0 kg" to wtedy nieprawda podana
-  z pewnością siebie; użytkownik nie wie, czy aplikacja mu każe wziąć pustą
-  sztangę, czy po prostu nie wie.
-- **Dowód:** ta sama ścieżka co w G15 — `SetRow.qml` pokazuje `secondaryText`
-  bez rozróżnienia „zero" od „nieustawione", a `Set` trzyma zwykły `double`
-  bez stanu „brak wartości".
-- **Zakres:** M
-- **Gotowe, gdy:** seria, dla której nie ma ani historii, ani wartości z planu,
-  pokazuje w aktywnym treningu i w edytorze znak braku wartości zamiast „0 kg",
-  a po ustawieniu ciężaru zachowuje się jak każda inna.
+### G10 — Filtr po mięśniu w katalogu ćwiczeń bez wejścia
+- **Dla kogo/po co:** wybierając ćwiczenie na zastępstwo szuka się po partii
+  („coś na biceps"), a nie po całej okolicy ciała.
+- **Dowód:** `ExerciseCatalogViewModel` ma zapisywalny filtr `muscle`
+  (`src/ui/viewmodels/exercisecatalogviewmodel.h:17,42`), a
+  `ExerciseFilterPanel.qml:46-80` wystawia tylko `region`, `equipment` i `kind`.
+  Ciąg „muscle" jako filtr nie pada w żadnym pliku QML.
+- **Zakres:** S
+- **Gotowe, gdy:** w panelu filtrów pickera jest wybór mięśnia; ustawienie go
+  zmniejsza licznik dopasowanych ćwiczeń i zawęża listę, a „Clear filters"
+  przywraca pełną liczbę.
 
 ### G13 — Poprawienie zakończonego treningu
 - **Dla kogo/po co:** telefon padł w połowie sesji albo seria została odhaczona
@@ -219,6 +212,13 @@ Kolejność sekcji „Open" to kolejność ważności.
   szablonu)
 
 ## Done
+
+### G22 — Objętość treningu jest liczona i wyrzucana (iteracja 8)
+Ekran główny dostał trzeci kafelek statystyk z `TrainingTotals.totalWeight`,
+formatowany przez nowe `WorkoutText::formatVolume` z grupowaniem tysięcy. Zero
+zmian w QML — delegat już budował `objectName` z etykiety. Sprawdzone w
+aplikacji: `totalsTile_volume` = „2 755 kg", pasek statystyk sztangisty przestał
+być pusty. Domyka też obserwowalną część G21.
 
 ### G21 — Trzy różne reguły „co się liczy jako zrobione" (iteracja 7)
 `countsAsPerformed` w `performedsets.h` jest teraz jedynym rozstrzygnięciem;

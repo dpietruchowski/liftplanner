@@ -26,6 +26,17 @@ QString formatDistance(double meters)
         QString::number(kilometers, 'f', 1).remove(QRegularExpression("\\.0$")));
 }
 
+QString formatVolume(double kilograms)
+{
+    const qint64 rounded = kilograms > 0.0 ? qRound64(kilograms) : 0;
+
+    QString digits = QString::number(rounded);
+    for (int at = digits.size() - 3; at > 0; at -= 3)
+        digits.insert(at, QChar(' '));
+
+    return digits + QStringLiteral(" kg");
+}
+
 QString workoutToText(const Workout& workout)
 {
     const QDateTime& started = workout.startedTime();

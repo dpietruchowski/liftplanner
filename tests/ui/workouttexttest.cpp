@@ -32,3 +32,23 @@ TEST_F(WorkoutTextTest, FormatDistance_SwitchesToKilometresAndTrimsTheZeroDecima
     EXPECT_EQ(WorkoutText::formatDistance(5000.0), "5 km");
     EXPECT_EQ(WorkoutText::formatDistance(12400.0), "12.4 km");
 }
+
+TEST_F(WorkoutTextTest, FormatVolume_StaysInKilogramsAndRoundsToWholeOnes)
+{
+    EXPECT_EQ(WorkoutText::formatVolume(0.0), "0 kg");
+    EXPECT_EQ(WorkoutText::formatVolume(900.0), "900 kg");
+    EXPECT_EQ(WorkoutText::formatVolume(987.5), "988 kg");
+}
+
+TEST_F(WorkoutTextTest, FormatVolume_GroupsThousandsSoBigNumbersStayReadable)
+{
+    EXPECT_EQ(WorkoutText::formatVolume(1000.0), "1 000 kg");
+    EXPECT_EQ(WorkoutText::formatVolume(12400.0), "12 400 kg");
+    EXPECT_EQ(WorkoutText::formatVolume(203450.0), "203 450 kg");
+    EXPECT_EQ(WorkoutText::formatVolume(1234567.0), "1 234 567 kg");
+}
+
+TEST_F(WorkoutTextTest, FormatVolume_NeverReportsNegativeWork)
+{
+    EXPECT_EQ(WorkoutText::formatVolume(-50.0), "0 kg");
+}

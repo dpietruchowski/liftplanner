@@ -87,12 +87,30 @@ TEST_F(HomeStatsTest, TimeAndDistanceGetTheirOwnTiles)
     EXPECT_EQ(totalsTile("distance")["value"].toString(), "5 km");
 }
 
-TEST_F(HomeStatsTest, TilesWithNothingToReportAreLeftOut)
+TEST_F(HomeStatsTest, ALifterWhoNeverWorksAgainstTheClockStillGetsAStatTile)
 {
     recordWorkout(TestData::SINGLE_WORKOUT_JSON);
 
+    EXPECT_FALSE(app.workoutHistoryViewModel().recentTotals().isEmpty());
+    EXPECT_EQ(totalsTile("volume")["value"].toString(), "900 kg");
+    EXPECT_TRUE(totalsTile("time").isEmpty());
+    EXPECT_TRUE(totalsTile("distance").isEmpty());
+}
+
+TEST_F(HomeStatsTest, VolumeAccumulatesAcrossWorkouts)
+{
+    recordWorkout(TestData::SINGLE_WORKOUT_JSON);
+    recordWorkout(TestData::SINGLE_WORKOUT_JSON);
+
+    EXPECT_EQ(totalsTile("volume")["value"].toString(), "1 800 kg");
+}
+
+TEST_F(HomeStatsTest, AnEmptyHistoryReportsNoTilesAtAll)
+{
+    app.workoutHistoryViewModel().loadAllWorkouts();
+    app.drain();
+
     EXPECT_TRUE(app.workoutHistoryViewModel().recentTotals().isEmpty());
-    EXPECT_FALSE(tileNames().isEmpty());
 }
 
 TEST_F(HomeStatsTest, TotalsAccumulateAcrossWorkouts)
