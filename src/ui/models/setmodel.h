@@ -36,6 +36,8 @@ public:
     QString secondaryText() const;
     bool secondaryAdjustable() const;
 
+    Q_INVOKABLE bool performed(bool completionFlagsMeaningful) const;
+
     void setRepetitions(int value);
     void setWeight(double value);
     void setCompleted(bool value);

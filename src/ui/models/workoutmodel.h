@@ -20,6 +20,8 @@ class WorkoutModel : public QObject
     Q_PROPERTY(QDateTime startedTime READ startedTime NOTIFY dataChanged)
     Q_PROPERTY(QDateTime endedTime READ endedTime NOTIFY dataChanged)
     Q_PROPERTY(bool completed READ isCompleted NOTIFY completedChanged)
+    Q_PROPERTY(
+        bool completionFlagsMeaningful READ completionFlagsMeaningful NOTIFY completedChanged)
     Q_PROPERTY(QString status READ statusString NOTIFY dataChanged)
 
 public:
@@ -33,6 +35,7 @@ public:
     QDateTime startedTime() const;
     QDateTime endedTime() const;
     bool isCompleted() const;
+    bool completionFlagsMeaningful() const;
     WorkoutStatus status() const;
     QString statusString() const;
 

@@ -194,6 +194,17 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
 - **Gotowe, gdy:** (do rozbicia — pierwszy plaster to zmiana nazwy istniejącego
   szablonu)
 
+### G32 — „1 exercises · 1 sets" na kaflu szablonu
+- **Dla kogo/po co:** drobiazg, ale stoi na kaflu, po którym wybiera się plan na
+  dziś, i wygląda na niedokończoną aplikację. Ta sama klasa usterki zawróciła już
+  raz robotę w iteracji 13 („1 of 1 sets"), więc wiadomo, że rzuca się w oczy.
+- **Dowód:** zobaczyłem to na ekranie szablonów w działającej aplikacji
+  (`tmp/loop/pm17-templates.png`): kafel „Regression Template" ma podpis
+  „1 exercises · 1 sets".
+- **Zakres:** S
+- **Gotowe, gdy:** szablon z jednym ćwiczeniem i jedną serią opisany jest w
+  liczbie pojedynczej, a szablon z kilkoma — w mnogiej.
+
 ## Odrzucone
 
 Zgłoszenia sprawdzone i świadomie niebrane na backlog — żeby nie wracały.

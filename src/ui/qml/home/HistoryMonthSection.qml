@@ -11,6 +11,7 @@ ColumnLayout {
 
     property string monthLabel
     property var workouts: []
+    property string headerName: ""
     property alias expanded: header.expanded
 
     signal deleteWorkoutRequest(var workout)
@@ -19,6 +20,7 @@ ColumnLayout {
 
     SectionHeader {
         id: header
+        objectName: root.headerName
         Layout.fillWidth: true
         title: root.monthLabel
         titleFont.pixelSize: Theme.fontSize.normal

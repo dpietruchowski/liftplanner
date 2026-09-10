@@ -21,6 +21,7 @@ Rectangle {
     property Component expandedActions: null
     property string expandButtonName: ""
     property string titleName: ""
+    property string chipPrefix: ""
 
     default property alias headerActions: headerActionsRow.data
 
@@ -89,6 +90,7 @@ Rectangle {
             Layout.fillWidth: true
             workout: root.workout
             expanded: root.expanded
+            chipPrefix: root.chipPrefix
             opacity: root.expanded ? 1 : 0
 
             Behavior on opacity { NumberAnimation { duration: 200 } }

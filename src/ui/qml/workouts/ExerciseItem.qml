@@ -10,6 +10,8 @@ ColumnLayout {
     spacing: Theme.spacing.xSmall
 
     property var exercise
+    property bool flagsMeaningful: false
+    property string chipPrefix: ""
 
     Text {
         text: exercise.name
@@ -28,7 +30,9 @@ ColumnLayout {
             model: exercise.sets
 
             delegate: SetChip {
+                objectName: root.chipPrefix.length > 0 ? root.chipPrefix + "_" + index : ""
                 setData: modelData
+                flagsMeaningful: root.flagsMeaningful
             }
         }
     }

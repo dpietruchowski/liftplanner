@@ -8,6 +8,9 @@ ColumnLayout {
 
     property var workout
     property bool expanded: false
+    property string chipPrefix: ""
+
+    readonly property bool flagsMeaningful: workout ? workout.completionFlagsMeaningful : false
 
     visible: expanded
     spacing: Theme.spacing.medium
@@ -17,6 +20,8 @@ ColumnLayout {
         delegate: ExerciseItem {
             Layout.fillWidth: true
             exercise: modelData
+            flagsMeaningful: root.flagsMeaningful
+            chipPrefix: root.chipPrefix.length > 0 ? root.chipPrefix + "_" + index : ""
         }
     }
 }

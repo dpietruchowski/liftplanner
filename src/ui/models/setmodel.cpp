@@ -1,5 +1,7 @@
 #include "setmodel.h"
 
+#include "domain/workout/performedsets.h"
+
 SetModel::SetModel(QObject* parent)
     : QObject(parent)
 {
@@ -141,6 +143,11 @@ void SetModel::setDistanceMeters(double value)
         emit distanceChanged();
         emit displayChanged();
     }
+}
+
+bool SetModel::performed(bool completionFlagsMeaningful) const
+{
+    return countsAsPerformed(true, m_set.completed(), completionFlagsMeaningful);
 }
 
 const Set& SetModel::entity() const { return m_set; }

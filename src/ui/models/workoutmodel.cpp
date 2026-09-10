@@ -1,5 +1,7 @@
 #include "workoutmodel.h"
 
+#include "domain/workout/performedsets.h"
+
 namespace
 {
 Workout recordOf(const Workout& workout)
@@ -36,6 +38,11 @@ QDateTime WorkoutModel::startedTime() const { return m_record.startedTime(); }
 QDateTime WorkoutModel::endedTime() const { return m_record.endedTime(); }
 
 bool WorkoutModel::isCompleted() const { return toEntity().isCompleted(); }
+
+bool WorkoutModel::completionFlagsMeaningful() const
+{
+    return completionFlagsAreMeaningful(toEntity());
+}
 
 WorkoutStatus WorkoutModel::status() const { return m_record.status(); }
 QString WorkoutModel::statusString() const { return workoutStatusToString(m_record.status()); }

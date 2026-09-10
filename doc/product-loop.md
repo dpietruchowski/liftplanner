@@ -94,11 +94,21 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 17 zamknięta (G6 — czas przerwy widoczny i do ustawienia)
+- **Iteracja:** 18 zamknięta (G31 — historia odróżnia serię opuszczoną od zrobionej)
 - **W locie:** nic
-- **Ostatni commit pętli:** G6
+- **Ostatni commit pętli:** G31
 - **Następna pozycja wg backlogu:** do wyboru przez PM. Na liście zostały G26
-  (nieudany import historii milczy) i G29 (wybór funtów kończy się na profilu).
+  (nieudany import historii milczy), G29 (wybór funtów kończy się na profilu)
+  i G32 („1 exercises · 1 sets" na kaflu szablonu).
+- **Pułapka pustych flag `completed` — czwarte spotkanie** (G19, G23, G25, G31).
+  Kształt bez ani jednego ptaszka nie znaczy „nic nie zrobione", tylko „flagi
+  nic nie znaczą"; w piaskownicy leży `w4 Base Strength` z importu, 20 serii,
+  zero flag. Reguła jest raz napisana w `src/domain/workout/performedsets.h`
+  (`countsAsPerformed`, `completionFlagsAreMeaningful`) i drugiej kopii nie
+  piszemy. Przy G31 pierwszy raz weszła do warunku akceptacji **z góry**,
+  zamiast wyjść dopiero w testach — tak ma zostać: przy każdej pozycji
+  dotykającej flag `completed` człon „a co z sesją bez ani jednej flagi"
+  dopisujemy od razu.
 - **Nieobecność elementu w drzewie nie jest dowodem usterki** — serwer
   automatyzacji przycina niewidoczne poddrzewa. Przy G6 odhaczyłem serię w
   treningu mającym **jedną** serię, timera nie było i o mało nie zawróciłem

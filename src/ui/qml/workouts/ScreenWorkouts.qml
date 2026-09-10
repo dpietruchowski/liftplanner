@@ -186,6 +186,7 @@ Rectangle {
                         Layout.fillWidth: true
                         monthLabel: modelData.label
                         workouts: modelData.workouts
+                        headerName: "historyMonthHeader" + index
                         expanded: index === 0
 
                         onDeleteWorkoutRequest: function(workout) {

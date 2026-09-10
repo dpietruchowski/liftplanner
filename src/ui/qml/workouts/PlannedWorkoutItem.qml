@@ -15,6 +15,7 @@ WorkoutCard {
     objectName: "plannedWorkoutItem" + itemIndex
     expandButtonName: "plannedWorkoutExpandButton" + itemIndex
     titleName: "plannedWorkoutTitle" + itemIndex
+    chipPrefix: "plannedWorkoutSetChip" + itemIndex
     borderColor: Theme.colors.primaryBorder
     dateColor: Theme.colors.primary
     dateText: workout ? Qt.formatDateTime(workout.plannedTime, "ddd, d MMM yyyy") : ""

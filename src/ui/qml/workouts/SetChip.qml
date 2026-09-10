@@ -6,6 +6,9 @@ Rectangle {
     id: root
 
     property var setData
+    property bool flagsMeaningful: false
+
+    readonly property bool performed: setData ? setData.performed(flagsMeaningful) : true
 
     readonly property string label: {
         if (!setData)
@@ -22,13 +25,16 @@ Rectangle {
     width: text.implicitWidth + 2 * Theme.chip.padding
     height: Theme.chip.height
     radius: Theme.chip.radius
-    color: Theme.colors.chipBackground
+    color: root.performed ? Theme.colors.chipBackground : "transparent"
+    border.width: root.performed ? 0 : Theme.border.thin
+    border.color: Theme.colors.border
 
     Text {
         id: text
         anchors.centerIn: parent
         text: root.label
         font.pixelSize: Theme.chip.fontSize
-        color: Theme.colors.chipText
+        font.strikeout: !root.performed
+        color: root.performed ? Theme.colors.chipText : Theme.colors.textFaint
     }
 }
