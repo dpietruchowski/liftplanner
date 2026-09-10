@@ -60,6 +60,29 @@ inline std::vector<Set> performedSets(const Exercise& exercise)
     return done;
 }
 
+inline Workout trimmedToPerformed(const Workout& workout)
+{
+    const bool flagsAreMeaningful = completionFlagsAreMeaningful(workout);
+    if (!flagsAreMeaningful)
+        return workout;
+
+    std::vector<Exercise> kept;
+    for (const Exercise& exercise : workout.exercises())
+    {
+        if (!wasPerformed(exercise, flagsAreMeaningful))
+            continue;
+
+        Exercise done = exercise;
+        done.sets() = performedSets(exercise);
+        kept.push_back(done);
+    }
+
+    Workout trimmed = workout;
+    trimmed.exercises() = kept;
+    trimmed.normalizePositions();
+    return trimmed;
+}
+
 inline Exercise asPerformed(const Exercise& exercise, bool flagsAreMeaningful)
 {
     if (flagsAreMeaningful)

@@ -19,10 +19,12 @@ QString finishPrompt(int completedSets, int plannedSets)
                  Plural::form(plannedSets, QStringLiteral("is"), QStringLiteral("are")));
     }
 
-    return QStringLiteral("%1 of %2 %3 %4 ticked off. The rest stay marked as not done.")
+    return QStringLiteral("%1 of %2 %3 %4 ticked off. Ending now deletes the other %5 for good.")
         .arg(completedSets)
         .arg(plannedSets)
-        .arg(sets, Plural::form(completedSets, QStringLiteral("is"), QStringLiteral("are")));
+        .arg(sets, Plural::form(completedSets, QStringLiteral("is"), QStringLiteral("are")),
+             Plural::counted(plannedSets - completedSets, QStringLiteral("set"),
+                             QStringLiteral("sets")));
 }
 
 QString amnestyLossWarning(const QString& workoutName, int plannedSets)

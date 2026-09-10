@@ -25,6 +25,9 @@ Rectangle {
             return
         }
 
+        var unticked = ActiveWorkoutViewModel.untickedSetCount()
+        endWorkoutPopup.title = unticked > 0 ? qsTr("End and delete unticked sets?") : qsTr("End workout?")
+        endWorkoutPopup.type = unticked > 0 ? Notification.Type.Warning : Notification.Type.Info
         endWorkoutPopup.text = ActiveWorkoutViewModel.finishPrompt()
         endWorkoutPopup.open()
     }

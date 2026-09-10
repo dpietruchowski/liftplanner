@@ -41,6 +41,7 @@ public:
 
     Q_INVOKABLE int completedSetCount() const;
     Q_INVOKABLE int totalSetCount() const;
+    Q_INVOKABLE int untickedSetCount() const;
     Q_INVOKABLE bool hasAnythingToRecord() const;
     Q_INVOKABLE QString finishPrompt() const;
 
@@ -90,7 +91,7 @@ private:
     void saveToDb();
     void saveSetToDb(SetModel* set);
 
-    void captureSessionSummary();
+    void captureSessionSummary(const Workout& recorded);
 
     WorkoutService* m_service;
     WorkoutTimer* m_timer;

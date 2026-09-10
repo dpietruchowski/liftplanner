@@ -97,65 +97,6 @@ zapis po fakcie, czyli to, czym ta aplikacja właśnie się staje.
 
 ## Open
 
-### G38 — Kończąc trening, nie wiadomo, że coś zostaje niezrobione
-- **Pochodzenie: prosto od użytkownika**, kilka minut po G37 i o tym samym
-  ekranie. Cytat: „jak sie wychodzi z treningu i ma sie nieskończone zadania to
-  pisac czy na pewno chcesz wyjść. I usuwać nieskończone zamiast potem trzymać i
-  skreślać w historii".
-- **Dla kogo/po co:** dwie rzeczy naraz. Po pierwsze, okno kończące trening pyta
-  dziś zawsze tak samo („End workout? / Do you want to end workout?",
-  `ScreenActiveWorkout.qml:194`) i ani słowem nie mówi, że dziewiętnaście serii
-  zostaje niezrobionych — czyli pyta, ale nie daje się przy czym zatrzymać. Po
-  drugie, użytkownik chce, żeby jego dziennik był zapisem tego, **co zrobił**, a
-  nie listą wyrzutów; przekreślone żetony w historii uważa za śmieci.
-- **Zakres:** M
-- **Gotowe, gdy:**
-  1. zakończenie treningu, w którym część serii nie jest odhaczona, otwiera okno
-     mówiące wprost, ile serii zostanie usuniętych i że znikną bezpowrotnie;
-  2. anulowanie tego okna nie zmienia **niczego** — trening dalej trwa, wszystkie
-     serie są na miejscu, w bazie ani jeden wiersz nie ubył;
-  3. po potwierdzeniu trening w historii ma wyłącznie serie zrobione — ani jednego
-     przekreślonego żetonu — a podsumowanie zaraz po zakończeniu opisuje to, co
-     zostało zapisane, a nie plan sprzed przycięcia;
-  4. ćwiczenie, w którym nie zrobiono ani jednej serii, wypada z zapisu w całości;
-  5. trening, w którym nie zrobiono nic, nadal wraca na listę zaplanowanych
-     (G23) i nie ląduje w historii jako pusty wpis;
-  6. treningi już leżące w historii — zaimportowane, ręcznie poprawione,
-     zakończone przed tą zmianą — wyglądają dokładnie jak dotąd, z przekreśleniem
-     włącznie;
-  7. odznaczenie serii w zakończonym treningu (G13) nadal ją **zachowuje** i
-     pokazuje jako niezrobioną; kasowanie zdarza się wyłącznie w chwili kończenia
-     treningu i wyłącznie po potwierdzeniu.
-
-#### Rozstrzygnięcia, o które prosiłeś
-
-**Jedno okno, jedno potwierdzenie — nie wybór między dwiema drogami.** Użytkownik
-poprosił o jedno zachowanie, a nie o pytanie „jak dziś zapisać". Widełki „zakończ
-i usuń" obok „zakończ i zachowaj" kazałyby mu rozstrzygać to samo po każdym
-treningu, w najbardziej zmęczonym momencie dnia, na dwóch podobnych przyciskach
-obok siebie — tak się gubi dane przez pomyłkę palca. Okno ma powiedzieć prawdę
-(ile znika) i mieć jedno potwierdzenie oraz anulowanie. Nie dokładam też
-przełącznika w profilu: to podwaja powierzchnię testów dla przypadku, o który
-nikt nie prosił.
-
-**G31 zostaje w mocy.** Przekreślony żeton przestanie powstawać nową drogą, ale
-nadal ma robotę: w historii zaimportowanej, w sesjach poprawionych ręcznie i we
-wszystkim, co zostało zakończone przed tą zmianą. Wycofanie go oznaczałoby, że
-odznaczenie serii w historii po cichu kasuje dane — czyli dokładnie to, co w
-iteracji 13 uznaliśmy za najgroźniejszą rzecz w aplikacji. Kasowanie ma być
-jednym świadomym zdarzeniem w jednym miejscu, nie skutkiem ubocznym edycji.
-
-**Ćwiczenie bez ani jednej zrobionej serii wypada w całości.** Skoro zapis ma być
-tym, co się zrobiło, ćwiczenie, którego się nie zrobiło, nie jest jego częścią; a
-nagłówek ćwiczenia bez ani jednego żetonu pod spodem wyglądałby jak usterka i był
-tym samym śmieciem, na który użytkownik narzeka.
-
-**Konsekwencja, którą trzeba znać z góry:** powtórzenie treningu z historii (G25)
-kopiuje to, co w historii zostało. Kto regularnie odpuszcza ostatnie ćwiczenie,
-dostanie z powtórzenia plan bez niego, i przy kolejnym powtórzeniu jeszcze
-krótszy. To uczciwa cena modelu „dziennik = co zrobiłem" i nie blokuje tej
-pozycji, ale jeśli kiedyś wróci jako skarga, wiadomo, skąd się wzięła.
-
 ### G39 — Nie da się zacząć treningu bez planu
 - **Pochodzenie: prosto od użytkownika**, tego samego wieczoru co G37 i G38.
   Cytat: „jeszcze jedna funkcjonalność produktowa. Tworzenie pustego aktywnego
@@ -414,6 +355,16 @@ Osobna iteracja na samą wielkość liter byłaby marnotrawstwem, a G8 i tak dok
 kafelki podsumowania — więc warunek spójności etykiet stał się częścią G8.
 
 ## Done
+
+### G38 — Kończąc trening, nie wiadomo, że coś zostaje niezrobione (iteracja 28)
+Okno kończące trening mówi, ile serii znika i że bezpowrotnie, a po potwierdzeniu
+w historii zostaje wyłącznie to, co zrobione — ćwiczenia bez ani jednej odhaczonej
+serii wypadają w całości. Sprawdzone na bazie: anulowanie nie ruszyło ani jednego
+wiersza, potwierdzenie zabrało dokładnie te 21 serii i 6 ćwiczeń, które okno
+obiecało. Dziewiąte spotkanie z regułą pustych flag, tym razem groźne w drugą
+stronę: sesja bez ani jednej flagi jest wykonana w całości, więc przycięcie jej
+skasowałoby cały trening. Kasowanie zdarza się wyłącznie tu — odznaczenie serii
+w historii (G13) nadal ją zachowuje, a starsze wpisy mają przekreślenia jak dotąd.
 
 ### G37 — Poprzedni wynik przy każdej serii z osobna (iteracja 27)
 Wiersz serii pokazuje wynik z tej samej pozycji poprzedniej sesji, a nagłówek

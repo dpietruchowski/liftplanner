@@ -84,8 +84,8 @@ void expectFits(const QFontMetricsF& metrics, const QString& text, int columnWid
 {
     EXPECT_LE(metrics.horizontalAdvance(text), columnWidth)
         << column.toStdString() << " of the " << row.toStdString() << " row cannot show \""
-        << text.toStdString() << "\": it needs " << metrics.horizontalAdvance(text)
-        << " px of " << columnWidth;
+        << text.toStdString() << "\": it needs " << metrics.horizontalAdvance(text) << " px of "
+        << columnWidth;
 }
 
 }

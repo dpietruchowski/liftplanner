@@ -39,19 +39,31 @@ TEST(PluralTest, TheQmlSingletonAnswersTheSameWay)
 TEST(FinishPromptTest, OneTickedSetOutOfManyUsesTheSingularVerb)
 {
     EXPECT_EQ(WorkoutText::finishPrompt(1, 22),
-              QStringLiteral("1 of 22 sets is ticked off. The rest stay marked as not done."));
+              QStringLiteral(
+                  "1 of 22 sets is ticked off. Ending now deletes the other 21 sets for good."));
 }
 
 TEST(FinishPromptTest, BothNumbersInTheSentenceBendOnTheirOwn)
 {
-    EXPECT_EQ(WorkoutText::finishPrompt(1, 2),
-              QStringLiteral("1 of 2 sets is ticked off. The rest stay marked as not done."));
+    EXPECT_EQ(
+        WorkoutText::finishPrompt(1, 2),
+        QStringLiteral("1 of 2 sets is ticked off. Ending now deletes the other 1 set for good."));
 }
 
 TEST(FinishPromptTest, SeveralTickedSetsUseThePluralVerb)
 {
     EXPECT_EQ(WorkoutText::finishPrompt(3, 22),
-              QStringLiteral("3 of 22 sets are ticked off. The rest stay marked as not done."));
+              QStringLiteral(
+                  "3 of 22 sets are ticked off. Ending now deletes the other 19 sets for good."));
+}
+
+TEST(FinishPromptTest, ThePromptNamesHowManySetsGoAndThatTheyGoForGood)
+{
+    const QString prompt = WorkoutText::finishPrompt(2, 24);
+
+    EXPECT_TRUE(prompt.contains(QStringLiteral("22 sets")));
+    EXPECT_TRUE(prompt.contains(QStringLiteral("deletes")));
+    EXPECT_TRUE(prompt.contains(QStringLiteral("for good")));
 }
 
 TEST(FinishPromptTest, AFullyTickedWorkoutCountsItsSets)

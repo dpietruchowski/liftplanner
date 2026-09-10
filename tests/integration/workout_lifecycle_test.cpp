@@ -43,6 +43,20 @@ protected:
         return active;
     }
 
+    ActiveWorkoutViewModel& startPlannedWorkoutNamed(const QString& json, const QString& name)
+    {
+        importWorkouts(json);
+        auto& active = app.activeWorkoutViewModel();
+
+        for (auto* workout : app.plannedWorkoutViewModel().workouts())
+        {
+            if (workout->name() == name)
+                active.startWorkout(workout);
+        }
+
+        return active;
+    }
+
     QList<WorkoutModel*> reloadHistory()
     {
         app.workoutHistoryViewModel().loadAllWorkouts();
@@ -123,7 +137,7 @@ TEST_F(WorkoutLifecycleTest, AHalfDoneWorkoutCanBeEndedAndReachesHistory)
     EXPECT_EQ(history.first()->endedTime().date(), TimeProvider::instance().currentDate());
 }
 
-TEST_F(WorkoutLifecycleTest, TheSetsTheLifterSkippedStayUnticked)
+TEST_F(WorkoutLifecycleTest, TheSetsTheLifterSkippedAreGoneFromTheRecord)
 {
     auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
     active.completeCurrentSet();
@@ -132,7 +146,77 @@ TEST_F(WorkoutLifecycleTest, TheSetsTheLifterSkippedStayUnticked)
 
     const auto history = reloadHistory();
     ASSERT_EQ(history.size(), 1);
-    EXPECT_EQ(tickedSetsOf(history.first()->toEntity()), 1);
+
+    const Workout stored = history.first()->toEntity();
+    EXPECT_EQ(stored.totalSets(), 1);
+    EXPECT_EQ(tickedSetsOf(stored), 1);
+}
+
+TEST_F(WorkoutLifecycleTest, AnExerciseWithoutASingleTickDoesNotReachTheHistory)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    active.completeCurrentSet();
+
+    active.endWorkout();
+
+    const auto history = reloadHistory();
+    ASSERT_EQ(history.size(), 1);
+
+    const Workout stored = history.first()->toEntity();
+    ASSERT_EQ(stored.exercises().size(), 1u);
+    EXPECT_EQ(stored.exercises().front().name(), "Squat");
+}
+
+TEST_F(WorkoutLifecycleTest, EndingKeepsOnlyTheTickedSetsOfAHalfDoneExercise)
+{
+    auto& active = startPlannedWorkoutNamed(TestData::THREE_WORKOUTS_JSON, "Push Day");
+    active.completeCurrentSet();
+    active.completeCurrentSet();
+
+    active.endWorkout();
+
+    const auto history = reloadHistory();
+    ASSERT_EQ(history.size(), 1);
+
+    const Workout stored = history.first()->toEntity();
+    ASSERT_EQ(stored.exercises().size(), 1u);
+    EXPECT_EQ(stored.exercises().front().name(), "Bench Press");
+    ASSERT_EQ(stored.exercises().front().sets().size(), 2u);
+    EXPECT_EQ(stored.exercises().front().sets()[0].repetitions(), 10);
+    EXPECT_EQ(stored.exercises().front().sets()[1].repetitions(), 8);
+}
+
+TEST_F(WorkoutLifecycleTest, ThePromptCountsExactlyWhatEndingDeletes)
+{
+    auto& active = startPlannedWorkoutNamed(TestData::THREE_WORKOUTS_JSON, "Push Day");
+    active.completeCurrentSet();
+
+    const int announced = active.untickedSetCount();
+    const int planned = active.totalSetCount();
+    EXPECT_TRUE(active.finishPrompt().contains(QString::number(announced)));
+
+    active.endWorkout();
+
+    const auto history = reloadHistory();
+    ASSERT_EQ(history.size(), 1);
+    EXPECT_EQ(history.first()->toEntity().totalSets(), planned - announced);
+}
+
+TEST_F(WorkoutLifecycleTest, AskingWhatWillBeDeletedTouchesNothing)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    active.completeCurrentSet();
+
+    const QString prompt = active.finishPrompt();
+    app.drain();
+
+    EXPECT_FALSE(prompt.isEmpty());
+    EXPECT_EQ(active.untickedSetCount(), 1);
+    EXPECT_EQ(active.totalSetCount(), 2);
+    EXPECT_EQ(active.completedSetCount(), 1);
+    EXPECT_TRUE(active.isActive());
+    ASSERT_NE(active.currentWorkout(), nullptr);
+    EXPECT_EQ(active.currentWorkout()->toEntity().totalSets(), 2);
 }
 
 TEST_F(WorkoutLifecycleTest, OnlyTheTickedSetsOfAHalfDoneSessionCountTowardsVolume)
@@ -263,8 +347,8 @@ TEST_F(WorkoutLifecycleTest, TheSummaryOfAnAbandonedSessionReportsOnlyWhatWasTic
 
     const QVariantMap summary = active.lastSessionSummary();
     EXPECT_EQ(summary["completedSets"].toInt(), 1);
-    EXPECT_EQ(summary["plannedSets"].toInt(), 2);
-    EXPECT_EQ(summary["setsText"].toString(), "1/2");
+    EXPECT_EQ(summary["plannedSets"].toInt(), 1);
+    EXPECT_EQ(summary["setsText"].toString(), "1/1");
     EXPECT_EQ(summary["volumeText"].toString(), "500 kg");
 }
 

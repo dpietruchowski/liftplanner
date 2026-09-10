@@ -169,6 +169,105 @@ TEST_F(PerformedSetsTest, WithMeaningfulFlagsTheExerciseIsReportedUntouched)
     EXPECT_FALSE(performed.sets()[1].completed());
 }
 
+TEST_F(PerformedSetsTest, TrimmingDropsTheUntickedSetsOfATickedExercise)
+{
+    const Workout session = sessionWith({ exerciseWith(
+        QStringLiteral("Bench Press"), { tickedSet(5, 45.0), Set(5, 45.0), tickedSet(5, 50.0) }) });
+
+    const Workout trimmed = trimmedToPerformed(session);
+
+    ASSERT_EQ(trimmed.exercises().size(), 1u);
+    ASSERT_EQ(trimmed.exercises()[0].sets().size(), 2u);
+    EXPECT_DOUBLE_EQ(trimmed.exercises()[0].sets()[0].weight(), 45.0);
+    EXPECT_DOUBLE_EQ(trimmed.exercises()[0].sets()[1].weight(), 50.0);
+}
+
+TEST_F(PerformedSetsTest, TrimmingDropsAnExerciseWithoutASingleTickedSet)
+{
+    const Workout session
+        = sessionWith({ exerciseWith(QStringLiteral("Bench Press"), { tickedSet(5, 45.0) }),
+                        exerciseWith(QStringLiteral("Row"), { Set(8, 40.0), Set(8, 40.0) }),
+                        exerciseWith(QStringLiteral("Curl"), {}) });
+
+    const Workout trimmed = trimmedToPerformed(session);
+
+    ASSERT_EQ(trimmed.exercises().size(), 1u);
+    EXPECT_EQ(trimmed.exercises()[0].name(), QStringLiteral("Bench Press"));
+}
+
+TEST_F(PerformedSetsTest, TrimmingRenumbersWhatIsLeft)
+{
+    const Workout session
+        = sessionWith({ exerciseWith(QStringLiteral("Row"), { Set(8, 40.0) }),
+                        exerciseWith(QStringLiteral("Bench Press"),
+                                     { Set(5, 45.0), tickedSet(5, 50.0), tickedSet(5, 55.0) }) });
+
+    const Workout trimmed = trimmedToPerformed(session);
+
+    ASSERT_EQ(trimmed.exercises().size(), 1u);
+    EXPECT_EQ(trimmed.exercises()[0].position(), 0);
+    ASSERT_EQ(trimmed.exercises()[0].sets().size(), 2u);
+    EXPECT_EQ(trimmed.exercises()[0].sets()[0].position(), 0);
+    EXPECT_EQ(trimmed.exercises()[0].sets()[1].position(), 1);
+}
+
+TEST_F(PerformedSetsTest, ASessionWithoutASingleTickIsKeptWholeByTrimming)
+{
+    const Workout session
+        = sessionWith({ exerciseWith(QStringLiteral("Bench Press"), { Set(5, 45.0), Set(5, 45.0) }),
+                        exerciseWith(QStringLiteral("Row"), { Set(8, 40.0) }) });
+
+    const Workout trimmed = trimmedToPerformed(session);
+
+    ASSERT_EQ(trimmed.exercises().size(), 2u);
+    EXPECT_EQ(trimmed.exercises()[0].sets().size(), 2u);
+    EXPECT_EQ(trimmed.exercises()[1].sets().size(), 1u);
+}
+
+TEST_F(PerformedSetsTest, TrimmingKeepsTheSessionItselfUntouched)
+{
+    Workout session
+        = sessionWith({ exerciseWith(QStringLiteral("Bench Press"), { tickedSet(5, 45.0) }) });
+    session.setId(172);
+    session.setStatus(WorkoutStatus::Ended);
+
+    const Workout trimmed = trimmedToPerformed(session);
+
+    EXPECT_EQ(trimmed.id(), 172);
+    EXPECT_EQ(trimmed.name(), QStringLiteral("Base Strength"));
+    EXPECT_EQ(trimmed.status(), WorkoutStatus::Ended);
+    EXPECT_EQ(trimmed.createdTime(), session.createdTime());
+}
+
+TEST_F(PerformedSetsTest, TrimmingKeepsTheIdentityOfTheSetsItKeeps)
+{
+    Set kept = tickedSet(5, 45.0);
+    kept.setId(9001);
+    Set dropped(5, 45.0);
+    dropped.setId(9002);
+
+    const Workout session
+        = sessionWith({ exerciseWith(QStringLiteral("Bench Press"), { dropped, kept }) });
+
+    const Workout trimmed = trimmedToPerformed(session);
+
+    ASSERT_EQ(trimmed.exercises().size(), 1u);
+    ASSERT_EQ(trimmed.exercises()[0].sets().size(), 1u);
+    EXPECT_EQ(trimmed.exercises()[0].sets()[0].id(), 9001);
+}
+
+TEST_F(PerformedSetsTest, ATrimmedSessionCountsAsFullyPerformed)
+{
+    const Workout session
+        = sessionWith({ exerciseWith(QStringLiteral("Bench Press"), { tickedSet(5, 45.0) }),
+                        exerciseWith(QStringLiteral("Row"), { Set(8, 40.0) }) });
+
+    const Workout trimmed = trimmedToPerformed(session);
+
+    EXPECT_TRUE(trimmed.isCompleted());
+    EXPECT_EQ(trimmed.totalSets(), 1);
+}
+
 TEST_F(PerformedSetsTest, ReportingAsPerformedKeepsTheValues)
 {
     const Exercise bench = exerciseWith(QStringLiteral("Bench Press"), { Set(5, 45.0) });

@@ -72,6 +72,7 @@ Popup {
         }
 
         Text {
+            objectName: "notificationTitleText"
             Layout.fillWidth: true
             text: notificationPopup.title
             color: Theme.colors.textPrimary
@@ -83,6 +84,7 @@ Popup {
         }
 
         Text {
+            objectName: "notificationBodyText"
             Layout.fillWidth: true
             text: notificationPopup.text
             color: Theme.colors.textSecondary

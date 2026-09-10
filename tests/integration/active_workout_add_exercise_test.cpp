@@ -245,7 +245,7 @@ TEST_F(ActiveWorkoutAddExerciseTest, TheAddedExerciseIsTheLastOneInTheStoredSess
     EXPECT_EQ(stored.exercises().back().name(), QStringLiteral("Back Squat"));
 }
 
-TEST_F(ActiveWorkoutAddExerciseTest, TickingOnlyTheAddedExerciseLeavesThePlanMarkedAsSkipped)
+TEST_F(ActiveWorkoutAddExerciseTest, TickingOnlyTheAddedExerciseDropsThePlannedOneFromTheRecord)
 {
     startPlannedWorkout();
     addExercise(QStringLiteral("Back Squat"));
@@ -259,13 +259,12 @@ TEST_F(ActiveWorkoutAddExerciseTest, TickingOnlyTheAddedExerciseLeavesThePlanMar
     ASSERT_TRUE(completionFlagsAreMeaningful(stored));
 
     const Exercise* added = exerciseNamed(stored, QStringLiteral("Back Squat"));
-    const Exercise* planned = exerciseNamed(stored, QStringLiteral("Bench Press"));
     ASSERT_NE(added, nullptr);
-    ASSERT_NE(planned, nullptr);
+    EXPECT_EQ(exerciseNamed(stored, QStringLiteral("Bench Press")), nullptr);
 
+    ASSERT_EQ(added->sets().size(), 1u);
     EXPECT_TRUE(added->sets().front().completed());
     EXPECT_TRUE(wasPerformed(*added, true));
-    EXPECT_FALSE(wasPerformed(*planned, true));
 }
 
 TEST_F(ActiveWorkoutAddExerciseTest, ASessionWithoutASingleTickKeepsTheAmnestyAfterAnAddition)

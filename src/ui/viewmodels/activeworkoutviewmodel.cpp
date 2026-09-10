@@ -311,8 +311,13 @@ void ActiveWorkoutViewModel::endWorkout()
 
     m_timer->stop();
     m_currentWorkout->end();
-    saveToDb();
-    captureSessionSummary();
+
+    const Workout recorded = trimmedToPerformed(m_currentWorkout->toEntity());
+
+    if (m_service)
+        m_service->saveWorkout(recorded).warnOnError("record the finished workout");
+
+    captureSessionSummary(recorded);
     emit workoutCompleted();
 
     auto* oldWorkout = m_currentWorkout;
@@ -378,6 +383,11 @@ int ActiveWorkoutViewModel::totalSetCount() const
     return total;
 }
 
+int ActiveWorkoutViewModel::untickedSetCount() const
+{
+    return totalSetCount() - completedSetCount();
+}
+
 bool ActiveWorkoutViewModel::hasAnythingToRecord() const { return completedSetCount() > 0; }
 
 QString ActiveWorkoutViewModel::finishPrompt() const
@@ -417,16 +427,12 @@ void ActiveWorkoutViewModel::loadExerciseSessions(ExerciseModel* exercise)
         .warnOnError("load the sessions of one exercise");
 }
 
-void ActiveWorkoutViewModel::captureSessionSummary()
+void ActiveWorkoutViewModel::captureSessionSummary(const Workout& recorded)
 {
-    if (!m_currentWorkout)
-        return;
-
-    const Workout entity = m_currentWorkout->toEntity();
-    const SessionSummary summary = summarizeSession(entity);
+    const SessionSummary summary = summarizeSession(recorded);
 
     QVariantMap map;
-    map[QStringLiteral("name")] = entity.name();
+    map[QStringLiteral("name")] = recorded.name();
     map[QStringLiteral("completedSets")] = summary.completedSets;
     map[QStringLiteral("plannedSets")] = summary.plannedSets;
     map[QStringLiteral("volume")] = summary.volume;
