@@ -17,6 +17,7 @@ class WorkoutEditorViewModel : public QObject
     Q_PROPERTY(WorkoutModel* workout READ workout NOTIFY workoutChanged)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY workoutChanged)
     Q_PROPERTY(QDateTime plannedTime READ plannedTime WRITE setPlannedTime NOTIFY workoutChanged)
+    Q_PROPERTY(QString plannedDayText READ plannedDayText NOTIFY workoutChanged)
     Q_PROPERTY(bool editing READ isEditing NOTIFY workoutChanged)
     Q_PROPERTY(int exerciseCount READ exerciseCount NOTIFY workoutChanged)
     Q_PROPERTY(bool valid READ isValid NOTIFY workoutChanged)
@@ -31,6 +32,7 @@ public:
     WorkoutModel* workout() const;
     QString name() const;
     QDateTime plannedTime() const;
+    QString plannedDayText() const;
     bool isEditing() const;
     int exerciseCount() const;
     bool isValid() const;
@@ -44,6 +46,7 @@ public:
     Q_INVOKABLE void edit(int workoutId);
     Q_INVOKABLE void startFromTemplate(int templateId, const QDateTime& plannedTime);
     Q_INVOKABLE void discard();
+    Q_INVOKABLE void shiftPlannedDay(int days);
 
     Q_INVOKABLE void addExercise(ExerciseDefinitionModel* definition);
     Q_INVOKABLE void removeExercise(int exerciseIndex);

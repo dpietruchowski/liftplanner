@@ -15,6 +15,7 @@ WorkoutCard {
     objectName: "plannedWorkoutItem" + itemIndex
     expandButtonName: "plannedWorkoutExpandButton" + itemIndex
     titleName: "plannedWorkoutTitle" + itemIndex
+    dateName: "plannedWorkoutDate" + itemIndex
     chipPrefix: "plannedWorkoutSetChip" + itemIndex
     borderColor: Theme.colors.primaryBorder
     dateColor: Theme.colors.primary

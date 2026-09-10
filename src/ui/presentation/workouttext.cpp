@@ -1,5 +1,6 @@
 #include "workouttext.h"
 #include "ui/presentation/plural.h"
+#include <QLocale>
 #include <QRegularExpression>
 #include <QStringList>
 
@@ -34,6 +35,22 @@ QString amnestyLossWarning(const QString& workoutName, int plannedSets)
     return QStringLiteral("%1 has no ticked sets, so the whole session counts as done. "
                           "Ticking this one marks the other %2 as skipped.")
         .arg(name, Plural::counted(rest, QStringLiteral("set"), QStringLiteral("sets")));
+}
+
+QString plannedDayLabel(const QDate& day, const QDate& today)
+{
+    if (!day.isValid())
+        return QStringLiteral("No day set");
+
+    const QString date = QLocale::c().toString(day, QStringLiteral("ddd, d MMM yyyy"));
+    const qint64 distance = today.isValid() ? today.daysTo(day) : 1;
+
+    if (distance == 0)
+        return QStringLiteral("Today · %1").arg(date);
+    if (distance == 1)
+        return QStringLiteral("Tomorrow · %1").arg(date);
+
+    return date;
 }
 
 QString formatDuration(qint64 seconds)

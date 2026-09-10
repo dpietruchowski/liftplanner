@@ -8,7 +8,7 @@ najpierw przepływy, które urywają się w połowie, potem zdolności, które
 aplikacja ma, ale nigdy nie oferuje, potem rzeczy, po których traci się do niej
 zaufanie, a dopiero na końcu nowe powierzchnie.
 
-## Stan produktu po 21 iteracjach
+## Stan produktu po 23 iteracjach
 
 Ocena product managera, nie sprawozdanie — spis zrobionej roboty jest w commitach
 i w sekcji „Done". To jest punkt wyjścia dla następnej sesji.
@@ -34,14 +34,15 @@ naprawdę zostało zrobione.
 
 ### Czego brakuje najbardziej — moim zdaniem, w tej kolejności
 
-1. **Poprawienia tego, co już zapisane (G13).** Cała ta tura poszła w to, żeby
-   historia mówiła prawdę. Brakuje ostatniego elementu: kiedy prawda była inna
-   niż zapis — telefon padł, ptaszek poszedł przez pomyłkę — jedynym wyjściem
-   jest skasować całą sesję. To dziś najostrzejsza dziura i jedyna, która stoi w
-   poprzek dorobku poprzednich iteracji.
-2. **Planowania w czasie (G2).** Aplikacja umie „dziś". Rozłożenie tygodnia na
+1. **Planowania w czasie (G2).** Aplikacja umie „dziś". Rozłożenie tygodnia na
    poniedziałek, środę i piątek bez pomocy AI nie jest możliwe, bo w edytorze nie
-   ma wyboru dnia.
+   ma wyboru dnia. Po zamknięciu G13 to jedyna duża rzecz, której nie da się
+   obejść żadną inną drogą w aplikacji.
+2. **Poprawienia liczb w zapisanym treningu (G13b).** Plaster pierwszy zamknął
+   pomyłkę w odhaczeniu; ciężar i powtórzenia w zakończonej sesji nadal są tylko
+   do czytania. Obejście istnieje — eksport, poprawka w tekście, import, i od G33
+   przeżywa to wykonanie serii — więc pilność jest mniejsza niż przy plastrze
+   pierwszym.
 3. **Drobiazgów edytora, każdy S:** kolejność serii (G11), notatka do ćwiczenia
    (G12), filtr po mięśniu w katalogu (G10). Wszystkie trzy to zdolności, które
    siedzą gotowe w view modelach i czekają wyłącznie na wejście z ekranu.
@@ -49,13 +50,12 @@ naprawdę zostało zrobione.
    zna ciężaru (G18), funty wybrane w profilu bez pokrycia w reszcie aplikacji
    (G29), pusty trening, który da się zapisać i wystartować (G17).
 
-### Od czego zacząłbym następną turę
+### Od czego zacząłbym dalej
 
-Od **G13, pierwszy plaster: poprawienie pojedynczej serii w zakończonym
-treningu**, bez zmiany składu ćwiczeń. To domyka wątek, który przeszedł przez
-całą tę turę, i jest jedyną pozycją L, której nie da się obejść inną drogą.
-Zaraz po niej G2, a potem seria S-ek z punktu 3 — one dają najwięcej odczucia
-kompletności za najmniej roboty.
+Od **G2 — wyboru dnia w edytorze**. To ostatnia rzecz, której użytkownik nie ma
+jak obejść: bez AI nie rozłoży tygodnia. Potem seria S-ek z punktu 3 (G11, G12,
+G10) — dają najwięcej odczucia kompletności za najmniej roboty — a G13b wtedy,
+gdy któryś raz okaże się, że eksport-poprawka-import jest za dużym zachodem.
 
 ### Trzy wnioski metodyczne dla następnej sesji
 
@@ -72,23 +72,22 @@ kompletności za najmniej roboty.
 
 ## Open
 
-### G2 — Wybór dnia zaplanowanego treningu
-- **Dla kogo/po co:** manualnie utworzony trening zawsze ląduje na „teraz", więc
-  tygodnia nie da się rozłożyć na poniedziałek, środę i piątek z wyprzedzeniem.
-- **Waga po sprawdzeniu:** mniejsza, niż pisałem wcześniej. Import z AI, czyli
-  sztandarowa droga do tej aplikacji, **przenosi daty** — `planned_time` jest i
-  w zapisie, i w odczycie (`workoutjson.cpp:340-341`). Dziura dotyczy więc
-  wyłącznie ścieżki ręcznej i szablonów, nie całego planowania.
-- **Dowód:** `MainView.qml:54` woła `WorkoutEditorViewModel.createNew("", new
-  Date())`, a `MainView.qml:47` — `startFromTemplate(templateId, new Date())`.
-  `ScreenWorkoutEditor.qml` (118 linii) nie ma żadnej kontrolki daty, choć
-  `plannedTime` jest zapisywalną właściwością view modelu
-  (`workouteditorviewmodel.h:19`). W efekcie `PlannedWorkoutItem.qml:13`
-  wyświetla dla wszystkich treningów dzisiejszą datę.
+### G13b — Ciężar i powtórzenia w zakończonym treningu tylko do czytania
+- **Dla kogo/po co:** drugi plaster po G13. Odhaczenie da się już poprawić, ale
+  jeśli podniosłeś 65 kg zamiast zaplanowanych 60 i nie zmieniłeś tego przed
+  ptaszkiem, historia zostaje z sześćdziesiątką — i tę sześćdziesiątkę dziedziczy
+  następny trening, statystyki i prompt dla AI.
+- **Dowód:** `WorkoutHistoryViewModel::saveWorkout` przyjmuje cały trening, więc
+  droga zapisu istnieje i po G13 jest już używana; w rozwiniętym kaflu historii
+  klikalne jest wyłącznie wykonanie serii, sama liczba nie.
+- **Waga:** niższa niż plaster pierwszy, bo obejście istnieje i od G33 jest
+  bezpieczne: eksport do schowka, poprawka w tekście, import z powrotem —
+  wykonanie serii przeżywa tę podróż.
 - **Zakres:** M
-- **Gotowe, gdy:** w edytorze treningu da się ustawić dzień; po zapisie kafel na
-  liście zaplanowanych pokazuje wybrany dzień, a nie dzisiejszy, i ta data
-  przeżywa restart aplikacji.
+- **Gotowe, gdy:** w rozwiniętym kaflu treningu z historii da się zmienić ciężar
+  i powtórzenia pojedynczej serii; zmiana przeżywa restart; objętość i „ostatnio"
+  na ekranie głównym liczą się po zmianie z nowej wartości; wykonanie serii nie
+  zmienia się przy okazji edycji liczby.
 
 ### G17 — Pusty trening da się zapisać i wystartować
 - **Dla kogo/po co:** trening bez ani jednego ćwiczenia trafia na listę
@@ -235,6 +234,68 @@ Osobna iteracja na samą wielkość liter byłaby marnotrawstwem, a G8 i tak dok
 kafelki podsumowania — więc warunek spójności etykiet stał się częścią G8.
 
 ## Done
+
+### G13 — Poprawienie zakończonego treningu, plaster 1: jedna seria (iteracja 23)
+Żeton serii w rozwiniętym kaflu historii jest klikalny i przełącza wykonanie;
+zmiana przeżywa restart, a kafel nie zwija się przy zapisie. Sesja bez ani jednej
+flagi najpierw ostrzega, że pierwszy ptaszek odbiera jej amnestię i pozostałe
+serie staną się opuszczone — „Cancel" nie rusza ani ekranu, ani bazy. Szóste
+spotkanie pętli z pułapką pustych flag i pierwsze, w którym nie dało się jej
+uniknąć: sesja bez flag musi ją stracić, więc rzecz była w tym, żeby nie
+zaskoczyć nią człowieka.
+
+### G32 — Aplikacja nie umie odmieniać tego, co policzyła (iteracja 22)
+Jedno miejsce odmienia policzone rzeczy, więc popup kończący trening i kafel
+szablonu przestały mówić „1 exercises" i „1 of 22 sets are". Zlepione z trzech
+osobnych wystąpień właśnie po to, żeby czwarty licznik nie odtworzył problemu.
+
+### G33 — Kopia zapasowa historii wracała jako trening zrobiony w całości (iteracja 21)
+Eksport i ponowny import zachowują teraz to, które serie były zrobione — wcześniej
+kompaktowy zapis gubił wykonanie, a amnestia dla sesji bez flag zamieniała „1 z 22"
+w „22 z 22". Stary format nadal się importuje, plan wchodzi jako niezrobiony.
+
+### G26 — Nieudany import historii milczał (iteracja 20)
+Śmieć w schowku, pusty schowek, zły kształt JSON-a, element bez nazwy i błąd
+zapisu mają osobne komunikaty; udany import nadal nic nie mówi.
+
+### G9 — Nie dało się dorzucić ćwiczenia w trakcie treningu (iteracja 19)
+Pasek akcji aktywnego treningu otwiera ten sam picker co edytor. Dorzucone
+ćwiczenie ląduje na końcu z serią do odhaczenia, wchodzi z ciężarem i rodzajem z
+ostatniego razu (zasiew przechodzi przez amnestię, więc widzi też historię z
+importu) i trafia do historii oznaczone dokładnie tak, jak zostało odhaczone.
+Przeżywa też powrót sesji na listę zaplanowanych.
+
+### G31 — Historia pokazywała serię opuszczoną tak samo jak zrobioną (iteracja 18)
+Żeton serii mówi, czy seria została zrobiona, i rozstrzyga o tym wspólna reguła z
+`performedsets.h`, nie surowa flaga — dzięki czemu sesja bez ani jednej flagi
+(import) nadal pokazuje się jako zrobiona, a kafel zaplanowany nie oznacza
+wszystkiego jako opuszczone.
+
+### G6 — Czas przerwy był niewidoczny i nie do ustawienia (iteracja 17)
+W edytorze przy każdym ćwiczeniu jest wiersz „REST − wartość +", wartość czyta się
+z prawdziwych danych, przeżywa zapis, a timer po odhaczeniu serii odlicza właśnie
+od niej. Nadpisanie przy pojedynczej serii świadomie zostało poza zakresem.
+
+### G30 — Na bębnie nie dało się przeczytać, co się wystartuje (iteracja 16)
+Zaznaczony wiersz zawija nazwę na dwie linie, niezaznaczone ściskają ją zamiast
+elidować. Wysokość ekranu głównego z G28 nie ucierpiała.
+
+### G28 — Ekran główny nie mieścił się i tnął własny przycisk startu (iteracja 15)
+Kolumna treści dostała twardy limit wysokości, nadmiar pochłania bęben. Nagłówek z
+datą i przycisk startu z pełnym napisem mieszczą się na 360 × 640.
+
+### G16 — Nazwa treningu na kaflu przegrywała z przyciskami (iteracja 14)
+Edycja i usunięcie zeszły do części rozwijanej, w nagłówku został sam start, a
+tytuł zawija się zamiast elidować.
+
+### G27 — Zamiana trwającego treningu kasowała go bez ostrzeżenia (iteracja 13)
+Przerwana sesja z ptaszkiem idzie do historii, bez ptaszków wraca na listę
+zaplanowanych, a potwierdzenie mówi z góry, co się stanie. Wcześniej wiersz
+znikał z bazy całkiem.
+
+### G4 — „Start workout" ignorował wybór na bębnie (iteracja 12)
+Startuje trening zaznaczony na bębnie. Pozycja, której nie da się wystartować,
+tłumaczy dlaczego i odsyła do powtórzenia z historii, zamiast ruszać cudzy trening.
 
 ### G25 — Nie da się powtórzyć treningu, który się już zrobiło (iteracja 11)
 Rozwinięty kafel w historii ma akcję powtórzenia: tworzy nowy zaplanowany trening

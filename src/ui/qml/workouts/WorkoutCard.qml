@@ -22,6 +22,7 @@ Rectangle {
     property Component expandedActions: null
     property string expandButtonName: ""
     property string titleName: ""
+    property string dateName: ""
     property string chipPrefix: ""
 
     default property alias headerActions: headerActionsRow.data
@@ -71,6 +72,7 @@ Rectangle {
                 dateText: root.dateText
                 dateColor: root.dateColor
                 titleName: root.titleName
+                dateName: root.dateName
             }
 
             Row {

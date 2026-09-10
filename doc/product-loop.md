@@ -119,10 +119,9 @@ aplikacja nie wstawała), G23 (ekran nie odświeżał listy, baza była poprawna
 G8 (ucięta etykieta), G27 i pośrednio G32 (odmiana liczebników). Żadnego z nich
 nie złapałby build ani testy jednostkowe.
 
-- **Iteracja:** 23 zamknięta (G13, pierwszy plaster — przełączanie wykonania
-  pojedynczej serii w zakończonym treningu)
+- **Iteracja:** 24 zamknięta (G2 — wybór dnia zaplanowanego treningu)
 - **W locie:** nic
-- **Ostatni commit pętli:** G13
+- **Ostatni commit pętli:** G2
 - **Zużyty przypadek testowy:** `w4 Base Strength` nie jest już „importem bez ani
   jednej flagi" — postawiłem w nim ptaszek, sprawdzając G13. Zastępniki: `w36`,
   `w61`, `w62`, `w111`, `w112`.

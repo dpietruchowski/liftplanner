@@ -10,6 +10,7 @@ ColumnLayout {
     property string dateText: ""
     property color dateColor: Theme.colors.textMuted
     property string titleName: ""
+    property string dateName: ""
 
     spacing: 2
 
@@ -26,6 +27,7 @@ ColumnLayout {
     }
 
     Text {
+        objectName: root.dateName
         Layout.fillWidth: true
         text: root.dateText
         font.pixelSize: Theme.fontSize.small

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "domain/workout/workout.h"
+#include <QDate>
 #include <QString>
 
 namespace WorkoutText
@@ -16,6 +17,7 @@ QString workoutToText(const Workout& workout);
 // "900 kg" / "12 400 kg".
 QString finishPrompt(int completedSets, int plannedSets);
 QString amnestyLossWarning(const QString& workoutName, int plannedSets);
+QString plannedDayLabel(const QDate& day, const QDate& today);
 
 QString formatDuration(qint64 seconds);
 QString formatRest(int seconds);

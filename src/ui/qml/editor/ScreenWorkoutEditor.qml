@@ -83,6 +83,16 @@ Rectangle {
             onTextChanged: WorkoutEditorViewModel.name = text
         }
 
+        StepperField {
+            Layout.fillWidth: true
+            label: WorkoutEditorViewModel.plannedDayText
+            labelName: "plannedDayValue"
+            decrementName: "plannedDayPreviousButton"
+            incrementName: "plannedDayNextButton"
+            onDecremented: WorkoutEditorViewModel.shiftPlannedDay(-1)
+            onIncremented: WorkoutEditorViewModel.shiftPlannedDay(1)
+        }
+
         ScrollView {
             id: scrollView
             objectName: "editorScrollView"

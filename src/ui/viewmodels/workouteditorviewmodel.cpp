@@ -8,6 +8,7 @@
 #include "domain/workout/setadjustment.h"
 #include "domain/workout/setcompatibility.h"
 #include "domain/workout/setseeding.h"
+#include "ui/presentation/workouttext.h"
 #include <algorithm>
 
 WorkoutEditorViewModel::WorkoutEditorViewModel(WorkoutService* service,
@@ -26,6 +27,27 @@ WorkoutModel* WorkoutEditorViewModel::workout() const { return m_model; }
 QString WorkoutEditorViewModel::name() const { return m_workout.name(); }
 
 QDateTime WorkoutEditorViewModel::plannedTime() const { return m_workout.plannedTime(); }
+
+QString WorkoutEditorViewModel::plannedDayText() const
+{
+    if (!m_editing)
+        return QString();
+
+    return WorkoutText::plannedDayLabel(m_workout.plannedTime().date(),
+                                        TimeProvider::instance().currentDate());
+}
+
+void WorkoutEditorViewModel::shiftPlannedDay(int days)
+{
+    if (!m_editing || days == 0)
+        return;
+
+    const QDateTime current = m_workout.plannedTime().isValid()
+        ? m_workout.plannedTime()
+        : TimeProvider::instance().currentDateTime();
+
+    setPlannedTime(current.addDays(days));
+}
 
 bool WorkoutEditorViewModel::isEditing() const { return m_editing; }
 
