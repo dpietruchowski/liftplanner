@@ -2,6 +2,7 @@
 #include "application/workout/workoutservice.h"
 #include "async/timeprovider.h"
 #include "infrastructure/workout/workoutjson.h"
+#include "ui/presentation/historyimportcheck.h"
 #include "ui/presentation/workouttext.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
 #include <QDate>
@@ -212,45 +213,37 @@ QVariantList WorkoutHistoryViewModel::recentTotals() const { return m_recentTota
 
 void WorkoutHistoryViewModel::importFromJson(const QString& jsonData)
 {
-    try
+    const QString problem = HistoryImportCheck::payloadProblem(jsonData);
+    if (!problem.isEmpty())
     {
-        QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
-        if (doc.isNull() || !doc.isArray())
-        {
-            emit errorOccurred("Import failed: invalid JSON");
-            return;
-        }
+        emit errorOccurred(problem);
+        return;
+    }
 
-        auto workouts = WorkoutJson::workoutsFromJsonArray(doc.array());
-        if (m_service)
-            m_service->importHistory(workouts).warnOnError("import the workout history");
-        loadAllWorkouts();
-    }
-    catch (const std::exception& e)
-    {
-        emit errorOccurred(QString("Import failed: %1").arg(e.what()));
-    }
+    if (!m_service)
+        return;
+
+    const QJsonDocument doc = QJsonDocument::fromJson(jsonData.toUtf8());
+    const auto workouts = WorkoutJson::workoutsFromJsonArray(doc.array());
+
+    m_service->importHistory(workouts)
+        .then(this, [this] { loadAllWorkouts(); })
+        .onError(this, [this](const QString& error)
+                 { emit errorOccurred(QStringLiteral("Import failed: %1").arg(error)); });
 }
 
 void WorkoutHistoryViewModel::importFromClipboard()
 {
-    try
-    {
-        QClipboard* clipboard = QGuiApplication::clipboard();
-        QString jsonData = clipboard->text();
+    const QString clipboardText = QGuiApplication::clipboard()->text();
 
-        if (jsonData.isEmpty())
-        {
-            emit errorOccurred("Clipboard is empty");
-            return;
-        }
-
-        importFromJson(jsonData);
-    }
-    catch (const std::exception& e)
+    const QString problem = HistoryImportCheck::clipboardProblem(clipboardText);
+    if (!problem.isEmpty())
     {
-        emit errorOccurred(QString("Import from clipboard failed: %1").arg(e.what()));
+        emit errorOccurred(problem);
+        return;
     }
+
+    importFromJson(clipboardText);
 }
 
 void WorkoutHistoryViewModel::exportToClipboard(int limit)

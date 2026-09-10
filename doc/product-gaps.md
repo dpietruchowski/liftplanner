@@ -10,6 +10,27 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
 
 ## Open
 
+### G32 — Aplikacja nie umie odmieniać tego, co policzyła (wchłania dawne G32)
+- **Dla kogo/po co:** wszędzie tam, gdzie aplikacja podsumowuje twoją robotę
+  liczbą, gramatyka się sypie. Pojedynczo to drobiazg, ale zdarza się dokładnie w
+  momentach rozliczenia — przy kończeniu treningu i przy wybieraniu planu na
+  dziś — czyli tam, gdzie aplikacja ma brzmieć wiarygodnie.
+- **Dowód:** trzy niezależne wystąpienia tej samej rzeczy, każde zobaczone w
+  działającej aplikacji: „1 of 22 sets **are** ticked off" w popupie kończącym
+  trening (raport z iteracji 19), „1 exercises · 1 sets" na kaflu szablonu
+  (`tmp/loop/pm17-templates.png`), oraz „1 of 1 sets" w tym samym popupie, przez
+  które poszedł zawrót w iteracji 13. Ten trzeci został wtedy naprawiony
+  **w jednym miejscu, ręcznie**, i właśnie dlatego dwa pozostałe przeżyły.
+- **Dlaczego jedna pozycja, a nie trzy:** to nie są trzy wpadki, tylko brak
+  jednego miejsca, które odmienia policzone rzeczy. Łatane po kolei, wróci przy
+  czwartym liczniku, który ktoś dopisze.
+- **Zakres:** S
+- **Gotowe, gdy:** popup kończący trening przy jednej odhaczonej serii z
+  dwudziestu dwóch brzmi „1 of 22 sets **is** ticked off"; kafel szablonu z
+  jednym ćwiczeniem i jedną serią jest opisany w liczbie pojedynczej, a z kilkoma
+  — w mnogiej; obie liczby w tym samym zdaniu odmieniają się niezależnie (jedna
+  seria z dwóch to nadal „1 of 2 sets").
+
 ### G2 — Wybór dnia zaplanowanego treningu
 - **Dla kogo/po co:** manualnie utworzony trening zawsze ląduje na „teraz", więc
   tygodnia nie da się rozłożyć na poniedziałek, środę i piątek z wyprzedzeniem.
@@ -44,27 +65,6 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
 - **Gotowe, gdy:** w edytorze trening bez ćwiczeń nie da się zapisać, a przy
   zablokowanym przycisku widać, że brakuje ćwiczeń; trening z co najmniej jednym
   ćwiczeniem zapisuje się jak dotąd.
-
-### G26 — Nieudany import historii milczy
-- **Dla kogo/po co:** wklejasz do schowka JSON od AI, klikasz import historii,
-  potwierdzasz — i nie dzieje się absolutnie nic. Nie wiadomo, czy plan był zły,
-  czy schowek pusty, czy aplikacja zamarła. Ta sama akcja obok, przy „Planned",
-  potrafi powiedzieć, co poszło nie tak, więc użytkownik dostaje dwa różne
-  zachowania na dwóch sąsiednich przyciskach tego samego ekranu.
-- **Dowód:** `MainView.qml:148-180` podpina komunikaty o błędach do trzech view
-  modeli: `PlannedWorkoutViewModel`, `WorkoutEditorViewModel`,
-  `WorkoutTemplateViewModel`. `WorkoutHistoryViewModel` na tej liście nie ma, a
-  zgłasza błędy w sześciu miejscach, m.in. „Import failed: invalid JSON"
-  (`workouthistoryviewmodel.cpp:218`) i „Clipboard is empty" (`:242`) — to
-  dokładnie ścieżka przycisku `importHistoryButton`
-  (`ScreenWorkouts.qml:164-173`).
-- **Zawężone po iteracji 12:** druga połowa tej pozycji („martwy przycisk startu")
-  odpadła — G4 dołożył `cannotStartPopup`, który mówi, czemu minionego treningu
-  nie da się wystartować, i odsyła do powtórzenia z historii. Zostaje sam import.
-- **Zakres:** S
-- **Gotowe, gdy:** import historii ze śmieciem w schowku (albo z pustym
-  schowkiem) pokazuje komunikat mówiący, co się nie udało, a poprawny import
-  nadal wchodzi bez ostrzeżeń.
 
 ### G29 — Wybór funtów w profilu kończy się na profilu
 - **Dla kogo/po co:** ustawiasz „Imperial (lb)", a cała reszta aplikacji dalej
@@ -157,17 +157,6 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
 - **Zakres:** L
 - **Gotowe, gdy:** (do rozbicia — pierwszy plaster to zmiana nazwy istniejącego
   szablonu)
-
-### G32 — „1 exercises · 1 sets" na kaflu szablonu
-- **Dla kogo/po co:** drobiazg, ale stoi na kaflu, po którym wybiera się plan na
-  dziś, i wygląda na niedokończoną aplikację. Ta sama klasa usterki zawróciła już
-  raz robotę w iteracji 13 („1 of 1 sets"), więc wiadomo, że rzuca się w oczy.
-- **Dowód:** zobaczyłem to na ekranie szablonów w działającej aplikacji
-  (`tmp/loop/pm17-templates.png`): kafel „Regression Template" ma podpis
-  „1 exercises · 1 sets".
-- **Zakres:** S
-- **Gotowe, gdy:** szablon z jednym ćwiczeniem i jedną serią opisany jest w
-  liczbie pojedynczej, a szablon z kilkoma — w mnogiej.
 
 ## Odrzucone
 

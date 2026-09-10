@@ -187,6 +187,11 @@ Item {
         function onErrorOccurred(error) { root.showError(error) }
     }
 
+    Connections {
+        target: WorkoutHistoryViewModel
+        function onErrorOccurred(error) { root.showError(error) }
+    }
+
     ThemedBottomNavigation {
         id: bottomNav
         objectName: "bottomNav"

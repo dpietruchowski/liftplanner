@@ -94,9 +94,18 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 19 zamknięta (G9 — dorzucenie ćwiczenia w trakcie treningu)
+- **Iteracja:** 20 zamknięta (G26 — nieudany import historii mówi, co się stało)
 - **W locie:** nic
-- **Ostatni commit pętli:** G9
+- **Ostatni commit pętli:** G26
+- **Piaskownica `tmp/run` spuchła do 55 treningów**, w większości duplikatów po
+  testach eksport → import. Świeżą daje usunięcie katalogu `tmp/run` (sesja UI
+  odtworzy go z kopii bazy), ale przepadną stany zbudowane przez pętlę: przerwy
+  z G6, dorzucone ćwiczenia z G9, nazwy z G16/G30.
+- **Schowek w sesji offscreen** żyje wewnątrz procesu, więc `xclip` go nie
+  dosięga. Wstawianie treści: `set:notificationPopup.text=…`,
+  `set:notificationPopup.copyEnabled=true`, `invoke:notificationPopup.open`,
+  `click:notificationCopyButton`. Poprawny JSON historii najprościej wrzucić
+  przyciskiem `exportHistoryButton`.
 - **Sprawdzając zasiew z historii, nie ufaj danym, które zostawił developer.**
   Przy G9 pierwszy przebieg czytał wpis, który sam odłożył w `tmp/run`, i nie
   dowodził niczego. Dopiero ćwiczenie z historii **z importu, bez ani jednej
