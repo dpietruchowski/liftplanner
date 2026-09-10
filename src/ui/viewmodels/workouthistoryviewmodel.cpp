@@ -38,6 +38,8 @@ WorkoutHistoryViewModel::WorkoutHistoryViewModel(WorkoutService* service,
                 &WorkoutHistoryViewModel::weekActivityChanged);
         connect(m_activeWorkoutViewModel, &ActiveWorkoutViewModel::workoutCompleted, this,
                 &WorkoutHistoryViewModel::loadAllWorkouts);
+        connect(m_activeWorkoutViewModel, &ActiveWorkoutViewModel::interruptedWorkoutSettled, this,
+                &WorkoutHistoryViewModel::loadAllWorkouts);
     }
 
     loadAllWorkouts();

@@ -42,6 +42,31 @@ QString messageOf(const QVariantMap& decision)
     return decision.value(QString::fromLatin1(WorkoutStartPolicy::messageKey)).toString();
 }
 
+QString confirmationOf(const QVariantMap& decision)
+{
+    return decision.value(QString::fromLatin1(WorkoutStartPolicy::confirmationKey)).toString();
+}
+
+Set tickedSet(int repetitions, double weight)
+{
+    Set set(repetitions, weight);
+    set.setCompleted(true);
+    return set;
+}
+
+Workout runningWorkout(const QString& name, int id, std::initializer_list<Set> sets)
+{
+    Workout workout(name, baseTime);
+    workout.setId(id);
+    Exercise exercise(QStringLiteral("Squat"), 120);
+    for (const Set& set : sets)
+        exercise.addSet(set);
+    workout.addExercise(exercise);
+    workout.setStartedTime(baseTime);
+    workout.setStatus(WorkoutStatus::Started);
+    return workout;
+}
+
 }  // namespace
 
 TEST(WorkoutStartPolicyTest, EmptySlot_AsksForAPlan)
@@ -157,6 +182,70 @@ TEST(WorkoutStartPolicyTest, EpochEndTime_DoesNotBlockAPlannedWorkout)
     const QVariantMap decision = policy.decide(&selected, nullptr);
 
     EXPECT_EQ(actionOf(decision), QStringLiteral("start"));
+}
+
+TEST(WorkoutStartPolicyTest, ReplacingATickedSession_PromisesHistoryBeforeTheTap)
+{
+    WorkoutStartPolicy policy;
+    WorkoutModel selected { plannedWorkout(QStringLiteral("Push B"), 7) };
+    WorkoutModel active { runningWorkout(
+        QStringLiteral("Push A"), 3, { tickedSet(5, 100.0), tickedSet(5, 100.0), Set(5, 100.0) }) };
+
+    const QString confirmation = confirmationOf(policy.decide(&selected, &active));
+
+    EXPECT_TRUE(confirmation.contains(QStringLiteral("\"Push A\"")));
+    EXPECT_TRUE(confirmation.contains(QStringLiteral("2 of 3 sets ticked off")));
+    EXPECT_TRUE(confirmation.contains(QStringLiteral("with those sets")));
+    EXPECT_TRUE(confirmation.contains(QStringLiteral("history")));
+    EXPECT_TRUE(confirmation.contains(QStringLiteral("\"Push B\"")));
+}
+
+TEST(WorkoutStartPolicyTest, ReplacingASessionOfASingleSet_ReadsInTheSingular)
+{
+    WorkoutStartPolicy policy;
+    WorkoutModel selected { plannedWorkout(QStringLiteral("Push B"), 7) };
+    WorkoutModel active { runningWorkout(QStringLiteral("Plank"), 3, { tickedSet(1, 0.0) }) };
+
+    const QString confirmation = confirmationOf(policy.decide(&selected, &active));
+
+    EXPECT_TRUE(confirmation.contains(QStringLiteral("1 of 1 set ticked off")));
+    EXPECT_TRUE(confirmation.contains(QStringLiteral("with that set")));
+    EXPECT_FALSE(confirmation.contains(QStringLiteral("sets")));
+}
+
+TEST(WorkoutStartPolicyTest, ReplacingASessionWithOneTickOfMany_KeepsThePluralWhereItBelongs)
+{
+    WorkoutStartPolicy policy;
+    WorkoutModel selected { plannedWorkout(QStringLiteral("Push B"), 7) };
+    WorkoutModel active { runningWorkout(QStringLiteral("Plank"), 3,
+                                         { tickedSet(1, 0.0), Set(1, 0.0) }) };
+
+    const QString confirmation = confirmationOf(policy.decide(&selected, &active));
+
+    EXPECT_TRUE(confirmation.contains(QStringLiteral("1 of 2 sets ticked off")));
+    EXPECT_TRUE(confirmation.contains(QStringLiteral("with that set")));
+}
+
+TEST(WorkoutStartPolicyTest, ReplacingAnUntouchedSession_PromisesThePlannedList)
+{
+    WorkoutStartPolicy policy;
+    WorkoutModel selected { plannedWorkout(QStringLiteral("Push B"), 7) };
+    WorkoutModel active { runningWorkout(QStringLiteral("Push A"), 3,
+                                         { Set(5, 100.0), Set(5, 100.0) }) };
+
+    const QString confirmation = confirmationOf(policy.decide(&selected, &active));
+
+    EXPECT_TRUE(confirmation.contains(QStringLiteral("no set is ticked off")));
+    EXPECT_TRUE(confirmation.contains(QStringLiteral("planned list")));
+    EXPECT_FALSE(confirmation.contains(QStringLiteral("history")));
+}
+
+TEST(WorkoutStartPolicyTest, ANormalStart_NeedsNoConfirmation)
+{
+    WorkoutStartPolicy policy;
+    WorkoutModel selected { plannedWorkout(QStringLiteral("Push B"), 7) };
+
+    EXPECT_TRUE(confirmationOf(policy.decide(&selected, nullptr)).isEmpty());
 }
 
 TEST(WorkoutStartPolicyTest, UnnamedFinishedWorkout_IsStillExplained)

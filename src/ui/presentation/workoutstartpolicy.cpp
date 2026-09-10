@@ -1,5 +1,6 @@
 #include "ui/presentation/workoutstartpolicy.h"
 
+#include "domain/workout/sessionsummary.h"
 #include "ui/models/workoutmodel.h"
 #include <QDateTime>
 #include <QLocale>
@@ -7,12 +8,14 @@
 namespace
 {
 
-QVariantMap decision(const char* action, const QString& label, const QString& message = QString())
+QVariantMap decision(const char* action, const QString& label, const QString& message = QString(),
+                     const QString& confirmation = QString())
 {
     QVariantMap result;
     result[QString::fromLatin1(WorkoutStartPolicy::actionKey)] = QString::fromLatin1(action);
     result[QString::fromLatin1(WorkoutStartPolicy::labelKey)] = label;
     result[QString::fromLatin1(WorkoutStartPolicy::messageKey)] = message;
+    result[QString::fromLatin1(WorkoutStartPolicy::confirmationKey)] = confirmation;
     return result;
 }
 
@@ -37,11 +40,43 @@ bool isFinished(const WorkoutModel& workout)
     return workout.status() == WorkoutStatus::Ended || hasMoment(workout.endedTime());
 }
 
-QString finishedMessage(const WorkoutModel& workout)
+QString quotedName(const WorkoutModel& workout, const QString& fallback)
 {
     const QString name = workout.name().trimmed();
-    const QString subject
-        = name.isEmpty() ? QStringLiteral("That workout") : QStringLiteral("\"%1\"").arg(name);
+    return name.isEmpty() ? fallback : QStringLiteral("\"%1\"").arg(name);
+}
+
+QString replaceConfirmation(const WorkoutModel& selected, const WorkoutModel& active)
+{
+    const QString running = quotedName(active, QStringLiteral("The running workout"));
+    const QString next = quotedName(selected, QStringLiteral("the selected workout"));
+    const Workout entity = active.toEntity();
+
+    if (!completionFlagsAreMeaningful(entity))
+    {
+        return QStringLiteral("%1 is still running, but no set is ticked off yet.\n\n"
+                              "Starting %2 now puts it back on your planned list, "
+                              "so nothing is lost.")
+            .arg(running, next);
+    }
+
+    const SessionSummary summary = summarizeSession(entity);
+    const QString progress
+        = QStringLiteral("%1 of %2 %3")
+              .arg(summary.completedSets)
+              .arg(summary.plannedSets)
+              .arg(summary.plannedSets == 1 ? QStringLiteral("set") : QStringLiteral("sets"));
+    const QString kept
+        = summary.completedSets == 1 ? QStringLiteral("that set") : QStringLiteral("those sets");
+
+    return QStringLiteral("%1 is still running with %2 ticked off.\n\n"
+                          "Starting %3 now ends it and files it in your history with %4.")
+        .arg(running, progress, next, kept);
+}
+
+QString finishedMessage(const WorkoutModel& workout)
+{
+    const QString subject = quotedName(workout, QStringLiteral("That workout"));
     const QString day
         = QLocale::c().toString(workout.endedTime().date(), QStringLiteral("d MMM yyyy"));
     const QString when
@@ -72,7 +107,8 @@ QVariantMap WorkoutStartPolicy::decide(WorkoutModel* selected, WorkoutModel* act
         return decision(blockedAction, startLabel(), finishedMessage(*selected));
 
     if (active)
-        return decision(replaceAction, startLabel());
+        return decision(replaceAction, startLabel(), QString(),
+                        replaceConfirmation(*selected, *active));
 
     return decision(startAction, startLabel());
 }

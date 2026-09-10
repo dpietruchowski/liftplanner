@@ -68,7 +68,7 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
   zablokowanym przycisku widać, że brakuje ćwiczeń; trening z co najmniej jednym
   ćwiczeniem zapisuje się jak dotąd.
 
-### G26 — Nieudany import historii i nieudany start milczą
+### G26 — Nieudany import historii milczy
 - **Dla kogo/po co:** wklejasz do schowka JSON od AI, klikasz import historii,
   potwierdzasz — i nie dzieje się absolutnie nic. Nie wiadomo, czy plan był zły,
   czy schowek pusty, czy aplikacja zamarła. Ta sama akcja obok, przy „Planned",
@@ -80,15 +80,14 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
   zgłasza błędy w sześciu miejscach, m.in. „Import failed: invalid JSON"
   (`workouthistoryviewmodel.cpp:218`) i „Clipboard is empty" (`:242`) — to
   dokładnie ścieżka przycisku `importHistoryButton`
-  (`ScreenWorkouts.qml:164-173`). Tak samo milczy `ActiveWorkoutViewModel`:
-  „Invalid workout" przy starcie (`activeworkoutviewmodel.cpp:183`) nie ma
-  odbiorcy, więc naciśnięcie startu na treningu, którego nie da się wystartować,
-  wygląda jak martwy przycisk.
+  (`ScreenWorkouts.qml:164-173`).
+- **Zawężone po iteracji 12:** druga połowa tej pozycji („martwy przycisk startu")
+  odpadła — G4 dołożył `cannotStartPopup`, który mówi, czemu minionego treningu
+  nie da się wystartować, i odsyła do powtórzenia z historii. Zostaje sam import.
 - **Zakres:** S
 - **Gotowe, gdy:** import historii ze śmieciem w schowku (albo z pustym
   schowkiem) pokazuje komunikat mówiący, co się nie udało, a poprawny import
-  nadal wchodzi bez ostrzeżeń; naciśnięcie startu na treningu, który nie może
-  ruszyć, też daje komunikat zamiast ciszy.
+  nadal wchodzi bez ostrzeżeń.
 
 ### G6 — Czas przerwy jest niewidoczny i nie do ustawienia
 - **Dla kogo/po co:** przerwa decyduje o charakterze treningu (siła vs

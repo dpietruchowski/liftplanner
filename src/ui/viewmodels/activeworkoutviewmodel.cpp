@@ -1,5 +1,6 @@
 #include "activeworkoutviewmodel.h"
 #include "application/workout/workoutservice.h"
+#include "domain/workout/performedsets.h"
 #include "domain/workout/sessionsummary.h"
 #include "domain/workout/setadjustment.h"
 #include "infrastructure/appstoragepaths.h"
@@ -200,13 +201,32 @@ void ActiveWorkoutViewModel::startWorkout(WorkoutModel* workout)
 
     if (previousWorkout)
     {
-        if (m_service && previousWorkout->id() != -1)
-            m_service->deleteWorkout(previousWorkout->id())
-                .warnOnError("delete the replaced workout");
+        settleInterruptedWorkout(previousWorkout);
         previousWorkout->deleteLater();
     }
 
     qDebug() << "Workout started:" << clonedWorkout->name();
+}
+
+void ActiveWorkoutViewModel::settleInterruptedWorkout(WorkoutModel* workout)
+{
+    if (!m_service || !workout)
+        return;
+
+    Workout entity = workout->toEntity();
+
+    if (completionFlagsAreMeaningful(entity))
+    {
+        entity.end();
+        m_service->saveWorkout(entity).warnOnError("file the interrupted workout in history");
+    }
+    else
+    {
+        entity.setStatus(WorkoutStatus::Planned);
+        m_service->saveWorkout(entity).warnOnError("return the interrupted workout to the plan");
+    }
+
+    emit interruptedWorkoutSettled();
 }
 
 void ActiveWorkoutViewModel::completeCurrentSet()

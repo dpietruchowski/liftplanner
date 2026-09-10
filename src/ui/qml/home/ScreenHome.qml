@@ -141,7 +141,8 @@ Rectangle {
     NotificationPopup {
         id: startWorkoutPopup
         objectName: "replaceWorkoutPopup"
-        text: "Previous workout was not ended. Do you want to start new one?"
+        title: "Replace the running workout?"
+        text: root.startDecision.confirmation
         type: Notification.Type.Warning
         buttons: Notification.Button.Ok | Notification.Button.Cancel
         onAccepted: root.startWorkout(root.selectedWorkout)

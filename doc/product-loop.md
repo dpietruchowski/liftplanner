@@ -94,20 +94,21 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 12 zamknięta (G4 — „Start workout" startuje zaznaczony trening)
+- **Iteracja:** 13 zamknięta (G27 — zamiana treningu nie kasuje przerwanej sesji)
 - **W locie:** nic
-- **Ostatni commit pętli:** G4
+- **Ostatni commit pętli:** G27
 - **Następna pozycja wg backlogu:** do wyboru przez PM. Na liście zostały m.in.
-  G16 (ucięte nazwy na kaflach) i G26 (nieudany import i nieudany start milczą).
-  W raporcie z iteracji 12 czeka też świeże znalezisko: potwierdzenie zamiany
-  trwającego treningu kasuje go bez ostrzeżenia
-  (`ActiveWorkoutViewModel::startWorkout` robi `deleteWorkout` na poprzednim).
-- **Zawroty do developera:** 3, wszystkie przy zielonym `ctest`:
+  G16 (ucięte nazwy na kaflach — widoczne na zrzucie trzecią iterację z rzędu)
+  i G26 (nieudany import historii milczy).
+- **Zawroty do developera:** 4, wszystkie przy zielonym `ctest`:
   G5 (brakujący import QML — aplikacja nie wstawała), G23 (lista zaplanowanych
   nieodświeżana po porzuceniu sesji — baza poprawna, ekran kłamał), G8 (etykieta
-  „DURATION" ucięta do „DURATI…" — poprawne funkcjonalnie, brzydkie).
-  **Wniosek: żadnego z tych trzech nie złapałby build ani testy.** Pierwsze dwa
-  wymagały klikania w działającą aplikację, trzeci obejrzenia zrzutu.
+  „DURATION" ucięta do „DURATI…" — poprawne funkcjonalnie, brzydkie), G27
+  („1 of 1 **sets** ticked off" — testy pilnowały liczb w tekście, nie tego, czy
+  brzmi po ludzku).
+  **Wniosek: żadnego z tych czterech nie złapałby build ani testy.** Dwa
+  wymagały klikania w działającą aplikację, dwa przeczytania tego, co widzi
+  użytkownik.
 - **Pętla zatrzymana na progu** przy 82% okna 5-godzinnego (próg 85%, iteracja
   kosztuje 5-6 punktów, więc kolejna nie zmieściłaby się w całości). Drzewo
   czyste, nic nie zostało w locie. Wznowienie: `bash tmp/probe_usage.sh`, potem

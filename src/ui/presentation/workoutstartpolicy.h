@@ -14,6 +14,7 @@ public:
     static constexpr auto actionKey = "action";
     static constexpr auto labelKey = "label";
     static constexpr auto messageKey = "message";
+    static constexpr auto confirmationKey = "confirmation";
 
     static constexpr auto startAction = "start";
     static constexpr auto replaceAction = "replace";

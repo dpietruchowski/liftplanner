@@ -26,6 +26,8 @@ PlannedWorkoutViewModel::PlannedWorkoutViewModel(WorkoutService* service,
     {
         connect(activeWorkoutViewModel, &ActiveWorkoutViewModel::workoutDiscarded, this,
                 &PlannedWorkoutViewModel::loadAll);
+        connect(activeWorkoutViewModel, &ActiveWorkoutViewModel::interruptedWorkoutSettled, this,
+                &PlannedWorkoutViewModel::loadAll);
     }
 }
 

@@ -114,6 +114,9 @@ Rectangle {
                         onStartWorkoutRequest: function(workout) {
                             root.currentWorkout = workout
                             if (ActiveWorkoutViewModel.currentWorkout) {
+                                startWorkoutPopup.text = WorkoutStartPolicy.decide(
+                                            workout,
+                                            ActiveWorkoutViewModel.currentWorkout).confirmation
                                 startWorkoutPopup.open()
                             } else {
                                 startWorkout()
@@ -224,7 +227,8 @@ Rectangle {
 
     NotificationPopup {
         id: startWorkoutPopup
-        text: "Previous workout was not ended. Do you want to start new one?"
+        objectName: "plannedReplaceWorkoutPopup"
+        title: "Replace the running workout?"
         type: Notification.Type.Warning
         buttons: Notification.Button.Ok | Notification.Button.Cancel
         onAccepted: {

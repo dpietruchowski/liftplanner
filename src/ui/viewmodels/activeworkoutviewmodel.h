@@ -57,6 +57,7 @@ public:
 signals:
     void workoutCompleted();
     void workoutDiscarded();
+    void interruptedWorkoutSettled();
     void lastSessionSummaryChanged();
     void errorOccurred(const QString& errorMessage);
 
@@ -68,6 +69,7 @@ private:
     int workSecondsFor(SetModel* set) const;
 
     void restoreWorkout(const Workout& entity);
+    void settleInterruptedWorkout(WorkoutModel* workout);
     void refreshPreviousPerformances();
     void saveCompletedSet();
     void updateCurrentExercise();

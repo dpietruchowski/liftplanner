@@ -401,6 +401,105 @@ TEST_F(WorkoutLifecycleTest, RepeatingLeavesTheOriginalEntryInTheHistoryUntouche
     EXPECT_NE(reloadPlanned().first()->id(), originalId);
 }
 
+// --- swapping a running session for another one ---
+
+TEST_F(WorkoutLifecycleTest, SwappingATickedSessionForAnotherKeepsItInTheHistory)
+{
+    importWorkouts(TestData::THREE_WORKOUTS_JSON);
+    auto& active = app.activeWorkoutViewModel();
+    active.startWorkout(app.plannedWorkoutViewModel().workouts().at(0));
+    active.completeCurrentSet();
+    ASSERT_EQ(active.currentWorkout()->name(), "Push Day");
+
+    active.startWorkout(reloadPlanned().at(0));
+    app.drain();
+
+    ASSERT_EQ(active.currentWorkout()->name(), "Pull Day");
+
+    const auto history = reloadHistory();
+    ASSERT_EQ(history.size(), 1);
+    EXPECT_EQ(history.first()->name(), "Push Day");
+    EXPECT_EQ(history.first()->statusString(), "Ended");
+    EXPECT_EQ(tickedSetsOf(history.first()->toEntity()), 1);
+}
+
+TEST_F(WorkoutLifecycleTest, SwappingAnUntouchedSessionForAnotherReturnsItToThePlannedList)
+{
+    importWorkouts(TestData::THREE_WORKOUTS_JSON);
+    auto& active = app.activeWorkoutViewModel();
+    active.startWorkout(app.plannedWorkoutViewModel().workouts().at(0));
+    ASSERT_EQ(active.completedSetCount(), 0);
+
+    active.startWorkout(reloadPlanned().at(0));
+    app.drain();
+
+    EXPECT_TRUE(reloadHistory().isEmpty());
+
+    const auto planned = reloadPlanned();
+    QStringList names;
+    for (const WorkoutModel* workout : planned)
+    {
+        names << workout->name();
+        EXPECT_EQ(workout->statusString(), "Planned");
+    }
+    EXPECT_TRUE(names.contains("Push Day"));
+}
+
+TEST_F(WorkoutLifecycleTest, ASwappedOutSessionKeepsItsOwnRowInsteadOfBeingDeleted)
+{
+    importWorkouts(TestData::THREE_WORKOUTS_JSON);
+    auto& active = app.activeWorkoutViewModel();
+    active.startWorkout(app.plannedWorkoutViewModel().workouts().at(0));
+    active.completeCurrentSet();
+    app.drain();
+    const int replacedId = active.currentWorkout()->id();
+    ASSERT_NE(replacedId, -1);
+
+    active.startWorkout(reloadPlanned().at(0));
+    app.drain();
+
+    const auto history = reloadHistory();
+    ASSERT_EQ(history.size(), 1);
+    EXPECT_EQ(history.first()->id(), replacedId);
+}
+
+TEST_F(WorkoutLifecycleTest, ASwappedOutSessionReachesTheListsWithoutAskingForAReload)
+{
+    importWorkouts(TestData::THREE_WORKOUTS_JSON);
+    auto& active = app.activeWorkoutViewModel();
+    active.startWorkout(app.plannedWorkoutViewModel().workouts().at(0));
+    app.drain();
+
+    const auto planned = reloadPlanned();
+    ASSERT_EQ(planned.size(), 2);
+
+    active.startWorkout(planned.at(0));
+    app.drain();
+
+    QStringList names;
+    for (const WorkoutModel* workout : app.plannedWorkoutViewModel().workouts())
+        names << workout->name();
+
+    EXPECT_TRUE(names.contains("Push Day"));
+}
+
+TEST_F(WorkoutLifecycleTest, ASwappedOutTickedSessionReachesTheHistoryWithoutAskingForAReload)
+{
+    importWorkouts(TestData::THREE_WORKOUTS_JSON);
+    auto& active = app.activeWorkoutViewModel();
+    active.startWorkout(app.plannedWorkoutViewModel().workouts().at(0));
+    active.completeCurrentSet();
+    app.drain();
+    ASSERT_TRUE(app.workoutHistoryViewModel().workouts().isEmpty());
+
+    active.startWorkout(reloadPlanned().at(0));
+    app.drain();
+
+    const auto history = app.workoutHistoryViewModel().workouts();
+    ASSERT_EQ(history.size(), 1);
+    EXPECT_EQ(history.first()->name(), "Push Day");
+}
+
 TEST_F(WorkoutLifecycleTest, DiscardingWithoutASessionDoesNothing)
 {
     auto& active = app.activeWorkoutViewModel();
