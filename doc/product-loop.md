@@ -83,9 +83,15 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 6 zamknięta (G19 — zakończony trening liczy się jako wykonany)
+- **Iteracja:** 7 zamknięta (G21 — jedna reguła „co się liczy jako zrobione")
 - **W locie:** nic
-- **Ostatni commit pętli:** G19
+- **Ostatni commit pętli:** G21
+- **Korekta roli PM (po uwadze użytkownika):** product manager zaczął zachowywać
+  się jak analityk kodu — G19 i G21 to defekty spójności wyłowione z
+  `workoutservice.cpp`, a nie braki, które czuje ktoś na siłowni. Definicja
+  agenta przestawiona: punkt wyjścia to raport z aplikacji i przejście ekranów
+  oczami użytkownika, kod wyłącznie do sprawdzenia, czy coś już istnieje.
+  Niespójność trafia na backlog tylko wtedy, gdy człowiek widzi złą liczbę.
 - **Zawroty do developera:** 1 (G5, brakujący import w QML)
 - **Stan piaskownicy `tmp/run` zmieniony w iteracji 5:** „Regression Template"
   zakończony, doszedł trening „Seed check". Zrobione celowo, żeby powstała

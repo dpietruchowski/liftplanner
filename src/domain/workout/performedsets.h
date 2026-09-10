@@ -1,8 +1,16 @@
 #pragma once
 
 #include "exercise.h"
+#include "historysetrow.h"
 #include "workout.h"
+#include <QSet>
 #include <algorithm>
+#include <vector>
+
+inline bool countsAsPerformed(bool hasContent, bool ticked, bool flagsAreMeaningful)
+{
+    return hasContent && (!flagsAreMeaningful || ticked);
+}
 
 inline bool hasCompletedSet(const Exercise& exercise)
 {
@@ -17,9 +25,27 @@ inline bool completionFlagsAreMeaningful(const Workout& workout)
                        [](const Exercise& exercise) { return hasCompletedSet(exercise); });
 }
 
+inline QSet<int> sessionsWithMeaningfulFlags(const std::vector<HistorySetRow>& rows)
+{
+    QSet<int> sessions;
+    for (const HistorySetRow& row : rows)
+    {
+        if (row.hasSet && row.completed)
+            sessions.insert(row.workoutId);
+    }
+
+    return sessions;
+}
+
 inline bool wasPerformed(const Exercise& exercise, bool flagsAreMeaningful)
 {
-    return flagsAreMeaningful ? hasCompletedSet(exercise) : !exercise.sets().empty();
+    return countsAsPerformed(!exercise.sets().empty(), hasCompletedSet(exercise),
+                             flagsAreMeaningful);
+}
+
+inline bool wasPerformed(const HistorySetRow& row, bool flagsAreMeaningful)
+{
+    return countsAsPerformed(row.hasSet, row.completed, flagsAreMeaningful);
 }
 
 inline Exercise asPerformed(const Exercise& exercise, bool flagsAreMeaningful)

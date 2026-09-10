@@ -83,6 +83,12 @@ protected:
             .WillOnce(::testing::Return(rowsOf(workouts)));
     }
 
+    void givenHistoryRowsRepeatedly(const std::vector<Workout>& workouts)
+    {
+        EXPECT_CALL(m_rowRepo, findSetsOfRecentWorkouts(::testing::_))
+            .WillRepeatedly(::testing::Return(rowsOf(workouts)));
+    }
+
     std::vector<Workout> loadPlannedWorkouts()
     {
         return m_service->loadPlannedWorkoutsCore().value();
@@ -435,12 +441,68 @@ TEST_F(WorkoutServiceTest, RecentTotals_SumsTimeDistanceAndVolume)
     EXPECT_DOUBLE_EQ(totals.totalWeight, 500.0);
 }
 
-TEST_F(WorkoutServiceTest, RecentTotals_IgnoresSetsTheUserNeverDid)
+namespace
+{
+
+Exercise weightedExercise(const QString& name, int reps, double weight, bool ticked)
+{
+    Exercise exercise(name, 90);
+    Set set(reps, weight);
+    set.setCompleted(ticked);
+    exercise.addSet(set);
+    return exercise;
+}
+
+Exercise timedExercise(const QString& name, int seconds, bool ticked)
+{
+    Exercise exercise(name, 60);
+    exercise.setKind(ExerciseKind::Interval);
+    Set set = Set::createDuration(seconds);
+    set.setCompleted(ticked);
+    exercise.addSet(set);
+    return exercise;
+}
+
+Exercise distanceExercise(const QString& name, double meters, int seconds, bool ticked)
+{
+    Exercise exercise(name, 0);
+    exercise.setKind(ExerciseKind::Cardio);
+    Set set = Set::createDistance(meters, seconds);
+    set.setCompleted(ticked);
+    exercise.addSet(set);
+    return exercise;
+}
+
+Workout sessionOf(const std::vector<Exercise>& exercises)
+{
+    Workout workout(QStringLiteral("Session"), QDateTime::currentDateTime());
+    for (const Exercise& exercise : exercises)
+        workout.addExercise(exercise);
+    return workout;
+}
+
+}  // namespace
+
+TEST_F(WorkoutServiceTest, RecentTotals_IgnoresUntickedSetsOfASessionThatWasTickedOff)
 {
     std::vector<Workout> history = {
-        completedWorkout(makeWorkoutWithTimedExercise("Plank", 45)),
-        makeWorkoutWithTimedExercise("Plank", 45),
-        makeWorkoutWithDistanceExercise("Run", 5000, 1440),
+        sessionOf({ timedExercise("Plank", 45, true), timedExercise("Hollow Hold", 60, false) }),
+    };
+
+    givenHistoryRows(history);
+
+    const auto totals = recentTotals(20);
+
+    EXPECT_EQ(totals.workouts, 1);
+    EXPECT_EQ(totals.totalDurationSeconds, 45);
+}
+
+TEST_F(WorkoutServiceTest, RecentTotals_CountsASessionThatWasNeverTickedOff)
+{
+    std::vector<Workout> history = {
+        sessionOf({ timedExercise("Plank", 45, false) }),
+        sessionOf({ distanceExercise("Run", 5000, 1440, false) }),
+        sessionOf({ weightedExercise("Bench", 5, 100.0, false) }),
     };
 
     givenHistoryRows(history);
@@ -448,8 +510,66 @@ TEST_F(WorkoutServiceTest, RecentTotals_IgnoresSetsTheUserNeverDid)
     const auto totals = recentTotals(20);
 
     EXPECT_EQ(totals.workouts, 3);
-    EXPECT_EQ(totals.totalDurationSeconds, 45);
-    EXPECT_DOUBLE_EQ(totals.totalDistanceMeters, 0.0);
+    EXPECT_EQ(totals.totalDurationSeconds, 45 + 1440);
+    EXPECT_DOUBLE_EQ(totals.totalDistanceMeters, 5000.0);
+    EXPECT_DOUBLE_EQ(totals.totalWeight, 500.0);
+}
+
+TEST_F(WorkoutServiceTest, TopExercises_IgnoresAnUntickedExerciseOfASessionThatWasTickedOff)
+{
+    std::vector<Workout> history = {
+        sessionOf({ timedExercise("Plank", 45, true), weightedExercise("Bench", 5, 100.0, false) }),
+    };
+
+    givenHistoryRows(history);
+
+    EXPECT_TRUE(topExercises(2, 20).empty());
+}
+
+TEST_F(WorkoutServiceTest, TopExercises_CountsASessionThatWasNeverTickedOff)
+{
+    std::vector<Workout> history = {
+        sessionOf(
+            { timedExercise("Plank", 45, false), weightedExercise("Bench", 5, 100.0, false) }),
+    };
+
+    givenHistoryRows(history);
+
+    const auto result = topExercises(2, 20);
+
+    ASSERT_EQ(result.size(), 1u);
+    EXPECT_EQ(result[0].name, "Bench");
+    EXPECT_DOUBLE_EQ(result[0].bestOneRepMax, 112.5);
+}
+
+TEST_F(WorkoutServiceTest, HomeTiles_AgreeOnWhetherASessionCounts)
+{
+    struct Scenario
+    {
+        const char* description;
+        bool benchTicked;
+        bool companionTicked;
+    };
+
+    const std::vector<Scenario> scenarios = {
+        { "nothing ticked anywhere", false, false },
+        { "only the companion ticked", false, true },
+        { "everything ticked", true, true },
+        { "only the bench ticked", true, false },
+    };
+
+    for (const Scenario& scenario : scenarios)
+    {
+        givenHistoryRowsRepeatedly({
+            sessionOf({ timedExercise("Plank", 45, scenario.companionTicked),
+                        weightedExercise("Bench", 5, 100.0, scenario.benchTicked) }),
+        });
+
+        const bool benchIsAPersonalRecord = !topExercises(5, 20).empty();
+        const bool benchAddsVolume = recentTotals(20).totalWeight > 0.0;
+
+        EXPECT_EQ(benchIsAPersonalRecord, benchAddsVolume) << scenario.description;
+    }
 }
 
 TEST_F(WorkoutServiceTest, RecentTotals_LimitsHistoryQueryToRecentWorkouts)

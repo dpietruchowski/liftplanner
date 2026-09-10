@@ -6,22 +6,21 @@ Kolejność sekcji „Open" to kolejność ważności.
 
 ## Open
 
-### G21 — Statystyki na ekranie głównym mają tę samą ślepotę co „Last time"
-- **Dla kogo/po co:** po naprawie G19 „Last time" pokazuje sesję z czerwca, ale
-  kafelki objętości i czasu na ekranie głównym dalej liczą tę samą sesję jako
-  zerową. Użytkownik widzi teraz dwie sprzeczne odpowiedzi na to samo pytanie.
-- **Dowód:** znalezione przez developera przy G19 i sprostowane w opisie:
-  `recentTotalsCore` ma `if (!row.hasSet || !row.completed) continue`
-  (`workoutservice.cpp:219`), czyli filtruje po fladze dokładnie tak, jak robiło
-  to `previousPerformancesCore` przed naprawą. `topExercises` nie filtruje, więc
-  lista najczęstszych ćwiczeń była i jest poprawna — stąd wrażenie, że część
-  ekranu głównego działa.
-- **Zakres:** M — nie da się przenieść reguły z G19 wprost, bo `recentTotals`
-  chodzi po płaskich `HistorySetRow`, a nie po agregacie `Workout`, więc
-  „czy w tej sesji ktokolwiek odhaczał" trzeba tam ustalić inaczej.
-- **Gotowe, gdy:** dla historii, w której żadna seria nie ma flagi, kafelki
-  objętości i czasu na ekranie głównym pokazują wartości z tych treningów, a nie
-  zera; historia z częściowym odhaczeniem nadal liczy wyłącznie odhaczone serie.
+### G22 — Objętość treningu jest liczona i wyrzucana
+- **Dla kogo/po co:** dla kogoś, kto podnosi ciężary, objętość (powtórzenia ×
+  ciężar) jest podstawową miarą tygodnia i najczęstszą odpowiedzią na pytanie
+  „czy robię więcej niż miesiąc temu". Aplikacja tę liczbę ma policzoną i nigdy
+  jej nie pokazuje.
+- **Dowód:** raport z iteracji 7. `WorkoutService::TrainingTotals` liczy
+  `totalWeight` z ostatnich 20 treningów, ale `refreshRecentTotals`
+  (`workouthistoryviewmodel.cpp:118-127`) buduje kafelki wyłącznie dla czasu i
+  dystansu — `totalWeight` jest wyrzucane tuż przed ekranem. Przy okazji: w
+  historii użytkownika nie ma ani jednej serii z czasem lub dystansem, więc oba
+  istniejące kafelki są zawsze puste i sekcja statystyk nie pokazuje nic.
+- **Zakres:** S
+- **Gotowe, gdy:** na ekranie głównym widać objętość z ostatnich treningów w
+  kilogramach, a sekcja statystyk przestaje być pusta dla użytkownika, który
+  podnosi ciężary i nie robi ćwiczeń na czas.
 
 ### G20 — Zaimportowana historia przychodzi bez śladu wykonania
 - **Dla kogo/po co:** import planu i historii z AI to sztandarowa droga do
@@ -221,6 +220,15 @@ Kolejność sekcji „Open" to kolejność ważności.
 
 ## Done
 
+### G21 — Trzy różne reguły „co się liczy jako zrobione" (iteracja 7)
+`countsAsPerformed` w `performedsets.h` jest teraz jedynym rozstrzygnięciem;
+`previousPerformances`, `recentTotals` i `topExercises` tylko je karmią, każde
+swoim kształtem danych. Doszedł test równoważności obu kafelków ekranu głównego.
+**Zastrzeżenie:** obserwowalnej części warunku akceptacji nie dało się pokazać —
+kafelka objętości aplikacja w ogóle nie ma, a danych czasowych i dystansowych w
+historii nie ma wcale. Przyjęte na podstawie testów i braku regresji; szczegóły
+w raporcie z iteracji 7.
+
 ### G19 — Zakończony trening nie liczy się jako wykonany (iteracja 6)
 Reguła: w zakończonym treningu seria liczy się, jeśli ma flagę; jeśli żadna seria
 w całej sesji jej nie ma, flaga nic nie niesie i liczą się wszystkie serie z
@@ -229,6 +237,10 @@ zawartością. Granulacja per sesja, nie per ćwiczenie, żeby nie wskrzeszać
 Sprawdzone w aplikacji: „Last time" dla Back Squata pokazuje wreszcie sesję z
 8 czerwca (5x20, 5x30, 3x5x40 kg), edytor zasiewa 40 kg, a dla Bench Pressa
 nowsza odhaczona sesja nadal wygrywa ze starszą nieodhaczoną.
+Sprostowanie do mojego opisu tej pozycji: twierdziłem, że `recentTotals` nie
+filtruje po fladze — filtruje (`workoutservice.cpp:219`), przeoczyłem to, bo
+szukałem `completed()` z nawiasami, a tam jest pole `row.completed`. Zakres
+naprawy był przez to za wąski; reszta poszła do G21.
 
 ### G15 — Nowe ćwiczenie nie dziedziczy ciężaru z poprzedniego razu (iteracja 5)
 `WorkoutService::lastPerformance` deleguje do istniejącego

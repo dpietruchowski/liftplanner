@@ -27,11 +27,74 @@ Workout sessionWith(std::initializer_list<Exercise> exercises)
     return workout;
 }
 
+HistorySetRow setRow(int workoutId, bool ticked)
+{
+    HistorySetRow row;
+    row.workoutId = workoutId;
+    row.hasSet = true;
+    row.completed = ticked;
+    return row;
+}
+
+HistorySetRow emptySessionRow(int workoutId)
+{
+    HistorySetRow row;
+    row.workoutId = workoutId;
+    return row;
+}
+
 }  // namespace
 
 class PerformedSetsTest : public ::testing::Test
 {
 };
+
+TEST_F(PerformedSetsTest, TheDecisionIsTheSameWhicheverShapeTheDataHas)
+{
+    const Exercise untickedExercise = exerciseWith(QStringLiteral("Bench Press"), { Set(5, 45.0) });
+    const Exercise tickedExercise
+        = exerciseWith(QStringLiteral("Bench Press"), { tickedSet(5, 45.0) });
+
+    EXPECT_EQ(wasPerformed(untickedExercise, false), wasPerformed(setRow(1, false), false));
+    EXPECT_EQ(wasPerformed(untickedExercise, true), wasPerformed(setRow(1, false), true));
+    EXPECT_EQ(wasPerformed(tickedExercise, false), wasPerformed(setRow(1, true), false));
+    EXPECT_EQ(wasPerformed(tickedExercise, true), wasPerformed(setRow(1, true), true));
+}
+
+TEST_F(PerformedSetsTest, RowsOfASessionWithoutASingleTickCarryNoMeaningfulFlag)
+{
+    const std::vector<HistorySetRow> rows = { setRow(1, false), setRow(1, false), setRow(2, true) };
+
+    const QSet<int> meaningful = sessionsWithMeaningfulFlags(rows);
+
+    EXPECT_FALSE(meaningful.contains(1));
+    EXPECT_TRUE(meaningful.contains(2));
+}
+
+TEST_F(PerformedSetsTest, ASessionWithoutAnySetsNeverHasMeaningfulFlags)
+{
+    const QSet<int> meaningful = sessionsWithMeaningfulFlags({ emptySessionRow(1) });
+
+    EXPECT_TRUE(meaningful.isEmpty());
+}
+
+TEST_F(PerformedSetsTest, ARowWithoutASetNeverCounts)
+{
+    EXPECT_FALSE(wasPerformed(emptySessionRow(1), false));
+    EXPECT_FALSE(wasPerformed(emptySessionRow(1), true));
+}
+
+TEST_F(PerformedSetsTest, WithoutMeaningfulFlagsEveryRowWithASetCounts)
+{
+    EXPECT_TRUE(wasPerformed(setRow(1, false), false));
+    EXPECT_TRUE(wasPerformed(setRow(1, true), false));
+}
+
+TEST_F(PerformedSetsTest, WithMeaningfulFlagsOnlyTickedRowsCount)
+{
+    EXPECT_FALSE(wasPerformed(setRow(1, false), true));
+    EXPECT_TRUE(wasPerformed(setRow(1, true), true));
+}
 
 TEST_F(PerformedSetsTest, ASessionWithNoTicksAnywhereCarriesNoInformationInTheFlag)
 {

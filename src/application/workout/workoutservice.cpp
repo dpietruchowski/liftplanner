@@ -164,13 +164,17 @@ WorkoutService::topExercisesCore(int topN, int recentWorkouts)
         entry.bestOneRepMax = std::max(entry.bestOneRepMax, bestOneRepMax);
     };
 
+    const std::vector<HistorySetRow> rows
+        = m_rowRepository.findSetsOfRecentWorkouts(recentWorkouts);
+    const QSet<int> meaningfulFlags = sessionsWithMeaningfulFlags(rows);
+
     int currentWorkoutId = -1;
     int currentExerciseId = -1;
     QString currentName;
     bool currentWeighted = false;
     double currentBest = 0.0;
 
-    for (const HistorySetRow& row : m_rowRepository.findSetsOfRecentWorkouts(recentWorkouts))
+    for (const HistorySetRow& row : rows)
     {
         if (row.exerciseId != currentExerciseId || row.workoutId != currentWorkoutId)
         {
@@ -182,7 +186,8 @@ WorkoutService::topExercisesCore(int topN, int recentWorkouts)
             currentBest = 0.0;
         }
 
-        if (!row.hasSet || !StrengthMath::isWeighted(row.metric, row.loadType))
+        if (!wasPerformed(row, meaningfulFlags.contains(row.workoutId))
+            || !StrengthMath::isWeighted(row.metric, row.loadType))
             continue;
 
         currentWeighted = true;
@@ -212,11 +217,15 @@ Result<WorkoutService::TrainingTotals> WorkoutService::recentTotalsCore(int rece
     TrainingTotals totals;
     QSet<int> workoutIds;
 
-    for (const HistorySetRow& row : m_rowRepository.findSetsOfRecentWorkouts(recentWorkouts))
+    const std::vector<HistorySetRow> rows
+        = m_rowRepository.findSetsOfRecentWorkouts(recentWorkouts);
+    const QSet<int> meaningfulFlags = sessionsWithMeaningfulFlags(rows);
+
+    for (const HistorySetRow& row : rows)
     {
         workoutIds.insert(row.workoutId);
 
-        if (!row.hasSet || !row.completed)
+        if (!wasPerformed(row, meaningfulFlags.contains(row.workoutId)))
             continue;
 
         if (StrengthMath::isWeighted(row.metric, row.loadType))
