@@ -298,6 +298,61 @@ void ActiveWorkoutViewModel::endWorkout()
     oldWorkout->deleteLater();
 }
 
+void ActiveWorkoutViewModel::discardWorkout()
+{
+    if (!m_currentWorkout)
+        return;
+
+    m_timer->stop();
+
+    if (m_service)
+    {
+        Workout entity = m_currentWorkout->toEntity();
+        entity.setStatus(WorkoutStatus::Planned);
+        m_service->saveWorkout(entity).warnOnError("return the abandoned workout to the plan");
+    }
+
+    auto* oldWorkout = m_currentWorkout;
+
+    setIsActive(false);
+    setCurrentWorkout(nullptr);
+    setCurrentExercise(nullptr);
+    setCurrentSet(nullptr);
+
+    oldWorkout->deleteLater();
+
+    emit workoutDiscarded();
+}
+
+int ActiveWorkoutViewModel::completedSetCount() const
+{
+    if (!m_currentWorkout)
+        return 0;
+
+    int done = 0;
+    for (const ExerciseModel* exercise : m_currentWorkout->exercises())
+    {
+        for (const SetModel* set : exercise->sets())
+            done += set->completed() ? 1 : 0;
+    }
+
+    return done;
+}
+
+int ActiveWorkoutViewModel::totalSetCount() const
+{
+    if (!m_currentWorkout)
+        return 0;
+
+    int total = 0;
+    for (const ExerciseModel* exercise : m_currentWorkout->exercises())
+        total += static_cast<int>(exercise->sets().size());
+
+    return total;
+}
+
+bool ActiveWorkoutViewModel::hasAnythingToRecord() const { return completedSetCount() > 0; }
+
 void ActiveWorkoutViewModel::duplicateSet(SetModel* set)
 {
     if (!set)

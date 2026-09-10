@@ -188,6 +188,22 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
   zmniejsza licznik dopasowanych ćwiczeń i zawęża listę, a „Clear filters"
   przywraca pełną liczbę.
 
+### G24 — Kafelki na ekranie głównym mówią dwoma stylami
+- **Dla kogo/po co:** pierwszy ekran ma wyglądać na dopracowany, a w jednym
+  rzędzie stoją obok siebie „Bench Press" i „volume". Drobiazg, ale to pierwsza
+  rzecz, którą użytkownik widzi po uruchomieniu.
+- **Dowód:** raport z iteracji 8 („Obserwacja"): etykieta nowego kafelka to małe
+  „volume", podczas gdy sąsiednie kafelki PR mają nazwy ćwiczeń z wielkiej
+  litery (zrzut `tmp/loop/g22-home.png`). Kafelek pokazuje etykietę dosłownie
+  tak, jak ją dostanie (`StatTile.qml:28`), a na ekranie profilu te same kafelki
+  dostają etykiety wersalikami („AGE", „BODYWEIGHT"), więc aplikacja ma już
+  trzeci wariant.
+- **Zakres:** S
+- **Gotowe, gdy:** wszystkie kafelki w pasku statystyk na ekranie głównym mają
+  etykiety w jednej konwencji, tej samej co kafelki na ekranie profilu.
+- **Uwaga:** najtaniej domknąć to przy okazji pozycji, która i tak dokłada
+  kafelki — czyli G8.
+
 ### G13 — Poprawienie zakończonego treningu
 - **Dla kogo/po co:** telefon padł w połowie sesji albo seria została odhaczona
   przez pomyłkę — historia zostaje nieprawdziwa, a to ona karmi statystyki i
@@ -212,6 +228,16 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
   szablonu)
 
 ## Done
+
+### G23 — Nie da się zakończyć treningu, którego się nie dokończyło (iteracja 9)
+Pasek akcji aktywnego treningu dostał `finishWorkoutButton` widoczny przez całą
+sesję. Odhaczona co najmniej jedna seria → trening idzie do historii z flagami
+takimi, jakie są, a serie nietknięte zostają nietknięte. Zero odhaczonych serii →
+sesja nie jest zapisywana jako trening, tylko wraca na listę zaplanowanych. To
+drugie rozstrzyga zderzenie z regułą z G19 bez ruszania samej reguły: nowa droga
+po prostu nie potrafi wyprodukować sesji zakończonej bez ani jednego ptaszka.
+Sprawdzone w aplikacji na obu gałęziach, łącznie z natychmiastowym odświeżeniem
+listy zaplanowanych i historii.
 
 ### G22 — Objętość treningu jest liczona i wyrzucana (iteracja 8)
 Ekran główny dostał trzeci kafelek statystyk z `TrainingTotals.totalWeight`,

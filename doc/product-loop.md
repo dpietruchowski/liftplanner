@@ -83,10 +83,14 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 8 zamknięta (G22 — objętość na ekranie głównym)
+- **Iteracja:** 9 zamknięta (G23 — zakończenie niedokończonego treningu)
 - **W locie:** nic
-- **Ostatni commit pętli:** G22
+- **Ostatni commit pętli:** G23
 - **Następna pozycja wg backlogu:** G8 — podsumowanie po zakończonym treningu
+  (po G23 istnieje wreszcie moment, w którym sesja się kończy)
+- **Zawroty do developera:** 2 — G5 (brakujący import QML) i G23 (lista
+  zaplanowanych nieodświeżana po porzuceniu sesji). Oba razy build i `ctest`
+  były zielone, a wadę złapało dopiero klikanie w prawdziwą aplikację.
 - **Pętla zatrzymana na progu** przy 82% okna 5-godzinnego (próg 85%, iteracja
   kosztuje 5-6 punktów, więc kolejna nie zmieściłaby się w całości). Drzewo
   czyste, nic nie zostało w locie. Wznowienie: `bash tmp/probe_usage.sh`, potem

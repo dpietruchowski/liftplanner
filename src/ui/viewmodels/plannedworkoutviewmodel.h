@@ -7,6 +7,7 @@
 
 class WorkoutService;
 class UserProfileService;
+class ActiveWorkoutViewModel;
 
 class PlannedWorkoutViewModel : public QObject
 {
@@ -17,6 +18,7 @@ class PlannedWorkoutViewModel : public QObject
 
 public:
     explicit PlannedWorkoutViewModel(WorkoutService* service, UserProfileService* profileService,
+                                     ActiveWorkoutViewModel* activeWorkoutViewModel = nullptr,
                                      QObject* parent = nullptr);
     ~PlannedWorkoutViewModel();
 

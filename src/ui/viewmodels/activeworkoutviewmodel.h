@@ -32,6 +32,11 @@ public:
     Q_INVOKABLE void navigateToNext();
     Q_INVOKABLE void navigateToPrevious();
     Q_INVOKABLE void endWorkout();
+    Q_INVOKABLE void discardWorkout();
+
+    Q_INVOKABLE int completedSetCount() const;
+    Q_INVOKABLE int totalSetCount() const;
+    Q_INVOKABLE bool hasAnythingToRecord() const;
 
     Q_INVOKABLE void duplicateSet(SetModel* set);
     Q_INVOKABLE void removeSet(SetModel* set);
@@ -46,6 +51,7 @@ public:
 
 signals:
     void workoutCompleted();
+    void workoutDiscarded();
     void errorOccurred(const QString& errorMessage);
 
 private:

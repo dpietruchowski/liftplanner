@@ -10,6 +10,29 @@ Rectangle {
     objectName: "screenActiveWorkout"
     color: Theme.colors.background
 
+    function leaveActiveWorkout() {
+        stackView.replace(homeScreen)
+        bottomNav.currentIndex = 1
+    }
+
+    function askToFinishWorkout() {
+        var done = ActiveWorkoutViewModel.completedSetCount()
+        var total = ActiveWorkoutViewModel.totalSetCount()
+
+        if (!ActiveWorkoutViewModel.hasAnythingToRecord()) {
+            discardWorkoutPopup.text = qsTr("No set is ticked off yet, so there is nothing to record. "
+                                            + "This workout goes back to your planned list.")
+            discardWorkoutPopup.open()
+            return
+        }
+
+        endWorkoutPopup.text = done === total
+            ? qsTr("All %1 sets are ticked off. End this workout?").arg(total)
+            : qsTr("%1 of %2 sets are ticked off. The rest stay marked as not done.")
+                  .arg(done).arg(total)
+        endWorkoutPopup.open()
+    }
+
     WorkoutTimerBar {
         id: timerBar
         objectName: "workoutTimerBar"
@@ -125,11 +148,23 @@ Rectangle {
                                  : Theme.button.success
                     onClicked: {
                         if (ActiveWorkoutViewModel.currentWorkout.completed) {
-                            endWorkoutPopup.open()
+                            root.askToFinishWorkout()
                         } else {
                             ActiveWorkoutViewModel.completeCurrentSet()
                         }
                     }
+                }
+
+                ThemedButton {
+                    objectName: "finishWorkoutButton"
+                    iconSource: Theme.icons.success
+                    enabled: ActiveWorkoutViewModel.isActive
+                    buttonSize: Theme.button.mediumSquare
+                    buttonStyle: Theme.button.tonal
+                    onClicked: root.askToFinishWorkout()
+                    ToolTip.visible: hovered
+                    ToolTip.text: qsTr("Finish workout")
+                    ToolTip.delay: 500
                 }
 
                 ThemedButton {
@@ -150,7 +185,9 @@ Rectangle {
 
     NotificationPopup {
         id: endWorkoutPopup
-        text: "Do you want to end workout?"
+        objectName: "endWorkoutPopup"
+        title: qsTr("End workout?")
+        text: qsTr("Do you want to end workout?")
         type: Notification.Type.Info
         buttons: Notification.Button.Ok | Notification.Button.Cancel
         onAccepted: {
@@ -158,11 +195,21 @@ Rectangle {
         }
     }
 
+    NotificationPopup {
+        id: discardWorkoutPopup
+        objectName: "discardWorkoutPopup"
+        title: qsTr("Nothing done yet")
+        type: Notification.Type.Warning
+        buttons: Notification.Button.Ok | Notification.Button.Cancel
+        onAccepted: {
+            ActiveWorkoutViewModel.discardWorkout()
+        }
+    }
+
     Connections {
         target: ActiveWorkoutViewModel
-        function onWorkoutCompleted() {
-            stackView.replace(homeScreen)
-            bottomNav.currentIndex = 1
-        }
+
+        function onWorkoutCompleted() { root.leaveActiveWorkout() }
+        function onWorkoutDiscarded() { root.leaveActiveWorkout() }
     }
 }

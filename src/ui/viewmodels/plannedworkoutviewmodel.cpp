@@ -4,6 +4,7 @@
 #include "async/timeprovider.h"
 #include "infrastructure/userprofile/userprofileserializer.h"
 #include "infrastructure/workout/workoutjson.h"
+#include "ui/viewmodels/activeworkoutviewmodel.h"
 #include <QClipboard>
 #include <QDate>
 #include <QDebug>
@@ -15,11 +16,17 @@
 
 PlannedWorkoutViewModel::PlannedWorkoutViewModel(WorkoutService* service,
                                                  UserProfileService* profileService,
+                                                 ActiveWorkoutViewModel* activeWorkoutViewModel,
                                                  QObject* parent)
     : QObject(parent)
     , m_service(service)
     , m_profileService(profileService)
 {
+    if (activeWorkoutViewModel)
+    {
+        connect(activeWorkoutViewModel, &ActiveWorkoutViewModel::workoutDiscarded, this,
+                &PlannedWorkoutViewModel::loadAll);
+    }
 }
 
 PlannedWorkoutViewModel::~PlannedWorkoutViewModel()

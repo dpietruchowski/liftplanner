@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "async/timeprovider.h"
 #include "fixtures/test_data.h"
 #include "testapplication.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
@@ -34,8 +35,217 @@ protected:
         }
     }
 
+    ActiveWorkoutViewModel& startFirstPlannedWorkout(const QString& json)
+    {
+        importWorkouts(json);
+        auto& active = app.activeWorkoutViewModel();
+        active.startWorkout(app.plannedWorkoutViewModel().workouts().first());
+        return active;
+    }
+
+    QList<WorkoutModel*> reloadHistory()
+    {
+        app.workoutHistoryViewModel().loadAllWorkouts();
+        app.drain();
+        return app.workoutHistoryViewModel().workouts();
+    }
+
+    QList<WorkoutModel*> reloadPlanned()
+    {
+        app.plannedWorkoutViewModel().loadAll();
+        app.drain();
+        return app.plannedWorkoutViewModel().workouts();
+    }
+
+    static int tickedSetsOf(const Workout& workout)
+    {
+        int done = 0;
+        for (const Exercise& exercise : workout.exercises())
+            for (const Set& set : exercise.sets())
+                done += set.completed() ? 1 : 0;
+        return done;
+    }
+
     TestApplication app;
 };
+
+// --- finishing a workout that was not carried to the end ---
+
+TEST_F(WorkoutLifecycleTest, SetCountsReportTheProgressOfTheSession)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+
+    EXPECT_EQ(active.totalSetCount(), 2);
+    EXPECT_EQ(active.completedSetCount(), 0);
+
+    active.completeCurrentSet();
+
+    EXPECT_EQ(active.completedSetCount(), 1);
+    EXPECT_EQ(active.totalSetCount(), 2);
+}
+
+TEST_F(WorkoutLifecycleTest, SetCountsAreZeroWithoutASession)
+{
+    auto& active = app.activeWorkoutViewModel();
+
+    EXPECT_EQ(active.completedSetCount(), 0);
+    EXPECT_EQ(active.totalSetCount(), 0);
+    EXPECT_FALSE(active.hasAnythingToRecord());
+}
+
+TEST_F(WorkoutLifecycleTest, ASessionIsWorthRecordingOnceTheFirstSetIsTickedOff)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+
+    EXPECT_FALSE(active.hasAnythingToRecord());
+
+    active.completeCurrentSet();
+
+    EXPECT_TRUE(active.hasAnythingToRecord());
+}
+
+TEST_F(WorkoutLifecycleTest, AHalfDoneWorkoutCanBeEndedAndReachesHistory)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    active.completeCurrentSet();
+    ASSERT_EQ(active.completedSetCount(), 1);
+
+    active.endWorkout();
+
+    EXPECT_FALSE(active.isActive());
+    EXPECT_EQ(active.currentWorkout(), nullptr);
+
+    const auto history = reloadHistory();
+    ASSERT_EQ(history.size(), 1);
+    EXPECT_EQ(history.first()->name(), "Full Body");
+    EXPECT_EQ(history.first()->statusString(), "Ended");
+    EXPECT_EQ(history.first()->startedTime().date(), TimeProvider::instance().currentDate());
+    EXPECT_EQ(history.first()->endedTime().date(), TimeProvider::instance().currentDate());
+}
+
+TEST_F(WorkoutLifecycleTest, TheSetsTheLifterSkippedStayUnticked)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    active.completeCurrentSet();
+
+    active.endWorkout();
+
+    const auto history = reloadHistory();
+    ASSERT_EQ(history.size(), 1);
+    EXPECT_EQ(tickedSetsOf(history.first()->toEntity()), 1);
+}
+
+TEST_F(WorkoutLifecycleTest, OnlyTheTickedSetsOfAHalfDoneSessionCountTowardsVolume)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    active.completeCurrentSet();
+    active.endWorkout();
+
+    reloadHistory();
+
+    // Squat 5x100 is ticked off, Bench Press 5x80 is not.
+    QString volume;
+    for (const QVariant& tile : app.workoutHistoryViewModel().recentTotals())
+    {
+        const QVariantMap map = tile.toMap();
+        if (map["label"].toString() == "volume")
+            volume = map["value"].toString();
+    }
+
+    EXPECT_EQ(volume, "500 kg");
+}
+
+TEST_F(WorkoutLifecycleTest, EndingLeavesNoSessionForTheNextStartToAskAbout)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    active.completeCurrentSet();
+
+    active.endWorkout();
+
+    EXPECT_EQ(active.currentWorkout(), nullptr);
+}
+
+// --- a session in which nothing was ticked off goes back to the plan ---
+
+TEST_F(WorkoutLifecycleTest, DiscardingASessionReturnsItToThePlannedList)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    ASSERT_EQ(active.completedSetCount(), 0);
+
+    active.discardWorkout();
+
+    EXPECT_FALSE(active.isActive());
+    EXPECT_EQ(active.currentWorkout(), nullptr);
+
+    EXPECT_TRUE(reloadHistory().isEmpty());
+
+    const auto planned = reloadPlanned();
+    ASSERT_EQ(planned.size(), 1);
+    EXPECT_EQ(planned.first()->name(), "Full Body");
+    EXPECT_EQ(planned.first()->statusString(), "Planned");
+}
+
+TEST_F(WorkoutLifecycleTest, ADiscardedSessionAddsNothingToTheStats)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+
+    active.discardWorkout();
+    reloadHistory();
+
+    EXPECT_TRUE(app.workoutHistoryViewModel().recentTotals().isEmpty());
+    EXPECT_TRUE(app.workoutHistoryViewModel().topExercises().isEmpty());
+}
+
+TEST_F(WorkoutLifecycleTest, ADiscardedSessionKeepsItsExercisesForTheNextAttempt)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+
+    active.discardWorkout();
+
+    const auto planned = reloadPlanned();
+    ASSERT_EQ(planned.size(), 1);
+    const Workout entity = planned.first()->toEntity();
+    EXPECT_EQ(entity.exercises().size(), 2u);
+    EXPECT_EQ(entity.totalSets(), 2);
+    EXPECT_EQ(tickedSetsOf(entity), 0);
+}
+
+TEST_F(WorkoutLifecycleTest, ADiscardedSessionIsBackOnThePlannedListWithoutAskingForAReload)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    app.drain();
+    ASSERT_TRUE(reloadPlanned().isEmpty());
+
+    active.discardWorkout();
+    app.drain();
+
+    const auto planned = app.plannedWorkoutViewModel().workouts();
+    ASSERT_EQ(planned.size(), 1);
+    EXPECT_EQ(planned.first()->name(), "Full Body");
+}
+
+TEST_F(WorkoutLifecycleTest, AnEndedSessionIsInTheHistoryWithoutAskingForAReload)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    active.completeCurrentSet();
+
+    active.endWorkout();
+    app.drain();
+
+    const auto history = app.workoutHistoryViewModel().workouts();
+    ASSERT_EQ(history.size(), 1);
+    EXPECT_EQ(history.first()->name(), "Full Body");
+}
+
+TEST_F(WorkoutLifecycleTest, DiscardingWithoutASessionDoesNothing)
+{
+    auto& active = app.activeWorkoutViewModel();
+
+    active.discardWorkout();
+
+    EXPECT_EQ(active.currentWorkout(), nullptr);
+    EXPECT_TRUE(reloadHistory().isEmpty());
+}
 
 TEST_F(WorkoutLifecycleTest, ImportPlanStartAndEnd_AppearsInHistory)
 {
