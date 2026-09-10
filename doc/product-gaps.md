@@ -11,9 +11,12 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
 ## Open
 
 ### G2 — Wybór dnia zaplanowanego treningu
-- **Dla kogo/po co:** aplikacja nazywa się planerem, a każdy nowo utworzony
-  trening ląduje na „teraz". Nie da się rozłożyć tygodnia na poniedziałek,
-  środę i piątek.
+- **Dla kogo/po co:** manualnie utworzony trening zawsze ląduje na „teraz", więc
+  tygodnia nie da się rozłożyć na poniedziałek, środę i piątek z wyprzedzeniem.
+- **Waga po sprawdzeniu:** mniejsza, niż pisałem wcześniej. Import z AI, czyli
+  sztandarowa droga do tej aplikacji, **przenosi daty** — `planned_time` jest i
+  w zapisie, i w odczycie (`workoutjson.cpp:340-341`). Dziura dotyczy więc
+  wyłącznie ścieżki ręcznej i szablonów, nie całego planowania.
 - **Dowód:** `MainView.qml:54` woła `WorkoutEditorViewModel.createNew("", new
   Date())`, a `MainView.qml:47` — `startFromTemplate(templateId, new Date())`.
   `ScreenWorkoutEditor.qml` (118 linii) nie ma żadnej kontrolki daty, choć
@@ -209,6 +212,15 @@ Osobna iteracja na samą wielkość liter byłaby marnotrawstwem, a G8 i tak dok
 kafelki podsumowania — więc warunek spójności etykiet stał się częścią G8.
 
 ## Done
+
+### G25 — Nie da się powtórzyć treningu, który się już zrobiło (iteracja 11)
+Rozwinięty kafel w historii ma akcję powtórzenia: tworzy nowy zaplanowany trening
+na dziś z tymi samymi ćwiczeniami i seriami, bez edytora i bez AI. Historia
+przestała być ślepym zaułkiem. Kopia idzie przez `SetPrescription`, więc brak
+odhaczeń wynika z typu, a nie z ręcznego resetu; ciężary są te z powtarzanej
+sesji, a nie z zasiewu, żeby akcja nie skłamała o tym, co użytkownik wskazał.
+Sprawdzone w aplikacji na przypadku czasowym i z ciężarami: oryginał nietknięty,
+kopia bez ptaszków, lista odświeża się bez restartu.
 
 ### G8 — Brak podsumowania po zakończonym treningu (iteracja 10, domyka G24)
 Po zakończeniu sesji otwiera się podsumowanie z czasem, odhaczonymi seriami i

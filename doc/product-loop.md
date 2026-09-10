@@ -83,10 +83,11 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 10 zamknięta (G8 — podsumowanie po treningu, domyka G24)
+- **Iteracja:** 11 zamknięta (G25 — powtórzenie treningu z historii)
 - **W locie:** nic
-- **Ostatni commit pętli:** G8
-- **Następna pozycja wg backlogu:** G2 — wybór dnia zaplanowanego treningu
+- **Ostatni commit pętli:** G25
+- **Następna pozycja wg backlogu:** do wyboru przez PM; G16 (ucięte nazwy na
+  kaflach) zyskało na wadze, bo powtarzanie odkłada treningi właśnie na tę listę
 - **Zawroty do developera:** 3, wszystkie przy zielonym `ctest`:
   G5 (brakujący import QML — aplikacja nie wstawała), G23 (lista zaplanowanych
   nieodświeżana po porzuceniu sesji — baza poprawna, ekran kłamał), G8 (etykieta

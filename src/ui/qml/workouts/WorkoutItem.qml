@@ -10,6 +10,7 @@ WorkoutCard {
 
     signal deleteWorkout(var workout)
     signal exportWorkout(var workout)
+    signal repeatWorkout(var workout)
 
     objectName: "historyWorkoutItem" + root.itemIndex
     expandButtonName: "historyWorkoutExpandButton" + root.itemIndex
@@ -20,6 +21,19 @@ WorkoutCard {
             spacing: Theme.spacing.medium
 
             ThemedButton {
+                objectName: "historyWorkoutRepeatButton" + root.itemIndex
+                iconSource: Theme.icons.curvedArrow
+                circular: true
+                buttonSize: Theme.button.square
+                buttonStyle: Theme.button.success
+                onClicked: root.repeatWorkout(root.workout)
+                ToolTip.visible: hovered
+                ToolTip.text: "Do this workout again"
+                ToolTip.delay: 500
+            }
+
+            ThemedButton {
+                objectName: "historyWorkoutCopyButton" + root.itemIndex
                 iconSource: Theme.icons.copy
                 circular: true
                 buttonSize: Theme.button.square
@@ -31,6 +45,7 @@ WorkoutCard {
             }
 
             ThemedButton {
+                objectName: "historyWorkoutDeleteButton" + root.itemIndex
                 iconSource: Theme.icons.close
                 circular: true
                 buttonSize: Theme.button.square

@@ -27,6 +27,7 @@ public:
     bool isLoading() const;
 
     Q_INVOKABLE void loadAll();
+    Q_INVOKABLE void repeatWorkout(WorkoutModel* workout);
     Q_INVOKABLE void deleteWorkout(WorkoutModel* workout);
     Q_INVOKABLE void importFromClipboard();
     Q_INVOKABLE void importFromJson(const QString& jsonData);
@@ -37,6 +38,7 @@ signals:
     void loadingChanged();
     void errorOccurred(const QString& errorMessage);
     void promptGenerated();
+    void workoutRepeated(const QString& name);
 
 private:
     void setLoading(bool value);

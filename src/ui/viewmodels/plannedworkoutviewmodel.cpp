@@ -80,6 +80,30 @@ void PlannedWorkoutViewModel::loadAll()
                  });
 }
 
+void PlannedWorkoutViewModel::repeatWorkout(WorkoutModel* workout)
+{
+    if (!m_service || !workout || workout->id() <= 0)
+        return;
+
+    setLoading(true);
+
+    const QString name = workout->name();
+
+    m_service->repeatWorkout(workout->id(), TimeProvider::instance().currentDateTime())
+        .then(this,
+              [this, name](int)
+              {
+                  loadAll();
+                  emit workoutRepeated(name);
+              })
+        .onError(this,
+                 [this](const QString& error)
+                 {
+                     setLoading(false);
+                     emit errorOccurred(error);
+                 });
+}
+
 void PlannedWorkoutViewModel::deleteWorkout(WorkoutModel* workout)
 {
     if (!m_service || !workout || workout->id() <= 0)

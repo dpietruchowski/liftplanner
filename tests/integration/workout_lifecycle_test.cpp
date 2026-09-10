@@ -309,6 +309,98 @@ TEST_F(WorkoutLifecycleTest, ADiscardedSessionProducesNoSummaryToShow)
     EXPECT_TRUE(active.lastSessionSummary().isEmpty());
 }
 
+// --- doing a workout from the history a second time ---
+
+TEST_F(WorkoutLifecycleTest, RepeatingAFinishedSessionPutsItBackOnThePlannedList)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    completeAllSets(active);
+    active.endWorkout();
+    app.drain();
+
+    const auto history = reloadHistory();
+    ASSERT_EQ(history.size(), 1);
+    ASSERT_TRUE(reloadPlanned().isEmpty());
+
+    app.plannedWorkoutViewModel().repeatWorkout(history.first());
+    app.drain();
+
+    const auto planned = app.plannedWorkoutViewModel().workouts();
+    ASSERT_EQ(planned.size(), 1);
+    EXPECT_EQ(planned.first()->name(), "Full Body");
+    EXPECT_EQ(planned.first()->statusString(), "Planned");
+}
+
+TEST_F(WorkoutLifecycleTest, TheRepeatedWorkoutCarriesTheSameExercisesAndWeights)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    completeAllSets(active);
+    active.endWorkout();
+    app.drain();
+
+    app.plannedWorkoutViewModel().repeatWorkout(reloadHistory().first());
+    app.drain();
+
+    const Workout copy = reloadPlanned().first()->toEntity();
+    ASSERT_EQ(copy.exercises().size(), 2u);
+    EXPECT_EQ(copy.exercises()[0].name(), "Squat");
+    EXPECT_EQ(copy.exercises()[1].name(), "Bench Press");
+    ASSERT_EQ(copy.exercises()[0].sets().size(), 1u);
+    EXPECT_DOUBLE_EQ(copy.exercises()[0].sets().front().weight(), 100.0);
+    EXPECT_DOUBLE_EQ(copy.exercises()[1].sets().front().weight(), 80.0);
+}
+
+TEST_F(WorkoutLifecycleTest, TheRepeatedWorkoutArrivesWithoutASingleTick)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    completeAllSets(active);
+    active.endWorkout();
+    app.drain();
+
+    app.plannedWorkoutViewModel().repeatWorkout(reloadHistory().first());
+    app.drain();
+
+    EXPECT_EQ(tickedSetsOf(reloadPlanned().first()->toEntity()), 0);
+}
+
+TEST_F(WorkoutLifecycleTest, RepeatingAddsNothingToTheStatsUntilItIsActuallyDone)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    active.completeCurrentSet();
+    active.endWorkout();
+    app.drain();
+
+    const QVariantList before = app.workoutHistoryViewModel().recentTotals();
+
+    app.plannedWorkoutViewModel().repeatWorkout(reloadHistory().first());
+    app.drain();
+    reloadHistory();
+
+    EXPECT_EQ(app.workoutHistoryViewModel().recentTotals(), before);
+}
+
+TEST_F(WorkoutLifecycleTest, RepeatingLeavesTheOriginalEntryInTheHistoryUntouched)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    active.completeCurrentSet();
+    active.endWorkout();
+    app.drain();
+
+    auto* original = reloadHistory().first();
+    const int originalId = original->id();
+
+    app.plannedWorkoutViewModel().repeatWorkout(original);
+    app.drain();
+
+    const auto history = reloadHistory();
+    ASSERT_EQ(history.size(), 1);
+    EXPECT_EQ(history.first()->id(), originalId);
+    EXPECT_EQ(history.first()->statusString(), "Ended");
+    EXPECT_EQ(tickedSetsOf(history.first()->toEntity()), 1);
+
+    EXPECT_NE(reloadPlanned().first()->id(), originalId);
+}
+
 TEST_F(WorkoutLifecycleTest, DiscardingWithoutASessionDoesNothing)
 {
     auto& active = app.activeWorkoutViewModel();

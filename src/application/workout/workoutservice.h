@@ -54,6 +54,7 @@ public:
     Task<std::optional<Exercise>> lastPerformance(const Exercise& exercise);
 
     Task<std::optional<Workout>> findWorkout(int id);
+    Task<int> repeatWorkout(int id, const QDateTime& plannedTime);
     Task<int> saveWorkout(const Workout& workout);
     Task<bool> saveSet(const Set& set);
     Task<bool> deleteWorkout(int id);
@@ -71,6 +72,7 @@ private:
     Result<std::vector<PreviousPerformance>> previousPerformancesCore(const Workout& workout);
     Result<std::optional<Exercise>> lastPerformanceCore(const Exercise& exercise);
     Result<std::optional<Workout>> findWorkoutCore(int id);
+    Result<int> repeatWorkoutCore(int id, const QDateTime& plannedTime);
     Result<int> saveWorkoutCore(const Workout& workout);
     Result<bool> saveSetCore(const Set& set);
     Result<bool> deleteWorkoutCore(int id);

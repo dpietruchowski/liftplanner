@@ -192,6 +192,9 @@ Rectangle {
                         onExportWorkoutRequest: function(workout) {
                             WorkoutHistoryViewModel.exportWorkoutToClipboard(workout)
                         }
+                        onRepeatWorkoutRequest: function(workout) {
+                            PlannedWorkoutViewModel.repeatWorkout(workout)
+                        }
                     }
                 }
             }
@@ -283,8 +286,24 @@ Rectangle {
         buttons: Notification.Button.Ok
     }
 
+    NotificationPopup {
+        id: repeatedPopup
+        objectName: "workoutRepeatedPopup"
+        title: "Ready to go again"
+        type: Notification.Type.Success
+        buttons: Notification.Button.Ok
+    }
+
     Connections {
         target: WorkoutHistoryViewModel
         function onExportedToClipboard() { exportedPopup.open() }
+    }
+
+    Connections {
+        target: PlannedWorkoutViewModel
+        function onWorkoutRepeated(name) {
+            repeatedPopup.text = name + " is on your planned list, ready to start."
+            repeatedPopup.open()
+        }
     }
 }

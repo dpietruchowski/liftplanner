@@ -4,6 +4,7 @@
 #include "domain/workout/performedsets.h"
 #include "domain/workout/strengthmath.h"
 #include "domain/workout/workoutquery.h"
+#include "domain/workout/workoutrepeat.h"
 #include "domain/workout/workoutrepository.h"
 #include "domain/workout/workoutrowrepository.h"
 #include "domain/workout/workoutstatus.h"
@@ -83,6 +84,11 @@ Task<std::optional<Exercise>> WorkoutService::lastPerformance(const Exercise& ex
 Task<std::optional<Workout>> WorkoutService::findWorkout(int id)
 {
     return invoke([this, id] { return findWorkoutCore(id); });
+}
+
+Task<int> WorkoutService::repeatWorkout(int id, const QDateTime& plannedTime)
+{
+    return invoke([this, id, plannedTime] { return repeatWorkoutCore(id, plannedTime); });
 }
 
 Task<int> WorkoutService::saveWorkout(const Workout& workout)
@@ -296,6 +302,15 @@ Result<std::optional<Workout>> WorkoutService::findWorkoutCore(int id)
     WorkoutQuery query;
     query.whereId(id);
     return Result<std::optional<Workout>>::success(m_repository.findOne(query));
+}
+
+Result<int> WorkoutService::repeatWorkoutCore(int id, const QDateTime& plannedTime)
+{
+    const std::optional<Workout> source = findWorkoutCore(id).value();
+    if (!source.has_value())
+        return Result<int>::failure(QStringLiteral("workout %1 does not exist").arg(id));
+
+    return saveWorkoutCore(repeatOf(source.value(), plannedTime));
 }
 
 Result<int> WorkoutService::saveWorkoutCore(const Workout& workout)

@@ -15,6 +15,7 @@ ColumnLayout {
 
     signal deleteWorkoutRequest(var workout)
     signal exportWorkoutRequest(var workout)
+    signal repeatWorkoutRequest(var workout)
 
     SectionHeader {
         id: header
@@ -44,6 +45,7 @@ ColumnLayout {
                 itemIndex: index
                 onDeleteWorkout: function(workout) { root.deleteWorkoutRequest(workout) }
                 onExportWorkout: function(workout) { root.exportWorkoutRequest(workout) }
+                onRepeatWorkout: function(workout) { root.repeatWorkoutRequest(workout) }
             }
         }
     }
