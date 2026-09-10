@@ -90,21 +90,35 @@ Aktualizowany po każdym commicie — to jest pamięć pętli.
   zakończony, doszedł trening „Seed check". Zrobione celowo, żeby powstała
   historia z ukończoną serią — bez tego nie dało się przetestować G15.
 
-### Koszt: agenty kontra robota własna
+### Koszt: jak mierzyć, żeby wyszło prawdziwie
 
-Zmierzone na sondzie `/usage`, w punktach okna 5-godzinnego:
+**Procentów z `/usage` NIE wolno używać do porównywania kosztu iteracji.** Limit
+5-godzinny jest wspólny dla całego konta, więc te procenty zawierają spalanie
+wszystkich równoległych okien użytkownika. Wcześniejsze porównanie „agenty
+kosztują 3× tyle co robota własna" powstało właśnie tak i **jest nieuprawnione —
+wycofane**. `/usage` zostaje wyłącznie do progu 80%, i tam jest właściwe, bo
+limit faktycznie jest wspólny.
 
-| iteracja | pozycja | rozmiar | tryb | koszt |
-|---|---|---|---|---|
-| 1 | G1 | M | agenty | 7 pkt (PM ~3) |
-| 2 | G7 | S | agenty | 6 pkt (PM 2, developer + testy 4) |
-| 3 | G3 | S | solo | **2 pkt** |
+Do porównywania kosztu służą dwa źródła odporne na inne okna:
 
-Przy tym samym rozmiarze pozycji (S) agenty kosztują trzy razy tyle. Ale to nie
-jest stała: robota własna wpycha treść plików do kontekstu głównej sesji na
-stałe, więc jej koszt rośnie z każdą iteracją i kończy się kompakcją, podczas
-gdy agenty trzymają ten kontekst płaski. Dwie różne krzywe, nie dwie liczby —
-zbierać dalej i porównać po kilku iteracjach, a nie po jednej.
+- `python3 tmp/usage.py` — mój własny transkrypt sesji, brany jako różnica
+  „billed-ish" przed i po iteracji,
+- `subagent_tokens` z powiadomienia o powrocie agenta — licznik **kumulatywny**
+  za całe życie agenta, więc koszt jednej tury to różnica względem poprzedniego
+  powrotu.
+
+Zmierzone w iteracjach 1-5:
+
+| | pierwsze uruchomienie | kolejne tury |
+|---|---|---|
+| product manager | 123k | +20k, +12k, +10k |
+| developer | 111k | +46k, +42k, +21k, +63k |
+
+**Wznowiony agent kosztuje ułamek świeżego spawnu.** Dlatego zawsze `SendMessage`
+do żywego agenta, nigdy nowy spawn na kolejną iterację.
+
+Cała pętla (iteracje 1-5): mój koszt 686k tokenów, kontekst urósł 74k → 287k;
+agenty łącznie 447k we własnych kontekstach.
 - **Odłożone:** nic
 - **Agenty przy życiu:** product-manager i developer z iteracji 1 — odzywać się
   do nich `SendMessage`, nie spawnować nowych.
