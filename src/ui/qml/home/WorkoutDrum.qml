@@ -10,15 +10,19 @@ Item {
     property int defaultIndex: 0
     property int currentIndex: 0
 
-    readonly property int slotHeight: Theme.drum.rowHeight
-    readonly property int slotHeightLarge: Theme.drum.rowHeightLarge
-    readonly property int slotSpacing: Theme.drum.rowSpacing
+    readonly property int fullHeight: 2 * Theme.drum.rowHeight + Theme.drum.rowHeightLarge
+                                      + 2 * Theme.drum.rowSpacing
+    readonly property real fitScale: height > 0 ? Math.min(1, height / fullHeight) : 1
+
+    readonly property int slotHeight: Math.round(Theme.drum.rowHeight * fitScale)
+    readonly property int slotHeightLarge: Math.round(Theme.drum.rowHeightLarge * fitScale)
+    readonly property int slotSpacing: Math.round(Theme.drum.rowSpacing * fitScale)
     readonly property int slotStep: slotHeight + slotSpacing
 
     readonly property real offsetTarget: slotStep - currentIndex * slotStep
     property real offset: offsetTarget
 
-    implicitHeight: 2 * slotHeight + slotHeightLarge + 2 * slotSpacing
+    implicitHeight: fullHeight
     clip: true
 
     function focusEntry(index) {

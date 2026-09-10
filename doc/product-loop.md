@@ -94,11 +94,17 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 14 zamknięta (G16 — pełna nazwa treningu na kaflu zaplanowanego)
+- **Iteracja:** 15 zamknięta (G28 — ekran główny mieści nagłówek i przycisk startu)
 - **W locie:** nic
-- **Ostatni commit pętli:** G16
-- **Następna pozycja wg backlogu:** do wyboru przez PM. Na liście został m.in.
-  G26 (nieudany import historii milczy).
+- **Ostatni commit pętli:** G28
+- **Następna pozycja wg backlogu:** do wyboru przez PM. Na liście zostały G26
+  (nieudany import historii milczy) i G29 (wybór funtów kończy się na profilu).
+  W raporcie z iteracji 15 czeka znalezisko: nazwa na bębnie elidzie także
+  w zaznaczonym wierszu, a od G4 to bęben decyduje, co wystartuje.
+- **Zrzut oglądam najpierw jako całość.** G28 (przycisk startu przecięty przez
+  dolną nawigację) był na moich zrzutach z iteracji 12 i 13 i go nie zobaczyłem,
+  bo za każdym razem szukałem na nich konkretnej rzeczy. Znalazł to dopiero
+  własny obchód product managera.
 - **Zawroty do developera:** 4, wszystkie przy zielonym `ctest`:
   G5 (brakujący import QML — aplikacja nie wstawała), G23 (lista zaplanowanych
   nieodświeżana po porzuceniu sesji — baza poprawna, ekran kłamał), G8 (etykieta

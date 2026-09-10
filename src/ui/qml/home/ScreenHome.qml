@@ -42,7 +42,10 @@ Rectangle {
                                              ActiveWorkoutViewModel.currentWorkout)
 
     ColumnLayout {
+        id: content
+        objectName: "homeContent"
         width: parent.width - 2 * Theme.padding.screen
+        height: Math.min(implicitHeight, parent.height - 2 * Theme.padding.screen)
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: 0
@@ -50,6 +53,7 @@ Rectangle {
         Text {
             objectName: "todayLabel"
             Layout.fillWidth: true
+            Layout.minimumHeight: implicitHeight
             text: Qt.formatDate(new Date(), "dddd, d MMM").toUpperCase()
             color: Theme.colors.textMuted
             font.pixelSize: Theme.fontSize.xSmall
@@ -59,14 +63,15 @@ Rectangle {
         WeekActivityStrip {
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: Theme.spacing.large
+            Layout.minimumHeight: implicitHeight
             activity: WorkoutHistoryViewModel.weekActivity
             todayIndex: (new Date().getDay() + 6) % 7
         }
 
-        // Top exercises (most frequent weighted lifts in recent workouts) with best 1RM
         RowLayout {
             Layout.fillWidth: true
             Layout.topMargin: Theme.spacing.xLarge
+            Layout.minimumHeight: implicitHeight
             spacing: Theme.stat.spacing
 
             Repeater {
@@ -83,11 +88,11 @@ Rectangle {
             }
         }
 
-        // Time held and ground covered in the same recent workouts
         RowLayout {
             Layout.fillWidth: true
             Layout.topMargin: WorkoutHistoryViewModel.recentTotals.length > 0
                               ? Theme.stat.spacing : 0
+            Layout.minimumHeight: implicitHeight
             spacing: Theme.stat.spacing
 
             Repeater {
@@ -106,7 +111,10 @@ Rectangle {
             id: workoutDrum
             objectName: "workoutDrum"
             Layout.fillWidth: true
+            Layout.fillHeight: true
             Layout.topMargin: Theme.spacing.xLarge
+            Layout.minimumHeight: 0
+            Layout.maximumHeight: implicitHeight
             entries: root.drumEntries
             defaultIndex: root.drumEntries.length > 1 ? root.drumEntries.length - 2 : 0
         }
@@ -117,6 +125,7 @@ Rectangle {
             Layout.leftMargin: Theme.drum.cardInset
             Layout.rightMargin: Theme.drum.cardInset
             Layout.topMargin: Theme.spacing.xLarge
+            Layout.minimumHeight: implicitHeight
             text: root.startDecision.label
             iconSource: Theme.icons.startWorkout
             iconSize: Theme.icon.large

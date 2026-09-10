@@ -66,6 +66,26 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
   schowkiem) pokazuje komunikat mówiący, co się nie udało, a poprawny import
   nadal wchodzi bez ostrzeżeń.
 
+### G29 — Wybór funtów w profilu kończy się na profilu
+- **Dla kogo/po co:** ustawiasz „Imperial (lb)", a cała reszta aplikacji dalej
+  mówi „kg" — przy każdej serii, przy rekordach na ekranie głównym, w objętości.
+  Aplikacja obiecuje jednostkę, której nie dotrzymuje, a przy ciężarach to
+  różnica ponad dwukrotna.
+- **Dowód:** `ScreenProfile.qml:316-322` daje wybór `unitSystem` (metric /
+  imperial) i kafelek wagi ciała rzeczywiście przechodzi na `bodyweightUnit`
+  (`:176-180`). Poza tym ekranem nikt tej właściwości nie czyta: „kg" jest wpisane
+  na stałe w `setmodel.cpp:62` (opis serii), `workouttext.cpp:37` (objętość) i
+  `ScreenHome.qml:80` (kafelek rekordu). Ciąg „unitSystem" nie pada w żadnym
+  innym pliku QML.
+- **Uwaga:** pozycja niżej niż reszta, bo wymaga świadomego przestawienia
+  przełącznika, którego domyślny użytkownik nie tknie. Ale kto go tknie, dostaje
+  dwa ekrany mówiące o tej samej wadze co innego.
+- **Zakres:** M
+- **Gotowe, gdy:** po przestawieniu profilu na „Imperial (lb)" jednostka przy
+  serii w aktywnym treningu, przy kafelku rekordu i przy objętości na ekranie
+  głównym jest ta sama co w profilu; powrót na „Metric (kg)" przywraca stan
+  sprzed zmiany.
+
 ### G6 — Czas przerwy jest niewidoczny i nie do ustawienia
 - **Dla kogo/po co:** przerwa decyduje o charakterze treningu (siła vs
   hipertrofia), a timer sam odlicza wartość, której użytkownik nigdzie nie widzi
