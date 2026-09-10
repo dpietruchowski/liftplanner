@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ui/models/setmodel.h"
 #include "ui/models/workoutmodel.h"
 #include "ui/presentation/serializationutils.h"
 #include <QClipboard>
@@ -9,6 +10,7 @@
 #include <QJsonDocument>
 #include <QList>
 #include <QObject>
+#include <QPointer>
 #include <QVariantList>
 
 class WorkoutService;
@@ -33,6 +35,10 @@ public:
     Q_INVOKABLE void loadAllWorkouts();
     Q_INVOKABLE void saveWorkout(WorkoutModel* workout);
     Q_INVOKABLE void deleteWorkout(WorkoutModel* workout);
+    Q_INVOKABLE void requestSetToggle(SetModel* set);
+    Q_INVOKABLE void confirmPendingToggle();
+    Q_INVOKABLE void cancelPendingToggle();
+
     Q_INVOKABLE void importFromJson(const QString& jsonData);
     Q_INVOKABLE void importFromClipboard();
     Q_INVOKABLE void exportToClipboard(int limit = 50);
@@ -47,6 +53,7 @@ public:
     QVariantList weekActivity() const;
 
 signals:
+    void amnestyWarningRaised(const QString& message);
     void errorOccurred(const QString& errorMessage);
     void loadingChanged();
     void lastWorkoutChanged();
@@ -56,6 +63,8 @@ signals:
     void exportedToClipboard();
 
 private:
+    WorkoutModel* ownerOf(SetModel* set) const;
+    void applyToggle(SetModel* set);
     void setLoading(bool value);
     void refreshTopExercises();
     void refreshRecentTotals();
@@ -64,5 +73,6 @@ private:
     ActiveWorkoutViewModel* m_activeWorkoutViewModel;
     QVariantList m_topExercises;
     QVariantList m_recentTotals;
+    QPointer<SetModel> m_pendingToggle;
     bool m_loading { false };
 };

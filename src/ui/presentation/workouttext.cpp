@@ -23,6 +23,19 @@ QString finishPrompt(int completedSets, int plannedSets)
         .arg(sets, Plural::form(completedSets, QStringLiteral("is"), QStringLiteral("are")));
 }
 
+QString amnestyLossWarning(const QString& workoutName, int plannedSets)
+{
+    const QString name = workoutName.trimmed().isEmpty()
+        ? QStringLiteral("This session")
+        : QStringLiteral("\"%1\"").arg(workoutName.trimmed());
+
+    const int rest = plannedSets > 1 ? plannedSets - 1 : 0;
+
+    return QStringLiteral("%1 has no ticked sets, so the whole session counts as done. "
+                          "Ticking this one marks the other %2 as skipped.")
+        .arg(name, Plural::counted(rest, QStringLiteral("set"), QStringLiteral("sets")));
+}
+
 QString formatDuration(qint64 seconds)
 {
     qint64 hours = seconds / 3600;

@@ -299,9 +299,24 @@ Rectangle {
         buttons: Notification.Button.Ok
     }
 
+    NotificationPopup {
+        id: amnestyWarningPopup
+        objectName: "amnestyWarningPopup"
+        title: "Tick this set?"
+        type: Notification.Type.Warning
+        buttons: Notification.Button.Ok | Notification.Button.Cancel
+        onAccepted: WorkoutHistoryViewModel.confirmPendingToggle()
+        onRejected: WorkoutHistoryViewModel.cancelPendingToggle()
+    }
+
     Connections {
         target: WorkoutHistoryViewModel
         function onExportedToClipboard() { exportedPopup.open() }
+
+        function onAmnestyWarningRaised(message) {
+            amnestyWarningPopup.text = message
+            amnestyWarningPopup.open()
+        }
     }
 
     Connections {

@@ -47,7 +47,8 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 ## Twarde zasady
 
-- **Próg 85% okna 5-godzinnego** (podniesiony z 80% na prośbę użytkownika).
+- **Próg 99% okna 5-godzinnego** (80% → 85% → 99%, każdorazowo na prośbę
+  użytkownika).
   Tygodniowy limit ignorujemy.
   `tmp/probe_usage.sh` kosztuje zero tokenów, więc sprawdzam co obrót.
 - **Nigdy nie piszę do innych sesji** z `ListAgents` — to inne projekty
@@ -96,21 +97,19 @@ Aktualizowany po każdym commicie — to jest pamięć pętli.
 
 ### Jak wznowić
 
-Tura zamknięta **przy 79%** okna pięciogodzinnego (próg 85%, obrót kosztuje
-5-6 punktów, więc następny nie zmieściłby się w całości). Drzewo czyste, nic nie
-zostało w locie, wszystkie 22 pozycje zamknięte i zacommitowane.
+Tura była raz zamknięta przy 79%, po czym użytkownik podniósł próg do 99% i
+kazał kontynuować — pętla ruszyła dalej od G13. Procedura wznowienia na
+przyszłość:
 
 1. `bash tmp/probe_usage.sh` — jeśli poniżej progu, ruszamy.
-2. Agenty z tamtej sesji już nie żyją (kompakcja je zabija). Spawnuję na nowo
-   przez `subagent_type: product-manager` i `developer` — definicje z
-   `.claude/agents/` wczytują się przy starcie sesji, więc działają wprost.
-3. Product manager ma gotowe zlecenie: **G13, pierwszy plaster — przełączanie
-   wykonania pojedynczej serii w zakończonym treningu**. Sam je przepisał
-   z „do rozbicia" na warunek akceptacji i postawił na czele „Open"; ocenił je
-   jako jedyną dziurę stojącą w poprzek dorobku tej tury, bo dziś jedynym
-   sposobem poprawienia zapisu jest skasowanie całej sesji.
-4. Ocena stanu produktu po 22 iteracjach jest w `doc/product-gaps.md`, sekcja
-   **„Stan produktu po 21 iteracjach"** (pisana przed ostatnim obrotem).
+2. Agenty giną przy kompakcji kontekstu. Jeśli `SendMessage` odpowiada „No agent
+   named … is reachable", spawnuję na nowo przez `subagent_type:
+   product-manager` i `developer` — definicje z `.claude/agents/` wczytują się
+   przy starcie sesji, więc działają wprost.
+3. Jeśli backlog ma pozycję z gotowym warunkiem akceptacji, **nie pytam PM o
+   wybór** — to czysty koszt. Pytam dopiero, gdy trzeba zdecydować, co dalej.
+4. Ocena stanu produktu jest w `doc/product-gaps.md`, sekcja
+   **„Stan produktu po 21 iteracjach"**.
 
 ### Bilans tury
 
@@ -120,9 +119,13 @@ aplikacja nie wstawała), G23 (ekran nie odświeżał listy, baza była poprawna
 G8 (ucięta etykieta), G27 i pośrednio G32 (odmiana liczebników). Żadnego z nich
 nie złapałby build ani testy jednostkowe.
 
-- **Iteracja:** 22 zamknięta (G32 — jedno miejsce odmienia liczebniki)
+- **Iteracja:** 23 zamknięta (G13, pierwszy plaster — przełączanie wykonania
+  pojedynczej serii w zakończonym treningu)
 - **W locie:** nic
-- **Ostatni commit pętli:** G32
+- **Ostatni commit pętli:** G13
+- **Zużyty przypadek testowy:** `w4 Base Strength` nie jest już „importem bez ani
+  jednej flagi" — postawiłem w nim ptaszek, sprawdzając G13. Zastępniki: `w36`,
+  `w61`, `w62`, `w111`, `w112`.
 - **Najlepsze pozycje tej pętli wyszły z weryfikacji, nie z backlogu.** G27
   i G33 zobaczyłem, sprawdzając co innego (odpowiednio G4 i G26), i oba okazały
   się pilniejsze od wszystkiego, co wtedy leżało na liście. Dlatego w raporcie

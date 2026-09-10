@@ -18,6 +18,7 @@ Rectangle {
     property string dateText: ""
     property color borderColor: Theme.colors.cardBorder
     property color dateColor: Theme.colors.textMuted
+    property bool setsEditable: false
     property Component expandedActions: null
     property string expandButtonName: ""
     property string titleName: ""
@@ -90,6 +91,7 @@ Rectangle {
             Layout.fillWidth: true
             workout: root.workout
             expanded: root.expanded
+            editable: root.setsEditable
             chipPrefix: root.chipPrefix
             opacity: root.expanded ? 1 : 0
 

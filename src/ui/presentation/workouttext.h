@@ -15,6 +15,7 @@ QString workoutToText(const Workout& workout);
 // Stat-tile formatting: "45s" / "12m" / "1h 05m", "800 m" / "5 km" / "12.4 km",
 // "900 kg" / "12 400 kg".
 QString finishPrompt(int completedSets, int plannedSets);
+QString amnestyLossWarning(const QString& workoutName, int plannedSets);
 
 QString formatDuration(qint64 seconds);
 QString formatRest(int seconds);

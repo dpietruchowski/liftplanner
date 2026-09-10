@@ -11,6 +11,7 @@ ColumnLayout {
 
     property var exercise
     property bool flagsMeaningful: false
+    property bool editable: false
     property string chipPrefix: ""
 
     Text {
@@ -33,6 +34,7 @@ ColumnLayout {
                 objectName: root.chipPrefix.length > 0 ? root.chipPrefix + "_" + index : ""
                 setData: modelData
                 flagsMeaningful: root.flagsMeaningful
+                editable: root.editable
             }
         }
     }

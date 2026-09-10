@@ -72,30 +72,6 @@ kompletności za najmniej roboty.
 
 ## Open
 
-### G13 — Poprawienie zakończonego treningu (pierwszy plaster: jedna seria)
-- **Dla kogo/po co:** telefon padł w połowie sesji, ptaszek poszedł przez pomyłkę
-  albo zapomniałeś odhaczyć ostatnią serię. Historia zostaje nieprawdziwa, a to
-  ona karmi statystyki, dziedziczenie ciężaru i prompt dla AI. Jedyne dzisiejsze
-  wyjście — skasować całą sesję — kosztuje więcej, niż jest warte, więc w praktyce
-  zostaje się z zapisem, o którym się wie, że kłamie.
-- **Dowód:** `WorkoutHistoryViewModel::saveWorkout`
-  (`src/ui/viewmodels/workouthistoryviewmodel.h:34`) nie jest wywoływany z
-  żadnego pliku QML. Rozwinięty kafel treningu z historii
-  (`tmp/loop/pm17-history-expanded.png`) daje trzy akcje: powtórz, skopiuj do
-  schowka, usuń. Żetony serii pokazują od G31 prawdę o wykonaniu, ale są tylko do
-  czytania.
-- **Zakres:** L w całości, dlatego **pierwszy plaster to jedna rzecz**:
-  przełączenie wykonania pojedynczej serii w zakończonym treningu. Bez zmiany
-  składu ćwiczeń, bez zmiany ciężarów i powtórzeń — te idą osobnymi plastrami.
-- **Gotowe, gdy:** w rozwiniętym kaflu treningu z historii da się oznaczyć serię
-  opuszczoną jako zrobioną i odwrotnie; zmiana jest widoczna od razu i przeżywa
-  restart aplikacji; statystyki i „ostatnio" na ekranie głównym liczą się po
-  zmianie zgodnie z nowym stanem; trening bez ani jednej flagi („Base Strength" z
-  importu) po odhaczeniu w nim jednej serii przestaje korzystać z amnestii i
-  pokazuje pozostałe serie jako opuszczone — bo to właśnie znaczy pierwszy ptaszek
-  w sesji, i użytkownik musi to zobaczyć od razu, a nie odkryć później w
-  statystykach.
-
 ### G2 — Wybór dnia zaplanowanego treningu
 - **Dla kogo/po co:** manualnie utworzony trening zawsze ląduje na „teraz", więc
   tygodnia nie da się rozłożyć na poniedziałek, środę i piątek z wyprzedzeniem.

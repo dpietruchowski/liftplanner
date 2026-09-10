@@ -16,6 +16,7 @@ WorkoutCard {
     expandButtonName: "historyWorkoutExpandButton" + root.itemIndex
     titleName: "historyWorkoutTitle" + root.itemIndex
     chipPrefix: "historyWorkoutSetChip" + root.itemIndex
+    setsEditable: true
     dateText: workout ? Qt.formatDateTime(workout.startedTime, "ddd, d MMM yyyy") : ""
 
     expandedActions: Component {

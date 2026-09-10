@@ -8,6 +8,7 @@ ColumnLayout {
 
     property var workout
     property bool expanded: false
+    property bool editable: false
     property string chipPrefix: ""
 
     readonly property bool flagsMeaningful: workout ? workout.completionFlagsMeaningful : false
@@ -21,6 +22,7 @@ ColumnLayout {
             Layout.fillWidth: true
             exercise: modelData
             flagsMeaningful: root.flagsMeaningful
+            editable: root.editable
             chipPrefix: root.chipPrefix.length > 0 ? root.chipPrefix + "_" + index : ""
         }
     }

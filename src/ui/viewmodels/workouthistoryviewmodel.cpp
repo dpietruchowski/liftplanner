@@ -1,6 +1,8 @@
 #include "workouthistoryviewmodel.h"
 #include "application/workout/workoutservice.h"
 #include "async/timeprovider.h"
+#include "domain/workout/performedsets.h"
+#include "domain/workout/sessionsummary.h"
 #include "infrastructure/workout/workoutjson.h"
 #include "ui/presentation/historyimportcheck.h"
 #include "ui/presentation/workouttext.h"
@@ -210,6 +212,60 @@ QVariantList WorkoutHistoryViewModel::weekActivity() const
 QVariantList WorkoutHistoryViewModel::topExercises() const { return m_topExercises; }
 
 QVariantList WorkoutHistoryViewModel::recentTotals() const { return m_recentTotals; }
+
+WorkoutModel* WorkoutHistoryViewModel::ownerOf(SetModel* set) const
+{
+    auto* exercise = set ? qobject_cast<ExerciseModel*>(set->parent()) : nullptr;
+    return exercise ? qobject_cast<WorkoutModel*>(exercise->parent()) : nullptr;
+}
+
+void WorkoutHistoryViewModel::requestSetToggle(SetModel* set)
+{
+    WorkoutModel* workout = ownerOf(set);
+    if (!workout)
+        return;
+
+    m_pendingToggle.clear();
+
+    const Workout entity = workout->toEntity();
+    if (set->completed() || completionFlagsAreMeaningful(entity))
+    {
+        applyToggle(set);
+        return;
+    }
+
+    m_pendingToggle = set;
+    emit amnestyWarningRaised(WorkoutText::amnestyLossWarning(
+        entity.name(), static_cast<int>(summarizeSession(entity).plannedSets)));
+}
+
+void WorkoutHistoryViewModel::confirmPendingToggle()
+{
+    SetModel* set = m_pendingToggle.data();
+    m_pendingToggle.clear();
+    applyToggle(set);
+}
+
+void WorkoutHistoryViewModel::cancelPendingToggle() { m_pendingToggle.clear(); }
+
+void WorkoutHistoryViewModel::applyToggle(SetModel* set)
+{
+    WorkoutModel* workout = ownerOf(set);
+    if (!m_service || !workout)
+        return;
+
+    set->setCompleted(!set->completed());
+
+    m_service->saveWorkout(workout->toEntity())
+        .then(this,
+              [this](int)
+              {
+                  refreshTopExercises();
+                  refreshRecentTotals();
+                  emit lastWorkoutChanged();
+              })
+        .onError(this, [this](const QString& error) { emit errorOccurred(error); });
+}
 
 void WorkoutHistoryViewModel::importFromJson(const QString& jsonData)
 {
