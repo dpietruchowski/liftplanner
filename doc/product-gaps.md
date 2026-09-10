@@ -10,6 +10,29 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
 
 ## Open
 
+### G16 — Nazwa treningu na kaflu przegrywa z przyciskami
+- **Dla kogo/po co:** nazwa jest jedyną rzeczą, po której odróżnia się „Push A"
+  od „Push B" na liście zaplanowanych. Dziś ucina się po kilkunastu znakach, a
+  kafel oddaje większość szerokości przyciskom, z których dwa (edycja,
+  usunięcie) używane są raz na kilka tygodni.
+- **Dowód:** raport z iteracji 11 (sekcja „Obserwacja", zrzut
+  `tmp/loop/g25-history.png`): kafle pokazują „Discard che…" i „Summary c…".
+  Wcześniej to samo w iteracji 3 („Naming che..."), więc nie jest to
+  jednorazowy przypadek długiej nazwy. `WorkoutCardTitle.qml:15-22` elidzie
+  tytuł, a nagłówek (`WorkoutCard.qml:46-77`) to przycisk rozwijania + tytuł +
+  rząd akcji; `PlannedWorkoutItem.qml:21-55` wstawia w ten rząd trzy przyciski,
+  więc przy oknie 360 px (`Main.qml:9`) na nazwę zostaje reszta. Wzorzec, który
+  to rozwiązuje, jest już w repo i działa: kafel historii
+  (`WorkoutItem.qml:19-59`) trzyma wszystkie trzy akcje w `expandedActions` i ma
+  w nagłówku tylko tytuł.
+- **Waga po iteracji 11:** wyższa. Powtórzenie treningu z historii odkłada kopię
+  właśnie na tę listę, więc użytkownik ląduje na niej częściej, i to z nazwami,
+  które różnią się dopiero na końcu.
+- **Zakres:** S
+- **Gotowe, gdy:** przy oknie 360 px kafel zaplanowanego treningu pokazuje pełną
+  nazwę długości typowej dla treningu (np. „Naming check upper A") bez
+  wielokropka, a edycja i usunięcie pozostają osiągalne.
+
 ### G2 — Wybór dnia zaplanowanego treningu
 - **Dla kogo/po co:** manualnie utworzony trening zawsze ląduje na „teraz", więc
   tygodnia nie da się rozłożyć na poniedziałek, środę i piątek z wyprzedzeniem.
@@ -28,21 +51,6 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
   liście zaplanowanych pokazuje wybrany dzień, a nie dzisiejszy, i ta data
   przeżywa restart aplikacji.
 
-### G4 — „Start workout" ignoruje wybór na bębnie
-- **Dla kogo/po co:** użytkownik przewija bęben na ekranie głównym, wybiera
-  konkretny trening i naciska duży przycisk startu — a rusza inny. To dokładnie
-  ten rodzaj zachowania, po którym przestaje się ufać aplikacji.
-- **Dowód:** `WorkoutDrum.qml:24-28` — kliknięcie pozycji zmienia tylko
-  `currentIndex`. `ScreenHome.qml:145-153` — `startWorkout()` startuje zawsze
-  `PlannedWorkoutViewModel.nextWorkout`, nigdzie nie czyta stanu bębna. Bęben
-  potrafi pokazać też „next planned" (`ScreenHome.qml:24`) i „last workout"
-  (`ScreenHome.qml:28`).
-- **Zakres:** S
-- **Gotowe, gdy:** przy dwóch zaplanowanych treningach wybranie na bębnie tego
-  drugiego i naciśnięcie „Start workout" uruchamia ten drugi (ekran aktywnego
-  treningu ma jego nazwę w tytule); dla pozycji, której nie da się wystartować
-  (miniony trening), przycisk nie startuje cudzego treningu.
-
 ### G17 — Pusty trening da się zapisać i wystartować
 - **Dla kogo/po co:** trening bez ani jednego ćwiczenia trafia na listę
   zaplanowanych i można go wystartować. Użytkownik ląduje wtedy na ekranie
@@ -59,6 +67,28 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
 - **Gotowe, gdy:** w edytorze trening bez ćwiczeń nie da się zapisać, a przy
   zablokowanym przycisku widać, że brakuje ćwiczeń; trening z co najmniej jednym
   ćwiczeniem zapisuje się jak dotąd.
+
+### G26 — Nieudany import historii i nieudany start milczą
+- **Dla kogo/po co:** wklejasz do schowka JSON od AI, klikasz import historii,
+  potwierdzasz — i nie dzieje się absolutnie nic. Nie wiadomo, czy plan był zły,
+  czy schowek pusty, czy aplikacja zamarła. Ta sama akcja obok, przy „Planned",
+  potrafi powiedzieć, co poszło nie tak, więc użytkownik dostaje dwa różne
+  zachowania na dwóch sąsiednich przyciskach tego samego ekranu.
+- **Dowód:** `MainView.qml:148-180` podpina komunikaty o błędach do trzech view
+  modeli: `PlannedWorkoutViewModel`, `WorkoutEditorViewModel`,
+  `WorkoutTemplateViewModel`. `WorkoutHistoryViewModel` na tej liście nie ma, a
+  zgłasza błędy w sześciu miejscach, m.in. „Import failed: invalid JSON"
+  (`workouthistoryviewmodel.cpp:218`) i „Clipboard is empty" (`:242`) — to
+  dokładnie ścieżka przycisku `importHistoryButton`
+  (`ScreenWorkouts.qml:164-173`). Tak samo milczy `ActiveWorkoutViewModel`:
+  „Invalid workout" przy starcie (`activeworkoutviewmodel.cpp:183`) nie ma
+  odbiorcy, więc naciśnięcie startu na treningu, którego nie da się wystartować,
+  wygląda jak martwy przycisk.
+- **Zakres:** S
+- **Gotowe, gdy:** import historii ze śmieciem w schowku (albo z pustym
+  schowkiem) pokazuje komunikat mówiący, co się nie udało, a poprawny import
+  nadal wchodzi bez ostrzeżeń; naciśnięcie startu na treningu, który nie może
+  ruszyć, też daje komunikat zamiast ciszy.
 
 ### G6 — Czas przerwy jest niewidoczny i nie do ustawienia
 - **Dla kogo/po co:** przerwa decyduje o charakterze treningu (siła vs
@@ -88,25 +118,6 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
 - **Gotowe, gdy:** w aktywnym treningu da się dorzucić ćwiczenie z katalogu; po
   dodaniu pojawia się ono na liście, ma serie do odhaczenia, a po zakończeniu
   treningu widać je w historii.
-
-### G16 — Nazwa treningu na kaflu przegrywa z przyciskami
-- **Dla kogo/po co:** nazwa jest jedyną rzeczą, po której odróżnia się „Push A"
-  od „Push B" na liście. Dziś ucina się po kilkunastu znakach, a kafel oddaje
-  większość szerokości przyciskom, z których dwa (edycja, usunięcie) używane są
-  raz na kilka tygodni.
-- **Dowód:** raport z iteracji 3 (`tmp/loop/test-report.md`, „Obserwacje",
-  zrzut `tmp/loop/g3-confirm.png`): „Naming che..." przy szerokości, na której
-  zmieściłoby się dużo więcej. Nagłówek kafla (`WorkoutCard.qml:46-77`) to
-  przycisk rozwijania + tytuł z `Layout.fillWidth` + rząd akcji; do
-  `PlannedWorkoutItem.qml` doszły w iteracjach 1 i 3 przyciski edycji i
-  usunięcia, więc rząd akcji urósł z jednego przycisku do trzech i tytuł dostaje
-  resztę przy oknie 360 px (`Main.qml:9`). Wzorzec, który to rozwiązuje, jest już
-  w repo: `WorkoutItem.qml:14-40` trzyma rzadkie i groźne akcje w
-  `expandedActions`, czyli pokazuje je dopiero po rozwinięciu kafla.
-- **Zakres:** S
-- **Gotowe, gdy:** przy oknie 360 px kafel zaplanowanego treningu pokazuje pełną
-  nazwę długości typowej dla treningu (np. „Naming check upper A") bez wielokropka,
-  a edycja i usunięcie pozostają osiągalne.
 
 ### G20 — Zaimportowana historia przychodzi bez śladu wykonania
 - **Dla kogo/po co:** import planu i historii z AI to sztandarowa droga do

@@ -18,6 +18,7 @@
 #include "ui/presentation/appinfo.h"
 #include "ui/presentation/clipboardhelper.h"
 #include "ui/presentation/notificationtypes.h"
+#include "ui/presentation/workoutstartpolicy.h"
 #include "ui/viewmodels/activeworkoutviewmodel.h"
 #include "ui/viewmodels/exercisecatalogviewmodel.h"
 #include "ui/viewmodels/plannedworkoutviewmodel.h"
@@ -38,6 +39,7 @@ LiftPlannerApplication::~LiftPlannerApplication()
 {
     m_worker->drain();
 
+    m_workoutStartPolicy.reset();
     m_appInfo.reset();
     m_clipboardHelper.reset();
     m_workoutTemplateViewModel.reset();
@@ -119,6 +121,7 @@ void LiftPlannerApplication::createViewModels()
         = std::make_unique<WorkoutTemplateViewModel>(m_workoutTemplateService.get());
     m_clipboardHelper = std::make_unique<ClipboardHelper>();
     m_appInfo = std::make_unique<AppInfo>();
+    m_workoutStartPolicy = std::make_unique<WorkoutStartPolicy>();
 }
 
 void LiftPlannerApplication::registerQmlTypes(QmlRegistrator& registrator)
@@ -140,6 +143,7 @@ void LiftPlannerApplication::registerQmlTypes(QmlRegistrator& registrator)
                                           m_workoutTemplateViewModel.get());
     registrator.registerSingletonInstance("ClipboardHelper", m_clipboardHelper.get());
     registrator.registerSingletonInstance("AppInfo", m_appInfo.get());
+    registrator.registerSingletonInstance("WorkoutStartPolicy", m_workoutStartPolicy.get());
 
     registrator.registerSingletonType("Themed.Components", "Theme.qml", "Theme");
 }

@@ -64,6 +64,11 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
   w innych oknach.
 - Agentów trzymam przy życiu i odzywam się do nich `SendMessage` zamiast
   spawnować nowych — świeży agent to kilkanaście tysięcy tokenów na samo wejście.
+  **Kompakcja kontekstu zabija agentów.** Po niej `SendMessage` odpowiada „No
+  agent named … is reachable" i trzeba spawnować od nowa. Wtedy jednak
+  `subagent_type: product-manager` / `developer` już działa (definicje z
+  `.claude/agents/` wczytały się przy starcie sesji), więc obejście przez
+  `general-purpose` czytający własną definicję jest niepotrzebne.
 - Agenty mają myślenie włączone — dziedziczą je z sesji. Zmierzone na
   transkryptach iteracji 1 (`tmp/thinkcheck.py`): developer 28 bloków / 8352
   tokeny, product manager 26 bloków / 9318 tokenów. Poziom podbijam słowami
@@ -76,6 +81,12 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 - Obchód aplikacji leci przez `tmp/walk.py` — jedno wywołanie na całą ścieżkę,
   zwraca skrót plus podejrzane linie z logu, zamiast surowych dumpów. Zrzuty
   oglądam wybiórczo, bo obrazek to ponad tysiąc tokenów.
+- **`click:` na bębnie i na przyciskach popupów nie wraca** — sterownik czeka na
+  wyciszenie animacji, której bęben nie kończy. Kliknięcie wykonuje się
+  poprawnie, wisi samo wywołanie. Robię wtedy jeden `click:` na wywołanie,
+  po timeoucie `TaskStop`, a stan czytam osobnym wywołaniem. `set:` na
+  `currentIndex` nie zadziała — Qt Quick Controls przyjmują tę zmianę tylko
+  z interakcji użytkownika.
 - Buduję przez `bash tmp/buildwarn.sh` (log do `tmp/build.log`, na wyjściu
   liczba ostrzeżeń), nie gołym `cmake --build` — ten wypluwa setki linii.
 
@@ -83,11 +94,14 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 11 zamknięta (G25 — powtórzenie treningu z historii)
+- **Iteracja:** 12 zamknięta (G4 — „Start workout" startuje zaznaczony trening)
 - **W locie:** nic
-- **Ostatni commit pętli:** G25
-- **Następna pozycja wg backlogu:** do wyboru przez PM; G16 (ucięte nazwy na
-  kaflach) zyskało na wadze, bo powtarzanie odkłada treningi właśnie na tę listę
+- **Ostatni commit pętli:** G4
+- **Następna pozycja wg backlogu:** do wyboru przez PM. Na liście zostały m.in.
+  G16 (ucięte nazwy na kaflach) i G26 (nieudany import i nieudany start milczą).
+  W raporcie z iteracji 12 czeka też świeże znalezisko: potwierdzenie zamiany
+  trwającego treningu kasuje go bez ostrzeżenia
+  (`ActiveWorkoutViewModel::startWorkout` robi `deleteWorkout` na poprzednim).
 - **Zawroty do developera:** 3, wszystkie przy zielonym `ctest`:
   G5 (brakujący import QML — aplikacja nie wstawała), G23 (lista zaplanowanych
   nieodświeżana po porzuceniu sesji — baza poprawna, ekran kłamał), G8 (etykieta

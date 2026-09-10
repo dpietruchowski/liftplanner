@@ -30,6 +30,17 @@ Rectangle {
         return list
     }
 
+    readonly property var selectedWorkout: {
+        var index = workoutDrum.currentIndex
+        if (index < 0 || index >= drumEntries.length)
+            return null
+        return drumEntries[index].workout
+    }
+
+    readonly property var startDecision: WorkoutStartPolicy.decide(
+                                             selectedWorkout,
+                                             ActiveWorkoutViewModel.currentWorkout)
+
     ColumnLayout {
         width: parent.width - 2 * Theme.padding.screen
         anchors.verticalCenter: parent.verticalCenter
@@ -92,6 +103,7 @@ Rectangle {
         }
 
         WorkoutDrum {
+            id: workoutDrum
             objectName: "workoutDrum"
             Layout.fillWidth: true
             Layout.topMargin: Theme.spacing.xLarge
@@ -105,25 +117,19 @@ Rectangle {
             Layout.leftMargin: Theme.drum.cardInset
             Layout.rightMargin: Theme.drum.cardInset
             Layout.topMargin: Theme.spacing.xLarge
-            text: "Start workout"
+            text: root.startDecision.label
             iconSource: Theme.icons.startWorkout
             iconSize: Theme.icon.large
             pill: true
             buttonStyle: Theme.button.primary
             buttonSize: Theme.button.wide
-            onClicked: {
-                if (ActiveWorkoutViewModel.currentWorkout)
-                    startWorkoutPopup.open()
-                else if (!PlannedWorkoutViewModel.nextWorkout)
-                    noPlannedPopup.open()
-                else
-                    startWorkout()
-            }
+            onClicked: root.handleStartRequest()
         }
     }
 
     NotificationPopup {
         id: noPlannedPopup
+        objectName: "noPlannedPopup"
         text: "No planned workouts yet.\n\n" +
               "Head to the workouts tab (calendar icon) and tap the AI button — it will copy a ready-made prompt to your clipboard. " +
               "Paste it into any AI assistant (ChatGPT, Gemini, etc.), describe your training goals, and let it generate a workout plan. " +
@@ -134,19 +140,51 @@ Rectangle {
 
     NotificationPopup {
         id: startWorkoutPopup
+        objectName: "replaceWorkoutPopup"
         text: "Previous workout was not ended. Do you want to start new one?"
         type: Notification.Type.Warning
         buttons: Notification.Button.Ok | Notification.Button.Cancel
-        onAccepted: {
-            startWorkout()
-        }
+        onAccepted: root.startWorkout(root.selectedWorkout)
     }
 
-    function startWorkout() {
-        if (!PlannedWorkoutViewModel.nextWorkout)
+    NotificationPopup {
+        id: cannotStartPopup
+        objectName: "cannotStartPopup"
+        type: Notification.Type.Info
+        buttons: Notification.Button.Ok
+    }
+
+    function handleStartRequest() {
+        var decision = root.startDecision
+        if (decision.action === "missing") {
+            noPlannedPopup.open()
             return
-        ActiveWorkoutViewModel.startWorkout(PlannedWorkoutViewModel.nextWorkout)
+        }
+        if (decision.action === "blocked") {
+            cannotStartPopup.text = decision.message
+            cannotStartPopup.open()
+            return
+        }
+        if (decision.action === "resume") {
+            showActiveWorkout()
+            return
+        }
+        if (decision.action === "replace") {
+            startWorkoutPopup.open()
+            return
+        }
+        startWorkout(root.selectedWorkout)
+    }
+
+    function startWorkout(workout) {
+        if (!workout)
+            return
+        ActiveWorkoutViewModel.startWorkout(workout)
         PlannedWorkoutViewModel.loadAll()
+        showActiveWorkout()
+    }
+
+    function showActiveWorkout() {
         if (stackView.currentItem !== activeWorkoutScreen) {
             stackView.replace(activeWorkoutScreen)
         }
