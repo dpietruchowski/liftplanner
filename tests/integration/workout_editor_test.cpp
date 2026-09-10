@@ -210,16 +210,83 @@ TEST_F(WorkoutEditorTest, AnExerciseWithHistoryStartsFromTheLastWeightAndReps)
     EXPECT_FALSE(firstSetOf(0).completed());
 }
 
-TEST_F(WorkoutEditorTest, HistoryWithoutACompletedSetDoesNotSeedAnything)
+TEST_F(WorkoutEditorTest, AFinishedSessionWithoutASingleTickStillSeedsTheWeight)
 {
-    seedLinkedHistory(QStringLiteral("Back Squat"), { Set(5, 82.5) }, QDate(2024, 12, 20));
+    seedLinkedHistory(QStringLiteral("Back Squat"), { Set(5, 20.0), Set(5, 45.0) },
+                      QDate(2024, 12, 20));
     startWorkout();
 
     addExercise(QStringLiteral("Back Squat"));
     m_app.drain();
 
+    EXPECT_EQ(firstSetOf(0).repetitions(), 5);
+    EXPECT_DOUBLE_EQ(firstSetOf(0).weight(), 45.0);
+}
+
+TEST_F(WorkoutEditorTest, AnUntickedExerciseInAPartlyTickedSessionIsTreatedAsSkipped)
+{
+    Exercise squat
+        = Exercise::createFromDefinition(definitionId(QStringLiteral("Back Squat")),
+                                         QStringLiteral("Back Squat"), ExerciseKind::Strength, 180);
+    squat.addSet(Set(5, 82.5));
+
+    Exercise plank = Exercise::createFromDefinition(
+        definitionId(QStringLiteral("Plank")), QStringLiteral("Plank"), ExerciseKind::Interval, 60);
+    Set held = Set::createDuration(90);
+    held.setCompleted(true);
+    plank.addSet(held);
+
+    Workout past(QStringLiteral("Half done"), QDateTime(QDate(2024, 12, 20), QTime(18, 0, 0)));
+    past.setStartedTime(QDateTime(QDate(2024, 12, 20), QTime(18, 0, 0)));
+    past.setEndedTime(QDateTime(QDate(2024, 12, 20), QTime(19, 0, 0)));
+    past.addExercise(squat);
+    past.addExercise(plank);
+    m_app.workoutService()
+        .importHistory(std::vector<Workout> { past })
+        .warnOnError("seed a partly ticked session");
+    m_app.drain();
+
+    startWorkout();
+    addExercise(QStringLiteral("Back Squat"));
+    m_app.drain();
+
     EXPECT_EQ(firstSetOf(0).repetitions(), 8);
     EXPECT_DOUBLE_EQ(firstSetOf(0).weight(), 0.0);
+}
+
+TEST_F(WorkoutEditorTest, APlannedWorkoutIsNeverASourceOfWeight)
+{
+    Exercise squat
+        = Exercise::createFromDefinition(definitionId(QStringLiteral("Back Squat")),
+                                         QStringLiteral("Back Squat"), ExerciseKind::Strength, 180);
+    squat.addSet(Set(5, 82.5));
+
+    Workout upcoming(QStringLiteral("Next week"), QDateTime(QDate(2025, 1, 10), QTime(18, 0, 0)));
+    upcoming.setPlannedTime(QDateTime(QDate(2025, 1, 10), QTime(18, 0, 0)));
+    upcoming.addExercise(squat);
+    m_app.workoutService()
+        .importPlannedWorkouts(std::vector<Workout> { upcoming })
+        .warnOnError("seed a planned workout");
+    m_app.drain();
+
+    startWorkout();
+    addExercise(QStringLiteral("Back Squat"));
+    m_app.drain();
+
+    EXPECT_EQ(firstSetOf(0).repetitions(), 8);
+    EXPECT_DOUBLE_EQ(firstSetOf(0).weight(), 0.0);
+}
+
+TEST_F(WorkoutEditorTest, AnEndedSessionBeatsAnOlderTickedOne)
+{
+    seedLinkedHistory(QStringLiteral("Back Squat"), { liftedSet(5, 70.0) }, QDate(2024, 11, 1));
+    seedLinkedHistory(QStringLiteral("Back Squat"), { Set(5, 95.0) }, QDate(2024, 12, 20));
+    startWorkout();
+
+    addExercise(QStringLiteral("Back Squat"));
+    m_app.drain();
+
+    EXPECT_DOUBLE_EQ(firstSetOf(0).weight(), 95.0);
 }
 
 TEST_F(WorkoutEditorTest, HistoryOfAnotherExerciseIsNotBorrowed)

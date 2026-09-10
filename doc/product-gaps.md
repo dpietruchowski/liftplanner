@@ -6,22 +6,38 @@ Kolejność sekcji „Open" to kolejność ważności.
 
 ## Open
 
-### G19 — Zakończony trening nie liczy się jako wykonany
-- **Dla kogo/po co:** użytkownik odbywa cały trening, kończy go, a aplikacja
-  uznaje, że nie zrobił nic. „Last time" nie pokazuje się mimo serii po 45 kg w
-  historii, a świeżo dodane dziedziczenie ciężaru dziedziczy tę samą ślepotę.
-- **Dowód:** raport z iteracji 5. Policzone na kopii prawdziwej bazy: na 58 serii
-  tylko 6 ma `completed = 1`, a w zakończonych treningach jest dokładnie jedna
-  taka seria (i ta ma ciężar 0). `previousPerformancesCore`
-  (`workoutservice.cpp:240-266`) wymaga `hasCompletedSet`, więc dla Bench Pressa
-  z zakończonego treningu „Base Strength" (20/30/45/45/45 kg, wszystkie
-  `completed = 0`) nie zwraca nic — potwierdzone w aplikacji, „Last time" nie
-  pojawiło się ani razu.
+### G21 — Statystyki na ekranie głównym mają tę samą ślepotę co „Last time"
+- **Dla kogo/po co:** po naprawie G19 „Last time" pokazuje sesję z czerwca, ale
+  kafelki objętości i czasu na ekranie głównym dalej liczą tę samą sesję jako
+  zerową. Użytkownik widzi teraz dwie sprzeczne odpowiedzi na to samo pytanie.
+- **Dowód:** znalezione przez developera przy G19 i sprostowane w opisie:
+  `recentTotalsCore` ma `if (!row.hasSet || !row.completed) continue`
+  (`workoutservice.cpp:219`), czyli filtruje po fladze dokładnie tak, jak robiło
+  to `previousPerformancesCore` przed naprawą. `topExercises` nie filtruje, więc
+  lista najczęstszych ćwiczeń była i jest poprawna — stąd wrażenie, że część
+  ekranu głównego działa.
+- **Zakres:** M — nie da się przenieść reguły z G19 wprost, bo `recentTotals`
+  chodzi po płaskich `HistorySetRow`, a nie po agregacie `Workout`, więc
+  „czy w tej sesji ktokolwiek odhaczał" trzeba tam ustalić inaczej.
+- **Gotowe, gdy:** dla historii, w której żadna seria nie ma flagi, kafelki
+  objętości i czasu na ekranie głównym pokazują wartości z tych treningów, a nie
+  zera; historia z częściowym odhaczeniem nadal liczy wyłącznie odhaczone serie.
+
+### G20 — Zaimportowana historia przychodzi bez śladu wykonania
+- **Dla kogo/po co:** import planu i historii z AI to sztandarowa droga do
+  aplikacji, a wszystko, co tą drogą wchodzi, jest oznaczone jako niezrobione.
+  To źródło zer, na które natrafił raport, i dopóki działa, każdy kolejny import
+  dokłada danych, które dla aplikacji nie istnieją.
+- **Dowód:** `parseSets` (`workoutjson.cpp:229` i dalej) buduje serie z
+  kompaktowego zapisu (`"5x60kg,5x75kg"`) i nigdy nie dotyka `completed`;
+  format kompaktowy, czyli ten, który produkuje prompt dla AI, w ogóle nie ma
+  takiego pola. Pełny JSON ustawia flagę tylko wtedy, gdy klucz jest obecny
+  (`workoutjson.cpp:120-121`). Trening zaimportowany ze statusem „ended" ląduje
+  więc w bazie z każdą serią na zero.
 - **Zakres:** M
-- **Gotowe, gdy:** rozstrzygnięte i wdrożone jedno z dwojga — albo seria w
-  zakończonym treningu liczy się jako wykonana niezależnie od flagi, albo flaga
-  jest poprawnie zapisywana przy kończeniu treningu; w efekcie „Last time"
-  pokazuje się dla ćwiczenia, które użytkownik faktycznie robił.
+- **Gotowe, gdy:** trening zaimportowany jako historia (status zakończony) ma po
+  imporcie serie oznaczone jako wykonane, widoczne jako odhaczone w podglądzie
+  treningu z historii; import planu na przyszłość nadal wchodzi jako niezrobiony.
 
 ### G2 — Wybór dnia zaplanowanego treningu
 - **Dla kogo/po co:** aplikacja nazywa się planerem, a każdy nowo utworzony
@@ -204,6 +220,15 @@ Kolejność sekcji „Open" to kolejność ważności.
   szablonu)
 
 ## Done
+
+### G19 — Zakończony trening nie liczy się jako wykonany (iteracja 6)
+Reguła: w zakończonym treningu seria liczy się, jeśli ma flagę; jeśli żadna seria
+w całej sesji jej nie ma, flaga nic nie niesie i liczą się wszystkie serie z
+zawartością. Granulacja per sesja, nie per ćwiczenie, żeby nie wskrzeszać
+ćwiczeń świadomie odpuszczonych. Polityka wydzielona do `domain/workout/performedsets.h`.
+Sprawdzone w aplikacji: „Last time" dla Back Squata pokazuje wreszcie sesję z
+8 czerwca (5x20, 5x30, 3x5x40 kg), edytor zasiewa 40 kg, a dla Bench Pressa
+nowsza odhaczona sesja nadal wygrywa ze starszą nieodhaczoną.
 
 ### G15 — Nowe ćwiczenie nie dziedziczy ciężaru z poprzedniego razu (iteracja 5)
 `WorkoutService::lastPerformance` deleguje do istniejącego

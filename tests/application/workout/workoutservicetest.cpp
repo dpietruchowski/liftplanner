@@ -573,10 +573,12 @@ Workout endedWorkout(int id, int daysAgo, const std::vector<Exercise>& exercises
 
 }
 
-TEST_F(WorkoutServiceTest, PreviousPerformances_PicksTheMostRecentCompletedMatch)
+TEST_F(WorkoutServiceTest, PreviousPerformances_SkipAnUntickedExerciseInATickedSession)
 {
     const std::vector<Workout> history = {
-        endedWorkout(4, 1, { exerciseWithSets("Bench Press", 100.0, false, 7) }),
+        endedWorkout(4, 1,
+                     { exerciseWithSets("Bench Press", 100.0, false, 7),
+                       exerciseWithSets("Squat", 90.0, true) }),
         endedWorkout(2, 2, { exerciseWithSets("Bench Press", 62.5, true, 7) }),
         endedWorkout(1, 3,
                      { exerciseWithSets("Bench Press", 60.0, true, 7),
@@ -598,6 +600,41 @@ TEST_F(WorkoutServiceTest, PreviousPerformances_PicksTheMostRecentCompletedMatch
     EXPECT_DOUBLE_EQ(result[0].exercise.sets()[0].weight(), 62.5);
     EXPECT_EQ(result[1].exerciseIndex, 1);
     EXPECT_EQ(result[1].exercise.name(), "Squat");
+}
+
+TEST_F(WorkoutServiceTest, PreviousPerformances_TrustsAFinishedSessionThatWasNeverTickedOff)
+{
+    const std::vector<Workout> history = {
+        endedWorkout(4, 1, { exerciseWithSets("Bench Press", 45.0, false, 7) }),
+    };
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+
+    Workout active("Today", QDateTime::currentDateTime());
+    active.setId(9);
+    active.addExercise(exerciseWithSets("Bench Press", 0.0, false, 7));
+
+    const auto result = previousPerformances(active);
+
+    ASSERT_EQ(result.size(), 1u);
+    EXPECT_EQ(result[0].exerciseIndex, 0);
+    ASSERT_EQ(result[0].exercise.sets().size(), 2u);
+    EXPECT_DOUBLE_EQ(result[0].exercise.sets()[0].weight(), 45.0);
+    EXPECT_TRUE(result[0].exercise.sets()[0].completed());
+    EXPECT_TRUE(result[0].exercise.sets()[1].completed());
+}
+
+TEST_F(WorkoutServiceTest, PreviousPerformances_IgnoreAnExerciseThatHasNoSetsAtAll)
+{
+    const std::vector<Workout> history = {
+        endedWorkout(4, 1, { Exercise(QStringLiteral("Bench Press"), 120) }),
+    };
+    EXPECT_CALL(m_repo, findAll(::testing::_)).WillOnce(::testing::Return(history));
+
+    Workout active("Today", QDateTime::currentDateTime());
+    active.setId(9);
+    active.addExercise(exerciseWithSets("Bench Press", 0.0, false));
+
+    EXPECT_TRUE(previousPerformances(active).empty());
 }
 
 TEST_F(WorkoutServiceTest, PreviousPerformances_SkipsTheWorkoutItselfAndNameMismatches)

@@ -1,6 +1,7 @@
 #include "workoutservice.h"
 #include "async/timeprovider.h"
 #include "domain/workout/historysetrow.h"
+#include "domain/workout/performedsets.h"
 #include "domain/workout/strengthmath.h"
 #include "domain/workout/workoutquery.h"
 #include "domain/workout/workoutrepository.h"
@@ -20,12 +21,6 @@ bool sameExercise(const Exercise& a, const Exercise& b)
     if (a.hasDefinition() && b.hasDefinition())
         return a.definitionId() == b.definitionId();
     return a.name().compare(b.name(), Qt::CaseInsensitive) == 0;
-}
-
-bool hasCompletedSet(const Exercise& exercise)
-{
-    return std::any_of(exercise.sets().begin(), exercise.sets().end(),
-                       [](const Set& set) { return set.completed(); });
 }
 
 }
@@ -241,23 +236,33 @@ WorkoutService::previousPerformancesCore(const Workout& workout)
 {
     const std::vector<Workout> history = loadHistoryCore(previous_performance_window).value();
 
+    std::vector<bool> flagsAreMeaningful;
+    flagsAreMeaningful.reserve(history.size());
+    for (const Workout& past : history)
+        flagsAreMeaningful.push_back(completionFlagsAreMeaningful(past));
+
     std::vector<PreviousPerformance> result;
     const auto& exercises = workout.exercises();
     for (size_t i = 0; i < exercises.size(); ++i)
     {
-        for (const Workout& past : history)
+        for (size_t h = 0; h < history.size(); ++h)
         {
+            const Workout& past = history[h];
             if (past.id() == workout.id())
                 continue;
 
+            const bool trustFlags = flagsAreMeaningful[h];
             const auto& candidates = past.exercises();
-            const auto match = std::find_if(
-                candidates.begin(), candidates.end(), [&](const Exercise& candidate)
-                { return sameExercise(candidate, exercises[i]) && hasCompletedSet(candidate); });
+            const auto match = std::find_if(candidates.begin(), candidates.end(),
+                                            [&](const Exercise& candidate) {
+                                                return sameExercise(candidate, exercises[i])
+                                                    && wasPerformed(candidate, trustFlags);
+                                            });
             if (match == candidates.end())
                 continue;
 
-            result.push_back({ static_cast<int>(i), past.startedTime(), *match });
+            result.push_back(
+                { static_cast<int>(i), past.startedTime(), asPerformed(*match, trustFlags) });
             break;
         }
     }

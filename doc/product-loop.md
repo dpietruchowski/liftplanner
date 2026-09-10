@@ -15,7 +15,7 @@ limitu albo do wyczerpania backlogu.
 
 ## Obrót pętli
 
-1. **Limit.** `bash tmp/probe_usage.sh`. Kod wyjścia 1 albo słowo `STOP` →
+1. **Limit.** `bash tmp/probe_usage.sh` (próg 85%). Kod wyjścia 1 albo `STOP` →
    przerywam natychmiast, nic nie zaczynam, dopisuję stan na dole tego pliku.
 2. **Product manager.** Dostaje raport z poprzedniej iteracji
    (`tmp/loop/test-report.md`). Oddaje jedną pozycję i warunek „gotowe, gdy".
@@ -47,7 +47,8 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 ## Twarde zasady
 
-- **Próg 80% okna 5-godzinnego.** Tygodniowy limit ignorujemy.
+- **Próg 85% okna 5-godzinnego** (podniesiony z 80% na prośbę użytkownika).
+  Tygodniowy limit ignorujemy.
   `tmp/probe_usage.sh` kosztuje zero tokenów, więc sprawdzam co obrót.
 - **Nigdy nie piszę do innych sesji** z `ListAgents` — to inne projekty
   użytkownika.
@@ -82,9 +83,9 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 5 zamknięta (G15 — dziedziczenie ciężaru z historii)
+- **Iteracja:** 6 zamknięta (G19 — zakończony trening liczy się jako wykonany)
 - **W locie:** nic
-- **Ostatni commit pętli:** G15
+- **Ostatni commit pętli:** G19
 - **Zawroty do developera:** 1 (G5, brakujący import w QML)
 - **Stan piaskownicy `tmp/run` zmieniony w iteracji 5:** „Regression Template"
   zakończony, doszedł trening „Seed check". Zrobione celowo, żeby powstała
