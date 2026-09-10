@@ -68,18 +68,29 @@ Rectangle {
             todayIndex: (new Date().getDay() + 6) % 7
         }
 
-        RowLayout {
+        Item {
+            id: topExerciseRow
+            objectName: "topExerciseRow"
             Layout.fillWidth: true
             Layout.topMargin: Theme.spacing.xLarge
             Layout.minimumHeight: implicitHeight
-            spacing: Theme.stat.spacing
+            Layout.preferredHeight: implicitHeight
+
+            readonly property int tileCount: WorkoutHistoryViewModel.topExercises.length
+            readonly property real tileWidth: tileCount > 0
+                ? (width - Theme.stat.spacing * (tileCount - 1)) / tileCount
+                : 0
+
+            implicitHeight: tileCount > 0 ? Theme.stat.height : 0
 
             Repeater {
                 model: WorkoutHistoryViewModel.topExercises
 
                 StatTile {
                     objectName: "topExerciseTile_" + modelData.name
-                    Layout.fillWidth: true
+                    x: index * (topExerciseRow.tileWidth + Theme.stat.spacing)
+                    width: topExerciseRow.tileWidth
+                    height: topExerciseRow.height
                     label: modelData.name
                     value: Math.round(modelData.oneRepMax)
                     unit: "kg"
@@ -88,19 +99,29 @@ Rectangle {
             }
         }
 
-        RowLayout {
+        Item {
+            id: totalsRow
+            objectName: "totalsRow"
             Layout.fillWidth: true
-            Layout.topMargin: WorkoutHistoryViewModel.recentTotals.length > 0
-                              ? Theme.stat.spacing : 0
+            Layout.topMargin: tileCount > 0 ? Theme.stat.spacing : 0
             Layout.minimumHeight: implicitHeight
-            spacing: Theme.stat.spacing
+            Layout.preferredHeight: implicitHeight
+
+            readonly property int tileCount: WorkoutHistoryViewModel.recentTotals.length
+            readonly property real tileWidth: tileCount > 0
+                ? (width - Theme.stat.spacing * (tileCount - 1)) / tileCount
+                : 0
+
+            implicitHeight: tileCount > 0 ? Theme.stat.height : 0
 
             Repeater {
                 model: WorkoutHistoryViewModel.recentTotals
 
                 StatTile {
                     objectName: "totalsTile_" + modelData.label
-                    Layout.fillWidth: true
+                    x: index * (totalsRow.tileWidth + Theme.stat.spacing)
+                    width: totalsRow.tileWidth
+                    height: totalsRow.height
                     label: modelData.label
                     value: modelData.value
                 }

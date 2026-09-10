@@ -119,19 +119,21 @@ aplikacja nie wstawała), G23 (ekran nie odświeżał listy, baza była poprawna
 G8 (ucięta etykieta), G27 i pośrednio G32 (odmiana liczebników). Żadnego z nich
 nie złapałby build ani testy jednostkowe.
 
-- **Iteracja:** 24 zamknięta (G2 — wybór dnia zaplanowanego treningu), plus
-  osobny commit domykający trop z bębnem (data zaplanowanego treningu)
+- **Iteracja:** 25 zamknięta (G34 — kafelki statystyk przeliczane przy schowanym
+  ekranie nie zapadają się już do zerowej szerokości)
 - **W locie:** nic
-- **Ostatni commit pętli:** data zaplanowanego treningu na bębnie
-- **PILNE na start następnej tury — kafelki statystyk na ekranie głównym
-  nachodzą na siebie.** Dwa kafelki rekordów rysują się jeden na drugim w lewym
-  slocie, prawy jest pusty, „TIME" zniknął, kafelki straciły tła. Trwałe, nie
-  przejściowe (zrzuty `tmp/loop/g2-drum.png`, `g2-drum2.png`). Przy dwunastu
-  treningach w piaskownicy ten wiersz wyglądał poprawnie (`g28-continue.png`),
-  dziś jest ich 165 i dużo więcej rekordów. Podejrzenie: kafelków jest więcej,
-  niż wiersz mieści, a limit wysokości kolumny z G28 nie pozwala im zejść niżej
-  — **niesprawdzone**, zabrakło limitu sesji. To najbardziej widoczna usterka
-  pierwszego ekranu.
+- **Ostatni commit pętli:** G34
+- **Pułapka `Layout.fillWidth` przy przebudowie delegatów.** Element bez
+  własnego `implicitWidth`, któremu geometrię daje `RowLayout`, zostaje
+  z `width = 0`, gdy `Repeater` przebuduje go w chwili, gdy ekran jest schowany
+  — layout nie przelicza się wtedy ani wtedy, ani po powrocie. Objawy: brak
+  teł, napisy jeden na drugim, naprawa dopiero po restarcie. Naprawione w G34
+  jawnymi bindingami `x`/`width`. Jeśli podobne zapadnięcie wyjdzie gdzie
+  indziej, szukać tego wzorca, nie wysokości kolumny.
+- **Trop podany PM-owi lub developerowi zawsze oznaczam jako trop.** Przy G34
+  moja hipoteza (liczba treningów + limit wysokości z G28) była błędna i PM
+  obalił ją pomiarem. Gdyby poszła jako ustalenie, developer szukałby
+  w niewłaściwym pliku.
 - **Zużyty przypadek testowy:** `w4 Base Strength` nie jest już „importem bez ani
   jednej flagi" — postawiłem w nim ptaszek, sprawdzając G13. Zastępniki: `w36`,
   `w61`, `w62`, `w111`, `w112`.
