@@ -87,6 +87,11 @@ Aktualizowany po każdym commicie — to jest pamięć pętli.
 - **W locie:** nic
 - **Ostatni commit pętli:** G22
 - **Następna pozycja wg backlogu:** G8 — podsumowanie po zakończonym treningu
+- **Pętla zatrzymana na progu** przy 82% okna 5-godzinnego (próg 85%, iteracja
+  kosztuje 5-6 punktów, więc kolejna nie zmieściłaby się w całości). Drzewo
+  czyste, nic nie zostało w locie. Wznowienie: `bash tmp/probe_usage.sh`, potem
+  `SendMessage` do żywego product managera z prośbą o wybór pozycji — jeśli
+  agenty już nie żyją, spawnować od nowa wg sekcji „Obsada".
 - **Korekta roli PM (po uwadze użytkownika):** product manager zaczął zachowywać
   się jak analityk kodu — G19 i G21 to defekty spójności wyłowione z
   `workoutservice.cpp`, a nie braki, które czuje ktoś na siłowni. Definicja
