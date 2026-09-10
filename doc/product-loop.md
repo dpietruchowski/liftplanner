@@ -94,8 +94,33 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 22 zamknięta (G32 — jedno miejsce odmienia liczebniki).
-  **Tura zamknięta na progu limitu — patrz „Jak wznowić" niżej.**
+### Jak wznowić
+
+Tura zamknięta **przy 79%** okna pięciogodzinnego (próg 85%, obrót kosztuje
+5-6 punktów, więc następny nie zmieściłby się w całości). Drzewo czyste, nic nie
+zostało w locie, wszystkie 22 pozycje zamknięte i zacommitowane.
+
+1. `bash tmp/probe_usage.sh` — jeśli poniżej progu, ruszamy.
+2. Agenty z tamtej sesji już nie żyją (kompakcja je zabija). Spawnuję na nowo
+   przez `subagent_type: product-manager` i `developer` — definicje z
+   `.claude/agents/` wczytują się przy starcie sesji, więc działają wprost.
+3. Product manager ma gotowe zlecenie: **G13, pierwszy plaster — przełączanie
+   wykonania pojedynczej serii w zakończonym treningu**. Sam je przepisał
+   z „do rozbicia" na warunek akceptacji i postawił na czele „Open"; ocenił je
+   jako jedyną dziurę stojącą w poprzek dorobku tej tury, bo dziś jedynym
+   sposobem poprawienia zapisu jest skasowanie całej sesji.
+4. Ocena stanu produktu po 22 iteracjach jest w `doc/product-gaps.md`, sekcja
+   **„Stan produktu po 21 iteracjach"** (pisana przed ostatnim obrotem).
+
+### Bilans tury
+
+Dwadzieścia dwie pozycje zamknięte, testy **682 → 903**, pięć zawrotów do
+developera — **wszystkie przy zielonym `ctest`**: G5 (brakujący import QML,
+aplikacja nie wstawała), G23 (ekran nie odświeżał listy, baza była poprawna),
+G8 (ucięta etykieta), G27 i pośrednio G32 (odmiana liczebników). Żadnego z nich
+nie złapałby build ani testy jednostkowe.
+
+- **Iteracja:** 22 zamknięta (G32 — jedno miejsce odmienia liczebniki)
 - **W locie:** nic
 - **Ostatni commit pętli:** G32
 - **Najlepsze pozycje tej pętli wyszły z weryfikacji, nie z backlogu.** G27
@@ -118,14 +143,8 @@ Aktualizowany po każdym commicie — to jest pamięć pętli.
   dowodził niczego. Dopiero ćwiczenie z historii **z importu, bez ani jednej
   flagi**, pokazało, że zasiew przechodzi przez amnestię z G19. Piaskownica jest
   wspólna, więc przed pomiarem sprawdzam, skąd wzięły się dane, na których mierzę.
-- **Następna pozycja wg backlogu:** do wyboru przez PM. Na liście zostały G26
-  (nieudany import historii milczy), G29 (wybór funtów kończy się na profilu)
-  i G32 („1 exercises · 1 sets" na kaflu szablonu).
-- **Plan na resztę budżetu** (wg PM, po iteracji 18): duża pozostała pozycja to
-  G9, potem G29 (jednostki, M). Małe, po jednej na obrót, gdyby zabrakło
-  budżetu: G26, G32, G11, G12, G17. Przy pięciu obrotach sensowna kolejność to
-  G9, G26, G17, G11, G32 — G29 tylko wtedy, gdy zamiast dwóch małych lepiej
-  wejść w jedną średnią.
+- **Piaskownica po turze:** 164 treningi, aktywny „Base Strength" (22 serie,
+  jedna odhaczona) — zostawiony celowo, bo to gotowy przypadek do G13.
 - **Pułapka pustych flag `completed` — czwarte spotkanie** (G19, G23, G25, G31).
   Kształt bez ani jednego ptaszka nie znaczy „nic nie zrobione", tylko „flagi
   nic nie znaczą"; w piaskownicy leży `w4 Base Strength` z importu, 20 serii,
