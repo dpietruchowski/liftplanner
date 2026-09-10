@@ -83,7 +83,8 @@ ThemedPanel {
         objectName: "filterPanelMatchCount"
         Layout.fillWidth: true
         horizontalAlignment: Text.AlignHCenter
-        text: qsTr("%1 matching exercises").arg(ExerciseCatalogViewModel.count)
+        text: Plural.counted(ExerciseCatalogViewModel.count, qsTr("matching exercise"),
+                             qsTr("matching exercises"))
         color: Theme.colors.textMuted
         font.pixelSize: Theme.fontSize.small
     }

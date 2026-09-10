@@ -21,6 +21,7 @@ class WorkoutEditorViewModel;
 class WorkoutTemplateViewModel;
 class ClipboardHelper;
 class AppInfo;
+class PluralText;
 class WorkoutStartPolicy;
 
 class LiftPlannerApplication final
@@ -53,5 +54,6 @@ private:
     std::unique_ptr<WorkoutTemplateViewModel> m_workoutTemplateViewModel;
     std::unique_ptr<ClipboardHelper> m_clipboardHelper;
     std::unique_ptr<AppInfo> m_appInfo;
+    std::unique_ptr<PluralText> m_pluralText;
     std::unique_ptr<WorkoutStartPolicy> m_workoutStartPolicy;
 };

@@ -80,8 +80,10 @@ Rectangle {
             Text {
                 objectName: "templateMeta"
                 text: root.workoutTemplate
-                    ? qsTr("%1 exercises · %2 sets").arg(root.workoutTemplate.exerciseCount)
-                                                   .arg(root.workoutTemplate.setCount)
+                    ? qsTr("%1 · %2").arg(Plural.counted(root.workoutTemplate.exerciseCount,
+                                                         qsTr("exercise"), qsTr("exercises")))
+                                     .arg(Plural.counted(root.workoutTemplate.setCount,
+                                                         qsTr("set"), qsTr("sets")))
                     : ""
                 color: Theme.colors.textMuted
                 font.pixelSize: Theme.fontSize.xSmall

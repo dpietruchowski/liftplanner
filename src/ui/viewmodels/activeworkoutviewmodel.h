@@ -41,6 +41,7 @@ public:
     Q_INVOKABLE int completedSetCount() const;
     Q_INVOKABLE int totalSetCount() const;
     Q_INVOKABLE bool hasAnythingToRecord() const;
+    Q_INVOKABLE QString finishPrompt() const;
 
     QVariantMap lastSessionSummary() const;
 

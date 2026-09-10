@@ -2,6 +2,7 @@
 
 #include "domain/workout/sessionsummary.h"
 #include "ui/models/workoutmodel.h"
+#include "ui/presentation/plural.h"
 #include <QDateTime>
 #include <QLocale>
 
@@ -61,13 +62,12 @@ QString replaceConfirmation(const WorkoutModel& selected, const WorkoutModel& ac
     }
 
     const SessionSummary summary = summarizeSession(entity);
-    const QString progress
-        = QStringLiteral("%1 of %2 %3")
-              .arg(summary.completedSets)
-              .arg(summary.plannedSets)
-              .arg(summary.plannedSets == 1 ? QStringLiteral("set") : QStringLiteral("sets"));
-    const QString kept
-        = summary.completedSets == 1 ? QStringLiteral("that set") : QStringLiteral("those sets");
+    const QString progress = QStringLiteral("%1 of %2")
+                                 .arg(summary.completedSets)
+                                 .arg(Plural::counted(summary.plannedSets, QStringLiteral("set"),
+                                                      QStringLiteral("sets")));
+    const QString kept = Plural::form(summary.completedSets, QStringLiteral("that set"),
+                                      QStringLiteral("those sets"));
 
     return QStringLiteral("%1 is still running with %2 ticked off.\n\n"
                           "Starting %3 now ends it and files it in your history with %4.")

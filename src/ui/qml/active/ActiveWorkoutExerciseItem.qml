@@ -38,7 +38,7 @@ Column {
         }
 
         var count = exercise.sets.length
-        var label = count + (count === 1 ? " set" : " sets")
+        var label = Plural.counted(count, qsTr("set"), qsTr("sets"))
         if (values.length === 0)
             return label
         if (values.length === 1)

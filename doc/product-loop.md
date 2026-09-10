@@ -94,9 +94,10 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 21 zamknięta (G33 — eksport historii niesie wykonanie serii)
+- **Iteracja:** 22 zamknięta (G32 — jedno miejsce odmienia liczebniki).
+  **Tura zamknięta na progu limitu — patrz „Jak wznowić" niżej.**
 - **W locie:** nic
-- **Ostatni commit pętli:** G33
+- **Ostatni commit pętli:** G32
 - **Najlepsze pozycje tej pętli wyszły z weryfikacji, nie z backlogu.** G27
   i G33 zobaczyłem, sprawdzając co innego (odpowiednio G4 i G26), i oba okazały
   się pilniejsze od wszystkiego, co wtedy leżało na liście. Dlatego w raporcie

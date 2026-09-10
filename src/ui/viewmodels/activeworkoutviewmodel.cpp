@@ -378,6 +378,11 @@ int ActiveWorkoutViewModel::totalSetCount() const
 
 bool ActiveWorkoutViewModel::hasAnythingToRecord() const { return completedSetCount() > 0; }
 
+QString ActiveWorkoutViewModel::finishPrompt() const
+{
+    return WorkoutText::finishPrompt(completedSetCount(), totalSetCount());
+}
+
 QVariantMap ActiveWorkoutViewModel::lastSessionSummary() const { return m_lastSessionSummary; }
 
 void ActiveWorkoutViewModel::captureSessionSummary()

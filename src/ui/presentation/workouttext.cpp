@@ -1,9 +1,27 @@
 #include "workouttext.h"
+#include "ui/presentation/plural.h"
 #include <QRegularExpression>
 #include <QStringList>
 
 namespace WorkoutText
 {
+
+QString finishPrompt(int completedSets, int plannedSets)
+{
+    const QString sets = Plural::form(plannedSets, QStringLiteral("set"), QStringLiteral("sets"));
+
+    if (completedSets >= plannedSets)
+    {
+        return QStringLiteral("All %1 %2 ticked off. End this workout?")
+            .arg(Plural::counted(plannedSets, QStringLiteral("set"), QStringLiteral("sets")),
+                 Plural::form(plannedSets, QStringLiteral("is"), QStringLiteral("are")));
+    }
+
+    return QStringLiteral("%1 of %2 %3 %4 ticked off. The rest stay marked as not done.")
+        .arg(completedSets)
+        .arg(plannedSets)
+        .arg(sets, Plural::form(completedSets, QStringLiteral("is"), QStringLiteral("are")));
+}
 
 QString formatDuration(qint64 seconds)
 {

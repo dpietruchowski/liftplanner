@@ -18,9 +18,6 @@ Rectangle {
     }
 
     function askToFinishWorkout() {
-        var done = ActiveWorkoutViewModel.completedSetCount()
-        var total = ActiveWorkoutViewModel.totalSetCount()
-
         if (!ActiveWorkoutViewModel.hasAnythingToRecord()) {
             discardWorkoutPopup.text = qsTr("No set is ticked off yet, so there is nothing to record. "
                                             + "This workout goes back to your planned list.")
@@ -28,10 +25,7 @@ Rectangle {
             return
         }
 
-        endWorkoutPopup.text = done === total
-            ? qsTr("All %1 sets are ticked off. End this workout?").arg(total)
-            : qsTr("%1 of %2 sets are ticked off. The rest stay marked as not done.")
-                  .arg(done).arg(total)
+        endWorkoutPopup.text = ActiveWorkoutViewModel.finishPrompt()
         endWorkoutPopup.open()
     }
 

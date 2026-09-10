@@ -8,28 +8,93 @@ najpierw przepływy, które urywają się w połowie, potem zdolności, które
 aplikacja ma, ale nigdy nie oferuje, potem rzeczy, po których traci się do niej
 zaufanie, a dopiero na końcu nowe powierzchnie.
 
+## Stan produktu po 21 iteracjach
+
+Ocena product managera, nie sprawozdanie — spis zrobionej roboty jest w commitach
+i w sekcji „Done". To jest punkt wyjścia dla następnej sesji.
+
+### Co ta aplikacja dziś potrafi dla kogoś, kto z nią trenuje
+
+Pętla treningowa jest domknięta od końca do końca i nie ma w niej miejsca, w
+którym użytkownik zostaje bez wyjścia. Plan wchodzi importem od AI albo powstaje
+ręcznie; trening startuje się z ekranu głównego albo z listy, i rusza ten, który
+został wskazany; w trakcie odhacza się serie, odlicza przerwę ustawioną przy
+ćwiczeniu, przestawia kolejność i dorzuca ćwiczenia, których nie było w planie —
+z ciężarem z ostatniego razu. Sesję można zakończyć również wtedy, gdy nie
+została dokończona: z choćby jednym ptaszkiem idzie do historii taka, jaka jest,
+bez ptaszków wraca na listę zaplanowanych i nic z włożonej pracy nie ginie.
+Po zakończeniu jest podsumowanie, a w historii — powtórzenie jednym przyciskiem.
+
+Druga rzecz, ważniejsza od listy funkcji: **aplikacja przestała kłamać o tym, co
+się zrobiło.** Jedna reguła rozstrzyga, co się liczy jako wykonane, i karmi
+wszystko naraz — statystyki, „ostatnio", dziedziczenie ciężaru, historię i kopię
+zapasową. Historia odróżnia serię zrobioną od opuszczonej, przerwany trening nie
+znika po cichu przy zamianie, a eksport i ponowny import zachowują to, co
+naprawdę zostało zrobione.
+
+### Czego brakuje najbardziej — moim zdaniem, w tej kolejności
+
+1. **Poprawienia tego, co już zapisane (G13).** Cała ta tura poszła w to, żeby
+   historia mówiła prawdę. Brakuje ostatniego elementu: kiedy prawda była inna
+   niż zapis — telefon padł, ptaszek poszedł przez pomyłkę — jedynym wyjściem
+   jest skasować całą sesję. To dziś najostrzejsza dziura i jedyna, która stoi w
+   poprzek dorobku poprzednich iteracji.
+2. **Planowania w czasie (G2).** Aplikacja umie „dziś". Rozłożenie tygodnia na
+   poniedziałek, środę i piątek bez pomocy AI nie jest możliwe, bo w edytorze nie
+   ma wyboru dnia.
+3. **Drobiazgów edytora, każdy S:** kolejność serii (G11), notatka do ćwiczenia
+   (G12), filtr po mięśniu w katalogu (G10). Wszystkie trzy to zdolności, które
+   siedzą gotowe w view modelach i czekają wyłącznie na wejście z ekranu.
+4. **Rzeczy, które kłamią warunkowo:** „0 kg" tam, gdzie aplikacja po prostu nie
+   zna ciężaru (G18), funty wybrane w profilu bez pokrycia w reszcie aplikacji
+   (G29), pusty trening, który da się zapisać i wystartować (G17).
+
+### Od czego zacząłbym następną turę
+
+Od **G13, pierwszy plaster: poprawienie pojedynczej serii w zakończonym
+treningu**, bez zmiany składu ćwiczeń. To domyka wątek, który przeszedł przez
+całą tę turę, i jest jedyną pozycją L, której nie da się obejść inną drogą.
+Zaraz po niej G2, a potem seria S-ek z punktu 3 — one dają najwięcej odczucia
+kompletności za najmniej roboty.
+
+### Trzy wnioski metodyczne dla następnej sesji
+
+- **Pułapka pustych flag `completed`.** Pięć spotkań w tej turze (G19, G23, G25,
+  G31, G33). Każda pozycja dotykająca wykonania serii musi mieć w warunku
+  akceptacji człon „a co z sesją, w której nie ma ani jednej flagi" — inaczej
+  naprawa jednego kłamstwa produkuje drugie.
+- **Obchód aplikacji własnymi oczami znajduje to, czego nie widać ani w kodzie,
+  ani w celowanym zrzucie.** Przycięty przycisk startu (G28) był na trzech
+  wcześniejszych zrzutach i nikt go nie zobaczył, bo każdy szukał czegoś innego.
+  Zawyżona historia (G31) też wyszła dopiero z rozwinięcia kafla ręką.
+- **Warunek akceptacji pisany negatywnie ratuje iterację.** Trzy razy człon „a to
+  ma się **nie** zmienić" złapał regresję, zanim powstała.
+
 ## Open
 
-### G32 — Aplikacja nie umie odmieniać tego, co policzyła (wchłania dawne G32)
-- **Dla kogo/po co:** wszędzie tam, gdzie aplikacja podsumowuje twoją robotę
-  liczbą, gramatyka się sypie. Pojedynczo to drobiazg, ale zdarza się dokładnie w
-  momentach rozliczenia — przy kończeniu treningu i przy wybieraniu planu na
-  dziś — czyli tam, gdzie aplikacja ma brzmieć wiarygodnie.
-- **Dowód:** trzy niezależne wystąpienia tej samej rzeczy, każde zobaczone w
-  działającej aplikacji: „1 of 22 sets **are** ticked off" w popupie kończącym
-  trening (raport z iteracji 19), „1 exercises · 1 sets" na kaflu szablonu
-  (`tmp/loop/pm17-templates.png`), oraz „1 of 1 sets" w tym samym popupie, przez
-  które poszedł zawrót w iteracji 13. Ten trzeci został wtedy naprawiony
-  **w jednym miejscu, ręcznie**, i właśnie dlatego dwa pozostałe przeżyły.
-- **Dlaczego jedna pozycja, a nie trzy:** to nie są trzy wpadki, tylko brak
-  jednego miejsca, które odmienia policzone rzeczy. Łatane po kolei, wróci przy
-  czwartym liczniku, który ktoś dopisze.
-- **Zakres:** S
-- **Gotowe, gdy:** popup kończący trening przy jednej odhaczonej serii z
-  dwudziestu dwóch brzmi „1 of 22 sets **is** ticked off"; kafel szablonu z
-  jednym ćwiczeniem i jedną serią jest opisany w liczbie pojedynczej, a z kilkoma
-  — w mnogiej; obie liczby w tym samym zdaniu odmieniają się niezależnie (jedna
-  seria z dwóch to nadal „1 of 2 sets").
+### G13 — Poprawienie zakończonego treningu (pierwszy plaster: jedna seria)
+- **Dla kogo/po co:** telefon padł w połowie sesji, ptaszek poszedł przez pomyłkę
+  albo zapomniałeś odhaczyć ostatnią serię. Historia zostaje nieprawdziwa, a to
+  ona karmi statystyki, dziedziczenie ciężaru i prompt dla AI. Jedyne dzisiejsze
+  wyjście — skasować całą sesję — kosztuje więcej, niż jest warte, więc w praktyce
+  zostaje się z zapisem, o którym się wie, że kłamie.
+- **Dowód:** `WorkoutHistoryViewModel::saveWorkout`
+  (`src/ui/viewmodels/workouthistoryviewmodel.h:34`) nie jest wywoływany z
+  żadnego pliku QML. Rozwinięty kafel treningu z historii
+  (`tmp/loop/pm17-history-expanded.png`) daje trzy akcje: powtórz, skopiuj do
+  schowka, usuń. Żetony serii pokazują od G31 prawdę o wykonaniu, ale są tylko do
+  czytania.
+- **Zakres:** L w całości, dlatego **pierwszy plaster to jedna rzecz**:
+  przełączenie wykonania pojedynczej serii w zakończonym treningu. Bez zmiany
+  składu ćwiczeń, bez zmiany ciężarów i powtórzeń — te idą osobnymi plastrami.
+- **Gotowe, gdy:** w rozwiniętym kaflu treningu z historii da się oznaczyć serię
+  opuszczoną jako zrobioną i odwrotnie; zmiana jest widoczna od razu i przeżywa
+  restart aplikacji; statystyki i „ostatnio" na ekranie głównym liczą się po
+  zmianie zgodnie z nowym stanem; trening bez ani jednej flagi („Base Strength" z
+  importu) po odhaczeniu w nim jednej serii przestaje korzystać z amnestii i
+  pokazuje pozostałe serie jako opuszczone — bo to właśnie znaczy pierwszy ptaszek
+  w sesji, i użytkownik musi to zobaczyć od razu, a nie odkryć później w
+  statystykach.
 
 ### G2 — Wybór dnia zaplanowanego treningu
 - **Dla kogo/po co:** manualnie utworzony trening zawsze ląduje na „teraz", więc
@@ -134,18 +199,6 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
 - **Gotowe, gdy:** w panelu filtrów pickera jest wybór mięśnia; ustawienie go
   zmniejsza licznik dopasowanych ćwiczeń i zawęża listę, a „Clear filters"
   przywraca pełną liczbę.
-
-### G13 — Poprawienie zakończonego treningu
-- **Dla kogo/po co:** telefon padł w połowie sesji albo seria została odhaczona
-  przez pomyłkę — historia zostaje nieprawdziwa, a to ona karmi statystyki i
-  prompt dla AI.
-- **Dowód:** `WorkoutHistoryViewModel::saveWorkout`
-  (`src/ui/viewmodels/workouthistoryviewmodel.h:34`) nie jest wywoływany z
-  żadnego pliku QML. `WorkoutItem.qml:14-40` daje przy treningu z historii tylko
-  kopiowanie do schowka i usunięcie — poprawka wymaga skasowania całej sesji.
-- **Zakres:** L
-- **Gotowe, gdy:** (do rozbicia — pierwszy plaster to poprawienie pojedynczej
-  serii w zakończonym treningu, bez zmiany składu ćwiczeń)
 
 ### G14 — Szablon nie do przerobienia
 - **Dla kogo/po co:** szablon to plan, do którego się wraca miesiącami; dziś po
