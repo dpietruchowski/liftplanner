@@ -18,6 +18,9 @@ Rectangle {
     readonly property var workoutDate: {
         if (!workout)
             return null
+        if (workout.status === "Planned")
+            return workout.plannedTime && workout.plannedTime.getTime() > 0
+                 ? workout.plannedTime : null
         if (workout.endedTime && workout.endedTime.getTime() > 0)
             return workout.endedTime
         if (workout.startedTime && workout.startedTime.getTime() > 0)
