@@ -53,6 +53,7 @@ public:
     QStringList validationErrors() const;
     bool isValid() const;
     QString setsToString() const;
+    QString setsToStringMarkingCompleted() const;
 
     double totalWeight() const;
     int totalRepetitions() const;
@@ -62,6 +63,8 @@ public:
     double bestOneRepMax() const;
 
 private:
+    QString setsAsText(bool markCompleted) const;
+
     int m_id { -1 };
     int m_workoutId { -1 };
     QString m_name;

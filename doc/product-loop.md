@@ -94,13 +94,19 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 20 zamknięta (G26 — nieudany import historii mówi, co się stało)
+- **Iteracja:** 21 zamknięta (G33 — eksport historii niesie wykonanie serii)
 - **W locie:** nic
-- **Ostatni commit pętli:** G26
-- **Piaskownica `tmp/run` spuchła do 55 treningów**, w większości duplikatów po
-  testach eksport → import. Świeżą daje usunięcie katalogu `tmp/run` (sesja UI
-  odtworzy go z kopii bazy), ale przepadną stany zbudowane przez pętlę: przerwy
-  z G6, dorzucone ćwiczenia z G9, nazwy z G16/G30.
+- **Ostatni commit pętli:** G33
+- **Najlepsze pozycje tej pętli wyszły z weryfikacji, nie z backlogu.** G27
+  i G33 zobaczyłem, sprawdzając co innego (odpowiednio G4 i G26), i oba okazały
+  się pilniejsze od wszystkiego, co wtedy leżało na liście. Dlatego w raporcie
+  dla PM opisuję też to, czego nie szukałem — sekcja „Znalezisko" zarabia na
+  siebie.
+- **Piaskownica `tmp/run` spuchła do 163 treningów**, w większości duplikatów po
+  trzech przejściach eksport → import. Świeżą daje usunięcie katalogu `tmp/run`
+  (sesja UI odtworzy go z kopii bazy), ale przepadną stany zbudowane przez
+  pętlę: przerwy z G6, dorzucone ćwiczenia z G9, nazwy z G16/G30, oraz oba
+  przypadki flagowe, na których sprawdza się G31 i G33.
 - **Schowek w sesji offscreen** żyje wewnątrz procesu, więc `xclip` go nie
   dosięga. Wstawianie treści: `set:notificationPopup.text=…`,
   `set:notificationPopup.copyEnabled=true`, `invoke:notificationPopup.open`,

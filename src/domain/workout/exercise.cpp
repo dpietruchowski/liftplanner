@@ -1,6 +1,7 @@
 #include "exercise.h"
 #include "domain/ordered.h"
 #include "setcompatibility.h"
+#include "setnotation.h"
 #include <QStringList>
 #include <algorithm>
 
@@ -93,7 +94,11 @@ bool Exercise::isCompleted() const
     return true;
 }
 
-QString Exercise::setsToString() const
+QString Exercise::setsToString() const { return setsAsText(false); }
+
+QString Exercise::setsToStringMarkingCompleted() const { return setsAsText(true); }
+
+QString Exercise::setsAsText(bool markCompleted) const
 {
     QStringList parts;
 
@@ -102,23 +107,27 @@ QString Exercise::setsToString() const
     {
         const QString compact = m_sets[i].toCompactString();
         const int restOverride = m_sets[i].restSecondsOverride();
+        const bool completed = m_sets[i].completed();
 
         size_t runEnd = i + 1;
         while (runEnd < m_sets.size() && m_sets[runEnd].restSecondsOverride() == restOverride
-               && m_sets[runEnd].toCompactString() == compact)
+               && m_sets[runEnd].toCompactString() == compact
+               && (!markCompleted || m_sets[runEnd].completed() == completed))
             ++runEnd;
 
         const int count = static_cast<int>(runEnd - i);
+        const bool mark = markCompleted && completed;
 
         if (restOverride >= 0)
         {
-            parts.append(
-                QString("%1x(%2/%3)").arg(count).arg(compact, Set::formatSeconds(restOverride)));
+            parts.append(SetNotation::marked(
+                QString("%1x(%2/%3)").arg(count).arg(compact, Set::formatSeconds(restOverride)),
+                mark));
         }
         else
         {
             for (int n = 0; n < count; ++n)
-                parts.append(compact);
+                parts.append(SetNotation::marked(compact, mark));
         }
 
         i = runEnd;

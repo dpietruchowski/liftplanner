@@ -1,5 +1,6 @@
 #include "workoutjson.h"
 #include "domain/workout/restseconds.h"
+#include "domain/workout/setnotation.h"
 #include "domain/workout/workoutstatus.h"
 #include <QJsonDocument>
 #include <QRegularExpression>
@@ -82,7 +83,7 @@ QJsonObject exerciseToJsonCompact(const Exercise& exercise)
     obj["name"] = exercise.name();
     obj["rest_seconds"] = exercise.restSeconds();
     obj["kind"] = exerciseKindToString(exercise.kind());
-    obj["sets"] = exercise.setsToString();
+    obj["sets"] = exercise.setsToStringMarkingCompleted();
     return obj;
 }
 
@@ -238,7 +239,7 @@ std::vector<Set> parseSets(const QString& text, QStringList* errors)
     const QStringList rawTokens = text.split(QLatin1Char(','), Qt::SkipEmptyParts);
     for (const QString& rawToken : rawTokens)
     {
-        const QString token = QString(rawToken).remove(whitespaceRe).toLower();
+        QString token = QString(rawToken).remove(whitespaceRe).toLower();
         if (token.isEmpty())
             continue;
 
@@ -247,6 +248,13 @@ std::vector<Set> parseSets(const QString& text, QStringList* errors)
             if (errors)
                 errors->append(QStringLiteral("Unrecognized set: '%1'").arg(rawToken.trimmed()));
         };
+
+        const bool completed = SetNotation::takeCompletedMarker(token);
+        if (token.isEmpty())
+        {
+            reportUnparsed();
+            continue;
+        }
 
         int count = 1;
         int restOverride = RestSeconds::inherited;
@@ -283,6 +291,7 @@ std::vector<Set> parseSets(const QString& text, QStringList* errors)
         }
 
         set.setRestSecondsOverride(restOverride);
+        set.setCompleted(completed);
         for (int i = 0; i < count; ++i)
             sets.push_back(set);
     }

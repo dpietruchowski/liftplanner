@@ -143,7 +143,12 @@ use profile.language; refresh notes; ALWAYS populate user_profile (never null).
   4x(400m/90s)      4 rounds: 400m, 90s rest
   5x(10x80kg/2min)  5 sets of 10 reps at 80kg, 2min rest
 
+  10x80kg!          set the user actually ticked off (history only)
+
 Separators:
+- `!` marks a set as done. It appears only in RECENT WORKOUT HISTORY — use it to
+  tell finished work from skipped work. A workout whose history entry has no `!`
+  at all was logged without ticks: treat every set in it as done.
 - `@` is the time a distance took.
 - `/` is ALWAYS rest. Use the parenthesised form only when the rest
   differs from the exercise's `rest_seconds`.
@@ -218,6 +223,7 @@ PLANNING STATE C:  user_profile populated (notes refreshed), workouts filled.
   interval work with the `sets` GRAMMAR. Never fake it as "8x0kg".
 - Every entry in `sets` must match the grammar exactly — an entry the app
   cannot parse is dropped and reported to the user as an error.
+- Never write `!` in a plan: planned sets are not done yet.
 - Include 1–2 warmup sets before working sets on compound lifts.
 - Never reduce weight without stated reason in STATE B.
 - Never invent profile data — confirm in interview.

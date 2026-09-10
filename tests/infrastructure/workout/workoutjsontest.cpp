@@ -269,6 +269,69 @@ TEST_F(WorkoutJsonTest, CompactJson_RoundtripsThroughExerciseFromJson)
     EXPECT_EQ(restored.setsToString(), original.setsToString());
 }
 
+TEST_F(WorkoutJsonTest, CompactJson_MarksTheTickedSets)
+{
+    Exercise exercise("Bench Press", 120);
+    Set done(5, 40.0);
+    done.setCompleted(true);
+    exercise.addSet(done);
+    exercise.addSet(Set(5, 40.0));
+
+    const QJsonObject compact = WorkoutJson::exerciseToJsonCompact(exercise);
+
+    EXPECT_EQ(compact["sets"].toString(), "5x40kg!, 5x40kg");
+}
+
+TEST_F(WorkoutJsonTest, CompactJson_RoundtripsWhichSetsWereDone)
+{
+    Exercise original("Bench Press", 120);
+    Set done(5, 40.0);
+    done.setCompleted(true);
+    original.addSet(done);
+    original.addSet(Set(5, 40.0));
+
+    QStringList errors;
+    const Exercise restored
+        = WorkoutJson::exerciseFromJson(WorkoutJson::exerciseToJsonCompact(original), &errors);
+
+    EXPECT_TRUE(errors.isEmpty());
+    ASSERT_EQ(restored.sets().size(), 2u);
+    EXPECT_TRUE(restored.sets()[0].completed());
+    EXPECT_FALSE(restored.sets()[1].completed());
+}
+
+TEST_F(WorkoutJsonTest, CompactJson_WithoutAnyMarkerReadsAsUntickedJustLikeBefore)
+{
+    QStringList errors;
+    const Exercise restored = WorkoutJson::exerciseFromJson(
+        QJsonDocument::fromJson(R"({"name": "Squat", "sets": "5x40kg, 5x40kg"})").object(),
+        &errors);
+
+    EXPECT_TRUE(errors.isEmpty());
+    ASSERT_EQ(restored.sets().size(), 2u);
+    EXPECT_FALSE(restored.sets()[0].completed());
+    EXPECT_FALSE(restored.sets()[1].completed());
+}
+
+TEST_F(WorkoutJsonTest, CompactJson_AMarkerOnItsOwnIsReportedNotImported)
+{
+    QStringList errors;
+    const std::vector<Set> sets = WorkoutJson::parseSets(QStringLiteral("!, 5x40kg"), &errors);
+
+    ASSERT_EQ(sets.size(), 1u);
+    EXPECT_FALSE(sets[0].completed());
+    ASSERT_EQ(errors.size(), 1);
+}
+
+TEST_F(WorkoutJsonTest, CompactJson_AMarkedRepeatedRunTicksEverySetInIt)
+{
+    const std::vector<Set> sets = WorkoutJson::parseSets(QStringLiteral("3x(20s/10s)!"), nullptr);
+
+    ASSERT_EQ(sets.size(), 3u);
+    for (const Set& set : sets)
+        EXPECT_TRUE(set.completed());
+}
+
 TEST_F(WorkoutJsonTest, WorkoutsFromJsonArray_CollectsErrorsFromEveryExercise)
 {
     const QString json = R"([

@@ -2,6 +2,7 @@
 #include "async/timeprovider.h"
 #include "domain/workout/historysetrow.h"
 #include "domain/workout/performedsets.h"
+#include "domain/workout/plannedworkout.h"
 #include "domain/workout/strengthmath.h"
 #include "domain/workout/workoutquery.h"
 #include "domain/workout/workoutrepeat.h"
@@ -118,7 +119,7 @@ Result<void> WorkoutService::importPlannedWorkoutsCore(const std::vector<Workout
 {
     removeAllPlannedWorkoutsCore();
     for (const auto& workout : workouts)
-        m_repository.save(workout);
+        m_repository.save(asPlanned(workout));
     return Result<void>::success();
 }
 
