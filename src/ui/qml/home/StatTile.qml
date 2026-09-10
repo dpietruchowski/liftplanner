@@ -25,11 +25,12 @@ Rectangle {
 
         Text {
             Layout.fillWidth: true
-            text: root.label
+            text: root.label.toUpperCase()
             elide: Text.ElideRight
             horizontalAlignment: root.centered ? Text.AlignHCenter : Text.AlignLeft
             color: Theme.colors.textMuted
             font.pixelSize: Theme.stat.labelSize
+            font.letterSpacing: Theme.stat.labelSpacing
         }
 
         Item { Layout.fillHeight: true }

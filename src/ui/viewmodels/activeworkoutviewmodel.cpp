@@ -1,9 +1,11 @@
 #include "activeworkoutviewmodel.h"
 #include "application/workout/workoutservice.h"
+#include "domain/workout/sessionsummary.h"
 #include "domain/workout/setadjustment.h"
 #include "infrastructure/appstoragepaths.h"
 #include "infrastructure/workout/workoutjson.h"
 #include "platform/haptics.h"
+#include "ui/presentation/workouttext.h"
 #include <QDebug>
 #include <QFile>
 #include <QHash>
@@ -286,6 +288,7 @@ void ActiveWorkoutViewModel::endWorkout()
     m_timer->stop();
     m_currentWorkout->end();
     saveToDb();
+    captureSessionSummary();
     emit workoutCompleted();
 
     auto* oldWorkout = m_currentWorkout;
@@ -352,6 +355,31 @@ int ActiveWorkoutViewModel::totalSetCount() const
 }
 
 bool ActiveWorkoutViewModel::hasAnythingToRecord() const { return completedSetCount() > 0; }
+
+QVariantMap ActiveWorkoutViewModel::lastSessionSummary() const { return m_lastSessionSummary; }
+
+void ActiveWorkoutViewModel::captureSessionSummary()
+{
+    if (!m_currentWorkout)
+        return;
+
+    const Workout entity = m_currentWorkout->toEntity();
+    const SessionSummary summary = summarizeSession(entity);
+
+    QVariantMap map;
+    map[QStringLiteral("name")] = entity.name();
+    map[QStringLiteral("completedSets")] = summary.completedSets;
+    map[QStringLiteral("plannedSets")] = summary.plannedSets;
+    map[QStringLiteral("volume")] = summary.volume;
+    map[QStringLiteral("durationSeconds")] = static_cast<qint64>(summary.durationSeconds);
+    map[QStringLiteral("durationText")] = WorkoutText::formatDuration(summary.durationSeconds);
+    map[QStringLiteral("setsText")]
+        = QStringLiteral("%1/%2").arg(summary.completedSets).arg(summary.plannedSets);
+    map[QStringLiteral("volumeText")] = WorkoutText::formatVolume(summary.volume);
+
+    m_lastSessionSummary = map;
+    emit lastSessionSummaryChanged();
+}
 
 void ActiveWorkoutViewModel::duplicateSet(SetModel* set)
 {

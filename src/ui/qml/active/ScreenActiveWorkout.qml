@@ -206,10 +206,17 @@ Rectangle {
         }
     }
 
+    WorkoutSummaryPopup {
+        id: workoutSummaryPopup
+        objectName: "workoutSummaryPopup"
+        summary: ActiveWorkoutViewModel.lastSessionSummary
+        onDismissed: root.leaveActiveWorkout()
+    }
+
     Connections {
         target: ActiveWorkoutViewModel
 
-        function onWorkoutCompleted() { root.leaveActiveWorkout() }
+        function onWorkoutCompleted() { workoutSummaryPopup.open() }
         function onWorkoutDiscarded() { root.leaveActiveWorkout() }
     }
 }

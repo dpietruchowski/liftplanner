@@ -237,6 +237,78 @@ TEST_F(WorkoutLifecycleTest, AnEndedSessionIsInTheHistoryWithoutAskingForAReload
     EXPECT_EQ(history.first()->name(), "Full Body");
 }
 
+// --- the summary the lifter sees the moment the session ends ---
+
+TEST_F(WorkoutLifecycleTest, TheSummaryOfAFinishedSessionReportsEverySetAndItsVolume)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    completeAllSets(active);
+
+    active.endWorkout();
+
+    const QVariantMap summary = active.lastSessionSummary();
+    EXPECT_EQ(summary["name"].toString(), "Full Body");
+    EXPECT_EQ(summary["completedSets"].toInt(), 2);
+    EXPECT_EQ(summary["plannedSets"].toInt(), 2);
+    EXPECT_EQ(summary["setsText"].toString(), "2/2");
+    EXPECT_EQ(summary["volumeText"].toString(), "900 kg");
+}
+
+TEST_F(WorkoutLifecycleTest, TheSummaryOfAnAbandonedSessionReportsOnlyWhatWasTickedOff)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    active.completeCurrentSet();
+
+    active.endWorkout();
+
+    const QVariantMap summary = active.lastSessionSummary();
+    EXPECT_EQ(summary["completedSets"].toInt(), 1);
+    EXPECT_EQ(summary["plannedSets"].toInt(), 2);
+    EXPECT_EQ(summary["setsText"].toString(), "1/2");
+    EXPECT_EQ(summary["volumeText"].toString(), "500 kg");
+}
+
+TEST_F(WorkoutLifecycleTest, TheSummaryAgreesWithTheVolumeOnTheHomeScreen)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    active.completeCurrentSet();
+    active.endWorkout();
+
+    reloadHistory();
+
+    QString homeVolume;
+    for (const QVariant& tile : app.workoutHistoryViewModel().recentTotals())
+    {
+        const QVariantMap map = tile.toMap();
+        if (map["label"].toString() == "volume")
+            homeVolume = map["value"].toString();
+    }
+
+    EXPECT_EQ(active.lastSessionSummary()["volumeText"].toString(), homeVolume);
+}
+
+TEST_F(WorkoutLifecycleTest, TheSummaryReportsHowLongTheLifterWasUnderTheBar)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+    active.completeCurrentSet();
+    app.advanceSeconds(3900);
+
+    active.endWorkout();
+
+    const QVariantMap summary = active.lastSessionSummary();
+    EXPECT_EQ(summary["durationSeconds"].toLongLong(), 3900);
+    EXPECT_EQ(summary["durationText"].toString(), "1h 05m");
+}
+
+TEST_F(WorkoutLifecycleTest, ADiscardedSessionProducesNoSummaryToShow)
+{
+    auto& active = startFirstPlannedWorkout(TestData::SINGLE_WORKOUT_JSON);
+
+    active.discardWorkout();
+
+    EXPECT_TRUE(active.lastSessionSummary().isEmpty());
+}
+
 TEST_F(WorkoutLifecycleTest, DiscardingWithoutASessionDoesNothing)
 {
     auto& active = app.activeWorkoutViewModel();

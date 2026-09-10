@@ -426,6 +426,7 @@ DefaultTheme {
         readonly property int padding: 10
         readonly property int spacing: 12
         readonly property int labelSize: theme.fontSize.xSmall
+        readonly property real labelSpacing: 1.2
         readonly property int valueSize: 22
         readonly property int unitSize: theme.fontSize.xSmall
         readonly property int badgeSize: 9

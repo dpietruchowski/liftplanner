@@ -6,6 +6,7 @@
 #include "ui/presentation/serializationutils.h"
 #include "workouttimer.h"
 #include <QObject>
+#include <QVariantMap>
 
 class WorkoutService;
 
@@ -17,6 +18,8 @@ class ActiveWorkoutViewModel : public QObject
     DECLARE_PROPERTY(SetModel*, currentSet, setCurrentSet)
     DECLARE_PROPERTY(bool, isActive, setIsActive)
     Q_PROPERTY(WorkoutTimer* timer READ timer CONSTANT)
+    Q_PROPERTY(
+        QVariantMap lastSessionSummary READ lastSessionSummary NOTIFY lastSessionSummaryChanged)
 
 public:
     explicit ActiveWorkoutViewModel(WorkoutService* service, QObject* parent = nullptr);
@@ -38,6 +41,8 @@ public:
     Q_INVOKABLE int totalSetCount() const;
     Q_INVOKABLE bool hasAnythingToRecord() const;
 
+    QVariantMap lastSessionSummary() const;
+
     Q_INVOKABLE void duplicateSet(SetModel* set);
     Q_INVOKABLE void removeSet(SetModel* set);
     Q_INVOKABLE void toggleSetCompleted(SetModel* set);
@@ -52,6 +57,7 @@ public:
 signals:
     void workoutCompleted();
     void workoutDiscarded();
+    void lastSessionSummaryChanged();
     void errorOccurred(const QString& errorMessage);
 
 private:
@@ -72,7 +78,10 @@ private:
     void saveToDb();
     void saveSetToDb(SetModel* set);
 
+    void captureSessionSummary();
+
     WorkoutService* m_service;
     WorkoutTimer* m_timer;
+    QVariantMap m_lastSessionSummary;
     bool m_shuttingDown { false };
 };

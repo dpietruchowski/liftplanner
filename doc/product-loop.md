@@ -83,14 +83,16 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 9 zamknięta (G23 — zakończenie niedokończonego treningu)
+- **Iteracja:** 10 zamknięta (G8 — podsumowanie po treningu, domyka G24)
 - **W locie:** nic
-- **Ostatni commit pętli:** G23
-- **Następna pozycja wg backlogu:** G8 — podsumowanie po zakończonym treningu
-  (po G23 istnieje wreszcie moment, w którym sesja się kończy)
-- **Zawroty do developera:** 2 — G5 (brakujący import QML) i G23 (lista
-  zaplanowanych nieodświeżana po porzuceniu sesji). Oba razy build i `ctest`
-  były zielone, a wadę złapało dopiero klikanie w prawdziwą aplikację.
+- **Ostatni commit pętli:** G8
+- **Następna pozycja wg backlogu:** G2 — wybór dnia zaplanowanego treningu
+- **Zawroty do developera:** 3, wszystkie przy zielonym `ctest`:
+  G5 (brakujący import QML — aplikacja nie wstawała), G23 (lista zaplanowanych
+  nieodświeżana po porzuceniu sesji — baza poprawna, ekran kłamał), G8 (etykieta
+  „DURATION" ucięta do „DURATI…" — poprawne funkcjonalnie, brzydkie).
+  **Wniosek: żadnego z tych trzech nie złapałby build ani testy.** Pierwsze dwa
+  wymagały klikania w działającą aplikację, trzeci obejrzenia zrzutu.
 - **Pętla zatrzymana na progu** przy 82% okna 5-godzinnego (próg 85%, iteracja
   kosztuje 5-6 punktów, więc kolejna nie zmieściłaby się w całości). Drzewo
   czyste, nic nie zostało w locie. Wznowienie: `bash tmp/probe_usage.sh`, potem

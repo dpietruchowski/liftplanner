@@ -163,14 +163,16 @@ Rectangle {
                 StatTile {
                     Layout.fillWidth: true
                     centered: true
-                    label: "AGE"
+                    objectName: "profileTileAge"
+                    label: "age"
                     value: UserProfileViewModel.age >= 0 ? UserProfileViewModel.age : "\u2014"
                 }
 
                 StatTile {
                     Layout.fillWidth: true
                     centered: true
-                    label: "BODYWEIGHT"
+                    objectName: "profileTileBodyweight"
+                    label: "bodyweight"
                     value: UserProfileViewModel.bodyweight > 0
                            ? UserProfileViewModel.bodyweight.toFixed(1) : "\u2014"
                     unit: UserProfileViewModel.bodyweight > 0
@@ -180,7 +182,8 @@ Rectangle {
                 StatTile {
                     Layout.fillWidth: true
                     centered: true
-                    label: "PER WEEK"
+                    objectName: "profileTilePerWeek"
+                    label: "per week"
                     value: UserProfileViewModel.sessionsPerWeek + "\u00d7"
                 }
             }

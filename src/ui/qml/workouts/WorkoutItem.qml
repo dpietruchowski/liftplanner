@@ -6,9 +6,13 @@ import Themed.Components
 WorkoutCard {
     id: root
 
+    property int itemIndex: 0
+
     signal deleteWorkout(var workout)
     signal exportWorkout(var workout)
 
+    objectName: "historyWorkoutItem" + root.itemIndex
+    expandButtonName: "historyWorkoutExpandButton" + root.itemIndex
     dateText: workout ? Qt.formatDateTime(workout.startedTime, "ddd, d MMM yyyy") : ""
 
     expandedActions: Component {

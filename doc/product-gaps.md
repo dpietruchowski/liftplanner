@@ -10,19 +10,6 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
 
 ## Open
 
-### G8 — Brak podsumowania po zakończonym treningu
-- **Dla kogo/po co:** trening kończy się wyrzuceniem na ekran główny bez ani
-  jednego zdania o tym, co się właśnie zrobiło. Zamknięcie sesji to najlepszy
-  moment na nagrodę i jedyny, w którym liczby jeszcze kogoś obchodzą.
-- **Dowód:** `ScreenActiveWorkout.qml:161-167` — `onWorkoutCompleted` robi
-  wyłącznie `stackView.replace(homeScreen)`. Dane do podsumowania już są
-  liczone: `WorkoutService::TrainingTotals` (objętość, czas, dystans) i
-  `topExercises` (`src/application/workout/workoutservice.h:19-32,51-52`).
-- **Zakres:** M
-- **Gotowe, gdy:** po zakończeniu treningu pojawia się ekran lub panel z czasem
-  trwania i liczbą ukończonych serii tej sesji, zamykany jednym przyciskiem,
-  który odprowadza na ekran główny.
-
 ### G2 — Wybór dnia zaplanowanego treningu
 - **Dla kogo/po co:** aplikacja nazywa się planerem, a każdy nowo utworzony
   trening ląduje na „teraz". Nie da się rozłożyć tygodnia na poniedziałek,
@@ -188,22 +175,6 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
   zmniejsza licznik dopasowanych ćwiczeń i zawęża listę, a „Clear filters"
   przywraca pełną liczbę.
 
-### G24 — Kafelki na ekranie głównym mówią dwoma stylami
-- **Dla kogo/po co:** pierwszy ekran ma wyglądać na dopracowany, a w jednym
-  rzędzie stoją obok siebie „Bench Press" i „volume". Drobiazg, ale to pierwsza
-  rzecz, którą użytkownik widzi po uruchomieniu.
-- **Dowód:** raport z iteracji 8 („Obserwacja"): etykieta nowego kafelka to małe
-  „volume", podczas gdy sąsiednie kafelki PR mają nazwy ćwiczeń z wielkiej
-  litery (zrzut `tmp/loop/g22-home.png`). Kafelek pokazuje etykietę dosłownie
-  tak, jak ją dostanie (`StatTile.qml:28`), a na ekranie profilu te same kafelki
-  dostają etykiety wersalikami („AGE", „BODYWEIGHT"), więc aplikacja ma już
-  trzeci wariant.
-- **Zakres:** S
-- **Gotowe, gdy:** wszystkie kafelki w pasku statystyk na ekranie głównym mają
-  etykiety w jednej konwencji, tej samej co kafelki na ekranie profilu.
-- **Uwaga:** najtaniej domknąć to przy okazji pozycji, która i tak dokłada
-  kafelki — czyli G8.
-
 ### G13 — Poprawienie zakończonego treningu
 - **Dla kogo/po co:** telefon padł w połowie sesji albo seria została odhaczona
   przez pomyłkę — historia zostaje nieprawdziwa, a to ona karmi statystyki i
@@ -227,7 +198,27 @@ zaufanie, a dopiero na końcu nowe powierzchnie.
 - **Gotowe, gdy:** (do rozbicia — pierwszy plaster to zmiana nazwy istniejącego
   szablonu)
 
+## Scalone
+
+Identyfikatory nie wracają do obiegu, więc pozycje wchłonięte przez inne
+zostają tutaj.
+
+### G24 — Kafelki na ekranie głównym mówią dwoma stylami → G8 (iteracja 10)
+Etykiety kafelków w trzech konwencjach naraz („Bench Press", „volume", „AGE").
+Osobna iteracja na samą wielkość liter byłaby marnotrawstwem, a G8 i tak dokłada
+kafelki podsumowania — więc warunek spójności etykiet stał się częścią G8.
+
 ## Done
+
+### G8 — Brak podsumowania po zakończonym treningu (iteracja 10, domyka G24)
+Po zakończeniu sesji otwiera się podsumowanie z czasem, odhaczonymi seriami i
+objętością tej sesji, zamykane jednym przyciskiem prowadzącym na ekran główny.
+Liczby idą przez tę samą `countsAsPerformed` co ekran główny, więc sesja urwana
+pokazuje to, co zrobiono — sprawdzone: jedna odhaczona seria z dwóch to „1/2" i
+200 kg, nie 400. Porzucenie bez ptaszków nie pokazuje podsumowania. Etykiety
+kafelków ujednolicone do wersalików, wymuszonych w `StatTile`, więc kolejna
+konwencja nie ma jak powstać. Przy okazji `objectName` dla kafli historii i
+profilu.
 
 ### G23 — Nie da się zakończyć treningu, którego się nie dokończyło (iteracja 9)
 Pasek akcji aktywnego treningu dostał `finishWorkoutButton` widoczny przez całą
