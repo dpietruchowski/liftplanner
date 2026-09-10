@@ -82,6 +82,46 @@ protected:
         editor().createNew(name, QDateTime(QDate(2025, 1, 3), QTime(18, 0, 0)));
     }
 
+    int definitionId(const QString& name)
+    {
+        ExerciseDefinitionModel* model = definition(name);
+        return model == nullptr ? -1 : model->entity().id();
+    }
+
+    void seedHistory(const Exercise& exercise, const QDate& date)
+    {
+        Workout past(QStringLiteral("Past session"), QDateTime(date, QTime(18, 0, 0)));
+        past.setStartedTime(QDateTime(date, QTime(18, 0, 0)));
+        past.setEndedTime(QDateTime(date, QTime(19, 0, 0)));
+        past.addExercise(exercise);
+
+        m_app.workoutService()
+            .importHistory(std::vector<Workout> { past })
+            .warnOnError("seed the workout history");
+        m_app.drain();
+    }
+
+    void seedLinkedHistory(const QString& name, std::initializer_list<Set> sets, const QDate& date)
+    {
+        Exercise exercise
+            = Exercise::createFromDefinition(definitionId(name), name, ExerciseKind::Strength, 180);
+        for (const Set& set : sets)
+            exercise.addSet(set);
+        seedHistory(exercise, date);
+    }
+
+    static Set liftedSet(int repetitions, double weight)
+    {
+        Set set(repetitions, weight);
+        set.setCompleted(true);
+        return set;
+    }
+
+    const Set& firstSetOf(int exerciseIndex)
+    {
+        return editor().workout()->exercises().at(exerciseIndex)->sets().first()->entity();
+    }
+
     TestApplication m_app;
 };
 
@@ -141,6 +181,149 @@ TEST_F(WorkoutEditorTest, AddingAnExerciseLinksItToTheCatalogAndSeedsOneSet)
     ASSERT_EQ(exercise->sets().size(), 1);
     EXPECT_EQ(exercise->sets().first()->metric(), QStringLiteral("reps"));
     EXPECT_EQ(exercise->sets().first()->repetitions(), 8);
+}
+
+// --- seeding a new exercise from history ---
+
+TEST_F(WorkoutEditorTest, AnExerciseWithNoHistoryKeepsTheCatalogSeed)
+{
+    startWorkout();
+
+    addExercise(QStringLiteral("Back Squat"));
+    m_app.drain();
+
+    EXPECT_EQ(firstSetOf(0).repetitions(), 8);
+    EXPECT_DOUBLE_EQ(firstSetOf(0).weight(), 0.0);
+}
+
+TEST_F(WorkoutEditorTest, AnExerciseWithHistoryStartsFromTheLastWeightAndReps)
+{
+    seedLinkedHistory(QStringLiteral("Back Squat"), { liftedSet(10, 60.0), liftedSet(5, 82.5) },
+                      QDate(2024, 12, 20));
+    startWorkout();
+
+    addExercise(QStringLiteral("Back Squat"));
+    m_app.drain();
+
+    EXPECT_EQ(firstSetOf(0).repetitions(), 5);
+    EXPECT_DOUBLE_EQ(firstSetOf(0).weight(), 82.5);
+    EXPECT_FALSE(firstSetOf(0).completed());
+}
+
+TEST_F(WorkoutEditorTest, HistoryWithoutACompletedSetDoesNotSeedAnything)
+{
+    seedLinkedHistory(QStringLiteral("Back Squat"), { Set(5, 82.5) }, QDate(2024, 12, 20));
+    startWorkout();
+
+    addExercise(QStringLiteral("Back Squat"));
+    m_app.drain();
+
+    EXPECT_EQ(firstSetOf(0).repetitions(), 8);
+    EXPECT_DOUBLE_EQ(firstSetOf(0).weight(), 0.0);
+}
+
+TEST_F(WorkoutEditorTest, HistoryOfAnotherExerciseIsNotBorrowed)
+{
+    seedLinkedHistory(QStringLiteral("Back Squat"), { liftedSet(5, 82.5) }, QDate(2024, 12, 20));
+    startWorkout();
+
+    addExercise(QStringLiteral("Plank"));
+    m_app.drain();
+
+    EXPECT_EQ(firstSetOf(0).durationSeconds(), 30);
+    EXPECT_DOUBLE_EQ(firstSetOf(0).weight(), 0.0);
+}
+
+TEST_F(WorkoutEditorTest, AnImportedHistoryEntryMatchesByName)
+{
+    Exercise imported
+        = Exercise::createAdHoc(QStringLiteral("back squat"), ExerciseKind::Strength, 180);
+    imported.addSet(liftedSet(6, 75.0));
+    seedHistory(imported, QDate(2024, 12, 20));
+    startWorkout();
+
+    addExercise(QStringLiteral("Back Squat"));
+    m_app.drain();
+
+    EXPECT_EQ(firstSetOf(0).repetitions(), 6);
+    EXPECT_DOUBLE_EQ(firstSetOf(0).weight(), 75.0);
+}
+
+TEST_F(WorkoutEditorTest, TheMostRecentSessionWins)
+{
+    seedLinkedHistory(QStringLiteral("Back Squat"), { liftedSet(5, 70.0) }, QDate(2024, 11, 1));
+    seedLinkedHistory(QStringLiteral("Back Squat"), { liftedSet(5, 90.0) }, QDate(2024, 12, 20));
+    startWorkout();
+
+    addExercise(QStringLiteral("Back Squat"));
+    m_app.drain();
+
+    EXPECT_DOUBLE_EQ(firstSetOf(0).weight(), 90.0);
+}
+
+TEST_F(WorkoutEditorTest, TheSeedFromHistoryReachesTheStoredWorkout)
+{
+    seedLinkedHistory(QStringLiteral("Back Squat"), { liftedSet(5, 82.5) }, QDate(2024, 12, 20));
+    startWorkout();
+    addExercise(QStringLiteral("Back Squat"));
+    m_app.drain();
+
+    QSignalSpy saved(&editor(), &WorkoutEditorViewModel::saved);
+    editor().save();
+    m_app.drain();
+    ASSERT_EQ(saved.count(), 1);
+
+    std::optional<Workout> reloaded;
+    m_app.workoutService()
+        .findWorkout(saved.first().first().toInt())
+        .then(&editor(), [&reloaded](std::optional<Workout> found) { reloaded = found; })
+        .warnOnError("reload the seeded workout");
+    m_app.drain();
+
+    ASSERT_TRUE(reloaded.has_value());
+    ASSERT_EQ(reloaded->exercises().size(), 1u);
+    ASSERT_EQ(reloaded->exercises()[0].sets().size(), 1u);
+    EXPECT_DOUBLE_EQ(reloaded->exercises()[0].sets()[0].weight(), 82.5);
+    EXPECT_EQ(reloaded->exercises()[0].sets()[0].repetitions(), 5);
+}
+
+TEST_F(WorkoutEditorTest, AWeightTypedBeforeHistoryArrivesIsNotOverwritten)
+{
+    seedLinkedHistory(QStringLiteral("Back Squat"), { liftedSet(5, 82.5) }, QDate(2024, 12, 20));
+    startWorkout();
+
+    addExercise(QStringLiteral("Back Squat"));
+    editor().setSetWeight(0, 0, 100.0);
+    m_app.drain();
+
+    EXPECT_DOUBLE_EQ(firstSetOf(0).weight(), 100.0);
+    EXPECT_EQ(firstSetOf(0).repetitions(), 8);
+}
+
+TEST_F(WorkoutEditorTest, AnExerciseRemovedBeforeHistoryArrivesSeedsNothing)
+{
+    seedLinkedHistory(QStringLiteral("Back Squat"), { liftedSet(5, 82.5) }, QDate(2024, 12, 20));
+    startWorkout();
+
+    addExercise(QStringLiteral("Back Squat"));
+    editor().removeExercise(0);
+    m_app.drain();
+
+    EXPECT_EQ(editor().exerciseCount(), 0);
+}
+
+TEST_F(WorkoutEditorTest, FurtherSetsInheritTheSeededWeight)
+{
+    seedLinkedHistory(QStringLiteral("Back Squat"), { liftedSet(5, 82.5) }, QDate(2024, 12, 20));
+    startWorkout();
+    addExercise(QStringLiteral("Back Squat"));
+    m_app.drain();
+
+    editor().addSet(0);
+
+    const auto sets = editor().workout()->exercises().first()->sets();
+    ASSERT_EQ(sets.size(), 2);
+    EXPECT_DOUBLE_EQ(sets[1]->weight(), 82.5);
 }
 
 TEST_F(WorkoutEditorTest, TheSeededSetFollowsTheDefinitionMetric)

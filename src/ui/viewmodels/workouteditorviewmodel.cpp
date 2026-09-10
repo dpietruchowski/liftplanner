@@ -5,6 +5,7 @@
 #include "async/timeprovider.h"
 #include "domain/workout/setadjustment.h"
 #include "domain/workout/setcompatibility.h"
+#include "domain/workout/setseeding.h"
 #include <algorithm>
 
 WorkoutEditorViewModel::WorkoutEditorViewModel(WorkoutService* service,
@@ -119,6 +120,48 @@ void WorkoutEditorViewModel::addExercise(ExerciseDefinitionModel* definition)
     exercise.addSet(seedSetFor(*definition));
 
     m_workout.addExercise(exercise);
+    markDirty();
+    publish();
+
+    seedFromHistory(static_cast<int>(m_workout.exercises().size()) - 1);
+}
+
+void WorkoutEditorViewModel::seedFromHistory(int exerciseIndex)
+{
+    const Exercise* exercise = exerciseAt(exerciseIndex);
+    if (m_service == nullptr || exercise == nullptr || exercise->sets().size() != 1)
+        return;
+
+    const Exercise added = *exercise;
+    const Set seed = added.sets().front();
+    const QString expectedName = added.name();
+
+    m_service->lastPerformance(added)
+        .then(this,
+              [this, exerciseIndex, expectedName, seed](std::optional<Exercise> previous)
+              {
+                  if (previous.has_value())
+                      applyHistorySeed(exerciseIndex, expectedName, seed, previous.value());
+              })
+        .warnOnError("seed a new exercise from history");
+}
+
+void WorkoutEditorViewModel::applyHistorySeed(int exerciseIndex, const QString& expectedName,
+                                              const Set& seed, const Exercise& previous)
+{
+    Exercise* exercise = exerciseAt(exerciseIndex);
+    if (exercise == nullptr || exercise->name() != expectedName || exercise->sets().size() != 1)
+        return;
+
+    Set& current = exercise->sets().front();
+    if (current.completed() || !sameSetValues(current, seed))
+        return;
+
+    const std::optional<Set> seeded = seedFromPreviousExercise(previous, seed);
+    if (!seeded.has_value())
+        return;
+
+    current = seeded.value();
     markDirty();
     publish();
 }

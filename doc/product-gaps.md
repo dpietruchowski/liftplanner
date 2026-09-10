@@ -6,6 +6,23 @@ Kolejność sekcji „Open" to kolejność ważności.
 
 ## Open
 
+### G19 — Zakończony trening nie liczy się jako wykonany
+- **Dla kogo/po co:** użytkownik odbywa cały trening, kończy go, a aplikacja
+  uznaje, że nie zrobił nic. „Last time" nie pokazuje się mimo serii po 45 kg w
+  historii, a świeżo dodane dziedziczenie ciężaru dziedziczy tę samą ślepotę.
+- **Dowód:** raport z iteracji 5. Policzone na kopii prawdziwej bazy: na 58 serii
+  tylko 6 ma `completed = 1`, a w zakończonych treningach jest dokładnie jedna
+  taka seria (i ta ma ciężar 0). `previousPerformancesCore`
+  (`workoutservice.cpp:240-266`) wymaga `hasCompletedSet`, więc dla Bench Pressa
+  z zakończonego treningu „Base Strength" (20/30/45/45/45 kg, wszystkie
+  `completed = 0`) nie zwraca nic — potwierdzone w aplikacji, „Last time" nie
+  pojawiło się ani razu.
+- **Zakres:** M
+- **Gotowe, gdy:** rozstrzygnięte i wdrożone jedno z dwojga — albo seria w
+  zakończonym treningu liczy się jako wykonana niezależnie od flagi, albo flaga
+  jest poprawnie zapisywana przy kończeniu treningu; w efekcie „Last time"
+  pokazuje się dla ćwiczenia, które użytkownik faktycznie robił.
+
 ### G2 — Wybór dnia zaplanowanego treningu
 - **Dla kogo/po co:** aplikacja nazywa się planerem, a każdy nowo utworzony
   trening ląduje na „teraz". Nie da się rozłożyć tygodnia na poniedziałek,
@@ -150,25 +167,18 @@ Kolejność sekcji „Open" to kolejność ważności.
   zapisie i wystartowaniu treningu ta sama notatka jest widoczna w panelu
   informacji o ćwiczeniu.
 
-### G15 — Nowe ćwiczenie zaczyna od zera kilogramów
-- **Dla kogo/po co:** ćwiczenie wzięte z katalogu wchodzi do planu z „0 kg", a
-  plan, w którym każda seria mówi zero, nie jest planem — użytkownik i tak musi
-  wyklikać ciężar od nowa przy sztandze, choć aplikacja pamięta, ile podniósł
-  ostatnim razem.
-- **Dowód:** raport z iteracji 1 zauważył „0 kg" przy 8 powtórzeniach.
-  Źródło: `WorkoutEditorViewModel::seedSet`
-  (`workouteditorviewmodel.cpp:378-398`) ustawia powtórzenia, czas albo
-  dystans, ale nigdy ciężaru. `addSet` na niepustym ćwiczeniu kopiuje już
-  ostatnią serię wraz z ciężarem (`workouteditorviewmodel.cpp:180-184`), więc
-  zero bierze się wyłącznie z pierwszej serii nowo dodanego ćwiczenia.
-  Historia potrzebna do sensownej wartości jest już liczona i pokazywana w
-  aktywnym treningu jako „Last time" (`WorkoutService::previousPerformances`,
-  `src/application/workout/workoutservice.h:53`;
-  `ActiveWorkoutExerciseItem.qml:221-230`).
-- **Zakres:** L
-- **Gotowe, gdy:** (do rozbicia — pierwszy plaster to podpowiedź w edytorze,
-  ile użytkownik podniósł w tym ćwiczeniu ostatnim razem, zanim wartość zacznie
-  być wstawiana automatycznie)
+### G18 — Seria bez ciężaru wygląda jak seria z zerowym ciężarem
+- **Dla kogo/po co:** reszta po G15 — ćwiczenie robione pierwszy raz w życiu
+  albo plan z AI, który nie podał obciążenia. „0 kg" to wtedy nieprawda podana
+  z pewnością siebie; użytkownik nie wie, czy aplikacja mu każe wziąć pustą
+  sztangę, czy po prostu nie wie.
+- **Dowód:** ta sama ścieżka co w G15 — `SetRow.qml` pokazuje `secondaryText`
+  bez rozróżnienia „zero" od „nieustawione", a `Set` trzyma zwykły `double`
+  bez stanu „brak wartości".
+- **Zakres:** M
+- **Gotowe, gdy:** seria, dla której nie ma ani historii, ani wartości z planu,
+  pokazuje w aktywnym treningu i w edytorze znak braku wartości zamiast „0 kg",
+  a po ustawieniu ciężaru zachowuje się jak każda inna.
 
 ### G13 — Poprawienie zakończonego treningu
 - **Dla kogo/po co:** telefon padł w połowie sesji albo seria została odhaczona
@@ -194,6 +204,13 @@ Kolejność sekcji „Open" to kolejność ważności.
   szablonu)
 
 ## Done
+
+### G15 — Nowe ćwiczenie nie dziedziczy ciężaru z poprzedniego razu (iteracja 5)
+`WorkoutService::lastPerformance` deleguje do istniejącego
+`previousPerformancesCore`, a edytor po dodaniu ćwiczenia z katalogu przepisuje
+ciężar i powtórzenia z ostatniej ukończonej serii. Sprawdzone w aplikacji na
+obu gałęziach: ćwiczenie z historią wchodzi z 2,5 kg i tę wartość ma po
+wystartowaniu treningu, ćwiczenie bez historii zostaje przy zasiewie z katalogu.
 
 ### G5 — Edytor serii w aktywnym treningu nie daje o sobie znać (iteracja 4)
 Wiersz serii dostał szewron rozwijający edytor jednym kliknięciem; przytrzymanie

@@ -94,6 +94,7 @@ Rectangle {
             }
 
             Text {
+                objectName: root.namePrefix + "primaryValueText"
                 text: root.primaryText
                 font.pixelSize: root.current ? Theme.fontSize.medium : Theme.fontSize.normal
                 font.bold: root.current
@@ -104,6 +105,7 @@ Rectangle {
             }
 
             Text {
+                objectName: root.namePrefix + "secondaryValueText"
                 text: root.secondaryText
                 font.pixelSize: root.current ? Theme.fontSize.medium : Theme.fontSize.normal
                 font.bold: root.current

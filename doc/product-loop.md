@@ -82,10 +82,13 @@ moja weryfikacja zachowaniowa w działającej aplikacji.
 
 Aktualizowany po każdym commicie — to jest pamięć pętli.
 
-- **Iteracja:** 4 zamknięta (G5 — edytor serii w aktywnym treningu)
+- **Iteracja:** 5 zamknięta (G15 — dziedziczenie ciężaru z historii)
 - **W locie:** nic
-- **Ostatni commit pętli:** G5
+- **Ostatni commit pętli:** G15
 - **Zawroty do developera:** 1 (G5, brakujący import w QML)
+- **Stan piaskownicy `tmp/run` zmieniony w iteracji 5:** „Regression Template"
+  zakończony, doszedł trening „Seed check". Zrobione celowo, żeby powstała
+  historia z ukończoną serią — bez tego nie dało się przetestować G15.
 
 ### Koszt: agenty kontra robota własna
 

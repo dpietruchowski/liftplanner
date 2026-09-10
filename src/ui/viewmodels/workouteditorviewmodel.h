@@ -79,6 +79,10 @@ private:
     Set seedSetFor(const Exercise& exercise) const;
     Set seedSet(SetMetric metric, LoadType loadType) const;
 
+    void seedFromHistory(int exerciseIndex);
+    void applyHistorySeed(int exerciseIndex, const QString& expectedName, const Set& seed,
+                          const Exercise& previous);
+
     void adopt(const Workout& workout, bool dirty);
     void publish();
     void markDirty();

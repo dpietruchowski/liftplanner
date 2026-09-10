@@ -80,6 +80,11 @@ WorkoutService::previousPerformances(const Workout& workout)
     return invoke([this, workout] { return previousPerformancesCore(workout); });
 }
 
+Task<std::optional<Exercise>> WorkoutService::lastPerformance(const Exercise& exercise)
+{
+    return invoke([this, exercise] { return lastPerformanceCore(exercise); });
+}
+
 Task<std::optional<Workout>> WorkoutService::findWorkout(int id)
 {
     return invoke([this, id] { return findWorkoutCore(id); });
@@ -258,6 +263,18 @@ WorkoutService::previousPerformancesCore(const Workout& workout)
     }
 
     return Result<std::vector<PreviousPerformance>>::success(result);
+}
+
+Result<std::optional<Exercise>> WorkoutService::lastPerformanceCore(const Exercise& exercise)
+{
+    Workout probe;
+    probe.addExercise(exercise);
+
+    const std::vector<PreviousPerformance> found = previousPerformancesCore(probe).value();
+    if (found.empty())
+        return Result<std::optional<Exercise>>::success(std::nullopt);
+
+    return Result<std::optional<Exercise>>::success(found.front().exercise);
 }
 
 Result<std::optional<Workout>> WorkoutService::findWorkoutCore(int id)
