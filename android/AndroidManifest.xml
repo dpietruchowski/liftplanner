@@ -30,7 +30,7 @@
 
           <meta-data
                 android:name="android.app.lib_name"
-                android:value="liftplanner" />
+                android:value="-- %%INSERT_APP_LIB_NAME%% --" />
 
           <meta-data
                 android:name="android.app.arguments"
