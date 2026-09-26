@@ -44,14 +44,13 @@ bool backfillGeneratedNames(QSqlDatabase& database)
         const QDateTime startedTime = QDateTime::fromString(
             row.value(WorkoutSerializer::started_time_key).toString(), Qt::ISODate);
 
-        const int affected
-            = Update(WorkoutSerializer::table)
-                  .set(WorkoutSerializer::name_key, repairedName(startedTime))
-                  .set(WorkoutSerializer::generated_name_key, 1)
-                  .where(Where(WorkoutSerializer::id_key)
-                             .equals(row.value(WorkoutSerializer::id_key).toInt()))
-                  .execute(database)
-                  .toInt();
+        const int affected = Update(WorkoutSerializer::table)
+                                 .set(WorkoutSerializer::name_key, repairedName(startedTime))
+                                 .set(WorkoutSerializer::generated_name_key, 1)
+                                 .where(Where(WorkoutSerializer::id_key)
+                                            .equals(row.value(WorkoutSerializer::id_key).toInt()))
+                                 .execute(database)
+                                 .toInt();
 
         if (affected < 0)
             return false;

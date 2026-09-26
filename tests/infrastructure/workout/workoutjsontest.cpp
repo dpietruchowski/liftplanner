@@ -193,7 +193,8 @@ TEST_F(WorkoutJsonTest, FullJson_RoundtripsTimedSet)
 
 TEST_F(WorkoutJsonTest, FullJson_CachedSessionRemembersThatItNamesItself)
 {
-    Workout session(QStringLiteral("Freestyle · 18:30"), QDateTime(QDate(2026, 9, 10), QTime(18, 30)));
+    Workout session(QStringLiteral("Freestyle · 18:30"),
+                    QDateTime(QDate(2026, 9, 10), QTime(18, 30)));
     session.setGeneratedName(true);
 
     const Workout restored = WorkoutJson::workoutFromJson(WorkoutJson::workoutToJson(session));

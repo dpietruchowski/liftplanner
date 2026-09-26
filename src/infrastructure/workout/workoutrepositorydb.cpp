@@ -96,19 +96,20 @@ void WorkoutRepositoryDb::registerMigrations(MigrationRunner& runner)
             return columnAdded && endedMarked && startedMarked;
         });
 
-    runner.add(9,
-               [](QSqlDatabase& db)
-               {
-                   const bool columnAdded = AlterTable(WorkoutSerializer::table)
-                                                .addColumn(Column(WorkoutSerializer::generated_name_key)
-                                                               .integer()
-                                                               .defaultValue(0))
-                                                .execute(db)
-                                                .toInt()
-                       != 0;
+    runner.add(
+        9,
+        [](QSqlDatabase& db)
+        {
+            const bool columnAdded
+                = AlterTable(WorkoutSerializer::table)
+                      .addColumn(
+                          Column(WorkoutSerializer::generated_name_key).integer().defaultValue(0))
+                      .execute(db)
+                      .toInt()
+                != 0;
 
-                   return columnAdded && backfillGeneratedNames(db);
-               });
+            return columnAdded && backfillGeneratedNames(db);
+        });
 }
 
 std::vector<Workout> WorkoutRepositoryDb::findAll(const WorkoutQuery& query) const

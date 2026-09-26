@@ -123,8 +123,7 @@ TEST(DrumFitTest, TheOfferToStartWithoutAPlanFitsBothRowFonts)
 
     expectFits(
         drumMetrics(themeNumber(QStringLiteral("drum"), QStringLiteral("nameSizeLarge")), true),
-        offer, drumTextWidth(QStringLiteral("gapLarge")),
-        QStringLiteral("the selected name font"));
+        offer, drumTextWidth(QStringLiteral("gapLarge")), QStringLiteral("the selected name font"));
 
     expectFits(drumMetrics(themeNumber(QStringLiteral("drum"), QStringLiteral("nameSize")), true),
                offer, drumTextWidth(QStringLiteral("gap")),
