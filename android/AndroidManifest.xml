@@ -15,6 +15,7 @@
         android:hardwareAccelerated="true"
         android:label="Lift Planner"
         android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:allowBackup="true"
         android:fullBackupOnly="false">
         <activity
