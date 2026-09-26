@@ -52,6 +52,7 @@ public:
     QVariantList exerciseSessions() const;
     Q_INVOKABLE void loadExerciseSessions(ExerciseModel* exercise);
 
+    Q_INVOKABLE void addSet(ExerciseModel* exercise);
     Q_INVOKABLE void duplicateSet(SetModel* set);
     Q_INVOKABLE void removeSet(SetModel* set);
     Q_INVOKABLE void toggleSetCompleted(SetModel* set);

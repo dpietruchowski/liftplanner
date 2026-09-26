@@ -478,6 +478,23 @@ void ActiveWorkoutViewModel::captureSessionSummary(const Workout& recorded)
     emit lastSessionSummaryChanged();
 }
 
+void ActiveWorkoutViewModel::addSet(ExerciseModel* exercise)
+{
+    if (!m_isActive || !exercise)
+        return;
+
+    const QList<SetModel*> sets = exercise->sets();
+    if (!sets.isEmpty())
+    {
+        duplicateSet(sets.last());
+        return;
+    }
+
+    exercise->addSet(new SetModel(seedSetForKind(exercise->toEntity().kind()), exercise));
+    selectFirstIncomplete();
+    saveCurrentWorkout();
+}
+
 void ActiveWorkoutViewModel::duplicateSet(SetModel* set)
 {
     if (!set)

@@ -254,6 +254,17 @@ Column {
                               : ""
             }
         }
+
+        ThemedButton {
+            objectName: "activeWorkoutAddSetButton" + exerciseDelegate.exerciseIndex
+            width: setsColumn.width
+            text: qsTr("Add set")
+            iconSource: Theme.icons.addSet
+            buttonSize: Theme.button.small
+            buttonStyle: Theme.button.sunken
+            visible: !screen.reorderMode
+            onClicked: ActiveWorkoutViewModel.addSet(exercise)
+        }
     }
 
     Item {

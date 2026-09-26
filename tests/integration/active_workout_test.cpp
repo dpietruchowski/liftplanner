@@ -197,6 +197,40 @@ TEST_F(ActiveWorkoutTest, DuplicateSet_CopiesValues)
     EXPECT_FALSE(duplicate->completed());
 }
 
+TEST_F(ActiveWorkoutTest, AddSet_AppendsACopyOfTheLastSet)
+{
+    auto& vm = app.activeWorkoutViewModel();
+    startFirstWorkout();
+
+    auto* exercise = vm.currentExercise();
+    auto* lastSet = exercise->sets().last();
+    int originalSetCount = exercise->sets().size();
+
+    vm.addSet(exercise);
+
+    ASSERT_EQ(exercise->sets().size(), originalSetCount + 1);
+    auto* added = exercise->sets().last();
+    EXPECT_NE(added, lastSet);
+    EXPECT_EQ(added->repetitions(), lastSet->repetitions());
+    EXPECT_EQ(added->weight(), lastSet->weight());
+    EXPECT_FALSE(added->completed());
+}
+
+TEST_F(ActiveWorkoutTest, AddSet_SeedsASetWhenTheExerciseHasNone)
+{
+    auto& vm = app.activeWorkoutViewModel();
+    startFirstWorkout();
+
+    auto* exercise = vm.currentExercise();
+    while (!exercise->sets().isEmpty())
+        vm.removeSet(exercise->sets().first());
+
+    vm.addSet(exercise);
+
+    ASSERT_EQ(exercise->sets().size(), 1);
+    EXPECT_FALSE(exercise->sets().first()->completed());
+}
+
 TEST_F(ActiveWorkoutTest, RemoveSet_RemovesFromExercise)
 {
     auto& vm = app.activeWorkoutViewModel();
