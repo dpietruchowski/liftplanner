@@ -49,22 +49,33 @@ Rectangle {
                                       : root.completed ? Theme.colors.textDisabled
                                                        : Theme.colors.textSecondary
 
-    height: root.expanded ? root.rowHeight + editor.height + Theme.padding.small
-                          : root.rowHeight
+    implicitHeight: root.expanded ? root.rowHeight + editor.height + Theme.padding.small
+                                  : root.rowHeight
     radius: Theme.radius.medium
     clip: true
 
     color: root.current ? Theme.colors.surfaceAccent
          : root.completed ? Theme.colors.surfaceSunken
                           : Theme.colors.surface
-    border.width: root.current ? Theme.border.medium : Theme.border.thin
-    border.color: root.current ? Theme.colors.primary
-                : root.completed ? Theme.colors.borderSubtle
-                                 : Theme.colors.border
 
     Behavior on color { ColorAnimation { duration: 200 } }
-    Behavior on border.color { ColorAnimation { duration: 200 } }
-    Behavior on height { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+    Behavior on implicitHeight {
+        enabled: root.expandable
+        NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        z: 1
+        radius: root.radius
+        color: "transparent"
+        border.width: root.current ? Theme.border.medium : Theme.border.thin
+        border.color: root.current ? Theme.colors.primary
+                    : root.completed ? Theme.colors.borderSubtle
+                                     : Theme.colors.border
+
+        Behavior on border.color { ColorAnimation { duration: 200 } }
+    }
 
     HoldToRevealArea {
         anchors.fill: parent
