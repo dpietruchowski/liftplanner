@@ -10,6 +10,7 @@ Rectangle {
     property int exerciseIndex: 0
     property bool first: false
     property bool last: false
+    property var editor
 
     implicitHeight: content.implicitHeight + Theme.padding.medium * 2
     radius: Theme.radius.medium
@@ -92,7 +93,11 @@ Rectangle {
             model: root.exercise ? root.exercise.sets : []
 
             delegate: SetRow {
-                objectName: "editorSetItem" + root.exerciseIndex + "_" + index
+                id: setRow
+
+                readonly property string setKey: root.exerciseIndex + "_" + index
+
+                objectName: "editorSetItem" + setKey
                 Layout.fillWidth: true
                 number: index + 1
                 primaryText: modelData.primaryText
@@ -101,9 +106,9 @@ Rectangle {
                 loadType: modelData.loadType
                 secondaryAdjustable: modelData.secondaryAdjustable
                 completable: false
-                expanded: true
-                expandable: false
+                expanded: root.editor.expandedSetKey === setRow.setKey
 
+                onExpandToggled: root.editor.expandedSetKey = setRow.expanded ? "" : setRow.setKey
                 onPrimaryAdjusted: function(direction) {
                     WorkoutEditorViewModel.adjustSetPrimary(root.exerciseIndex, index, direction)
                 }
@@ -111,7 +116,10 @@ Rectangle {
                     WorkoutEditorViewModel.adjustSetSecondary(root.exerciseIndex, index, direction)
                 }
                 onDuplicateRequested: WorkoutEditorViewModel.duplicateSet(root.exerciseIndex, index)
-                onRemoveRequested: WorkoutEditorViewModel.removeSet(root.exerciseIndex, index)
+                onRemoveRequested: {
+                    root.editor.expandedSetKey = ""
+                    WorkoutEditorViewModel.removeSet(root.exerciseIndex, index)
+                }
             }
         }
 

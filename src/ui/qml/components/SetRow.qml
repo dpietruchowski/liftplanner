@@ -42,14 +42,17 @@ Rectangle {
     signal secondaryAdjusted(int direction)
     signal duplicateRequested()
     signal removeRequested()
+    signal expandToggled()
 
     readonly property int rowHeight: root.current ? Theme.layout.activeRowHeight
                                                   : Theme.layout.listItemHeight
+    readonly property real editorHeight: Theme.padding.small + Theme.setRow.stepperHeight
+                                         + Theme.setRow.actionHeight + Theme.spacing.small * 2
     readonly property color valueColor: root.current ? Theme.colors.textPrimary
                                       : root.completed ? Theme.colors.textDisabled
                                                        : Theme.colors.textSecondary
 
-    implicitHeight: root.expanded ? root.rowHeight + editor.height + Theme.padding.small
+    implicitHeight: root.expanded ? root.rowHeight + root.editorHeight + Theme.padding.small
                                   : root.rowHeight
     radius: Theme.radius.medium
     clip: true
@@ -77,14 +80,10 @@ Rectangle {
         Behavior on border.color { ColorAnimation { duration: 200 } }
     }
 
-    HoldToRevealArea {
+    MouseArea {
         anchors.fill: parent
-        enabled: root.editable
-        onHeld: root.expanded = !root.expanded
-        onTapped: {
-            if (root.revealable)
-                root.expanded = !root.expanded
-        }
+        enabled: root.revealable
+        onClicked: root.expandToggled()
     }
 
     Column {
@@ -110,7 +109,7 @@ Rectangle {
                 objectName: root.namePrefix + "previousValueText"
                 text: root.previousText
                 font.pixelSize: Theme.setRow.previousFontSize
-                color: Theme.colors.textFaint
+                color: Theme.colors.textMuted
                 horizontalAlignment: Text.AlignLeft
                 elide: Text.ElideRight
                 Layout.preferredWidth: root.previousShown ? Theme.setRow.previousWidth : 0
@@ -142,22 +141,6 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.minimumWidth: Theme.setRow.valueMinWidth
                 Layout.alignment: Qt.AlignVCenter
-            }
-
-            ThemedButton {
-                objectName: root.namePrefix + "expandSetButton"
-                iconSource: root.expanded ? Theme.icons.chevronUp : Theme.icons.chevronDown
-                iconColor: root.expanded ? Theme.colors.primary : Theme.colors.textFaint
-                circular: true
-                buttonSize: Theme.button.square
-                buttonStyle: Theme.button.ghost
-                visible: root.revealable
-                Layout.alignment: Qt.AlignVCenter
-                Layout.rightMargin: Theme.spacing.small
-                onClicked: root.expanded = !root.expanded
-                ToolTip.visible: hovered
-                ToolTip.text: root.expanded ? qsTr("Hide set editor") : qsTr("Edit this set")
-                ToolTip.delay: 500
             }
 
             CompletionDot {

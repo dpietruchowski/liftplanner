@@ -14,6 +14,7 @@ SetRow {
     completed: root.setData ? root.setData.completed : false
     secondaryAdjustable: root.setData ? root.setData.secondaryAdjustable : false
 
+    onExpandToggled: root.expanded = !root.expanded
     onCompletionToggled: ActiveWorkoutViewModel.toggleSetCompleted(root.setData)
     onPrimaryAdjusted: function(direction) {
         ActiveWorkoutViewModel.adjustSetPrimary(root.setData, direction)

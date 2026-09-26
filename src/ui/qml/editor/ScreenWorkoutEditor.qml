@@ -13,6 +13,8 @@ Rectangle {
     signal closed()
     signal addExerciseRequested()
 
+    property string expandedSetKey: ""
+
     readonly property bool editingExisting: WorkoutEditorViewModel.workout
         ? WorkoutEditorViewModel.workout.id > 0
         : false
@@ -118,6 +120,7 @@ Rectangle {
                         exerciseIndex: index
                         first: index === 0
                         last: index === exerciseRepeater.count - 1
+                        editor: root
                     }
                 }
 

@@ -445,7 +445,7 @@ DefaultTheme {
         readonly property int numberWidth: 24
         readonly property int primaryWidth: 66
         readonly property int previousWidth: 84
-        readonly property int previousFontSize: 10
+        readonly property int previousFontSize: 11
         readonly property int valueMinWidth: 78
         readonly property int valueFontSize: 14
         readonly property int valueCurrentFontSize: 16
