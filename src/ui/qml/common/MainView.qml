@@ -13,7 +13,7 @@ Item {
             exercisePickerScreen.openFor("activeWorkout")
             stackView.push(exercisePickerScreen)
         }
-        onStartWorkoutRequested: root.startFromWorkoutTab()
+        onStartEmptyWorkoutRequested: homeScreen.startBlankWorkout()
     }
     property var homeScreen: ScreenHome {}
     property var workoutsScreen: ScreenWorkouts {
@@ -58,14 +58,6 @@ Item {
             stackView.pop()
             stackView.push(workoutEditorScreen)
         }
-    }
-
-    function startFromWorkoutTab() {
-        if (homeScreen.startDecision.action !== "start") {
-            stackView.replace(homeScreen)
-            bottomNav.currentIndex = 1
-        }
-        homeScreen.handleStartRequest()
     }
 
     function openWorkoutEditor() {

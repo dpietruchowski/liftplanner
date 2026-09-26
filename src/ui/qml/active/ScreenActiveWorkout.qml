@@ -11,7 +11,7 @@ Rectangle {
     color: Theme.colors.background
 
     signal addExerciseRequested()
-    signal startWorkoutRequested()
+    signal startEmptyWorkoutRequested()
 
     readonly property int exerciseCount: ActiveWorkoutViewModel.currentWorkout
                                          ? ActiveWorkoutViewModel.currentWorkout.exercises.length
@@ -52,13 +52,13 @@ Rectangle {
         objectName: "noWorkoutStartButton"
         anchors.centerIn: parent
         visible: !ActiveWorkoutViewModel.isActive
-        text: qsTr("Start workout")
+        text: qsTr("Start empty workout")
         iconSource: Theme.icons.startWorkout
         iconSize: Theme.icon.large
         pill: true
         buttonStyle: Theme.button.primary
         buttonSize: Theme.button.large
-        onClicked: root.startWorkoutRequested()
+        onClicked: root.startEmptyWorkoutRequested()
     }
 
     ColumnLayout {
