@@ -12,7 +12,7 @@ Popup {
     signal dismissed()
 
     width: Theme.applicationWidth * 0.85
-    height: contentLayout.implicitHeight + Theme.padding.large * 2
+    padding: Theme.padding.large
     x: (Theme.applicationWidth - width) / 2
     y: (Theme.applicationHeight - height) / 2
     modal: true
@@ -34,7 +34,6 @@ Popup {
     ColumnLayout {
         id: contentLayout
         anchors.fill: parent
-        anchors.margins: Theme.padding.large
         spacing: Theme.spacing.medium
 
         ThemedIcon {
