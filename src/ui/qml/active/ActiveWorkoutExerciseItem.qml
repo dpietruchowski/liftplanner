@@ -234,11 +234,13 @@ Column {
         id: setsColumn
         width: exerciseDelegate.width
         spacing: Theme.spacing.small
-        height: exerciseDelegate.isExpanded ? implicitHeight : 0
-        visible: height > 0
+        property real revealProgress: exerciseDelegate.isExpanded ? 1 : 0
+
+        height: implicitHeight * revealProgress
+        visible: revealProgress > 0
         clip: true
 
-        Behavior on height { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+        Behavior on revealProgress { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
 
         Repeater {
             model: exercise.sets

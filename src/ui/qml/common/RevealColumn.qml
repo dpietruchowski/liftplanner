@@ -9,17 +9,14 @@ Item {
     property int spacing: Theme.spacing.medium
     default property alias items: column.data
 
-    readonly property real revealTarget: expanded ? column.implicitHeight : 0
-    property real revealHeight: revealTarget
+    property real revealProgress: expanded ? 1 : 0
 
     Layout.fillWidth: true
-    Layout.preferredHeight: revealHeight
-    visible: revealHeight > 0
+    Layout.preferredHeight: column.implicitHeight * revealProgress
+    visible: revealProgress > 0
     clip: true
 
-    onRevealTargetChanged: revealHeight = revealTarget
-
-    Behavior on revealHeight {
+    Behavior on revealProgress {
         NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
     }
 
