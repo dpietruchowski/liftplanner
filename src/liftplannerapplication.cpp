@@ -114,8 +114,8 @@ void LiftPlannerApplication::createViewModels()
     m_plannedWorkoutViewModel = std::make_unique<PlannedWorkoutViewModel>(
         m_workoutService.get(), m_userProfileService.get(), m_activeWorkoutViewModel.get());
     m_userProfileViewModel = std::make_unique<UserProfileViewModel>(m_userProfileService.get());
-    m_exerciseCatalogViewModel
-        = std::make_unique<ExerciseCatalogViewModel>(m_exerciseCatalogService.get());
+    m_exerciseCatalogViewModel = std::make_unique<ExerciseCatalogViewModel>(
+        m_exerciseCatalogService.get(), m_workoutService.get());
     m_workoutEditorViewModel = std::make_unique<WorkoutEditorViewModel>(
         m_workoutService.get(), m_workoutTemplateService.get());
     m_workoutTemplateViewModel

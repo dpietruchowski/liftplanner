@@ -1,5 +1,8 @@
 #include "application/exercisecatalog/exercisecatalogservice.h"
+#include "application/workout/workoutservice.h"
 #include "domain/exercisecatalog/exercisedefinition.h"
+#include "domain/workout/workout.h"
+#include "domain/workout/workoutstatus.h"
 #include "testapplication.h"
 #include "ui/models/exercisedefinitionmodel.h"
 #include "ui/viewmodels/exercisecatalogviewmodel.h"
@@ -54,6 +57,56 @@ protected:
     }
 
     ExerciseCatalogViewModel& viewModel() { return m_app.exerciseCatalogViewModel(); }
+
+    int definitionId(const QString& name)
+    {
+        viewModel().load();
+        m_app.drain();
+        for (const auto* model : viewModel().exercises())
+        {
+            if (model->name() == name)
+                return model->definitionId();
+        }
+        return -1;
+    }
+
+    static Exercise performed(Exercise exercise)
+    {
+        Set set(5, 100.0);
+        set.setCompleted(true);
+        exercise.addSet(set);
+        return exercise;
+    }
+
+    Exercise linked(const QString& name)
+    {
+        return performed(
+            Exercise::createFromDefinition(definitionId(name), name, ExerciseKind::Strength, 120));
+    }
+
+    void seedSession(std::initializer_list<Exercise> exercises, const QDate& date,
+                     WorkoutStatus status = WorkoutStatus::Ended)
+    {
+        Workout session(QStringLiteral("Session"), QDateTime(date, QTime(18, 0, 0)));
+        session.setStartedTime(QDateTime(date, QTime(18, 0, 0)));
+        session.setEndedTime(QDateTime(date, QTime(19, 0, 0)));
+        for (const Exercise& exercise : exercises)
+            session.addExercise(exercise);
+
+        if (status == WorkoutStatus::Ended)
+        {
+            m_app.workoutService()
+                .importHistory(std::vector<Workout> { session })
+                .warnOnError("seed a session");
+        }
+        else
+        {
+            m_app.workoutService()
+                .importPlannedWorkouts(std::vector<Workout> { session })
+                .warnOnError("seed a planned session");
+        }
+        m_app.drain();
+    }
 
     TestApplication m_app;
 };
@@ -184,6 +237,66 @@ TEST_F(ExerciseCatalogTest, ModelExposesTheFieldsTheExercisePickerNeeds)
     EXPECT_EQ(model->regions(), QStringList({ QStringLiteral("chest") }));
     EXPECT_FALSE(model->isArchived());
     EXPECT_GT(model->definitionId(), 0);
+}
+
+TEST_F(ExerciseCatalogTest, RefreshPutsRecentlyDoneExercisesFirstNewestFirst)
+{
+    seedSession({ linked(QStringLiteral("Push Up")) }, QDate(2024, 12, 20));
+    seedSession({ linked(QStringLiteral("Front Squat")), linked(QStringLiteral("Push Up")) },
+                QDate(2024, 12, 28));
+
+    viewModel().refresh();
+    m_app.drain();
+
+    EXPECT_EQ(viewModel().recentCount(), 2);
+    EXPECT_EQ(loadedNames(),
+              QStringList({ QStringLiteral("Front Squat"), QStringLiteral("Push Up"),
+                            QStringLiteral("Back Squat"), QStringLiteral("Bench Press"),
+                            QStringLiteral("Treadmill Run") }));
+    EXPECT_EQ(viewModel().exercises().first()->lastPerformed().date(), QDate(2024, 12, 28));
+    EXPECT_FALSE(viewModel().exercises().at(2)->isRecent());
+}
+
+TEST_F(ExerciseCatalogTest, AnExerciseWithoutADefinitionMatchesTheCatalogByName)
+{
+    seedSession({ performed(Exercise::createAdHoc(QStringLiteral("bench press"),
+                                                  ExerciseKind::Strength, 120)) },
+                QDate(2024, 12, 28));
+
+    viewModel().refresh();
+    m_app.drain();
+
+    EXPECT_EQ(viewModel().recentCount(), 1);
+    EXPECT_EQ(loadedNames().first(), QStringLiteral("Bench Press"));
+}
+
+TEST_F(ExerciseCatalogTest, PlannedAndUntouchedExercisesAreNotRecent)
+{
+    seedSession({ linked(QStringLiteral("Push Up")) }, QDate(2025, 1, 5), WorkoutStatus::Planned);
+    seedSession({ Exercise::createFromDefinition(definitionId(QStringLiteral("Treadmill Run")),
+                                                 QStringLiteral("Treadmill Run"),
+                                                 ExerciseKind::Cardio, 120) },
+                QDate(2024, 12, 28));
+
+    viewModel().refresh();
+    m_app.drain();
+
+    EXPECT_EQ(viewModel().recentCount(), 0);
+    EXPECT_EQ(loadedNames().first(), QStringLiteral("Back Squat"));
+}
+
+TEST_F(ExerciseCatalogTest, RecentExercisesStayFirstWhileSearching)
+{
+    seedSession({ linked(QStringLiteral("Front Squat")) }, QDate(2024, 12, 28));
+
+    viewModel().refresh();
+    m_app.drain();
+    viewModel().setSearchText(QStringLiteral("squat"));
+    m_app.drain();
+
+    EXPECT_EQ(viewModel().recentCount(), 1);
+    EXPECT_EQ(loadedNames(),
+              QStringList({ QStringLiteral("Front Squat"), QStringLiteral("Back Squat") }));
 }
 
 TEST_F(ExerciseCatalogTest, FindByIdReturnsTheLoadedModel)

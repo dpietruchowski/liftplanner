@@ -3,10 +3,27 @@
 #include "application/exercisecatalog/exercisecatalogservice.h"
 #include "domain/exercisecatalog/exercisedefinitionquery.h"
 #include "ui/presentation/filterfield.h"
+#include <algorithm>
 
-ExerciseCatalogViewModel::ExerciseCatalogViewModel(ExerciseCatalogService* service, QObject* parent)
+namespace
+{
+
+constexpr int max_recent_shown = 8;
+
+bool matches(const WorkoutService::RecentExercise& recent, const ExerciseDefinition& definition)
+{
+    if (recent.definitionId.has_value())
+        return recent.definitionId.value() == definition.id();
+    return recent.name.compare(definition.name(), Qt::CaseInsensitive) == 0;
+}
+
+}
+
+ExerciseCatalogViewModel::ExerciseCatalogViewModel(ExerciseCatalogService* service,
+                                                   WorkoutService* workoutService, QObject* parent)
     : QObject(parent)
     , m_service(service)
+    , m_workoutService(workoutService)
 {
 }
 
@@ -19,6 +36,8 @@ ExerciseCatalogViewModel::~ExerciseCatalogViewModel()
 QList<ExerciseDefinitionModel*> ExerciseCatalogViewModel::exercises() const { return m_exercises; }
 
 int ExerciseCatalogViewModel::count() const { return static_cast<int>(m_exercises.size()); }
+
+int ExerciseCatalogViewModel::recentCount() const { return m_recentCount; }
 
 bool ExerciseCatalogViewModel::isLoading() const { return m_loading; }
 
@@ -79,13 +98,8 @@ void ExerciseCatalogViewModel::load()
         .then(this,
               [this](std::vector<ExerciseDefinition> definitions)
               {
-                  qDeleteAll(m_exercises);
-                  m_exercises.clear();
-                  for (const auto& definition : definitions)
-                      m_exercises.append(new ExerciseDefinitionModel(definition, this));
-
+                  showExercises(definitions);
                   setLoading(false);
-                  emit exercisesChanged();
               })
         .onError(this,
                  [this](const QString& error)
@@ -93,6 +107,63 @@ void ExerciseCatalogViewModel::load()
                      setLoading(false);
                      emit errorOccurred(error);
                  });
+}
+
+void ExerciseCatalogViewModel::refresh()
+{
+    if (!m_workoutService)
+    {
+        load();
+        return;
+    }
+
+    m_workoutService->recentExercises()
+        .then(this,
+              [this](std::vector<WorkoutService::RecentExercise> recent)
+              {
+                  m_recent = std::move(recent);
+                  load();
+              })
+        .onError(this,
+                 [this](const QString& error)
+                 {
+                     emit errorOccurred(error);
+                     load();
+                 });
+}
+
+void ExerciseCatalogViewModel::showExercises(const std::vector<ExerciseDefinition>& definitions)
+{
+    QList<ExerciseDefinitionModel*> all;
+    for (const auto& definition : definitions)
+        all.append(new ExerciseDefinitionModel(definition, this));
+
+    QList<ExerciseDefinitionModel*> ordered;
+    for (const auto& entry : m_recent)
+    {
+        if (ordered.size() >= max_recent_shown)
+            break;
+
+        const auto found
+            = std::find_if(all.begin(), all.end(), [&entry](const ExerciseDefinitionModel* model)
+                           { return !model->isRecent() && matches(entry, model->entity()); });
+        if (found == all.end())
+            continue;
+
+        (*found)->setLastPerformed(entry.performedAt);
+        ordered.append(*found);
+    }
+    m_recentCount = static_cast<int>(ordered.size());
+
+    for (auto* model : all)
+    {
+        if (!model->isRecent())
+            ordered.append(model);
+    }
+
+    qDeleteAll(m_exercises);
+    m_exercises = ordered;
+    emit exercisesChanged();
 }
 
 void ExerciseCatalogViewModel::clearFilters()

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "domain/exercisecatalog/exercisedefinition.h"
+#include <QDateTime>
 #include <QObject>
 #include <QString>
 #include <QStringList>
@@ -23,6 +24,8 @@ class ExerciseDefinitionModel : public QObject
     Q_PROPERTY(QString instructions READ instructions NOTIFY dataChanged)
     Q_PROPERTY(bool custom READ isCustom NOTIFY dataChanged)
     Q_PROPERTY(bool archived READ isArchived NOTIFY dataChanged)
+    Q_PROPERTY(QDateTime lastPerformed READ lastPerformed NOTIFY dataChanged)
+    Q_PROPERTY(bool recent READ isRecent NOTIFY dataChanged)
 
 public:
     explicit ExerciseDefinitionModel(QObject* parent = nullptr);
@@ -44,6 +47,10 @@ public:
     QString instructions() const;
     bool isCustom() const;
     bool isArchived() const;
+    QDateTime lastPerformed() const;
+    bool isRecent() const;
+
+    void setLastPerformed(const QDateTime& performedAt);
 
     const ExerciseDefinition& entity() const;
 
@@ -54,4 +61,5 @@ private:
     QStringList musclesWithRole(MuscleRole role) const;
 
     ExerciseDefinition m_definition;
+    QDateTime m_lastPerformed;
 };

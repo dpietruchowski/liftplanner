@@ -24,7 +24,7 @@ Rectangle {
         searchField.text = ""
         filterPanel.reset()
         ExerciseCatalogViewModel.clearFilters()
-        ExerciseCatalogViewModel.load()
+        ExerciseCatalogViewModel.refresh()
     }
 
     ColumnLayout {
@@ -95,11 +95,31 @@ Rectangle {
             spacing: Theme.spacing.small
             model: ExerciseCatalogViewModel.exercises
 
-            delegate: ExercisePickerItem {
-                objectName: "exercisePickerItem" + index
+            delegate: Column {
+                id: pickerRow
                 width: exerciseList.width
-                definition: modelData
-                onClicked: root.exerciseSelected(modelData)
+                spacing: Theme.spacing.small
+
+                readonly property int recentCount: ExerciseCatalogViewModel.recentCount
+                readonly property bool startsRecent: index === 0 && recentCount > 0
+                readonly property bool startsRest: index === recentCount && recentCount > 0
+
+                Text {
+                    objectName: pickerRow.startsRecent ? "pickerRecentHeader" : "pickerAllHeader"
+                    visible: pickerRow.startsRecent || pickerRow.startsRest
+                    topPadding: pickerRow.startsRest ? Theme.spacing.medium : 0
+                    text: pickerRow.startsRecent ? qsTr("Recently done") : qsTr("All exercises")
+                    color: Theme.colors.textMuted
+                    font.pixelSize: Theme.fontSize.small
+                    font.bold: true
+                }
+
+                ExercisePickerItem {
+                    objectName: "exercisePickerItem" + index
+                    width: pickerRow.width
+                    definition: modelData
+                    onClicked: root.exerciseSelected(modelData)
+                }
             }
         }
 

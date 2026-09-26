@@ -44,6 +44,13 @@ public:
         Exercise exercise;
     };
 
+    struct RecentExercise
+    {
+        std::optional<int> definitionId;
+        QString name;
+        QDateTime performedAt;
+    };
+
     WorkoutService(WorkoutRepository& repository, WorkoutRowRepository& rowRepository,
                    QObject* worker);
 
@@ -59,6 +66,7 @@ public:
     Task<std::vector<PreviousPerformance>> previousPerformances(const Workout& workout);
     Task<std::optional<Exercise>> lastPerformance(const Exercise& exercise);
     Task<std::vector<ExerciseSession>> exerciseSessions(const Exercise& exercise, int limit);
+    Task<std::vector<RecentExercise>> recentExercises();
 
     Task<std::optional<Workout>> findWorkout(int id);
     Task<int> repeatWorkout(int id, const QDateTime& plannedTime);
@@ -79,6 +87,7 @@ private:
     Result<std::vector<PreviousPerformance>> previousPerformancesCore(const Workout& workout);
     Result<std::optional<Exercise>> lastPerformanceCore(const Exercise& exercise);
     Result<std::vector<ExerciseSession>> exerciseSessionsCore(const Exercise& exercise, int limit);
+    Result<std::vector<RecentExercise>> recentExercisesCore();
     Result<std::optional<Workout>> findWorkoutCore(int id);
     Result<int> repeatWorkoutCore(int id, const QDateTime& plannedTime);
     Result<int> saveWorkoutCore(const Workout& workout);

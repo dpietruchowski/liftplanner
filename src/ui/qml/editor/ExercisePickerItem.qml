@@ -25,13 +25,26 @@ Rectangle {
         anchors.margins: Theme.padding.medium
         spacing: Theme.spacing.xSmall
 
-        Text {
-            objectName: "exerciseName"
+        RowLayout {
             Layout.fillWidth: true
-            text: root.definition ? root.definition.name : ""
-            color: Theme.colors.textPrimary
-            font.pixelSize: Theme.fontSize.medium
-            elide: Text.ElideRight
+            spacing: Theme.spacing.small
+
+            Text {
+                objectName: "exerciseName"
+                Layout.fillWidth: true
+                text: root.definition ? root.definition.name : ""
+                color: Theme.colors.textPrimary
+                font.pixelSize: Theme.fontSize.medium
+                elide: Text.ElideRight
+            }
+
+            Text {
+                objectName: "exerciseLastPerformed"
+                visible: root.definition ? root.definition.recent : false
+                text: visible ? Qt.formatDate(root.definition.lastPerformed, "d MMM") : ""
+                color: Theme.colors.textMuted
+                font.pixelSize: Theme.fontSize.small
+            }
         }
 
         RowLayout {

@@ -65,6 +65,19 @@ bool ExerciseDefinitionModel::isCustom() const
 
 bool ExerciseDefinitionModel::isArchived() const { return m_definition.isArchived(); }
 
+QDateTime ExerciseDefinitionModel::lastPerformed() const { return m_lastPerformed; }
+
+bool ExerciseDefinitionModel::isRecent() const { return m_lastPerformed.isValid(); }
+
+void ExerciseDefinitionModel::setLastPerformed(const QDateTime& performedAt)
+{
+    if (m_lastPerformed == performedAt)
+        return;
+
+    m_lastPerformed = performedAt;
+    emit dataChanged();
+}
+
 const ExerciseDefinition& ExerciseDefinitionModel::entity() const { return m_definition; }
 
 QStringList ExerciseDefinitionModel::musclesWithRole(MuscleRole role) const

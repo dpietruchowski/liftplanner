@@ -88,6 +88,11 @@ WorkoutService::exerciseSessions(const Exercise& exercise, int limit)
     return invoke([this, exercise, limit] { return exerciseSessionsCore(exercise, limit); });
 }
 
+Task<std::vector<WorkoutService::RecentExercise>> WorkoutService::recentExercises()
+{
+    return invoke([this] { return recentExercisesCore(); });
+}
+
 Task<std::optional<Workout>> WorkoutService::findWorkout(int id)
 {
     return invoke([this, id] { return findWorkoutCore(id); });
@@ -327,6 +332,33 @@ WorkoutService::exerciseSessionsCore(const Exercise& exercise, int limit)
     }
 
     return Result<std::vector<ExerciseSession>>::success(sessions);
+}
+
+Result<std::vector<WorkoutService::RecentExercise>> WorkoutService::recentExercisesCore()
+{
+    const std::vector<Workout> history = loadHistoryCore(previous_performance_window).value();
+
+    std::vector<Exercise> seen;
+    std::vector<RecentExercise> recent;
+    for (const Workout& past : history)
+    {
+        const bool trustFlags = completionFlagsAreMeaningful(past);
+        for (const Exercise& exercise : past.exercises())
+        {
+            if (!wasPerformed(exercise, trustFlags))
+                continue;
+
+            const bool known = std::any_of(seen.begin(), seen.end(), [&](const Exercise& other)
+                                           { return sameExercise(other, exercise); });
+            if (known)
+                continue;
+
+            seen.push_back(exercise);
+            recent.push_back({ exercise.definitionId(), exercise.name(), past.startedTime() });
+        }
+    }
+
+    return Result<std::vector<RecentExercise>>::success(recent);
 }
 
 Result<std::optional<Workout>> WorkoutService::findWorkoutCore(int id)
