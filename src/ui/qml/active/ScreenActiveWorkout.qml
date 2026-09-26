@@ -49,8 +49,12 @@ Rectangle {
     }
 
     ThemedButton {
+        id: noWorkoutStartButton
         objectName: "noWorkoutStartButton"
         anchors.centerIn: parent
+        implicitWidth: Math.max(buttonSize.width,
+                                startLabelMetrics.advanceWidth + iconSize + Theme.spacing.small
+                                + Theme.padding.large * 2)
         visible: !ActiveWorkoutViewModel.isActive
         text: qsTr("Start empty workout")
         iconSource: Theme.icons.startWorkout
@@ -59,6 +63,12 @@ Rectangle {
         buttonStyle: Theme.button.primary
         buttonSize: Theme.button.large
         onClicked: root.startEmptyWorkoutRequested()
+
+        TextMetrics {
+            id: startLabelMetrics
+            font.pixelSize: noWorkoutStartButton.buttonSize.fontSize
+            text: noWorkoutStartButton.text
+        }
     }
 
     ColumnLayout {
