@@ -170,21 +170,10 @@ Rectangle {
                             objectName: "activeWorkoutEmptyHint"
                             width: parent.width
                             horizontalAlignment: Text.AlignHCenter
-                            text: qsTr("This session is empty. Pick an exercise and it arrives with a set to tick off and the weight you used last time.")
+                            text: qsTr("This session is empty. Tap + below to pick an exercise. It arrives with a set to tick off and the weight you used last time.")
                             color: Theme.colors.textMuted
                             font.pixelSize: Theme.fontSize.normal
                             wrapMode: Text.WordWrap
-                        }
-
-                        ThemedButton {
-                            objectName: "addFirstExerciseButton"
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: qsTr("Add exercise")
-                            iconSource: Theme.icons.plus
-                            pill: true
-                            buttonSize: Theme.button.large
-                            buttonStyle: Theme.button.primary
-                            onClicked: root.addExerciseRequested()
                         }
                     }
                 }
@@ -241,11 +230,32 @@ Rectangle {
                     iconSource: Theme.icons.plus
                     enabled: ActiveWorkoutViewModel.isActive
                     buttonSize: Theme.button.mediumSquare
-                    buttonStyle: Theme.button.subtle
+                    buttonStyle: root.exerciseCount === 0 ? Theme.button.primary : Theme.button.subtle
                     onClicked: root.addExerciseRequested()
                     ToolTip.visible: hovered
                     ToolTip.text: qsTr("Add exercise")
                     ToolTip.delay: 500
+
+                    ThemedIcon {
+                        id: addExercisePointer
+                        objectName: "addExercisePointer"
+                        property real bounce: 0
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottom: parent.top
+                        anchors.bottomMargin: Theme.spacing.small + bounce
+                        width: parent.width
+                        height: parent.width
+                        svgSource: Theme.icons.chevronDown
+                        color: Theme.colors.primary
+                        visible: ActiveWorkoutViewModel.isActive && root.exerciseCount === 0
+
+                        SequentialAnimation on bounce {
+                            running: addExercisePointer.visible
+                            loops: Animation.Infinite
+                            NumberAnimation { to: Theme.spacing.medium; duration: 450; easing.type: Easing.OutQuad }
+                            NumberAnimation { to: 0; duration: 450; easing.type: Easing.InQuad }
+                        }
+                    }
                 }
 
                 ThemedButton {
