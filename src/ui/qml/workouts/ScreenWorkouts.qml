@@ -45,9 +45,10 @@ Rectangle {
         objectName: "workoutsScrollView"
         anchors.fill: parent
         anchors.margins: Theme.padding.screen
+        contentWidth: availableWidth
 
         ColumnLayout {
-            width: scrollView.contentItem.width
+            width: scrollView.availableWidth
             spacing: Theme.spacing.medium
 
             SectionHeader {

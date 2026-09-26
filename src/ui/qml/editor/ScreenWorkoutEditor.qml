@@ -99,9 +99,10 @@ Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
+            contentWidth: availableWidth
 
             ColumnLayout {
-                width: scrollView.contentItem.width
+                width: scrollView.availableWidth
                 spacing: Theme.spacing.medium
 
                 Repeater {

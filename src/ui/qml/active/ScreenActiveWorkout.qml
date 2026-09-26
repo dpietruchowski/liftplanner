@@ -93,6 +93,7 @@ Rectangle {
             Layout.leftMargin: Theme.padding.screen
             Layout.rightMargin: Theme.padding.screen
             clip: true
+            contentWidth: availableWidth
 
             Column {
                 id: contentColumn
