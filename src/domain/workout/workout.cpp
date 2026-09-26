@@ -1,6 +1,7 @@
 #include "workout.h"
 #include "async/timeprovider.h"
 #include "domain/ordered.h"
+#include "domain/workout/generatedworkoutname.h"
 
 Workout::Workout() = default;
 
@@ -17,8 +18,11 @@ const QDateTime& Workout::plannedTime() const { return m_plannedTime; }
 const QDateTime& Workout::startedTime() const { return m_startedTime; }
 const QDateTime& Workout::endedTime() const { return m_endedTime; }
 
+bool Workout::hasGeneratedName() const { return m_generatedName; }
+
 void Workout::setId(int id) { m_id = id; }
 void Workout::setName(const QString& name) { m_name = name; }
+void Workout::setGeneratedName(bool generated) { m_generatedName = generated; }
 void Workout::setCreatedTime(const QDateTime& createdTime) { m_createdTime = createdTime; }
 void Workout::setPlannedTime(const QDateTime& plannedTime) { m_plannedTime = plannedTime; }
 void Workout::setStartedTime(const QDateTime& startedTime) { m_startedTime = startedTime; }
@@ -31,12 +35,23 @@ void Workout::start()
 {
     m_startedTime = TimeProvider::instance().currentDateTime();
     m_status = WorkoutStatus::Started;
+
+    if (m_generatedName)
+        m_name = generatedSessionName(m_startedTime);
 }
 
 void Workout::end()
 {
     m_endedTime = TimeProvider::instance().currentDateTime();
     m_status = WorkoutStatus::Ended;
+}
+
+void Workout::returnToPlan()
+{
+    m_status = WorkoutStatus::Planned;
+
+    if (m_generatedName)
+        m_name = generatedPlanName();
 }
 
 const std::vector<Exercise>& Workout::exercises() const { return m_exercises; }

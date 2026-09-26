@@ -15,6 +15,7 @@ public:
     static constexpr const char* started_time_key = "started_time";
     static constexpr const char* ended_time_key = "ended_time";
     static constexpr const char* status_key = "status";
+    static constexpr const char* generated_name_key = "generated_name";
 
     static Workout fromVariant(const QVariantMap& data);
     static QVariantMap toVariant(const Workout& workout);

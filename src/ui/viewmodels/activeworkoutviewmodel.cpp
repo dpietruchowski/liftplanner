@@ -241,7 +241,7 @@ void ActiveWorkoutViewModel::settleInterruptedWorkout(WorkoutModel* workout)
     }
     else
     {
-        entity.setStatus(WorkoutStatus::Planned);
+        entity.returnToPlan();
         m_service->saveWorkout(entity).warnOnError("return the interrupted workout to the plan");
     }
 
@@ -361,7 +361,7 @@ void ActiveWorkoutViewModel::discardWorkout()
         }
         else
         {
-            entity.setStatus(WorkoutStatus::Planned);
+            entity.returnToPlan();
             m_service->saveWorkout(entity).warnOnError("return the abandoned workout to the plan");
         }
     }

@@ -1,4 +1,4 @@
-#include "domain/workout/blanksession.h"
+#include "domain/workout/generatedworkoutname.h"
 #include <QDate>
 #include <QFile>
 #include <QFontMetricsF>
@@ -55,19 +55,17 @@ QFontMetricsF drumMetrics(int pixelSize, bool bold)
     return QFontMetricsF(font);
 }
 
-QString widestBlankSessionName()
+QString widestGeneratedSessionName(const QFontMetricsF& metrics)
 {
-    const QFontMetricsF metrics
-        = drumMetrics(themeNumber(QStringLiteral("drum"), QStringLiteral("nameSizeLarge")), true);
+    const QDate day(2026, 9, 10);
 
-    QString widest;
-    QDate day(2026, 1, 1);
-    while (day.year() == 2026)
+    QString widest = generatedPlanName();
+    for (int minutes = 0; minutes < 24 * 60; ++minutes)
     {
-        const QString name = blankSessionName(day);
+        const QString name
+            = generatedSessionName(QDateTime(day, QTime(0, 0).addSecs(minutes * 60)));
         if (metrics.horizontalAdvance(name) > metrics.horizontalAdvance(widest))
             widest = name;
-        day = day.addDays(1);
     }
 
     return widest;
@@ -100,9 +98,11 @@ TEST(DrumFitTest, TheNameOfAFreeSessionFitsTheSelectedRowOnANarrowScreen)
     const int available = drumTextWidth(QStringLiteral("gapLarge"));
     ASSERT_GT(available, 0);
 
-    expectFits(
-        drumMetrics(themeNumber(QStringLiteral("drum"), QStringLiteral("nameSizeLarge")), true),
-        widestBlankSessionName(), available, QStringLiteral("the selected name font"));
+    const QFontMetricsF metrics
+        = drumMetrics(themeNumber(QStringLiteral("drum"), QStringLiteral("nameSizeLarge")), true);
+
+    expectFits(metrics, widestGeneratedSessionName(metrics), available,
+               QStringLiteral("the selected name font"));
 }
 
 TEST(DrumFitTest, TheNameOfAFreeSessionFitsARestingRowOnANarrowScreen)
@@ -110,8 +110,25 @@ TEST(DrumFitTest, TheNameOfAFreeSessionFitsARestingRowOnANarrowScreen)
     const int available = drumTextWidth(QStringLiteral("gap"));
     ASSERT_GT(available, 0);
 
+    const QFontMetricsF metrics
+        = drumMetrics(themeNumber(QStringLiteral("drum"), QStringLiteral("nameSize")), true);
+
+    expectFits(metrics, widestGeneratedSessionName(metrics), available,
+               QStringLiteral("the resting name font"));
+}
+
+TEST(DrumFitTest, TheOfferToStartWithoutAPlanFitsBothRowFonts)
+{
+    const QString offer = QStringLiteral("Start from scratch");
+
+    expectFits(
+        drumMetrics(themeNumber(QStringLiteral("drum"), QStringLiteral("nameSizeLarge")), true),
+        offer, drumTextWidth(QStringLiteral("gapLarge")),
+        QStringLiteral("the selected name font"));
+
     expectFits(drumMetrics(themeNumber(QStringLiteral("drum"), QStringLiteral("nameSize")), true),
-               widestBlankSessionName(), available, QStringLiteral("the resting name font"));
+               offer, drumTextWidth(QStringLiteral("gap")),
+               QStringLiteral("the resting name font"));
 }
 
 TEST(DrumFitTest, TheLabelOfTheFreeSessionRowFitsTheSelectedRowOnANarrowScreen)

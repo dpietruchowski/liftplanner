@@ -3,6 +3,7 @@
 #include "application/workout/workoutservice.h"
 #include "async/timeprovider.h"
 #include "domain/exercisecatalog/exercisedefinition.h"
+#include "domain/workout/generatedworkoutname.h"
 #include "domain/workout/workout.h"
 #include "fixtures/test_data.h"
 #include "testapplication.h"
@@ -87,27 +88,26 @@ protected:
     TestApplication m_app;
 };
 
-TEST_F(BlankWorkoutTest, TheOfferedSessionIsNamedAfterTheDayAndHoldsNoExercise)
+TEST_F(BlankWorkoutTest, TheOfferedSessionCarriesNoMomentAndHoldsNoExercise)
 {
     ASSERT_NE(planned().blankWorkout(), nullptr);
 
-    EXPECT_TRUE(planned().blankWorkout()->name().contains(QStringLiteral("10 Sep")));
+    EXPECT_EQ(planned().blankWorkout()->name(), generatedPlanName());
     EXPECT_TRUE(planned().blankWorkout()->exercises().isEmpty());
 }
 
 TEST_F(BlankWorkoutTest, TheOfferedSessionFollowsTheDayWithoutRestartingTheApp)
 {
-    const QString firstDay = planned().blankWorkout()->name();
+    ASSERT_EQ(planned().blankWorkout()->plannedTime().date(), QDate(2026, 9, 10));
 
     m_app.advanceDay();
     planned().loadAll();
     m_app.drain();
 
-    EXPECT_NE(planned().blankWorkout()->name(), firstDay);
-    EXPECT_TRUE(planned().blankWorkout()->name().contains(QStringLiteral("11 Sep")));
+    EXPECT_EQ(planned().blankWorkout()->plannedTime().date(), QDate(2026, 9, 11));
 }
 
-TEST_F(BlankWorkoutTest, StartingWithoutAPlanRunsAnEmptySession)
+TEST_F(BlankWorkoutTest, StartingWithoutAPlanRunsAnEmptySessionStampedWithTheClock)
 {
     startBlankWorkout();
 
@@ -115,7 +115,32 @@ TEST_F(BlankWorkoutTest, StartingWithoutAPlanRunsAnEmptySession)
     EXPECT_TRUE(active().isActive());
     EXPECT_EQ(active().exerciseCount(), 0);
     EXPECT_EQ(active().totalSetCount(), 0);
-    EXPECT_TRUE(active().currentWorkout()->name().contains(QStringLiteral("10 Sep")));
+    EXPECT_EQ(active().currentWorkout()->name(), QStringLiteral("Freestyle · 18:30"));
+}
+
+TEST_F(BlankWorkoutTest, TwoSessionsOfOneDayAreToldApartInTheHistoryList)
+{
+    startBlankWorkout();
+    addSquat();
+    active().completeCurrentSet();
+    active().endWorkout();
+    m_app.drain();
+
+    m_app.setCurrentDateTime(QDateTime(QDate(2026, 9, 10), QTime(7, 15)));
+    planned().loadAll();
+    m_app.drain();
+
+    startBlankWorkout();
+    addSquat();
+    active().completeCurrentSet();
+    active().endWorkout();
+    m_app.drain();
+
+    const auto stored = reloadHistory();
+    ASSERT_EQ(stored.size(), 2);
+    EXPECT_NE(stored.first()->name(), stored.last()->name());
+    EXPECT_TRUE(stored.first()->name().contains(QStringLiteral(":")));
+    EXPECT_TRUE(stored.last()->name().contains(QStringLiteral(":")));
 }
 
 TEST_F(BlankWorkoutTest, StartingWithoutAPlanLeavesTheOfferedSessionUntouched)
@@ -192,7 +217,7 @@ TEST_F(BlankWorkoutTest, AbandoningASessionThatGotAnExerciseKeepsItOnThePlannedL
 
     const auto planned = reloadPlanned();
     ASSERT_EQ(planned.size(), 1);
-    EXPECT_TRUE(planned.first()->name().contains(QStringLiteral("10 Sep")));
+    EXPECT_EQ(planned.first()->name(), generatedPlanName());
     EXPECT_EQ(planned.first()->statusString(), QStringLiteral("Planned"));
     EXPECT_TRUE(reloadHistory().isEmpty());
 }
@@ -212,10 +237,10 @@ TEST_F(BlankWorkoutTest, ReplacingAnEmptySessionLeavesNothingBehind)
     EXPECT_TRUE(reloadHistory().isEmpty());
 
     for (const WorkoutModel* workout : reloadPlanned())
-        EXPECT_FALSE(workout->name().contains(QStringLiteral("10 Sep")));
+        EXPECT_NE(workout->name(), generatedPlanName());
 }
 
-TEST_F(BlankWorkoutTest, AFinishedFreeSessionReachesTheHistoryUnderItsDayName)
+TEST_F(BlankWorkoutTest, AFinishedFreeSessionReachesTheHistoryUnderItsClockTime)
 {
     startBlankWorkout();
     addSquat();
@@ -226,8 +251,82 @@ TEST_F(BlankWorkoutTest, AFinishedFreeSessionReachesTheHistoryUnderItsDayName)
 
     const auto stored = reloadHistory();
     ASSERT_EQ(stored.size(), 1);
-    EXPECT_TRUE(stored.first()->name().contains(QStringLiteral("10 Sep")));
-    EXPECT_FALSE(stored.first()->name().isEmpty());
+    EXPECT_EQ(stored.first()->name(), QStringLiteral("Freestyle · 18:30"));
     EXPECT_EQ(stored.first()->statusString(), QStringLiteral("Ended"));
     EXPECT_TRUE(reloadPlanned().isEmpty());
+}
+
+TEST_F(BlankWorkoutTest, RepeatingAFreeSessionPlansItWithoutTheMomentOfTheOldOne)
+{
+    startBlankWorkout();
+    addSquat();
+    active().completeCurrentSet();
+    active().endWorkout();
+    m_app.drain();
+
+    const auto stored = reloadHistory();
+    ASSERT_EQ(stored.size(), 1);
+    const QString sessionName = stored.first()->name();
+
+    planned().repeatWorkout(stored.first());
+    m_app.drain();
+
+    const auto plans = reloadPlanned();
+    ASSERT_EQ(plans.size(), 1);
+    EXPECT_NE(plans.first()->name(), sessionName);
+    EXPECT_EQ(plans.first()->name(), generatedPlanName());
+}
+
+TEST_F(BlankWorkoutTest, TheCopyOfAFreeSessionStampsItsOwnClockTimeWhenItStarts)
+{
+    startBlankWorkout();
+    addSquat();
+    active().completeCurrentSet();
+    active().endWorkout();
+    m_app.drain();
+
+    planned().repeatWorkout(reloadHistory().first());
+    m_app.drain();
+
+    m_app.setCurrentDateTime(QDateTime(QDate(2026, 9, 12), QTime(9, 5)));
+
+    active().startWorkout(reloadPlanned().first());
+    m_app.drain();
+
+    EXPECT_EQ(active().currentWorkout()->name(), QStringLiteral("Freestyle · 09:05"));
+}
+
+TEST_F(BlankWorkoutTest, RepeatingAWorkoutTheLifterNamedKeepsThatName)
+{
+    planned().importFromJson(TestData::SINGLE_WORKOUT_JSON);
+    planned().loadAll();
+    m_app.drain();
+
+    active().startWorkout(planned().workouts().first());
+    active().completeCurrentSet();
+    active().endWorkout();
+    m_app.drain();
+
+    const auto stored = reloadHistory();
+    ASSERT_EQ(stored.size(), 1);
+    ASSERT_EQ(stored.first()->name(), QStringLiteral("Full Body"));
+
+    planned().repeatWorkout(stored.first());
+    m_app.drain();
+
+    const auto plans = reloadPlanned();
+    ASSERT_EQ(plans.size(), 1);
+    EXPECT_EQ(plans.first()->name(), QStringLiteral("Full Body"));
+}
+
+TEST_F(BlankWorkoutTest, AStartedPlanTheLifterNamedKeepsItsNameThroughTheSession)
+{
+    planned().importFromJson(TestData::SINGLE_WORKOUT_JSON);
+    planned().loadAll();
+    m_app.drain();
+
+    active().startWorkout(planned().workouts().first());
+    m_app.drain();
+
+    EXPECT_EQ(active().currentWorkout()->name(), QStringLiteral("Full Body"));
 }

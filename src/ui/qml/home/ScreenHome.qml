@@ -37,6 +37,7 @@ Rectangle {
         var current = ActiveWorkoutViewModel.currentWorkout
         var history = root.historyWorkouts
         list.push({ label: "without a plan", kind: "blank", itemName: "drumItemBlank",
+                    nameOverride: "Start from scratch",
                     workout: PlannedWorkoutViewModel.blankWorkout })
         if (current) {
             if (planned.length > 0)

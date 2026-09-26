@@ -66,6 +66,7 @@ Item {
                                 ? modelData.itemName + "Name"
                                 : "drumItemName_" + index
                 placeholder: modelData.placeholder !== undefined ? modelData.placeholder : ""
+                nameOverride: modelData.nameOverride !== undefined ? modelData.nameOverride : ""
                 x: boxed ? Theme.drum.cardInset : 0
                 width: root.width - 2 * x
                 height: isCurrent ? root.slotHeightLarge : root.slotHeight

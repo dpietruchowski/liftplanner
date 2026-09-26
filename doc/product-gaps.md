@@ -97,6 +97,38 @@ zapis po fakcie, czyli to, czym ta aplikacja właśnie się staje.
 
 ## Open
 
+### G41 — Sesja bez planu nazywa się tak, jak nazywa się jej sąsiad
+- **Dla kogo/po co:** trening bez planu dostaje nazwę z dnia, a dzień i tak stoi
+  obok — pod nazwą na kaflu historii i w kolumnie z datą na bębnie. Nazwa nie
+  niesie więc **niczego**, czego ekran już nie mówi, i dwie sesje z jednego dnia
+  (rano i wieczorem, albo nieudane pierwsze podejście i drugie) są w dzienniku
+  nie do odróżnienia. Dziennik, w którym nie umiesz wskazać własnego treningu,
+  przestaje być dziennikiem.
+- **Dowód:** raport z iteracji 29 — sześć wierszy historii czytających się
+  identycznie („Freestyle · 10 Sep / Thu, 10 Sep 2026", jeden pod drugim) oraz
+  bęben pokazujący naraz „WITHOUT A PLAN / Freestyle · 10 Sep" i „PLANNED
+  WORKOUT / Freestyle · 10 Sep" — dwie pozycje o tej samej nazwie, znaczące co
+  innego. Rozróżniają je wyłącznie etykiety nad nimi.
+- **To poprawka mojego własnego rozstrzygnięcia z G39.** Napisałem tam, że „nazwa
+  z dnia wystarczy, żeby odróżnić wpis w bębnie i w historii". Nie wystarcza, i
+  to z powodu, który powinienem był zobaczyć od razu: nazwa powtarza pole, które
+  stoi tuż obok. Reguła, którą powinienem był podać, brzmi — **nazwa ma nieść to,
+  czego sąsiednie pole nie mówi**, a przy dacie widocznej obok jest to godzina.
+- **Druga połowa: co się dzieje z tą nazwą przy powtórzeniu.** Nazwa opisująca
+  „kiedy" nie ma czego szukać na kopii, która wydarzy się kiedy indziej —
+  powtórzenie sesji bez planu nie może odziedziczyć jej znacznika czasu. Ale
+  nazwa nadana przez człowieka opisuje „co", więc przy powtórzeniu ma zostać.
+  Rozróżnienie jest proste: **nazwę nadaną automatycznie kopia tworzy sobie na
+  nowo, nazwę nadaną ręcznie dziedziczy.**
+- **Zakres:** S
+- **Gotowe, gdy:** dwie sesje bez planu zrobione tego samego dnia mają na liście
+  historii nazwy, które je odróżniają, bez rozwijania kafla; nazwa nie powtarza
+  tego, co i tak stoi obok niej; powtórzenie sesji bez planu daje zaplanowany
+  trening, którego nazwa nie niesie godziny ani daty tamtej sesji, więc bęben nie
+  pokazuje dwóch pozycji czytających się tak samo; powtórzenie treningu o nazwie
+  nadanej ręcznie („Push A") nadal tę nazwę zachowuje; start sesji bez planu
+  nadal o nic nie pyta.
+
 ### G40 — Okno, które kasuje dane, wygląda jak każde inne pytanie
 - **Dla kogo/po co:** od G38 jest w aplikacji miejsce, w którym jedno kliknięcie
   bezpowrotnie usuwa serie. Treść okna mówi prawdę, ale układ prowadzi rękę ku
@@ -108,6 +140,10 @@ zapis po fakcie, czyli to, czym ta aplikacja właśnie się staje.
   `NotificationPopup` jest wspólny dla wszystkich okien i ma już
   `Theme.button.dangerSubtle`, używane przy usuwaniu serii, więc materiał
   istnieje; brakuje reguły, kiedy go użyć.
+- **Część już stoi:** przy sesji w pełni odhaczonej okno mówi „All 1 set is ticked
+  off. End this workout?", czyli nie straszy tam, gdzie nic nie ginie (zauważone
+  w iteracji 29). Do zrobienia zostaje druga strona: żeby okno, które **usuwa**,
+  wyglądało inaczej niż to, które tylko pyta.
 - **Dlaczego osobna pozycja, a nie dopisek przy okazji:** zmiana dotyka
   komponentu wspólnego dla **każdego** okna w aplikacji. To znaczy, że trzeba
   osobno sprawdzić, że pozostałe okna nie zmieniły się przy okazji — a takiej

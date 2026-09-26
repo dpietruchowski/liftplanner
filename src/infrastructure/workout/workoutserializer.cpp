@@ -26,6 +26,8 @@ Workout WorkoutSerializer::fromVariant(const QVariantMap& data)
             QDateTime::fromString(data.value(ended_time_key).toString(), Qt::ISODate));
     if (data.contains(status_key))
         workout.setStatus(workoutStatusFromString(data.value(status_key).toString()));
+    if (data.contains(generated_name_key))
+        workout.setGeneratedName(data.value(generated_name_key).toBool());
 
     return workout;
 }
@@ -49,6 +51,7 @@ QVariantMap WorkoutSerializer::toVariant(const Workout& workout)
         data.insert(ended_time_key, workout.endedTime().toString(Qt::ISODate));
 
     data.insert(status_key, workoutStatusToString(workout.status()));
+    data.insert(generated_name_key, workout.hasGeneratedName());
 
     return data;
 }

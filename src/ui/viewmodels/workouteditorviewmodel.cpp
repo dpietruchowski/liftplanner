@@ -71,6 +71,7 @@ void WorkoutEditorViewModel::setName(const QString& value)
         return;
 
     m_workout.setName(value);
+    m_workout.setGeneratedName(false);
     markDirty();
     publish();
 }

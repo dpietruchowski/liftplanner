@@ -51,9 +51,11 @@ WorkoutModel* PlannedWorkoutViewModel::blankWorkout() const { return m_blankWork
 
 void PlannedWorkoutViewModel::refreshBlankWorkout()
 {
-    const Workout session = blankSession(TimeProvider::instance().currentDateTime());
-    if (m_blankWorkout && m_blankWorkout->name() == session.name())
+    const QDateTime moment = TimeProvider::instance().currentDateTime();
+    if (m_blankWorkout && m_blankWorkout->plannedTime().date() == moment.date())
         return;
+
+    const Workout session = blankSession(moment);
 
     auto* previous = m_blankWorkout;
     m_blankWorkout = new WorkoutModel(session, this);

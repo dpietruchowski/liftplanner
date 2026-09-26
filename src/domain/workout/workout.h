@@ -20,9 +20,11 @@ public:
     const QDateTime& startedTime() const;
     const QDateTime& endedTime() const;
     WorkoutStatus status() const;
+    bool hasGeneratedName() const;
 
     void setId(int id);
     void setName(const QString& name);
+    void setGeneratedName(bool generated);
     void setCreatedTime(const QDateTime& createdTime);
     void setPlannedTime(const QDateTime& plannedTime);
     void setStartedTime(const QDateTime& startedTime);
@@ -31,6 +33,7 @@ public:
 
     void start();
     void end();
+    void returnToPlan();
 
     const std::vector<Exercise>& exercises() const;
     std::vector<Exercise>& exercises();
@@ -59,5 +62,6 @@ private:
     QDateTime m_startedTime;
     QDateTime m_endedTime;
     WorkoutStatus m_status { WorkoutStatus::Planned };
+    bool m_generatedName { false };
     std::vector<Exercise> m_exercises;
 };

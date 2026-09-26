@@ -124,6 +124,23 @@ protected:
                                "VALUES (1, 1, 10, 80.0)"));
     }
 
+    void insertDayStampedSessions()
+    {
+        QSqlQuery query(m_database);
+        ASSERT_TRUE(query.exec("INSERT INTO workouts (id, name, started_time, ended_time, status) "
+                               "VALUES (30, 'Freestyle · 10 Sep', '2026-09-10T07:15:00', "
+                               "'2026-09-10T08:05:00', 'Ended')"));
+        ASSERT_TRUE(query.exec("INSERT INTO workouts (id, name, started_time, ended_time, status) "
+                               "VALUES (31, 'Freestyle · 10 Sep', '2026-09-10T18:30:00', "
+                               "'2026-09-10T19:40:00', 'Ended')"));
+        ASSERT_TRUE(query.exec("INSERT INTO workouts (id, name, planned_time, status) "
+                               "VALUES (32, 'Freestyle · 10 Sep', '2026-09-12T09:00:00', "
+                               "'Planned')"));
+        ASSERT_TRUE(query.exec("INSERT INTO workouts (id, name, started_time, ended_time, status) "
+                               "VALUES (33, 'Push A', '2026-09-09T18:00:00', "
+                               "'2026-09-09T19:00:00', 'Ended')"));
+    }
+
     void migrate()
     {
         m_dbStorage = std::make_unique<DbStorage>(m_database);
@@ -246,7 +263,7 @@ TEST_F(MigrationTest, LegacyDatabase_ReachesLatestSchemaVersion)
 
     migrate();
 
-    EXPECT_EQ(m_schemaVersion, 8);
+    EXPECT_EQ(m_schemaVersion, 9);
 }
 
 TEST_F(MigrationTest, Migration_IsIdempotent)
@@ -259,7 +276,7 @@ TEST_F(MigrationTest, Migration_IsIdempotent)
     m_repo->registerMigrations(second);
 
     EXPECT_TRUE(second.run());
-    EXPECT_EQ(second.currentVersion(), 8);
+    EXPECT_EQ(second.currentVersion(), 9);
     EXPECT_EQ(scalar("SELECT COUNT(*) FROM sets").toInt(), 2);
     EXPECT_EQ(scalar("SELECT metric FROM sets WHERE id = 1").toString(), "reps");
 }
@@ -299,7 +316,7 @@ TEST_F(MigrationTest, FreshDatabase_HasAllColumnsAndLatestVersion)
     EXPECT_TRUE(setColumns.contains(SetSerializer::metric_key));
     EXPECT_TRUE(setColumns.contains(SetSerializer::rest_seconds_override_key));
     EXPECT_TRUE(columnsOf(ExerciseSerializer::table).contains(ExerciseSerializer::kind_key));
-    EXPECT_EQ(m_schemaVersion, 8);
+    EXPECT_EQ(m_schemaVersion, 9);
 }
 
 TEST_F(MigrationTest, FreshDatabase_RoundtripsTimedAndDistanceSets)
@@ -419,7 +436,69 @@ TEST_F(MigrationTest, PreStatusDatabase_GainsStatusAndCompletedColumns)
 
     EXPECT_TRUE(columnsOf(WorkoutSerializer::table).contains(WorkoutSerializer::status_key));
     EXPECT_TRUE(columnsOf(SetSerializer::table).contains(SetSerializer::completed_key));
-    EXPECT_EQ(m_schemaVersion, 8);
+    EXPECT_EQ(m_schemaVersion, 9);
+}
+
+TEST_F(MigrationTest, LegacyDatabase_GainsTheGeneratedNameColumn)
+{
+    createLegacySchema();
+    insertLegacyData();
+
+    migrate();
+
+    EXPECT_TRUE(
+        columnsOf(WorkoutSerializer::table).contains(WorkoutSerializer::generated_name_key));
+    EXPECT_EQ(scalar("SELECT generated_name FROM workouts WHERE id = 1").toInt(), 0);
+}
+
+TEST_F(MigrationTest, SessionsNamedAfterTheirDayAreRestampedWithTheirClockTime)
+{
+    createLegacySchema();
+    insertLegacyData();
+    insertDayStampedSessions();
+
+    migrate();
+
+    EXPECT_EQ(scalar("SELECT name FROM workouts WHERE id = 30").toString(), "Freestyle · 07:15");
+    EXPECT_EQ(scalar("SELECT name FROM workouts WHERE id = 31").toString(), "Freestyle · 18:30");
+    EXPECT_NE(scalar("SELECT name FROM workouts WHERE id = 30").toString(),
+              scalar("SELECT name FROM workouts WHERE id = 31").toString());
+}
+
+TEST_F(MigrationTest, ARestampedSessionCountsAsAutomaticallyNamed)
+{
+    createLegacySchema();
+    insertLegacyData();
+    insertDayStampedSessions();
+
+    migrate();
+
+    EXPECT_EQ(scalar("SELECT generated_name FROM workouts WHERE id = 30").toInt(), 1);
+    EXPECT_EQ(scalar("SELECT generated_name FROM workouts WHERE id = 32").toInt(), 1);
+}
+
+TEST_F(MigrationTest, APlanNamedAfterADayLosesThatDay)
+{
+    createLegacySchema();
+    insertLegacyData();
+    insertDayStampedSessions();
+
+    migrate();
+
+    EXPECT_EQ(scalar("SELECT name FROM workouts WHERE id = 32").toString(), "Freestyle");
+}
+
+TEST_F(MigrationTest, NamesTheLifterChoseAreLeftAlone)
+{
+    createLegacySchema();
+    insertLegacyData();
+    insertDayStampedSessions();
+
+    migrate();
+
+    EXPECT_EQ(scalar("SELECT name FROM workouts WHERE id = 33").toString(), "Push A");
+    EXPECT_EQ(scalar("SELECT generated_name FROM workouts WHERE id = 33").toInt(), 0);
+    EXPECT_EQ(scalar("SELECT name FROM workouts WHERE id = 1").toString(), "Push Day");
 }
 
 TEST_F(MigrationTest, PreStatusWorkouts_GetStatusFromTheirTimes)

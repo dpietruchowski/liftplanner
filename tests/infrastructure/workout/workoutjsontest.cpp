@@ -191,6 +191,26 @@ TEST_F(WorkoutJsonTest, FullJson_RoundtripsTimedSet)
     EXPECT_TRUE(restored.completed());
 }
 
+TEST_F(WorkoutJsonTest, FullJson_CachedSessionRemembersThatItNamesItself)
+{
+    Workout session(QStringLiteral("Freestyle · 18:30"), QDateTime(QDate(2026, 9, 10), QTime(18, 30)));
+    session.setGeneratedName(true);
+
+    const Workout restored = WorkoutJson::workoutFromJson(WorkoutJson::workoutToJson(session));
+
+    EXPECT_TRUE(restored.hasGeneratedName());
+    EXPECT_EQ(restored.name(), QStringLiteral("Freestyle · 18:30"));
+}
+
+TEST_F(WorkoutJsonTest, FullJson_WorkoutNamedByTheLifterStaysThatWay)
+{
+    const Workout push(QStringLiteral("Push A"), QDateTime(QDate(2026, 9, 10), QTime(18, 30)));
+
+    const Workout restored = WorkoutJson::workoutFromJson(WorkoutJson::workoutToJson(push));
+
+    EXPECT_FALSE(restored.hasGeneratedName());
+}
+
 TEST_F(WorkoutJsonTest, FullJson_RoundtripsDistanceSet)
 {
     const Set original = Set::createDistance(5000.0, 1440);

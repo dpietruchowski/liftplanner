@@ -6,6 +6,7 @@
 #include "domain/workout/workoutstatus.h"
 #include "infrastructure/dbrows.h"
 #include "infrastructure/whereclause.h"
+#include "infrastructure/workout/generatednamebackfill.h"
 #include "infrastructure/workout/workoutserializer.h"
 
 #include <dbtoolkit/dbrepository.h>
@@ -26,7 +27,7 @@ WorkoutRepositoryDb::WorkoutRepositoryDb(DbStorage& storage)
           QStringList { WorkoutSerializer::id_key, WorkoutSerializer::name_key,
                         WorkoutSerializer::created_time_key, WorkoutSerializer::planned_time_key,
                         WorkoutSerializer::started_time_key, WorkoutSerializer::ended_time_key,
-                        WorkoutSerializer::status_key },
+                        WorkoutSerializer::status_key, WorkoutSerializer::generated_name_key },
           storage, nullptr))
     , m_exerciseRepo(storage)
     , m_setRepo(storage)
@@ -45,7 +46,8 @@ bool WorkoutRepositoryDb::createTables()
         .column(Column(WorkoutSerializer::planned_time_key).text())
         .column(Column(WorkoutSerializer::started_time_key).text())
         .column(Column(WorkoutSerializer::ended_time_key).text())
-        .column(Column(WorkoutSerializer::status_key).text());
+        .column(Column(WorkoutSerializer::status_key).text())
+        .column(Column(WorkoutSerializer::generated_name_key).integer().defaultValue(0));
 
     return m_workoutRepo->createTable(workouts) && m_exerciseRepo.createTable()
         && m_setRepo.createTable();
@@ -93,6 +95,20 @@ void WorkoutRepositoryDb::registerMigrations(MigrationRunner& runner)
 
             return columnAdded && endedMarked && startedMarked;
         });
+
+    runner.add(9,
+               [](QSqlDatabase& db)
+               {
+                   const bool columnAdded = AlterTable(WorkoutSerializer::table)
+                                                .addColumn(Column(WorkoutSerializer::generated_name_key)
+                                                               .integer()
+                                                               .defaultValue(0))
+                                                .execute(db)
+                                                .toInt()
+                       != 0;
+
+                   return columnAdded && backfillGeneratedNames(db);
+               });
 }
 
 std::vector<Workout> WorkoutRepositoryDb::findAll(const WorkoutQuery& query) const

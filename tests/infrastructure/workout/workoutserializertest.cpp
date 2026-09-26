@@ -27,6 +27,33 @@ TEST_F(WorkoutSerializerTest, ToVariant_FullWorkout)
     EXPECT_EQ(data.value(WorkoutSerializer::status_key).toString(), "Planned");
 }
 
+TEST_F(WorkoutSerializerTest, Roundtrip_RemembersThatTheNameWasGenerated)
+{
+    Workout w("Freestyle", QDateTime(QDate(2026, 9, 10), QTime(18, 30)));
+    w.setGeneratedName(true);
+
+    const Workout restored = WorkoutSerializer::fromVariant(WorkoutSerializer::toVariant(w));
+
+    EXPECT_TRUE(restored.hasGeneratedName());
+}
+
+TEST_F(WorkoutSerializerTest, Roundtrip_RemembersThatTheLifterChoseTheName)
+{
+    Workout w("Push A", QDateTime(QDate(2026, 9, 10), QTime(18, 30)));
+
+    const Workout restored = WorkoutSerializer::fromVariant(WorkoutSerializer::toVariant(w));
+
+    EXPECT_FALSE(restored.hasGeneratedName());
+}
+
+TEST_F(WorkoutSerializerTest, FromVariant_RowWithoutTheColumn_CountsAsChosenByTheLifter)
+{
+    QVariantMap data;
+    data.insert(WorkoutSerializer::name_key, QStringLiteral("Push A"));
+
+    EXPECT_FALSE(WorkoutSerializer::fromVariant(data).hasGeneratedName());
+}
+
 TEST_F(WorkoutSerializerTest, ToVariant_NewWorkout_NoId)
 {
     Workout w("Test", QDateTime::currentDateTime());

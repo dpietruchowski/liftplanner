@@ -69,6 +69,9 @@ QJsonObject workoutToJson(const Workout& workout)
 
     obj["status"] = workoutStatusToString(workout.status());
 
+    if (workout.hasGeneratedName())
+        obj["generated_name"] = true;
+
     QJsonArray exercisesArray;
     for (const auto& exercise : workout.exercises())
         exercisesArray.append(exerciseToJson(exercise));
@@ -354,6 +357,8 @@ Workout workoutFromJson(const QJsonObject& json, QStringList* errors)
         w.setEndedTime(QDateTime::fromString(json["ended_time"].toString(), Qt::ISODate));
     if (json.contains("status"))
         w.setStatus(workoutStatusFromString(json["status"].toString()));
+    if (json.contains("generated_name"))
+        w.setGeneratedName(json["generated_name"].toBool());
 
     if (json.contains("exercises"))
     {
